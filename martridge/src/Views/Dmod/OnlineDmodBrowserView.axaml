@@ -1,0 +1,142 @@
+<UserControl x:Class="Martridge.Views.Dmod.OnlineDmodBrowserView" 
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:dloc="using:Martridge.ViewModels.Localization"
+             xmlns:vm="using:Martridge.ViewModels.Dmod"
+             xmlns:vw="using:Martridge.Views.Dmod">
+    <Design.DataContext>
+        <vm:OnlineDmodBrowserViewModel/>
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </UserControl.Styles>
+    <UserControl.Resources>
+        <vm:DmodScoreToSolidColorBrushConverter x:Key="DmodScoreToSolidColorBrushConverter"/>
+    </UserControl.Resources>
+
+
+    <Grid Margin="8">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="600" MinWidth="350"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*" MinWidth="450"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0" RowDefinitions="Auto,*">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0"
+                           Classes="Heading2B"
+                           HorizontalAlignment="Center"
+                           Text="{dloc:Localize OnlineDmodBrowser/Refresh}" />
+                <TextBlock Grid.Row="0" Grid.Column="1"
+                           Classes="Heading2B"
+                           Text="{dloc:Localize OnlineDmodBrowser/Search}" />
+                <TextBlock Grid.Row="0" Grid.Column="2"
+                           Classes="Heading2B"
+                           Text="{dloc:Localize OnlineDmodBrowser/OrderBy}" />
+                <Button Grid.Row="1" Grid.Column="0" Width="48" Height="48"
+                        HorizontalAlignment="Center"
+                        Command="{Binding CmdRefreshDmods}"
+                        ToolTip.Tip="{dloc:Localize DmodBrowser/RefreshTooltip}">
+                    <Image Source="/Assets/reload-refresh-icon-placeholder.png"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           Margin="6"/>
+                </Button>
+                <TextBox Grid.Row="1" Grid.Column="1" 
+                         HorizontalAlignment="Stretch"
+                         VerticalContentAlignment="Center"
+                         Text="{Binding DmodSearchString}"/>
+                <ComboBox Grid.Row="1" Grid.Column="2" 
+                          Items="{Binding DmodOrderByList}"
+                          SelectedItem="{Binding DmodOrderBy}">
+                    <ComboBox.Resources>
+                        <vm:DmodOrderByEnumTextConverter x:Key="DmodOrderByEnumTextConverter"/>
+                    </ComboBox.Resources>
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="vm:DmodOrderBy">
+                            <TextBlock Classes="Heading2I"
+                                       HorizontalAlignment="Center"
+                                       Text="{Binding Converter={StaticResource DmodOrderByEnumTextConverter}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </Grid>
+            <ListBox Grid.Row="1" Name="DmodList" 
+                     IsVisible="{Binding DmodDefinitionsFilteredHasItems}"
+                     Items="{Binding DmodDefinitionsFiltered}" 
+                     SelectedItem="{Binding SelectedDmodDefinition, Mode=TwoWay}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.IsEnabled>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Path="!ProgressIsVisible"/>
+                        <Binding Path="!IsReloadingDmodList"/>
+                    </MultiBinding>
+                </ListBox.IsEnabled>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="vm:OnlineDmodInfoViewModel">
+                        <Grid RowDefinitions="Auto,Auto" 
+                              ColumnDefinitions="Auto,*,Auto" 
+                              Margin="4"
+                              ToolTip.Tip="{Binding UrlMain}">
+                            <Grid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="{dloc:Localize OnlineDmodBrowser/ContextMenu/OpenDmodLocation}"
+                                              Command="{Binding CmdOpenDmodHyperlink}" />
+                                    <MenuItem Header="{dloc:Localize OnlineDmodBrowser/ContextMenu/OpenDmodCacheLocation}"
+                                              Command="{Binding CmdOpenCacheLocation}"/>
+                                </ContextMenu>
+                            </Grid.ContextMenu>
+                  
+                            <!-- this is needed to trigger the context menu when right clicking empty spaces... -->
+                            <Border Grid.Row="0" Grid.Column="0" 
+                                    Grid.RowSpan="2" Grid.ColumnSpan="3" 
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Background="Transparent">
+                            </Border>
+                  
+                            <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+                                    Classes="PfpFrame">
+                                <Border Width="50" Height="50"
+                                        Background="{Binding ScoreValue, 
+                                        Converter={StaticResource DmodScoreToSolidColorBrushConverter}}">
+                                    <TextBlock Classes="Heading2I"
+                                               HorizontalAlignment="Center"
+                                               Foreground="Black"
+                                               Text="{Binding Score}"/>
+                                </Border>
+                            </Border>
+                    
+                            <TextBlock Grid.Row="0" Grid.Column="1" Classes="Heading2B"
+                                       Text="{Binding Name}"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock Grid.Row="0" Grid.Column="2" Classes="Heading2I"
+                                       HorizontalAlignment="Right"
+                                       Text="{Binding Updated}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="2" Classes="Heading2I"
+                                       HorizontalAlignment="Right"
+                                       Text="{Binding Downloads}"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="1" Classes="Heading2I"
+                                       Text="{Binding Author}"
+                                       TextWrapping="Wrap"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock Grid.Row="1" 
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       IsVisible="{Binding !DmodDefinitionsFilteredHasItems}"
+                       Classes="HeadingTitle"
+                       Text="{dloc:Localize DmodBrowser/NoDmodsFound}"
+            />
+        </Grid>
+
+        <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch"/>
+        <vw:OnlineDmodBrowserSelectedDmodView Grid.Column="2" DataContext="{Binding}"/>
+    </Grid>
+</UserControl>

@@ -1,0 +1,114 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+        xmlns:dloc="using:Martridge.ViewModels.Localization"
+        xmlns:vm="using:Martridge.ViewModels.About"
+        
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="540"
+        MinWidth="600" MinHeight="540"
+        Width="800" Height="600"
+        
+        x:Class="Martridge.Views.About.AboutWindow"
+        Icon="/Assets/martridge.ico"
+        Title="{dloc:Localize AboutWindow/Title}">
+
+    <Design.DataContext>
+        <vm:AboutWindowViewModel/>
+    </Design.DataContext>
+    
+    <Window.Styles>
+        <StyleInclude Source="avares://Citrus.Avalonia/Citrus.xaml"/>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </Window.Styles>
+  
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*">
+            <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto">
+                <TextBlock Grid.Row="0"
+                           Classes="HeadingTitle"
+                           Text="{dloc:Localize AboutWindow/AppName}"
+                           HorizontalAlignment="Center"/>
+
+                <TextBlock Grid.Row="1"
+                           Classes="Heading2"
+                           Text="{dloc:Localize AboutWindow/Version2}"
+                           HorizontalAlignment="Center"/>
+
+                <StackPanel 
+                    Grid.Row="2"
+                    Margin="10,5"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+
+                    <TextBlock  
+                        Text="{dloc:Localize AboutWindow/Version}"
+                        HorizontalAlignment="Center"/>
+                    <TextBlock  
+                        Text=" - "
+                        HorizontalAlignment="Center"/>
+                    <TextBlock  
+                        Text="{Binding Version}"
+                        HorizontalAlignment="Center"/>
+                </StackPanel>
+      
+                <TextBlock 
+                    Grid.Row="3"
+                    Margin="20,10"
+                    Text="{dloc:Localize AboutWindow/Description}"
+                    TextWrapping="Wrap"
+                />
+      
+            </Grid>
+            
+            <Image Grid.Row="0" Grid.Column="2"
+                   Source="{Binding AnimatedMartridgeLeft.Frame}"
+                   Height="80"/>
+            <Image Grid.Row="0" Grid.Column="0"
+                   Source="{Binding AnimatedMartridgeRight.Frame}"
+                   Height="80"/>
+        </Grid>
+      
+
+        <Grid Grid.Row="1" RowDefinitions="Auto,*">
+            <TextBlock
+                Grid.Row="0"
+                Margin="20,5"
+                Text="{dloc:Localize AboutWindow/ResourceCredits}"
+            />
+
+            <ScrollViewer Grid.Row="1">
+                <ItemsRepeater 
+                    Margin="6"
+                    Items="{Binding UsedPackages}">
+                    <ItemsRepeater.Layout>
+                        <StackLayout Spacing="4" Orientation="Vertical"/>
+                    </ItemsRepeater.Layout>
+                    <ItemsRepeater.ItemTemplate>
+                        <DataTemplate DataType="vm:AboutUsedPackageViewModel">
+                            <Border BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
+                                <Grid Margin="2"
+                                      RowDefinitions="Auto,Auto">
+                                    <TextBlock Grid.Row="0" Classes="Heading2B"
+                                               Text="{Binding PackageName}"/>
+                                    <TextBox Grid.Row="1" 
+                                             Text="{Binding PackageInfo}" 
+                                             TextWrapping="Wrap"
+                                             IsReadOnly="True"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+            </ScrollViewer>
+        </Grid>
+    
+        <Button Grid.Row="2" 
+                Margin="20"
+                Content="{dloc:Localize Generic/ButtonOk}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Click="ButtonOkClickHandler"/>
+    </Grid>
+</Window>

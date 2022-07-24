@@ -1,0 +1,119 @@
+<UserControl x:Class="Martridge.Views.Dmod.DmodBrowserSelectedDmodView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:dloc="using:Martridge.ViewModels.Localization"
+             xmlns:vm="using:Martridge.ViewModels.Dmod">
+    <Design.DataContext>
+        <vm:DmodBrowserViewModel/>
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </UserControl.Styles>
+    <UserControl.Resources>
+        <x:String x:Key="DataNotAvailable">N/A</x:String>
+    </UserControl.Resources>
+  
+    <Grid>
+        <Grid RowDefinitions="Auto,Auto,Auto"
+              VerticalAlignment="Center"
+              HorizontalAlignment="Center"
+              IsVisible="{Binding SelectedDmodDefinition,
+                      Converter={x:Static ObjectConverters.IsNull}}">
+
+            <TextBlock Grid.Row="0" Classes="HeadingTitle"
+                       HorizontalAlignment="Center"
+                       Text="{dloc:Localize DmodBrowser/NoDmodSelectedTitle}"/>
+
+            <TextBlock Grid.Row="1" Classes="Heading2I"
+                       HorizontalAlignment="Center"
+                       MaxWidth="400"
+                       TextWrapping="Wrap"
+                       Text="{dloc:Localize DmodBrowser/NoDmodSelectedBody}"/>
+        </Grid>
+        <Grid RowDefinitions="Auto,Auto,Auto,*"
+              IsVisible="{Binding SelectedDmodDefinition,
+                      Converter={x:Static ObjectConverters.IsNotNull}}">
+            <TextBlock Grid.Row="0" Classes="Heading2B"
+                       Text="{Binding SelectedDmodDefinition.Name, 
+                      FallbackValue={StaticResource DataNotAvailable},
+                      TargetNullValue={StaticResource DataNotAvailable} }" />
+            <TextBlock Grid.Row="1" Classes="Heading2I"
+                       Text="{Binding SelectedDmodDefinition.Path, 
+                      FallbackValue={StaticResource DataNotAvailable},
+                      TargetNullValue={StaticResource DataNotAvailable} }" 
+                       TextWrapping="Wrap"
+                       ToolTip.Tip="{Binding SelectedDmodDefinition.Path, 
+                      FallbackValue={StaticResource DataNotAvailable},
+                      TargetNullValue={StaticResource DataNotAvailable} }"/>
+
+            <Grid Grid.Row="2"
+                  RowDefinitions="Auto,Auto,Auto,Auto">
+                <TextBlock  Grid.Row="0" Classes="Heading2B"
+                            Text="{dloc:Localize DmodBrowser/SelectExe}"/>
+                <ComboBox   Grid.Row="1"
+                            HorizontalAlignment="Stretch"
+                            Items="{Binding GameExePaths}"
+                            SelectedIndex="{Binding ActiveGameExeIndex, Mode=TwoWay}"/>
+
+                <Grid Grid.Row="2"
+                      RowDefinitions="Auto,Auto,Auto"
+                      ColumnDefinitions="*, Auto, Auto">
+                    <CheckBox   Grid.Row="0"  Grid.Column="1" 
+                                Content="{dloc:Localize DmodBrowser/LaunchTrueColor}"
+                                IsChecked="{Binding LaunchTrueColor}"/>
+                    <CheckBox   Grid.Row="1"  Grid.Column="1" 
+                                Content="{dloc:Localize DmodBrowser/LaunchWindowed}"
+                                IsChecked="{Binding LaunchWindowed}"/>
+                    <CheckBox   Grid.Row="0"  Grid.Column="2" 
+                                Content="{dloc:Localize DmodBrowser/LaunchSound}"
+                                IsChecked="{Binding LaunchSound}"/>
+                    <CheckBox   Grid.Row="1"  Grid.Column="2" 
+                                Content="{dloc:Localize DmodBrowser/LaunchJoystick}"
+                                IsChecked="{Binding LaunchJoystick}"/>
+                    <CheckBox   Grid.Row="2"  Grid.Column="1" 
+                                Content="{dloc:Localize DmodBrowser/LaunchDebug}"
+                                IsChecked="{Binding LaunchDebug}"/>
+                    <CheckBox   Grid.Row="2"  Grid.Column="2" 
+                                Content="{dloc:Localize DmodBrowser/LaunchV107Mode}"
+                                IsChecked="{Binding LaunchV107Mode}"/>
+
+                    <Button Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+                            Content="{dloc:Localize DmodBrowser/LaunchDmod}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Width="NaN" Height="NaN"
+                            Command="{Binding CmdLaunchDmod}"/>
+                    <Grid Grid.Column="0" Grid.Row="2" ColumnDefinitions="Auto, *">
+                        <TextBlock Grid.Column="0" Text="{dloc:Localize DmodBrowser/Localization}" Classes="Heading2B" />
+                        <ComboBox Grid.Column="1"
+                                  HorizontalAlignment="Stretch"
+                                  SelectedItem="{Binding SelectedLocalization}"
+                                  Items="{Binding  SelectedDmodDefinition.Localizations }">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate DataType="vm:DmodLocalizationDefinition">
+                                    <Grid>
+                                        <TextBlock Text="{Binding Header}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+                </Grid>
+        
+            </Grid>
+      
+            <TextBox Grid.Row="3" 
+                     Text="{Binding SelectedDmodDefinition.Description, 
+                    FallbackValue={StaticResource DataNotAvailable},
+                    TargetNullValue={StaticResource DataNotAvailable}  }" 
+                     HorizontalAlignment="Stretch" 
+                     VerticalAlignment="Stretch"
+                     TextWrapping="Wrap"
+                     ScrollViewer.VerticalScrollBarVisibility="Visible"
+                     IsReadOnly="True"/>
+        </Grid>
+    </Grid>
+</UserControl>

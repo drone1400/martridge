@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             
+             xmlns:dloc="using:Martridge.ViewModels.Localization"
+             xmlns:vm="using:Martridge.ViewModels.Installer"
+             
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Martridge.Views.Installer.InstallerViewPage3">
+
+    <Design.DataContext>
+        <vm:DmodInstallerViewModel/>
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="40,80,80,*,Auto">
+
+        <TextBlock Grid.Row="0" Classes="HeadingTitle"
+                   Text="{Binding InstallerProgressTitle}"/>
+
+        <Grid Grid.Row="1"
+              RowDefinitions="16,16,*"
+              IsVisible="{Binding InstallerProgressLevel0IsVisibile}">
+            <TextBlock Grid.Row="0" Classes="Heading2B"
+                       Text="{Binding InstallerProgressLevel0MainTitle}"/>
+            <TextBlock Grid.Row="1" Classes="Heading2I"
+                       Text="{Binding InstallerProgressLevel0SubTitle}"/>
+            <ProgressBar Grid.Row="2"
+                         Minimum="0" Maximum="1"
+                         Value="{Binding InstallerProgressLevel0Progress}"/>
+        </Grid>
+
+        <Grid Grid.Row="2"
+              RowDefinitions="16,16,*"
+              IsVisible="{Binding InstallerProgressLevel1IsVisibile}">
+            <TextBlock Grid.Row="0" Classes="Heading2B"
+                       Text="{Binding InstallerProgressLevel1MainTitle}"/>
+            <TextBlock Grid.Row="1" Classes="Heading2I"
+                       Text="{Binding InstallerProgressLevel1SubTitle}"/>
+            <ProgressBar Grid.Row="2"
+                         Minimum="0" Maximum="1"
+                         Value="{Binding InstallerProgressLevel1Progress}"
+                         IsIndeterminate="{Binding InstallerProgressLevel1Indeterminate}"/>
+        </Grid>
+
+        <Border Grid.Row="3" BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
+            <TextBox Text="{Binding InstallerProgressLog}"
+                     CaretIndex="{Binding InstallerProgressLogCaretIndex, Mode=TwoWay}"
+            />
+        </Border>
+
+
+
+        <Grid Grid.Row="4"
+              ColumnDefinitions="*,Auto,Auto">
+
+            <Button Grid.Column="1"
+                    Content="{dloc:Localize Generic/ButtonCancel}"
+                    Command="{Binding CmdCancel}"/>
+            <Button Grid.Column="2"
+                    Content="{dloc:Localize Generic/ButtonFinish}"
+                    Command="{Binding CmdFinish}"/>
+        </Grid>
+    </Grid>
+</UserControl>

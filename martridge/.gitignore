@@ -1,0 +1,19 @@
+#output files
+output*
+output/*
+output.obj/*
+output.MsBuildProps/*
+
+#publish files
+publish*/*
+
+.vs
+.vscode
+.idea
+*.suo
+*.user
+
+*.nupkg
+
+**/bin/*
+**/obj/*

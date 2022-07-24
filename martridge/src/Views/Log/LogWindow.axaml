@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+        xmlns:dloc="using:Martridge.ViewModels.Localization"
+        xmlns:vw="using:Martridge.Views.Log"
+        xmlns:vm="using:Martridge.ViewModels"
+        
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        
+        x:Class="Martridge.Views.Log.LogWindow"
+        Icon="/Assets/martridge.ico"
+        Title="{dloc:Localize LogWindow/Title}"
+        
+        Closed="OnWindowClosed">
+    <Design.DataContext>
+        <vm:LogConsoleViewModel/>
+    </Design.DataContext>
+
+    <Window.Styles>
+        <StyleInclude Source="avares://Citrus.Avalonia/Citrus.xaml"/>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </Window.Styles>
+  
+    <Grid>
+        <Border>
+            <TextBox Text="{Binding Text}" IsReadOnly="True"
+                     FontFamily="Consolas"/>
+        </Border>
+    </Grid>
+</Window>

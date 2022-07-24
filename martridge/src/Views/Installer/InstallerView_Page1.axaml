@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             
+             xmlns:dloc="using:Martridge.ViewModels.Localization"
+             xmlns:vw="using:Martridge.Views.Installer"
+             xmlns:vm="using:Martridge.ViewModels.Installer"
+             
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Martridge.Views.Installer.InstallerViewPage1">
+
+    <Design.DataContext>
+        <vm:DinkInstallerViewModel/>
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </UserControl.Styles>
+
+    <Grid Name="GridInstaller_Versions"
+          RowDefinitions="Auto,*,Auto,Auto">
+
+        <TextBlock Grid.Row="0" Classes="Heading2B"
+                   Text="{dloc:Localize DinkInstallerView/SelectVersion}"/>
+
+        <ListBox Grid.Row="1"
+                 Items="{Binding InstallableVersions}"
+                 SelectionMode="Single"
+                 SelectedIndex="{Binding SelectedInstallableVersionIndex, Mode=TwoWay}"
+                 SelectedItem="{Binding SelectedInstallableVersion, Mode=TwoWay}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="2">
+                        <TextBlock  Classes="Heading2"
+                                    Text="{Binding InstallerName}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <TextBlock Grid.Row="2" Classes="Heading2I"
+                   Text="{dloc:Localize DinkInstallerView/InfoAdditionalVersions}"
+                   TextWrapping="Wrap"/>
+
+        <Grid Grid.Row="3"
+              ColumnDefinitions="*,Auto,Auto">
+            <Button Grid.Column="1"
+                    Content="{dloc:Localize Generic/ButtonBack}"
+                    Command="{Binding CmdGoBack}"/>
+            <Button Grid.Column="2"
+                    Content="{dloc:Localize Generic/ButtonNext}"
+                    Command="{Binding CmdGoNext}"/>
+        </Grid>
+    </Grid>
+</UserControl>

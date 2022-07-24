@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             
+             xmlns:dloc="using:Martridge.ViewModels.Localization"
+             xmlns:vm="using:Martridge.ViewModels"
+             xmlns:vwd="using:Martridge.Views.Dmod"
+             
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             
+             x:Class="Martridge.Views.MainView">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </UserControl.Styles>
+
+    <Grid>
+        <Grid ColumnDefinitions="*,Auto,*">
+      
+            <Image Grid.Column="0" 
+                   Source="{Binding AnimatedDuckWizardRight.Frame}"
+                   Width="99"
+                   VerticalAlignment="Center"/>
+      
+            <Image Grid.Column="2" 
+                   Source="{Binding AnimatedDuckWizardLeft.Frame}"
+                   Width="99"
+                   VerticalAlignment="Center" />
+      
+            <Grid Grid.Column="1"  
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Center"
+                  IsVisible="{Binding !VmDmodBrowser.GameExeFound}"
+                  RowDefinitions="Auto,Auto,Auto">
+
+                <TextBlock Grid.Row="0" Classes="HeadingTitle"
+                           HorizontalAlignment="Center"
+                           Text="{dloc:Localize MainWindow/NoDmods_Title}"/>
+
+                <TextBlock Grid.Row="1" Classes="Heading2I"
+                           HorizontalAlignment="Center"
+                           MaxWidth="400"
+                           TextWrapping="Wrap"
+                           Text="{dloc:Localize MainWindow/NoDmods_Body}"/>
+        
+                <Grid Grid.Row="2" ColumnDefinitions="Auto,Auto" Margin="10" HorizontalAlignment="Center">
+                    <Button Grid.Column="0"
+                            Content="{dloc:Localize MainWindow/MenuDinkInstaller}"
+                            Command="{Binding CmdShowPageDinkInstaller}"/>
+                    <Button Grid.Column="1"
+                            Content="{dloc:Localize MainWindow/MenuSettings}"
+                            Command="{Binding CmdShowPageSettings}"/>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <TabControl 
+            IsVisible="{Binding VmDmodBrowser.GameExeFound}">
+      
+            <TabItem  Classes="Big"
+                      Header="{dloc:Localize MainWindow/TabItemInstalledDmods}">
+                <vwd:DmodBrowserView DataContext="{Binding VmDmodBrowser}"
+                                     Name="DmodBrowserView"
+                                     DragDrop.AllowDrop="True"/>
+            </TabItem>
+            <TabItem  Classes="Big"
+                      Header="{dloc:Localize MainWindow/TabItemOnlineDmods}">
+                <vwd:OnlineDmodBrowserView DataContext="{Binding VmOnlineDmodBrowser}" 
+                                           Name="OnlineDmodBrowserView"/>
+            </TabItem>
+        </TabControl>
+    </Grid>
+
+</UserControl>

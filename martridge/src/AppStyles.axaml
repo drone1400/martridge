@@ -1,0 +1,159 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=netstandard">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+            <StackPanel Orientation="Vertical">
+                <Button Content="Test Button"/>
+                <TextBox Text="Hello world" />
+                <TextBox>
+                    This Text box
+                    Has Multiple
+                    Lines
+                </TextBox>
+            </StackPanel>
+        </Border>
+    </Design.PreviewWith>
+
+    <!-- Add Styles Here -->
+    <Style Selector="CheckBox">
+        <Setter Property="Margin" Value="6,3"/>
+    </Style>
+
+    <Style Selector="ListBox">
+        <Setter Property="Margin" Value="6,3"/>
+    </Style>
+
+    <Style Selector="ComboBox">
+        <Setter Property="Margin" Value="6,3"/>
+    </Style>
+
+    <Style Selector="Button">
+        <Setter Property="Margin" Value="6,3"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Width" Value="120"/>
+        <Setter Property="Height" Value="32"/>
+    </Style>
+
+    <Style Selector="TextBox">
+        <Setter Property="Margin" Value="6,3"/>
+        <Setter Property="Padding" Value="8,3"/>
+        <Setter Property="Height" Value="NaN"/>
+    </Style>
+
+    <Style Selector="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style Selector="TextBlock.HeadingTitle">
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Margin" Value="10,5"/>
+    </Style>
+
+    <Style Selector="CheckBox.Heading2B">
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Margin" Value="10,3"/>
+    </Style>
+
+    <Style Selector="TextBlock.Heading2B">
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Margin" Value="10,3"/>
+    </Style>
+
+    <Style Selector="TextBlock.Heading2I">
+        <Setter Property="FontStyle" Value="Italic"/>
+        <Setter Property="Margin" Value="10,3"/>
+    </Style>
+
+    <Style Selector="TextBlock.Heading2">
+        <Setter Property="Margin" Value="10,3"/>
+    </Style>
+
+    <Style Selector="ProgressBar">
+        <Setter Property="Margin" Value="6,3"/>
+        <Setter Property="Height" Value="32"/>
+    </Style>
+  
+    <Style Selector="Border.PfpFrame">
+        <Setter Property="Height" Value="NaN"/>
+        <Setter Property="Width" Value="NaN"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="3"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+    </Style>
+
+    <Style Selector="TabItem.Big">
+        <Setter Property="Margin" Value="6,3"/>
+        <Setter Property="Padding" Value="8,3"/>
+        <Setter Property="Width" Value="240"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    </Style>
+  
+    <Style Selector="TabItem.Medium">
+        <Setter Property="Margin" Value="6,3"/>
+        <Setter Property="Padding" Value="8,3"/>
+        <Setter Property="Width" Value="140"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    </Style>
+  
+    <!-- Hyperlink Button -->
+    <Style Selector="Button.Invisibutton">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="CornerRadius" Value="0"></Setter>
+        <Setter Property="Width" Value="NaN"/>
+        <Setter Property="Height" Value="NaN"/>
+    </Style>
+    <Style Selector="Button.Invisibutton:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent"/>
+    </Style> 
+    <Style Selector="Button.Invisibutton:pressed /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="TextBlock.Hyperlink">
+        <Setter Property="FontStyle" Value="Italic"/>
+        <Setter Property="Margin" Value="10,3"/>
+        <Setter Property="TextDecorations" Value="Underline"/>
+        <Setter Property="Foreground" Value="Blue" />
+    </Style> 
+  
+    <!-- Expander template -->
+    <Style Selector="Expander /template/ ToggleButton#PART_toggle">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderThickness="0">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Border Grid.Column="0" Width="20" Height="20"
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center">
+                            <Path Fill="#ffffff"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Center"
+                                  Data="M 0 2 L 4 6 L 0 10 Z" />
+                        </Border>
+                        <ContentPresenter Name="PART_ContentPresenter"
+                                          Grid.Column="1" 
+                                          Background="Transparent" 
+                                          Content="{TemplateBinding Content}" 
+                                          VerticalAlignment="Center" 
+                                          HorizontalAlignment="Stretch"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Padding="{TemplateBinding Padding}"/>
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+  
+</Styles>

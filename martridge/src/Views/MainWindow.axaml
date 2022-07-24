@@ -1,0 +1,98 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:dloc="using:Martridge.ViewModels.Localization"
+        xmlns:vm="using:Martridge.ViewModels"
+        xmlns:vw="using:Martridge.Views"
+        xmlns:vwi="using:Martridge.Views.Installer"
+        xmlns:vwc="using:Martridge.Views.Configuration"
+        
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        
+        MinWidth="800"
+        MinHeight="600"
+        
+        x:Class="Martridge.Views.MainWindow"
+        
+        Icon="/Assets/martridge.ico"
+        Title="{dloc:Localize MainWindow/Title}"
+        Background="{DynamicResource ThemeBackgroundColor}"
+        Name="TheMainWindow"
+        KeyDown="KeyDownHandler">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+    <Window.Styles>
+        <StyleInclude Source="avares://Citrus.Avalonia/Citrus.xaml"/>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,*">
+        <Grid.Resources>
+            <vm:MainViewPageEnumConverter x:Key="ViewPageEnumConverter"/>
+        </Grid.Resources>
+
+        <Menu Grid.Row="0">
+            <MenuItem Header="{dloc:Localize MainWindow/MenuFile}">
+                <MenuItem Header="{dloc:Localize MainWindow/MenuDmodInstaller}"
+                          Command="{Binding CmdShowPageDmodInstallerAndBrowse}"/>
+                <MenuItem Header="{dloc:Localize MainWindow/MenuDmodPacker}"
+                          Command="{Binding CmdShowPageDmodPackerAndBrowse}"/>
+                <MenuItem Header="{dloc:Localize MainWindow/MenuDinkInstaller}"
+                          Command="{Binding CmdShowPageDinkInstaller}"/>
+                <MenuItem Header="{dloc:Localize MainWindow/MenuExit}"
+                          Click="CloseWindow"/>
+            </MenuItem>
+
+            <MenuItem Header="{dloc:Localize MainWindow/MenuTools}">
+                <MenuItem Header="{dloc:Localize MainWindow/MenuSettings}"
+                          Command="{Binding CmdShowPageSettings}"/>
+                <MenuItem Header="{dloc:Localize MainWindow/MenuLogWindow}"
+                          Command="{Binding CmdShowLogWindow}"/>
+            </MenuItem>
+
+            <MenuItem Header="{dloc:Localize MainWindow/MenuAbout}"
+                      Click="ShowAboutWindow"/>
+
+        </Menu>
+
+        <Grid Grid.Row="1"
+              IsVisible="{Binding Path=ActiveUserPage,
+              Converter={StaticResource ViewPageEnumConverter},
+              ConverterParameter={x:Static vm:MainViewPage.MainView }}">
+            <vw:MainView DataContext="{Binding }"/>
+        </Grid>
+
+        <Grid Grid.Row="1"
+              IsVisible="{Binding Path=ActiveUserPage,
+              Converter={StaticResource ViewPageEnumConverter},
+              ConverterParameter={x:Static vm:MainViewPage.Settings }}">
+            <vwc:SettingsGeneralView DataContext="{Binding VmGeneralSettings}"/>
+        </Grid>
+
+        <Grid Grid.Row="1"
+              IsVisible="{Binding Path=ActiveUserPage,
+              Converter={StaticResource ViewPageEnumConverter},
+              ConverterParameter={x:Static vm:MainViewPage.DinkInstaller }}">
+            <vwi:DinkInstallerView DataContext="{Binding VmDinkInstaller}"/>
+        </Grid>
+
+        <Grid Grid.Row="1"
+              IsVisible="{Binding Path=ActiveUserPage,
+              Converter={StaticResource ViewPageEnumConverter},
+              ConverterParameter={x:Static vm:MainViewPage.DmodInstaller }}">
+            <vwi:DmodInstallerView DataContext="{Binding VmDmodInstaller}"/>
+        </Grid>
+    
+        <Grid Grid.Row="1"
+              IsVisible="{Binding Path=ActiveUserPage,
+              Converter={StaticResource ViewPageEnumConverter},
+              ConverterParameter={x:Static vm:MainViewPage.DmodPacker }}">
+            <vwi:DmodPackerView DataContext="{Binding VmDmodPacker}"/>
+        </Grid>
+
+
+    </Grid>
+</Window>

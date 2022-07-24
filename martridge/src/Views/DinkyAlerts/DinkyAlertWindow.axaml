@@ -1,0 +1,69 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Martridge.Views.DinkyAlerts.DinkyAlertWindow"
+        
+        xmlns:vm="using:Martridge.ViewModels.DinkyAlerts"
+        xmlns:dloc="using:Martridge.ViewModels.Localization"
+        
+        Title="{Binding Title }"
+        Name="Alert"
+        MinWidth="520" MinHeight="300"
+        Width="520" Height="300">
+    <Design.DataContext>
+        <vm:DinkyAlertWindowViewModel/>
+    </Design.DataContext>
+    <Window.Styles>
+        <StyleInclude Source="avares://Citrus.Avalonia/Citrus.xaml"/>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </Window.Styles>
+  
+    <Grid RowDefinitions="*, Auto" 
+          ColumnDefinitions="128, *" 
+          Margin="10">
+    
+        <Image Grid.Row="0" Grid.Column="0"
+               Source="{Binding AnimatedImage.Frame}"/>
+    
+        <TextBlock Grid.Row="0" Grid.Column="1" 
+                   Text="{Binding Message}"
+                   Classes="Heading2I"
+                   TextWrapping="Wrap"/>
+    
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+              ColumnDefinitions="*, Auto, Auto, Auto, Auto, Auto, *">
+            <Button Grid.Column="1"
+                    Content="{dloc:Localize DinkyAlertWindow/ButtonOk}"
+                    Command="{Binding CmdExitOk}"
+                    CommandParameter="{Binding ElementName=Alert}"
+                    IsVisible="{Binding ShowButtonOk}"/>
+        
+            <Button Grid.Column="2"
+                    Content="{dloc:Localize DinkyAlertWindow/ButtonYes}"
+                    Command="{Binding CmdExitYes}"
+                    CommandParameter="{Binding ElementName=Alert}"
+                    IsVisible="{Binding ShowButtonYes}"/>
+        
+            <Button Grid.Column="3"
+                    Content="{dloc:Localize DinkyAlertWindow/ButtonNo}"
+                    Command="{Binding CmdExitNo}"
+                    CommandParameter="{Binding ElementName=Alert}"
+                    IsVisible="{Binding ShowButtonNo}"/>
+        
+            <Button Grid.Column="4"
+                    Content="{dloc:Localize DinkyAlertWindow/ButtonCancel}"
+                    Command="{Binding CmdExitCancel}"
+                    CommandParameter="{Binding ElementName=Alert}"
+                    IsVisible="{Binding ShowButtonCancel}"/>
+        
+            <Button Grid.Column="5"
+                    Content="{dloc:Localize DinkyAlertWindow/ButtonAbort}"
+                    Command="{Binding CmdExitAbort}"
+                    CommandParameter="{Binding ElementName=Alert}"
+                    IsVisible="{Binding ShowButtonAbort}"/>
+        </Grid>
+    </Grid>
+  
+</Window>

@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             
+             xmlns:vm="using:Martridge.ViewModels.Dmod"
+             mc:Ignorable="d" d:DesignWidth="300" d:DesignHeight="200"
+             x:Class="Martridge.Views.Dmod.OnlineUserHeaderView">
+  
+    <Design.DataContext>
+        <vm:OnlineUserViewModel/>
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </UserControl.Styles>
+  
+    <Grid RowDefinitions="*,*,*" ColumnDefinitions="Auto,*">
+        <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="3"
+                Classes="PfpFrame">
+            <Grid>
+                <Image Width="50" Height="50" Source="{Binding PfpImageBackground}"/>
+                <Image Width="50" Height="50" Source="{Binding PfpImageForeground}"/>
+            </Grid>
+        </Border>
+        <TextBlock Grid.Row="0" Grid.Column="1" Classes="Heading2B"
+                   Text="{Binding Name}"/>
+        <ItemsRepeater Grid.Row="1" Grid.Column="1"
+                       Margin="10,3"
+                       Items="{Binding BadgeImages}">
+            <ItemsRepeater.Layout>
+                <StackLayout Spacing="4" Orientation="Horizontal"/>
+            </ItemsRepeater.Layout>
+            <ItemsRepeater.ItemTemplate>
+                <DataTemplate DataType="Bitmap">
+                    <Image Source="{Binding}"/>
+                </DataTemplate>
+            </ItemsRepeater.ItemTemplate>
+        </ItemsRepeater>
+        <TextBlock Grid.Row="2" Grid.Column="1" Classes="Heading2I"
+                   Text="{Binding TagLine}"/>
+    </Grid>
+</UserControl>

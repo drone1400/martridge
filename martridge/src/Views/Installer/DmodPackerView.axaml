@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+             xmlns:dloc="using:Martridge.ViewModels.Localization"
+             xmlns:vw="using:Martridge.Views.Installer"
+             xmlns:vm="using:Martridge.ViewModels.Installer"
+
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Martridge.Views.Installer.DmodPackerView"
+             Name="DmodInstallerUserControl">
+    <Design.DataContext>
+        <vm:DmodPackerViewModel/>
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </UserControl.Styles>
+
+
+    <Grid Margin="8">
+        <Grid.Resources>
+            <vm:InstallerViewPageEnumConverter x:Key="ViewPageEnumConverter"/>
+        </Grid.Resources>
+
+        <vw:InstallerViewPage5
+            DataContext="{Binding DataContext, ElementName=DmodInstallerUserControl}"
+            IsVisible="{Binding Path=ActiveUserPage,
+                          Converter={StaticResource ViewPageEnumConverter},
+                          ConverterParameter={x:Static vm:InstallerViewPage.InstallSettings }}"/>
+
+        <vw:InstallerViewPage3
+            DataContext="{Binding DataContext, ElementName=DmodInstallerUserControl}"
+            IsVisible="{Binding Path=ActiveUserPage,
+                          Converter={StaticResource ViewPageEnumConverter},
+                          ConverterParameter={x:Static vm:InstallerViewPage.InstallProgress }}"/>
+
+    </Grid>
+</UserControl>

@@ -1,0 +1,114 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             
+             xmlns:dloc="using:Martridge.ViewModels.Localization"
+             xmlns:vm="using:Martridge.ViewModels.Installer"
+             xmlns:cfg="clr-namespace:Martridge.Models.Configuration"
+
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Martridge.Views.Installer.InstallerViewPage2">
+
+    <Design.DataContext>
+        <vm:DinkInstallerViewModel/>
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="40,Auto,Auto,Auto,Auto,*,Auto,Auto">
+    
+        <Grid.Resources>
+            <vm:InstallerFileFilterConverter x:Key="ListStringConverter"/>
+        </Grid.Resources>
+
+        <TextBlock Grid.Row="0" Classes="HeadingTitle"
+                   Text="{Binding InstallerProgressTitle}"/>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+            <TextBlock Grid.Column="0" Classes="Heading2B"
+                       Text="{dloc:Localize DinkInstallerView/SelectDestination}"/>
+            <Button   Grid.Row="0" Grid.Column="1"
+                      Content="{dloc:Localize Generic/ButtonBrowse}"
+                      Command="{Binding CmdBrowseDestination}"/>
+        </Grid>
+
+        <TextBox Grid.Row="2"
+                 Text="{Binding InstallerDestination}"/>
+
+        <TextBlock Grid.Row="3" Classes="Heading2B"
+                   Text="{dloc:Localize DinkInstallerView/GameExeName}"/>
+
+        <TextBox   Grid.Row="4"
+                   Text="{Binding SelectedInstallableVersion.GameExeName}"
+                   IsReadOnly="True"/>
+
+        <ScrollViewer Grid.Row="5">
+            <ItemsRepeater 
+                Margin="6"
+                Items="{Binding SelectedInstallableVersion.InstallerComponents}">
+                <ItemsRepeater.Layout>
+                    <StackLayout Spacing="4" Orientation="Vertical"/>
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate DataType="cfg:ConfigInstallerComponent">
+                        <Border BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
+                            <Grid Margin="2"
+                                  RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                                  ColumnDefinitions="Auto,*">
+                                <TextBlock Grid.Column="0" Grid.Row="1" Classes="Heading2"
+                                           Text="{dloc:Localize DinkInstallerView/WebResourceName}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="2" Classes="Heading2"
+                                           Text="{dloc:Localize DinkInstallerView/WebResourceUri}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="3" Classes="Heading2"
+                                           IsEnabled="False"
+                                           Text="{dloc:Localize DinkInstallerView/WebResourceSha256}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="4" Classes="Heading2"
+                                           Text="{dloc:Localize DinkInstallerView/WebResourceType}"/>
+                                <TextBlock Grid.Column="0" Grid.Row="5" Classes="Heading2"
+                                           Text="{dloc:Localize DinkInstallerView/WebResourceFilterType}"/>
+                
+                                <TextBox   Grid.Column="1" Grid.Row="1" 
+                                           Text="{Binding WebResource.Name}"
+                                           IsReadOnly="True"/>
+                                <TextBox   Grid.Column="1" Grid.Row="2"
+                                           Text="{Binding WebResource.Uri}"
+                                           IsReadOnly="True"/>
+                                <Grid Grid.Column="1" Grid.Row="3"
+                                      ColumnDefinitions="Auto,*">
+                                    <CheckBox Grid.Column="0"
+                                              IsEnabled="False"
+                                              IsChecked="{Binding WebResource.CheckSha256}"/>
+                                    <TextBox  Grid.Column="1"
+                                              Text="{Binding WebResource.Sha256}"
+                                              IsReadOnly="True"/>
+                                </Grid>
+
+                                <TextBox   Grid.Column="1" Grid.Row="4"
+                                           Text="{Binding WebResource.ResourceArchiveFormat}"
+                                           IsReadOnly="True"/>
+                                <TextBox   Grid.Column="1" Grid.Row="5"
+                                           Text="{Binding FileFilterMode}"
+                                           IsReadOnly="True"/>
+                                <TextBox   Grid.Column="1" Grid.Row="6"
+                                           Text="{Binding FileFilterList, Converter={StaticResource ListStringConverter}, Mode=OneWay}"
+                                           IsReadOnly="True"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+        </ScrollViewer>
+
+        <Grid Grid.Row="6"
+              ColumnDefinitions="*,Auto,Auto">
+            <Button Grid.Column="1"
+                    Content="{dloc:Localize Generic/ButtonBack}"
+                    Command="{Binding CmdGoBack}"/>
+            <Button Grid.Column="2"
+                    Content="{dloc:Localize DinkInstallerView/StartInstall}"
+                    Command="{Binding CmdGoNext}"/>
+        </Grid>
+    </Grid>
+</UserControl>

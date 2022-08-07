@@ -8,6 +8,27 @@ namespace Martridge.Models.Configuration {
 
         public List<ConfigInstallerComponent> InstallerComponents { get; set; } = new List<ConfigInstallerComponent>();
 
+        public static ConfigInstaller GetDefaultInstaller_DinkHD_LatestRTSoft() {
+            return new ConfigInstaller() {
+                GameExeName = "dink.exe",
+                InstallerName = "Dink HD - RTSoft",
+                InstallerComponents = new List<ConfigInstallerComponent>() {
+                    new ConfigInstallerComponent() {
+                        WebResource = new ConfigWebResource() {
+                            Sha256 = "",
+                            CheckSha256 = false,
+                            Name = "dink_smallwood_hd.exe",
+                            Uri = @"https://www.rtsoft.com/dink/DinkSmallwoodHDInstaller.exe",
+                            ResourceArchiveFormat = "Nsis",
+                        },
+
+                        FileFilterMode = InstallerFiltering.NoFiltering,
+                        FileFilterList = new List<string>(),
+                    },
+                },
+            };
+        }
+        
         public static ConfigInstaller GetDefaultInstaller_DinkHD_193() {
             return new ConfigInstaller() {
                 GameExeName = "dink.exe",

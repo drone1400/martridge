@@ -10,5 +10,7 @@ namespace Martridge.ViewModels.Dmod {
         UpdatedDesc,
         AuthorAsc,
         AuthorDesc,
+        PathAsc,
+        PathDesc,
     }
 }

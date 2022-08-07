@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:dloc="using:Martridge.ViewModels.Localization"
+             xmlns:vmm="using:Martridge.ViewModels"
              xmlns:vm="using:Martridge.ViewModels.Dmod"
              xmlns:vw="using:Martridge.Views.Dmod"
              x:Class="Martridge.Views.Dmod.DmodBrowserView"
@@ -14,91 +15,37 @@
     <UserControl.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
     </UserControl.Styles>
-
-    <Grid Margin="8">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="600" MinWidth="350"/>
-            <ColumnDefinition Width="5"/>
-            <ColumnDefinition Width="*" MinWidth="450"/>
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" RowDefinitions="Auto,*">
-            <Grid Grid.Row="0" ColumnDefinitions="Auto, *" RowDefinitions="Auto,Auto">
-                <TextBlock Grid.Row="0" Grid.Column="0"
-                           Classes="Heading2B"
-                           HorizontalAlignment="Center"
-                           Text="{dloc:Localize DmodBrowser/Refresh}" />
-                <TextBlock Grid.Row="0" Grid.Column="1"
-                           Classes="Heading2B"
-                           Text="{dloc:Localize DmodBrowser/Search}" />
-                <Button Grid.Row="1" Grid.Column="0" Width="48" Height="48"
-                        HorizontalAlignment="Center"
-                        Command="{Binding CmdRefreshDmods}"
-                        ToolTip.Tip="{dloc:Localize DmodBrowser/RefreshTooltip}">
-                    <Image Source="/Assets/reload-refresh-icon-placeholder.png"
-                           HorizontalAlignment="Stretch"
-                           VerticalAlignment="Stretch"
-                           Margin="6"/>
-                </Button>
-                <TextBox Grid.Row="1" Grid.Column="1" 
-                         HorizontalAlignment="Stretch"
-                         VerticalContentAlignment="Center"
-                         Text="{Binding DmodSearchString}"/>
-            </Grid>
-            <ListBox Grid.Row="1" Name="DmodList" 
-                     IsVisible="{Binding DmodDefinitionsFilteredHasItems}"
-                     Items="{Binding DmodDefinitionsFiltered}" 
-                     SelectedItem="{Binding SelectedDmodDefinition, Mode=TwoWay}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="vm:DmodDefinition">
-                        <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*" Margin="4"
-                              ToolTip.Tip="{Binding Path}">
-                            <Grid.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="{dloc:Localize DmodBrowser/ContextMenu/OpenDmodLocation}"
-                                              Command="{Binding CmdOpenLocation}"/>
-                                    <MenuItem Header="{dloc:Localize DmodBrowser/ContextMenu/PackDmodLocation}"
-                                              Command="{Binding $parent[Window].DataContext.CmdShowPageDmodPacker}"
-                                              CommandParameter="{Binding Files.DmodRoot.FullName}"/>
-                                </ContextMenu>
-                            </Grid.ContextMenu>
-                    
-                            <!-- this is needed to trigger the context menu when right clicking empty spaces... -->
-                            <Border Grid.Row="0" Grid.Column="0" 
-                                    Grid.RowSpan="2" Grid.ColumnSpan="2" 
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch"
-                                    Background="Transparent">
-                            </Border>
-        
-                            <TextBlock Grid.Row="0" Grid.Column="1" Classes="Heading2B"
-                                       Text="{Binding Name}"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Classes="Heading2I"
-                                       Text="{Binding Path}"
-                                       TextWrapping="NoWrap"
-                                       ToolTip.Tip="{Binding Path}"/>
-
-                            <Image Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" 
-                                   Source="{Binding Thumbnail}" 
-                                   Margin="6,2" 
-                                   Width="96" Height="48" 
-                                   HorizontalAlignment="Center" 
-                                   VerticalAlignment="Center" 
-                                   Stretch="Uniform" />
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-            <TextBlock Grid.Row="1" 
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       IsVisible="{Binding !DmodDefinitionsFilteredHasItems}"
-                       Classes="HeadingTitle"
-                       Text="{dloc:Localize DmodBrowser/NoDmodsFound}"
-            />
-        </Grid>
-
-        <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch"/>
+    <UserControl.Resources>
+        <vmm:IsNotNullCheckBoolConverter x:Key="ConverterIsNotNullCheck"/>
+    </UserControl.Resources>
     
-        <vw:DmodBrowserSelectedDmodView Grid.Column="2" DataContext="{Binding }"/>
-    </Grid>
+    <vw:MagicSplitPresenterView 
+        Name="MagicSplit"
+        Margin="8"
+        LeftPanelMinWidth="450"
+        RightPanelMinWidth="540"
+        IsOnePageShowingRightContent="{Binding SelectedDmodDefinition, 
+                Converter={StaticResource ConverterIsNotNullCheck}}" >
+            
+        <vw:MagicSplitPresenterView.LeftPanelContent>
+            <vw:DmodBrowserDmodListView DataContext="{Binding }"/>
+        </vw:MagicSplitPresenterView.LeftPanelContent>
+            
+        <vw:MagicSplitPresenterView.RightPanelContent>
+            <Grid RowDefinitions="Auto, *">
+                <Button Grid.Row="0"
+                        IsVisible="{Binding IsViewOnePageMode, ElementName=MagicSplit}"
+                        HorizontalAlignment="Stretch"
+                        Width="NaN"
+                        Command="{Binding CmdClearSelectedDmod}"
+                        Content="{dloc:Localize DmodBrowser/BackToList}"/>
+            
+            
+                <vw:DmodBrowserSelectedDmodView
+                    Grid.Row="1" 
+                    DataContext="{Binding }"/>
+            </Grid>
+        </vw:MagicSplitPresenterView.RightPanelContent>
+            
+    </vw:MagicSplitPresenterView>
 </UserControl>

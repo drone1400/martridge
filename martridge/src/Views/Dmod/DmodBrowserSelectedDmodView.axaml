@@ -60,7 +60,7 @@
 
                 <Grid Grid.Row="2"
                       RowDefinitions="Auto,Auto,Auto"
-                      ColumnDefinitions="*, Auto, Auto">
+                      ColumnDefinitions="*, Auto, Auto, Auto, Auto">
                     <CheckBox   Grid.Row="0"  Grid.Column="1" 
                                 Content="{dloc:Localize DmodBrowser/LaunchTrueColor}"
                                 IsChecked="{Binding LaunchTrueColor}"/>
@@ -73,12 +73,18 @@
                     <CheckBox   Grid.Row="1"  Grid.Column="2" 
                                 Content="{dloc:Localize DmodBrowser/LaunchJoystick}"
                                 IsChecked="{Binding LaunchJoystick}"/>
-                    <CheckBox   Grid.Row="2"  Grid.Column="1" 
+                    <CheckBox   Grid.Row="0"  Grid.Column="3" 
                                 Content="{dloc:Localize DmodBrowser/LaunchDebug}"
                                 IsChecked="{Binding LaunchDebug}"/>
-                    <CheckBox   Grid.Row="2"  Grid.Column="2" 
+                    <CheckBox   Grid.Row="1"  Grid.Column="3" 
                                 Content="{dloc:Localize DmodBrowser/LaunchV107Mode}"
                                 IsChecked="{Binding LaunchV107Mode}"/>
+                    <CheckBox   Grid.Row="0"  Grid.Column="4" 
+                                Content="{dloc:Localize DmodBrowser/LaunchUsePathRelativeToGame}"
+                                IsChecked="{Binding LaunchUsePathRelativeToGame}"/>
+                    <CheckBox   Grid.Row="1"  Grid.Column="4" 
+                                Content="{dloc:Localize DmodBrowser/LaunchUsePathQuotationMarks}"
+                                IsChecked="{Binding LaunchUsePathQuotationMarks}"/>
 
                     <Button Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
                             Content="{dloc:Localize DmodBrowser/LaunchDmod}"
@@ -86,9 +92,12 @@
                             VerticalAlignment="Stretch"
                             Width="NaN" Height="NaN"
                             Command="{Binding CmdLaunchDmod}"/>
-                    <Grid Grid.Column="0" Grid.Row="2" ColumnDefinitions="Auto, *">
-                        <TextBlock Grid.Column="0" Text="{dloc:Localize DmodBrowser/Localization}" Classes="Heading2B" />
-                        <ComboBox Grid.Column="1"
+                    
+                    <Grid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="5" 
+                          ColumnDefinitions="Auto, *"
+                          RowDefinitions="Auto, Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{dloc:Localize DmodBrowser/FreeDinkLocalization}" Classes="Heading2B" />
+                        <ComboBox Grid.Row="0" Grid.Column="1"
                                   HorizontalAlignment="Stretch"
                                   SelectedItem="{Binding SelectedLocalization}"
                                   Items="{Binding  SelectedDmodDefinition.Localizations }">
@@ -100,6 +109,12 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
+                        
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="{dloc:Localize DmodBrowser/LaunchCustomUserArguments}" Classes="Heading2B" />
+                        <TextBox Grid.Row="1" Grid.Column="1"
+                                 HorizontalAlignment="Stretch"
+                                 Text="{Binding  LaunchCustomUserArguments}">
+                        </TextBox>
                     </Grid>
                 </Grid>
         

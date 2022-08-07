@@ -76,8 +76,7 @@ namespace Martridge.ViewModels {
             this.VmDmodBrowser.ConfigurationGeneral = this._logic.Config.General;
             this.VmDmodBrowser.DmodLauncher = this._logic.LaunchDmod;
             this.VmDmodBrowser.DmodManager = this._logic.DmodManager;
-
-            this.VmOnlineDmodBrowser.ConfigurationGeneral = this._logic.Config.General;
+            
             this.VmOnlineDmodBrowser.DmodCrawler = this._logic.DmodCrawler;
             this.VmOnlineDmodBrowser.MainVm = this;
 

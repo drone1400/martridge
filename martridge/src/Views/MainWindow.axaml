@@ -10,8 +10,8 @@
         
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         
-        MinWidth="800"
-        MinHeight="600"
+        MinWidth="600"
+        MinHeight="580"
         
         x:Class="Martridge.Views.MainWindow"
         

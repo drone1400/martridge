@@ -1,0 +1,15 @@
+--- V0.4.0 ---
+- added launch option: make path relative
+- added launch option: use quotation marks, if not used, quotation marks will be added anyway if path contains spaces
+- added order by options to Dmod Browser (by name or by path)
+- changed online dmod browser by default orders by updated, descending
+- added refresh buttons and local cache timestamp to Online Dmod Browser (used to be only context menu to refresh)
+- added 'single page mode' to local and online Dmod Browsers when window width is too small to display split view correctly
+- added DinkHD option to installer using RTSoft website as source
+- fixed bug where Online Dmod Browser would not show reviews/versions correctly (scrolling issue)
+- fixed bug that would launch game instead of opening location in explorer when base Dink was selected in Dmod Browser
+- fixed bug related to rendering dmod versions and reviews correctly in Online Dmod Browser
+
+
+--- V0.3.0 ---
+- Initial Git release

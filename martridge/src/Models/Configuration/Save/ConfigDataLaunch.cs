@@ -1,5 +1,21 @@
 namespace Martridge.Models.Configuration.Save {
     public class ConfigDataLaunch {
+        
+        /// <summary>
+        /// Additional custom user arguments
+        /// </summary>
+        public string? CustomUserArguments { get ; set; } = "";
+
+        /// <summary>
+        /// Use quotation marks in the path (works only for DinkHD after 1.97 and FreeDink versions)
+        /// </summary>
+        public bool? UsePathQuotationMarks { get; set; } = true;
+        
+        /// <summary>
+        /// Make the DMOD path relative to the chosen Dink Launcher
+        /// </summary>
+        public bool? UsePathRelativeToGame { get; set; } = true;
+        
         /// <summary>
         /// Launches the game in true color mode
         /// </summary>

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 namespace Martridge.Models.OnlineDmods {
     public class DmodCrawler {
 
+        public DateTime DmodPagesLastWriteTime { get; private set; } = DateTime.MinValue;
         public event EventHandler DmodListInitialized;
 
         private HttpClient _httpClient = new HttpClient();
@@ -48,6 +49,9 @@ namespace Martridge.Models.OnlineDmods {
                     }
                     localHtml.Refresh();
                     if (localHtml.Exists) {
+                        if (localHtml.LastWriteTime > this.DmodPagesLastWriteTime) {
+                            this.DmodPagesLastWriteTime = localHtml.LastWriteTime;
+                        }
                         int dmodCount = this.ParseDmodsPage(cachedResource.Local, dmodEntries);
                         nextPageExists = this.ParseDmodsNextPageExists(cachedResource.Local);
                     } else {
@@ -385,7 +389,7 @@ namespace Martridge.Models.OnlineDmods {
                             DateTime dmodUpdated = DateTime.Parse(dmodUpdatedText);
                             int dmodDownloads = 0;
                             if (!int.TryParse(dmodDownloadsText, out dmodDownloads)) {
-                                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Error parsing dmod downloads for dmod #{rowCount}, {dmodName}...", MyTraceLevel.Warning);
+                                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Error parsing dmod downloads number for dmod #{rowCount}, {dmodName}...", MyTraceLevel.Warning);
                             }
                             double dmodScore = double.NaN;
                             

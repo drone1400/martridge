@@ -7,6 +7,21 @@ namespace Martridge.Models.Configuration {
         public event EventHandler? Updated;
 
         /// <summary>
+        /// Additional custom user arguments
+        /// </summary>
+        public string CustomUserArguments { get ; private set; } = "";
+
+        /// <summary>
+        /// Use quotation marks in the path (works only for DinkHD after 1.97 and FreeDink versions)
+        /// </summary>
+        public bool UsePathQuotationMarks { get; private set; } = false;
+
+        /// <summary>
+        /// Make the DMOD path relative to the chosen Dink Launcher
+        /// </summary>
+        public bool UsePathRelativeToGame { get; private set; } = true;
+
+        /// <summary>
         /// Launches the game in true color mode
         /// </summary>
         public bool TrueColor { get; private set; } = false;
@@ -45,7 +60,10 @@ namespace Martridge.Models.Configuration {
             bool sound,
             bool joystick,
             bool debug,
-            bool v107Mode
+            bool v107Mode,
+            bool usePathQuotationMarks,
+            bool usePathRelativeToGame,
+            string customUserArguments
             ) {
 
             bool hasChanges = false;
@@ -77,6 +95,21 @@ namespace Martridge.Models.Configuration {
 
             if (this.V107Mode != v107Mode) {
                 this.V107Mode = v107Mode;
+                hasChanges = true;
+            }
+            
+            if (this.UsePathQuotationMarks != usePathQuotationMarks) {
+                this.UsePathQuotationMarks = usePathQuotationMarks;
+                hasChanges = true;
+            }
+            
+            if (this.UsePathRelativeToGame != usePathRelativeToGame) {
+                this.UsePathRelativeToGame = usePathRelativeToGame;
+                hasChanges = true;
+            }
+            
+            if (this.CustomUserArguments != customUserArguments) {
+                this.CustomUserArguments = customUserArguments;
                 hasChanges = true;
             }
 
@@ -116,6 +149,21 @@ namespace Martridge.Models.Configuration {
                 this.V107Mode = (bool)data.V107Mode;
                 hasChanges = true;
             }
+            
+            if (data.UsePathQuotationMarks != null && this.UsePathQuotationMarks != data.UsePathQuotationMarks) {
+                this.UsePathQuotationMarks = (bool)data.UsePathQuotationMarks;
+                hasChanges = true;
+            }
+            
+            if (data.UsePathRelativeToGame != null && this.UsePathRelativeToGame != data.UsePathRelativeToGame) {
+                this.UsePathRelativeToGame = (bool)data.UsePathRelativeToGame;
+                hasChanges = true;
+            }
+            
+            if (data.CustomUserArguments != null && this.CustomUserArguments != data.CustomUserArguments) {
+                this.CustomUserArguments = (string)data.CustomUserArguments;
+                hasChanges = true;
+            }
 
             if (hasChanges) {
                 this.FireUpdatedEvent();
@@ -131,6 +179,9 @@ namespace Martridge.Models.Configuration {
                 Joystick = this.Joystick,
                 Debug = this.Debug,
                 V107Mode = this.V107Mode,
+                UsePathQuotationMarks = this.UsePathQuotationMarks,
+                UsePathRelativeToGame = this.UsePathRelativeToGame,
+                CustomUserArguments = this.CustomUserArguments,
             };
         }
     }

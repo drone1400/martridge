@@ -57,7 +57,29 @@ namespace Martridge.ViewModels.Dmod {
         }
 
         public void CmdOpenLocation(object? parameter) {
-            ProcessStartInfo pinfo = new ProcessStartInfo(this.Path) {
+            if (this.Path == null) {
+                return;
+            }
+            
+            string dirPath = "";
+            
+            // if path is a file, open its directory
+            FileInfo finfo = new FileInfo(this.Path);
+            if (finfo.Exists && finfo.Directory?.Exists == true) {
+                dirPath = finfo.Directory.FullName;
+            }
+            
+            // if path is a directory, open it
+            DirectoryInfo dinfo = new DirectoryInfo(this.Path);
+            if (dinfo.Exists) {
+                dirPath = dinfo.FullName;
+            }
+
+            if (dirPath == "") {
+                return;
+            }
+            
+            ProcessStartInfo pinfo = new ProcessStartInfo(dirPath) {
                 UseShellExecute = true,
                 Verb = "open",
             };

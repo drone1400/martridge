@@ -19,7 +19,7 @@ namespace Martridge.ViewModels.Dmod {
         public string Name { get => this.DmodInfo.Name; }
         public string Author { get => this.DmodInfo.Author; }
         public string UrlMain { get => this.DmodInfo.ResMain.Url; }
-        public string Downloads { get => this.DmodInfo.Downloads.ToString(); }
+        public int Downloads { get => this.DmodInfo.Downloads; }
         public string Updated { get => this.DmodInfo.Updated.ToString("d"); }
         
         public double ScoreValue { get => this.DmodInfo.Score; }

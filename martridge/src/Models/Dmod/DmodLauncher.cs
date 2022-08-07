@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using DynamicData.Kernel;
 using Martridge.Trace;
+using System.Linq;
 
 namespace Martridge.Models.Dmod
 {
@@ -38,18 +39,27 @@ namespace Martridge.Models.Dmod
 
                 FileInfo finfo = new FileInfo(gameExe);
                 DirectoryInfo dinfo = new DirectoryInfo(path);
+                
                 if (dinfo.Name.ToLowerInvariant() != "dink") {
-                    string relPath = Path.GetRelativePath(finfo.DirectoryName, path);
-                    if (relPath.StartsWith('.')) {
-                        // append full path
-                        arguments += " -game ";
-                        arguments += $"\"{path}\"";
-                    } else {
-                        // append relative path
-                        arguments += " -game ";
-                        //arguments += $"\"{relPath}\"";
-                        arguments += relPath;
+                    string finalPath = path;
+                    
+                    if (config.Launch.UsePathRelativeToGame) {
+                        finalPath = Path.GetRelativePath(finfo.DirectoryName, path);
                     }
+
+                    // NOTE: If path contains whitespace, force quotation marks on since otherwise you can't launch the DMOD
+                    if (config.Launch.UsePathQuotationMarks ||
+                        finalPath.Any(c => Char.IsWhiteSpace(c))) {
+                        finalPath = $"\"{finalPath}\"";
+                    }
+                    
+                    arguments += " -game ";
+                    arguments += finalPath;
+                }
+
+                if (!string.IsNullOrWhiteSpace(config.Launch.CustomUserArguments)) {
+                    arguments += " ";
+                    arguments += config.Launch.CustomUserArguments;
                 }
 
                 MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {

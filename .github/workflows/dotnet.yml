@@ -2,15 +2,13 @@ name: .NET Release on tag push
 
 on:
   push:
-    branches:
-      - "master"
     tags:
       - "V*.*.*"
 
 jobs:
   publish_and_release:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
 # ---- Checkout main source code

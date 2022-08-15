@@ -1,3 +1,7 @@
+--- V0.4.2 ---
+- updated AvaloniaUI package to latest (0.10.18)
+- fixed issue with github automatic release publishing
+
 --- V0.4.1 ---
 - fixed bug where dmod thumbnails from readonly dir.ff files not being opened
 - fixed bug where Online Dmod Browser would break when parsing user reviews without avatars

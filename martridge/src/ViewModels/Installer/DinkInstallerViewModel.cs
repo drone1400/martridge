@@ -277,6 +277,8 @@ namespace Martridge.ViewModels.Installer {
 
                         string title = Localizer.Instance[@"DinkInstallerView/MessageBox_CleanInstallConfirm_Title"];
                         string body = Localizer.Instance[@"DinkInstallerView/MessageBox_CleanInstallConfirm_Body"];
+                        
+                        
 
                         // make sure the correct new line characters are used
                         body = body.Replace("\n\r", Environment.NewLine);
@@ -287,7 +289,16 @@ namespace Martridge.ViewModels.Installer {
                             return;
                         }
                         if (result == AlertResults.Yes) {
-                            removeOldFiles = true;
+                            title = Localizer.Instance[@"DinkInstallerView/MessageBox_CleanInstallConfirm_DeleteDoubleConfirm_Title"];
+                            body = Localizer.Instance[@"DinkInstallerView/MessageBox_CleanInstallConfirm_DeleteDoubleConfirm_Body"];
+                            body += Environment.NewLine;
+                            body += destination.FullName;
+                            result = await DinkyAlert.ShowDialog(title, body, AlertResults.Yes | AlertResults.Cancel, AlertType.Warning, this.ParentWindow);
+                            if (result == AlertResults.Yes) {
+                                removeOldFiles = true;
+                            } else {
+                                return;
+                            }
                         }
                     }
 

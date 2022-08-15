@@ -95,7 +95,10 @@
   "DinkInstallerView/MessageBox_Cancel_Title": "Installation cancelled by user",
   "DinkInstallerView/MessageBox_Cancel_Body": "Installation was cancelled!",
   "DinkInstallerView/MessageBox_CleanInstallConfirm_Title": "Installation issue!...",
-  "DinkInstallerView/MessageBox_CleanInstallConfirm_Body": "Existing files detected in installation destination!\n\rDo you want to DELETE all existing files before isntalling?\n\r\n\r    Yes = Delete everything, clean install\n\r    No = Install over existing files\n\r    Cancel = Cancels the installation",
+  "DinkInstallerView/MessageBox_CleanInstallConfirm_Body": "Existing files detected in installation destination!\n\rDo you want to DELETE all existing files before installing?\n\r\n\r    Yes = Delete everything, clean install\n\r    No = Install over existing files\n\r    Cancel = Cancels the installation",
+
+  "DinkInstallerView/MessageBox_CleanInstallConfirm_DeleteDoubleConfirm_Title": "Installation issue!...",
+  "DinkInstallerView/MessageBox_CleanInstallConfirm_DeleteDoubleConfirm_Body": "You have chosen to DELETE ALL FILES in the Installation path! Are you REALLY sure this is what you want?! Clicking YES here will delete all files in the destination path!",
   
   "DinkyAlertWindow/ButtonOk": "Ok",
   "DinkyAlertWindow/ButtonYes": "Yes",

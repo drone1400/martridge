@@ -17,11 +17,11 @@ namespace Martridge.Models.Installer {
         public event EventHandler<DinkInstallerDoneEventArgs>? InstallerDone;
 
         // download config parameters, maybe make them not be hardcoded in the future?...
-        private TimeSpan _timeoutHttpClient = new TimeSpan(0,0,10);
-        private TimeSpan _downloadProgressReportInterval = new TimeSpan(0,0,0,0,500);
+        private readonly TimeSpan _timeoutHttpClient = new TimeSpan(0,0,10);
+        private readonly TimeSpan _downloadProgressReportInterval = new TimeSpan(0,0,0,0,500);
 
-        private List<DirectoryInfo> _tempDirs = new List<DirectoryInfo>();
-        private List<FileInfo> _tempFiles = new List<FileInfo>();
+        private readonly List<DirectoryInfo> _tempDirs = new List<DirectoryInfo>();
+        private readonly List<FileInfo> _tempFiles = new List<FileInfo>();
 
         #if PLATF_WINDOWS
 
@@ -38,8 +38,8 @@ namespace Martridge.Models.Installer {
                 try {
                     // starting...
                     this.StartTime = DateTime.Now;
-                    this._progPhaseCurrent = 0;
-                    this._progPhaseTotal = 2 + 2 * (config.InstallerComponents.Count + 1);
+                    this.ProgPhaseCurrent = 0;
+                    this.ProgPhaseTotal = 2 + 2 * (config.InstallerComponents.Count + 1);
                     DirectoryInfo webCacheDir = new DirectoryInfo(LocationHelper.WebCache);
                     // log start of installation
                     this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
@@ -111,7 +111,7 @@ namespace Martridge.Models.Installer {
             this.ReportProgress(InstallerReportLevel.Primary,
                 Localizer.Instance[@"DinkInstaller/Heading/Preparing"],
                 Localizer.Instance[@"DinkInstaller/Preparing/PreparingDirectoriesStart"],
-                this._progPhaseCurrent / this._progPhaseTotal);
+                this.ProgPhaseCurrent / this.ProgPhaseTotal);
             this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                 "",
                 Localizer.Instance[@"DinkInstaller/Preparing/PreparingDirectoriesStart"]
@@ -159,7 +159,7 @@ namespace Martridge.Models.Installer {
             this.ReportProgress(InstallerReportLevel.Primary,
                 Localizer.Instance[@"DinkInstaller/Heading/Preparing"],
                 Localizer.Instance[@"DinkInstaller/Preparing/PreparingDirectoriesDone"],
-                this._progPhaseCurrent++ / this._progPhaseTotal);
+                this.ProgPhaseCurrent++ / this.ProgPhaseTotal);
             this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                 Localizer.Instance[@"DinkInstaller/Preparing/PreparingDirectoriesDone"],
                 "",
@@ -180,7 +180,7 @@ namespace Martridge.Models.Installer {
                 this.ReportProgress(InstallerReportLevel.Primary,
                     Localizer.Instance[@"DinkInstaller/Heading/Downloading"],
                     comp.WebResource.Uri,
-                    this._progPhaseCurrent++ / this._progPhaseTotal);
+                    this.ProgPhaseCurrent++ / this.ProgPhaseTotal);
 
                 FileInfo finfo = new FileInfo(Path.Combine(webCacheDir.FullName, comp.WebResource.Name));
                 this._tempFiles.Add(finfo);
@@ -192,7 +192,7 @@ namespace Martridge.Models.Installer {
             this.ReportProgress(InstallerReportLevel.Primary,
                 Localizer.Instance[@"DinkInstaller/Heading/Downloading"],
                 Localizer.Instance[@"DinkInstaller/DownloadingResources/Done"],
-                this._progPhaseCurrent++ / this._progPhaseTotal);
+                this.ProgPhaseCurrent++ / this.ProgPhaseTotal);
             this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                 "",
                 Localizer.Instance[@"DinkInstaller/DownloadingResources/Done"],
@@ -219,7 +219,7 @@ namespace Martridge.Models.Installer {
                 this.ReportProgress(InstallerReportLevel.Primary,
                     Localizer.Instance[@"DinkInstaller/Heading/Installing"],
                     comp.WebResource.Name,
-                    this._progPhaseCurrent++ / this._progPhaseTotal);
+                    this.ProgPhaseCurrent++ / this.ProgPhaseTotal);
 
                 this.ReportProgress(InstallerReportLevel.Indeterminate,
                     finfo.FullName,
@@ -243,7 +243,7 @@ namespace Martridge.Models.Installer {
             this.ReportProgress(InstallerReportLevel.Primary,
                 Localizer.Instance[@"DinkInstaller/Heading/Installing"],
                 Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResource/Done"],
-                this._progPhaseCurrent++ / this._progPhaseTotal);
+                this.ProgPhaseCurrent++ / this.ProgPhaseTotal);
             this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                 Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResource/Done"],
             });
@@ -296,7 +296,7 @@ namespace Martridge.Models.Installer {
             this.ReportProgress(InstallerReportLevel.Primary,
                 Localizer.Instance[@"DinkInstaller/Heading/Cleanup"],
                 "",
-                this._progPhaseCurrent / this._progPhaseTotal);
+                this.ProgPhaseCurrent / this.ProgPhaseTotal);
             this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                 "",
                 Localizer.Instance[@"DinkInstaller/CleaningUp/Start"],
@@ -471,8 +471,8 @@ namespace Martridge.Models.Installer {
                         new List<string>() { indentStr + relativePath },
                         MyTraceLevel.Verbose);
 
-                    newFile.Directory.Refresh();
-                    if (newFile.Directory.Exists == false) {
+                    newFile.Directory?.Refresh();
+                    if (newFile.Directory?.Exists == false) {
                         newFile.Directory.Create();
                     }
 
@@ -495,10 +495,8 @@ namespace Martridge.Models.Installer {
         }
 
         private bool TryUnzipFile(FileInfo file, DirectoryInfo destination, string expectedFormatName) {
-
-            SevenZipFormat expectedFormat = SevenZipFormat.Zip;
             
-            if (!Enum.TryParse( expectedFormatName, out expectedFormat))
+            if (!Enum.TryParse( expectedFormatName, out SevenZipFormat expectedFormat))
             {
                 this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                     Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResourceUnzipping/ErrorParsing7ZipFormat"],
@@ -516,8 +514,8 @@ namespace Martridge.Models.Installer {
             bool success = this.TryUnzipFile_SingleFormat(file, destination, expectedFormat);
             if (!success) {
                 // failed to extract archive with expected format... attempt all known formats?..
-                Array enumVals = Enum.GetValues(typeof(SevenZipExtractor.SevenZipFormat));
-                foreach (SevenZipExtractor.SevenZipFormat format in enumVals) {
+                Array enumVals = Enum.GetValues(typeof(SevenZipFormat));
+                foreach (SevenZipFormat format in enumVals) {
                     if (this.CancelToken.IsCancellationRequested) {
                         throw new DinkInstallerCancelledByUserException();
                     }
@@ -551,7 +549,7 @@ namespace Martridge.Models.Installer {
             return false;
         }
 
-        private bool TryUnzipFile_SingleFormat(FileInfo file, DirectoryInfo destination, SevenZipExtractor.SevenZipFormat format) {
+        private bool TryUnzipFile_SingleFormat(FileInfo file, DirectoryInfo destination, SevenZipFormat format) {
             try {
                 using (FileStream fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read))
                 using (ArchiveFile archive = new ArchiveFile(fs, format)) {
@@ -663,7 +661,7 @@ namespace Martridge.Models.Installer {
                                     res.Uri,
                                     progress);
                                 this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                                        $"    ({(int)Math.Ceiling((double)downloaded/1024)}kB/{(int)Math.Ceiling((double)totalsize/1024)}kB)"
+                                        $"    ({(int)Math.Ceiling((double)downloaded/1024)}kB/{(int)Math.Ceiling(totalsize/1024.0)}kB)"
                                     });
                                 nextReport = DateTime.Now + this._downloadProgressReportInterval;
                             }

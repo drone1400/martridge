@@ -35,8 +35,8 @@ namespace Martridge.ViewModels.Installer {
         //      Installer logic 
         //
         
-        public event EventHandler<DmodInstallerDoneEventArgs>? InstallerDone;
-        private DmodInstallerDoneEventArgs _lastInstallerDoneEventArgs = new DmodInstallerDoneEventArgs(DinkInstallerResult.Cancelled);
+        public event EventHandler<DmodPackerDoneEventArgs>? InstallerDone;
+        private DmodPackerDoneEventArgs _lastInstallerDoneEventArgs = new DmodPackerDoneEventArgs(DinkInstallerResult.Cancelled);
 
         public InstallerViewPage ActiveUserPage {
             get => this._activeUserPage;
@@ -120,7 +120,7 @@ namespace Martridge.ViewModels.Installer {
 
         public void CmdGoBack(object? parameter = null) {
             if (this.ActiveUserPage == InstallerViewPage.InstallSettings) {
-                this._lastInstallerDoneEventArgs = new DmodInstallerDoneEventArgs(DinkInstallerResult.Cancelled);
+                this._lastInstallerDoneEventArgs = new DmodPackerDoneEventArgs(DinkInstallerResult.Cancelled);
                 this.ResetInstallerStateAndFireDoneEvent();
             }
         }
@@ -294,7 +294,7 @@ namespace Martridge.ViewModels.Installer {
             this.InstallerDone?.Invoke(this, this._lastInstallerDoneEventArgs);
         }
         
-        private void InstallerOnDone(object? sender, DmodInstallerDoneEventArgs args) {
+        private void InstallerOnDone(object? sender, DmodPackerDoneEventArgs args) {
             this.IsInstallerFinished = true;
             this._lastInstallerDoneEventArgs = args;
             if (args.Result == DinkInstallerResult.Cancelled) this.ShowInstallerCancelledMessageBox();

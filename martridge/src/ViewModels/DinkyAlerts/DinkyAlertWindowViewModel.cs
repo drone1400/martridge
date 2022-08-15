@@ -5,25 +5,25 @@ using ReactiveUI;
 namespace Martridge.ViewModels.DinkyAlerts {
     public class DinkyAlertWindowViewModel :ViewModelBase {
 
-        private string _title = "???";
+        private string _title;
         public string Title {
             get => this._title;
             set => this.RaiseAndSetIfChanged(ref this._title, value);
         }
         
-        private string _message = "Hello World!";
+        private string _message;
         public string Message {
             get => this._message;
             set => this.RaiseAndSetIfChanged(ref this._message, value);
         }
 
-        private AlertResults _result = AlertResults.None;
+        private AlertResults _result;
         public AlertResults Result {
             get => this._result;
             set => this.RaiseAndSetIfChanged(ref this._result, value);
         }
 
-        private AlertResults _resultButtons = AlertResults.None;
+        private AlertResults _resultButtons;
 
         public bool ShowButtonOk {
             get => this._resultButtons.HasFlag(AlertResults.Ok);
@@ -45,7 +45,7 @@ namespace Martridge.ViewModels.DinkyAlerts {
             get => this._resultButtons.HasFlag(AlertResults.Abort);
         }
 
-        private AlertType _type = AlertType.Info;
+        private AlertType _type;
         public AnimatedDinkGraphicViewModel? AnimatedImage {
             get => this._type switch {
                 AlertType.Info => GetGraphicInfo(),

@@ -11,7 +11,7 @@ namespace Martridge.ViewModels.Dmod {
     public class DmodDefinition {
         public DmodFileDefinition Files { get; private set; }
 
-        public List<DmodLocalizationDefinition> Localizations { get; private set; }
+        public List<DmodLocalizationDefinition> Localizations { get; private set; } = new List<DmodLocalizationDefinition>();
         public string? Description { get; private set; }
         public string? Name { get; private set; }
         public string? Path { get; private set; }
@@ -22,15 +22,13 @@ namespace Martridge.ViewModels.Dmod {
 
             this.Description = this.Files.GetDescription();
             this.Name = this.Files.GetName();
-            this.Path = this.Files.DmodRoot?.FullName;
+            this.Path = this.Files.DmodRoot.FullName;
             this.Thumbnail = this.Files.GetThumbnail();
 
             this.InitializeLocalizations();
         }
 
         private void InitializeLocalizations() {
-            this.Localizations = new List<DmodLocalizationDefinition>();
-
             string defaultLoc = Localizer.Instance[@"Generic/DoNotChangeDmodLocalization"];
             
             this.Localizations.Add(new DmodLocalizationDefinition() {
@@ -46,13 +44,11 @@ namespace Martridge.ViewModels.Dmod {
                         CultureInfo = cat.CultureInfo,
                     });
                 }
-                
-                
             }
         }
 
         public override string ToString() {
-            return $"{this.Name} [{this.Files.DmodRoot?.FullName}]";
+            return $"{this.Name} [{this.Files.DmodRoot.FullName}]";
         }
 
         public void CmdOpenLocation(object? parameter) {

@@ -500,13 +500,12 @@ namespace Martridge.ViewModels.Dmod {
         public bool CanCmdLaunchDmod(object? parameter = null) {
             try {
                 if (!this.GameExeFound) { return false; }
-                if (this.ConfigurationGeneral == null) { return false; }
                 if (this.ConfigurationLauncher == null) { return false; }
                 if (this.DmodLauncher == null) { return false; }
                 if (this.DmodManager == null) { return false; }
-                if (this.SelectedDmodDefinition == null) { return false; }
-
+                if (this.SelectedDmodDefinition?.Path == null) { return false; }
                 if (this.ConfigurationGeneral?.GameExePaths.Count == 0) { return false; }
+                if (this.ConfigurationGeneral == null) { return false; }
 
                 string exePath = this.ConfigurationGeneral.GameExePaths[this.ActiveGameExeIndex];
                 string dmodPath = this.SelectedDmodDefinition.Path;

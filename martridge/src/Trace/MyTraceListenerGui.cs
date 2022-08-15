@@ -16,14 +16,15 @@ namespace Martridge.Trace {
         private StringBuilder _stringBuilder = new StringBuilder();
         public string Text { get => this._stringBuilder.ToString(); }
 
-        private Thread _notifyThread;
-        private object _notifyThreadLock = new object();
+        private readonly object _notifyThreadLock = new object();
         private bool _notifyThreadStop = false;
         private bool _notifyThreadHasChanges = false;
 
         public MyTraceListenerGui(string name) : base(name) {
-            this._notifyThread = new Thread(this.NotifyThreadLoop);
-            this._notifyThread.Start();
+            Thread notifyThread = new Thread(this.NotifyThreadLoop) {
+                Name = "MyTraceListenerGui - Notify Thread",
+            };
+            notifyThread.Start();
         }
 
         private void NotifyThreadLoop() {

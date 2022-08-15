@@ -161,7 +161,7 @@ namespace Martridge.Models.Configuration {
             }
             
             if (data.CustomUserArguments != null && this.CustomUserArguments != data.CustomUserArguments) {
-                this.CustomUserArguments = (string)data.CustomUserArguments;
+                this.CustomUserArguments = data.CustomUserArguments;
                 hasChanges = true;
             }
 

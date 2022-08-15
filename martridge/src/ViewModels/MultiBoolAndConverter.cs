@@ -6,7 +6,7 @@ using System.Globalization;
 namespace Martridge.ViewModels {
     public class MultiBoolAndConverter : IMultiValueConverter {
 
-        public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture) {
+        public object Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture) {
 
             foreach (object? obj in values) {
                 if (obj is bool boolVal) {

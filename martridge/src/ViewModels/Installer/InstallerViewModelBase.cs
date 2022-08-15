@@ -89,6 +89,8 @@ namespace Martridge.ViewModels.Installer {
         protected void ShowInstallerCancelledMessageBox() {
             Dispatcher.UIThread.InvokeAsync(() => {
                 try {
+                    if (this.ParentWindow == null) return;
+                    
                     string title = Localizer.Instance[@"DinkInstallerView/MessageBox_Cancel_Title"];
                     string body = Localizer.Instance[@"DinkInstallerView/MessageBox_Cancel_Body"];
                     DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Info, this.ParentWindow);
@@ -101,6 +103,8 @@ namespace Martridge.ViewModels.Installer {
         protected void ShowInstallerErrorMessageBox(Exception? exception) {
             Dispatcher.UIThread.InvokeAsync(() => {
                 try {
+                    if (this.ParentWindow == null) return;
+                    
                     string title = Localizer.Instance[@"DinkInstallerView/MessageBox_Error_Title"];
                     string body = Localizer.Instance[@"DinkInstallerView/MessageBox_Error_Body"] + Environment.NewLine + MyTrace.GetExceptionMessages(exception);
                     DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Error, this.ParentWindow);

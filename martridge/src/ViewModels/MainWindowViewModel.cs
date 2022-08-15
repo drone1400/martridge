@@ -156,7 +156,7 @@ namespace Martridge.ViewModels {
             this.ActiveUserPage = MainViewPage.MainView;
         }
 
-        private void VmDmodPackerOnInstallerDone(object? sender, DmodInstallerDoneEventArgs e) {
+        private void VmDmodPackerOnInstallerDone(object? sender, DmodPackerDoneEventArgs e) {
             // switch back to the main view...
             this.ActiveUserPage = MainViewPage.MainView;
         }

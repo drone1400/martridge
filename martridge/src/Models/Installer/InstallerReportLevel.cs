@@ -4,6 +4,5 @@
         Primary = 0,
         Secondary = 1,
         Indeterminate = 2,
-        DmodInformation = 3,
     }
 }

@@ -13,9 +13,9 @@ namespace Martridge.Models.OnlineDmods {
     public class DmodCrawler {
 
         public DateTime DmodPagesLastWriteTime { get; private set; } = DateTime.MinValue;
-        public event EventHandler DmodListInitialized;
+        public event EventHandler? DmodListInitialized;
 
-        private HttpClient _httpClient = new HttpClient();
+        private readonly HttpClient _httpClient = new HttpClient();
         
         private readonly int _knownDmodPages = 8;
 
@@ -23,12 +23,6 @@ namespace Martridge.Models.OnlineDmods {
         private List<OnlineDmodInfo> _dmodList = new List<OnlineDmodInfo>();
 
         private Dictionary<string, OnlineUser> _onlineUsers = new Dictionary<string, OnlineUser>();
-
-        
-        
-        public DmodCrawler() {
-            
-        }
 
         public async Task InitializeDmodLists(bool forceOnlineRefresh) {
             int dmodPageIdx = 1;
@@ -41,7 +35,7 @@ namespace Martridge.Models.OnlineDmods {
                     OnlineDmodCachedResource? cachedResource = OnlineDmodCachedResource.FromDmodListPageNumber(dmodPageIdx);
                     if (cachedResource != null) {
                         FileInfo localHtml = new FileInfo(cachedResource.Local);
-                        if (localHtml.Directory.Exists == false) {
+                        if (localHtml.Directory?.Exists == false) {
                             localHtml.Directory.Create();
                         }
                         if (localHtml.Exists == false || forceOnlineRefresh) {
@@ -131,7 +125,7 @@ namespace Martridge.Models.OnlineDmods {
 
         public async Task<HttpStatusCode> DownloadWebContent(OnlineDmodCachedResource res) {
             FileInfo fileInfo = new FileInfo(res.Local);
-            if (fileInfo.Directory.Exists == false) {
+            if (fileInfo.Directory?.Exists == false) {
                 fileInfo.Directory.Create();
             }
             
@@ -191,7 +185,7 @@ namespace Martridge.Models.OnlineDmods {
                                 HttpStatusCode result = await this.DownloadWebContent(res);
                             }
 
-                            if (File.Exists(res.Local) == true) {
+                            if (File.Exists(res.Local)) {
                                 HtmlDocument htmlDocScreenshot = new HtmlDocument();
                                 htmlDocScreenshot.Load(res.Local);
 
@@ -314,8 +308,7 @@ namespace Martridge.Models.OnlineDmods {
 
                         DateTime date = ShittyParseDateTime(dateStr);
 
-                        int downloads = 0;
-                        if (!int.TryParse(downloadsStr, out downloads)) {
+                        if (!int.TryParse(downloadsStr, out int downloads)) {
                             MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Error parsing dmod version downloads...", MyTraceLevel.Warning);
                         }
                         string downloadUrl = "";
@@ -381,10 +374,6 @@ namespace Martridge.Models.OnlineDmods {
                         
                         HtmlNodeCollection? cells = node.SelectNodes(".//td");
                         if (cells != null && cells.Count == 5) {
-                            if (rowCount == 44 || rowCount == 39) {
-                                int x = 0;
-                            }
-                            
                             HtmlNode dmodLink = cells[0].SelectSingleNode(".//a");
                             string dmodUrl = dmodLink.Attributes["href"].Value;
                             string dmodName = dmodLink.InnerText;
@@ -392,8 +381,7 @@ namespace Martridge.Models.OnlineDmods {
                             string dmodUpdatedText = cells[2].InnerText;
                             string dmodDownloadsText = cells[3].InnerText;
                             DateTime dmodUpdated = DateTime.Parse(dmodUpdatedText);
-                            int dmodDownloads = 0;
-                            if (!int.TryParse(dmodDownloadsText, out dmodDownloads)) {
+                            if (!int.TryParse(dmodDownloadsText, out int dmodDownloads)) {
                                 MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Error parsing dmod downloads number for dmod #{rowCount}, {dmodName}...", MyTraceLevel.Warning);
                             }
                             double dmodScore = double.NaN;

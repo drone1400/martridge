@@ -152,35 +152,33 @@ namespace Martridge.Models.DirFastFile {
                 offset += (int)file.Length;
             }
 
-            using (FileStream dirffStream = new FileStream(dirffFile, FileMode.Create, FileAccess.Write)) {
-                using (BinaryWriter dirffWriter = new BinaryWriter(dirffStream)) {
-                    // write block count as 4 bytes
-                    dirffWriter.Write(blockCount);
+            using (FileStream dirffStream = new FileStream(dirffFile, FileMode.Create, FileAccess.Write))
+            using (BinaryWriter dirffWriter = new BinaryWriter(dirffStream)) {
+                // write block count as 4 bytes
+                dirffWriter.Write(blockCount);
 
-                    // write headers
-                    for (int i = 0; i < headers.Count; i++) {
-                        dirffWriter.Write(headers[i].GetHeaderBytes());
-                    }
+                // write headers
+                for (int i = 0; i < headers.Count; i++) {
+                    dirffWriter.Write(headers[i].GetHeaderBytes());
+                }
 
-                    // write final header marking end offset...
-                    DirFfBmpMetaData last = new DirFfBmpMetaData(headers[headers.Count-1].Offset + headers[headers.Count-1].Size, 0, "");
-                    dirffWriter.Write(last.GetHeaderBytes());
+                // write final header marking end offset...
+                DirFfBmpMetaData last = new DirFfBmpMetaData(headers[headers.Count-1].Offset + headers[headers.Count-1].Size, 0, "");
+                dirffWriter.Write(last.GetHeaderBytes());
 
-                    // write actual data...
-                    foreach (FileInfo file in orderedBmps) {
-                        using (FileStream fileStream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read)) {
-                            using (BinaryReader binaryReader = new BinaryReader(fileStream)) {
-                                dirffWriter.Write(binaryReader.ReadBytes((int)file.Length));
-                            }
+                // write actual data...
+                foreach (FileInfo file in orderedBmps) {
+                    using (FileStream fileStream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read)) {
+                        using (BinaryReader binaryReader = new BinaryReader(fileStream)) {
+                            dirffWriter.Write(binaryReader.ReadBytes((int)file.Length));
                         }
                     }
-
-                    // done, close streams
-                    dirffWriter.Close();
-                    dirffStream.Close();
                 }
-            }
 
+                // done, close streams
+                dirffWriter.Close();
+                dirffStream.Close();
+            }
         }
 
 

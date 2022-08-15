@@ -8,7 +8,7 @@ namespace Martridge.Models.OnlineDmods {
         public string Url { get; private set; } = "";
         public static string DinkNetworkUrlBase => "https://www.dinknetwork.com";
         
-        public static OnlineDmodCachedResource? FromDmodListPageNumber(int pageNumber) {
+        public static OnlineDmodCachedResource FromDmodListPageNumber(int pageNumber) {
             return new OnlineDmodCachedResource() {
                 Local = Path.Combine(new [] {
                     LocationHelper.WebCache, "dinknetwork", "file", ".dmodlist", $"page{pageNumber}.html",

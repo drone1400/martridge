@@ -51,7 +51,7 @@ namespace Martridge.Models.Localization {
                     
                     CultureInfo ci = CultureInfo.GetCultureInfo(name);
                     
-                    // if culture info was initialized correctly, add this to available culture infos...
+                    // if culture info was initialized correctly without throwing any exception, add this to available culture infos...
                     _availableLocalizationFiles.Add(name, finfo);
                 }  catch (Exception) {
                     // do nothing
@@ -87,7 +87,7 @@ namespace Martridge.Models.Localization {
             // if language does not exist, get out
             if (!_availableLocalizationFiles.ContainsKey(language))
                 return false;
-            if (_availableLocalizationFiles[language]?.Exists != true)
+            if (_availableLocalizationFiles[language].Exists != true)
                 return false;
 
             try {

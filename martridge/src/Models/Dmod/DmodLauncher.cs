@@ -43,7 +43,7 @@ namespace Martridge.Models.Dmod
                 if (dinfo.Name.ToLowerInvariant() != "dink") {
                     string finalPath = path;
                     
-                    if (config.Launch.UsePathRelativeToGame) {
+                    if (config.Launch.UsePathRelativeToGame && finfo.DirectoryName != null) {
                         finalPath = Path.GetRelativePath(finfo.DirectoryName, path);
                     }
 

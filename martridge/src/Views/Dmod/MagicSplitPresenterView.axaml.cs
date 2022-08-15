@@ -12,28 +12,28 @@ namespace Martridge.Views.Dmod {
         public static readonly AvaloniaProperty<double> OnePageSwitchThresholdProperty =
             AvaloniaProperty.Register<MagicSplitPresenterView, double>(nameof(OnePageSwitchThreshold), 1000);
         public double OnePageSwitchThreshold {
-            get => (double)this.GetValue(OnePageSwitchThresholdProperty);
+            get => (double)(this.GetValue(OnePageSwitchThresholdProperty) ?? double.NaN);
             set => this.SetValue(OnePageSwitchThresholdProperty,value);
         }
         
         public static readonly AvaloniaProperty<double> OnePageSwitchHysteresisProperty =
             AvaloniaProperty.Register<MagicSplitPresenterView, double>(nameof(OnePageSwitchHysteresis), 10);
         public double OnePageSwitchHysteresis {
-            get => (double)this.GetValue(OnePageSwitchHysteresisProperty);
+            get => (double)(this.GetValue(OnePageSwitchHysteresisProperty) ?? double.NaN);
             set => this.SetValue(OnePageSwitchHysteresisProperty,value);
         }
 
         public static readonly AvaloniaProperty<bool> IsViewOnePageModeProperty =
             AvaloniaProperty.Register<MagicSplitPresenterView, bool>(nameof(IsViewOnePageMode), false);
         public bool IsViewOnePageMode {
-            get => (bool)this.GetValue(IsViewOnePageModeProperty);
+            get => (bool)(this.GetValue(IsViewOnePageModeProperty) ?? false);
             private set => this.SetValue(IsViewOnePageModeProperty,value);
         }
         
         public static readonly AvaloniaProperty<bool> IsOnePageShowingRightContentProperty =
             AvaloniaProperty.Register<MagicSplitPresenterView, bool>(nameof(IsOnePageShowingRightContent), false);
         public bool IsOnePageShowingRightContent {
-            get => (bool)this.GetValue(IsOnePageShowingRightContentProperty);
+            get => (bool)(this.GetValue(IsOnePageShowingRightContentProperty) ?? false);
             set => this.SetValue(IsOnePageShowingRightContentProperty,value);
         }
         
@@ -51,21 +51,21 @@ namespace Martridge.Views.Dmod {
         public static readonly AvaloniaProperty<double> LeftPanelMinWidthProperty =
             AvaloniaProperty.Register<MagicSplitPresenterView, double>(nameof(LeftPanelMinWidth), 480);
         public double LeftPanelMinWidth {
-            get => (double)this.GetValue(LeftPanelMinWidthProperty);
+            get => (double)(this.GetValue(LeftPanelMinWidthProperty) ?? double.NaN);
             set => this.SetValue(LeftPanelMinWidthProperty,value);
         }
         
         public static readonly AvaloniaProperty<int> LeftPanelColumnProperty =
             AvaloniaProperty.Register<MagicSplitPresenterView, int>(nameof(LeftPanelColumn), 0);
         public int LeftPanelColumn {
-            get => (int)this.GetValue(LeftPanelColumnProperty);
+            get => (int)(this.GetValue(LeftPanelColumnProperty) ?? 0);
             private set => this.SetValue(LeftPanelColumnProperty,value);
         }
         
         public static readonly AvaloniaProperty<int> LeftPanelColumnSpanProperty =
             AvaloniaProperty.Register<MagicSplitPresenterView, int>(nameof(LeftPanelColumnSpan), 1);
         public int LeftPanelColumnSpan {
-            get => (int)this.GetValue(LeftPanelColumnSpanProperty);
+            get => (int)(this.GetValue(LeftPanelColumnSpanProperty) ?? 0);
             private set => this.SetValue(LeftPanelColumnSpanProperty,value);
         }
         
@@ -83,21 +83,21 @@ namespace Martridge.Views.Dmod {
         public static readonly AvaloniaProperty<double> RightPanelMinWidthProperty =
             AvaloniaProperty.Register<MagicSplitPresenterView, double>(nameof(RightPanelMinWidth), 480);
         public double RightPanelMinWidth {
-            get => (double)this.GetValue(RightPanelMinWidthProperty);
+            get => (double)(this.GetValue(RightPanelMinWidthProperty) ?? double.NaN);
             set => this.SetValue(RightPanelMinWidthProperty,value);
         }
         
         public static readonly AvaloniaProperty<int> RightPanelColumnProperty =
             AvaloniaProperty.Register<MagicSplitPresenterView, int>(nameof(RightPanelColumn), 2);
         public int RightPanelColumn {
-            get => (int)this.GetValue(RightPanelColumnProperty);
+            get => (int)(this.GetValue(RightPanelColumnProperty) ?? 0);
             private set => this.SetValue(RightPanelColumnProperty,value);
         }
         
         public static readonly AvaloniaProperty<int> RightPanelColumnSpanProperty =
             AvaloniaProperty.Register<MagicSplitPresenterView, int>(nameof(RightPanelColumnSpan), 1);
         public int RightPanelColumnSpan {
-            get => (int)this.GetValue(RightPanelColumnSpanProperty);
+            get => (int)(this.GetValue(RightPanelColumnSpanProperty) ?? 0);
             private set => this.SetValue(RightPanelColumnSpanProperty,value);
         }
         

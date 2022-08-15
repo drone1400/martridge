@@ -148,6 +148,9 @@ namespace Martridge.Models.Dmod {
 
 
         private Bitmap? ScanDirFf(FileInfo file) {
+            // this should be impossible but just in case
+            if (file.Directory == null) return null;
+            
             List<DirFfBmpMetaData>  meta = DirFf.LoadMetaDataFromDirectory(file.Directory.FullName);
             foreach (DirFfBmpMetaData metaData in meta) {
                 string fileLower = metaData.FileName.ToLowerInvariant();

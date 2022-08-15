@@ -16,11 +16,11 @@ namespace Martridge.ViewModels.About {
         }
         private List<AboutUsedPackageViewModel> _usedPackages = new List<AboutUsedPackageViewModel>();
         
-        public AnimatedDinkGraphicViewModel? AnimatedMartridgeLeft {
+        public AnimatedDinkGraphicViewModel AnimatedMartridgeLeft {
             get => DinkyAlert.AnimatedMartridgeLeft;
         }
         
-        public AnimatedDinkGraphicViewModel? AnimatedMartridgeRight {
+        public AnimatedDinkGraphicViewModel AnimatedMartridgeRight {
             get => DinkyAlert.AnimatedMartridgeRight;
         }
 

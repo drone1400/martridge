@@ -17,20 +17,19 @@ namespace Martridge.Trace {
 
         private FileStream _logStream;
         private StreamWriter _streamWriter;
-        private FileInfo _logFileInfo;
-        private Thread _autoLogFlusher;
-        private object _objectLock = new object();
 
         public MyTraceListenerLogger(string name, bool autoFlush = true) : base(name){
             string fileName = name + "_" + DateTime.Now.ToString(MyTrace.FileTimestamp) + ".log";
 
             string path = Path.Combine(LocationHelper.LogsDirectory, fileName);
-            this._logFileInfo = new FileInfo(path);
-            this._logStream = new FileStream(this._logFileInfo.FullName, FileMode.Create, FileAccess.Write, FileShare.Read);
+            FileInfo finfo = new FileInfo(path);
+            this._logStream = new FileStream(finfo.FullName, FileMode.Create, FileAccess.Write, FileShare.Read);
             this._streamWriter = new StreamWriter(this._logStream);
-            this._autoLogFlusher = new Thread(this.LogFlushLoop);
             if (autoFlush) {
-                this._autoLogFlusher.Start();
+                Thread logFlusherThread = new Thread(this.LogFlushLoop) {
+                    Name = "MyTraceListenerLogger - Log Flusher Thread", 
+                };
+                logFlusherThread.Start();
             }
         }
 

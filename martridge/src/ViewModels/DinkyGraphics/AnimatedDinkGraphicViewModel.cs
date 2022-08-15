@@ -31,7 +31,11 @@ namespace Martridge.ViewModels.DinkyGraphics {
         }
 
         public AnimatedDinkGraphicViewModel(string assetImagePrefix, List<int> frameTimes) {
-            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+            IAssetLoader? assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+
+            if (assets == null) {
+                throw new Exception("Could not initialize Avalonia IAssetLoader");
+            }
 
             assetImagePrefix = @"avares://martridge/Assets/" + assetImagePrefix;
             
@@ -52,7 +56,11 @@ namespace Martridge.ViewModels.DinkyGraphics {
         }
         
         public AnimatedDinkGraphicViewModel(List<string> imageResoruces, List<int> frameTimes) {
-            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+            IAssetLoader? assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+            
+            if (assets == null) {
+                throw new Exception("Could not initialize Avalonia IAssetLoader");
+            }
             
             string assetImagePrefix = @"avares://martridge/Assets/";
 

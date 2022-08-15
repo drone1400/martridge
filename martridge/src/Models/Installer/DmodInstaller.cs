@@ -10,10 +10,8 @@ namespace Martridge.Models.Installer {
     public class DmodInstaller : InstallerBase {
         public event EventHandler<DmodInstallerDoneEventArgs>? InstallerDone;
 
-        private Stream? _tempStream = null;
-        private FileInfo? _tempFile = null;
-
-        
+        private readonly Stream? _tempStream = null;
+        private readonly FileInfo? _tempFile = null;
 
         public void StartInstallingDmod(FileInfo sourceFile, DirectoryInfo destinationDirectory) {
             // only allow installer to run once
@@ -28,8 +26,8 @@ namespace Martridge.Models.Installer {
                 try {
                     // starting...
                     this.StartTime = DateTime.Now;
-                    this._progPhaseCurrent = 0;
-                    this._progPhaseTotal = 5;
+                    this.ProgPhaseCurrent = 0;
+                    this.ProgPhaseTotal = 5;
                     // log start of installation
                     this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                         "",
@@ -112,7 +110,7 @@ namespace Martridge.Models.Installer {
             this.ReportProgress(InstallerReportLevel.Primary,
                 Localizer.Instance[@"DinkInstaller/Heading/Cleanup"],
                 "",
-                this._progPhaseCurrent / this._progPhaseTotal);
+                this.ProgPhaseCurrent / this.ProgPhaseTotal);
             this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                 "",
                 Localizer.Instance[@"DinkInstaller/CleaningUp/Start"],
@@ -142,7 +140,7 @@ namespace Martridge.Models.Installer {
             this.ReportProgress(InstallerReportLevel.Primary,
                 Localizer.Instance[@"DinkInstaller/Heading/InstallingDmod"],
                 sourceFile.FullName,
-                this._progPhaseCurrent++/this._progPhaseTotal);
+                this.ProgPhaseCurrent++/this.ProgPhaseTotal);
             this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                 "",
                 Localizer.Instance[@"DinkInstaller/InstallingDmod/FinalUnzip/Start"],
@@ -189,7 +187,7 @@ namespace Martridge.Models.Installer {
             this.ReportProgress(InstallerReportLevel.Primary,
                 Localizer.Instance[@"DinkInstaller/Heading/InstallingDmod"],
                 sourceFile.FullName,
-                this._progPhaseCurrent++ / this._progPhaseTotal);
+                this.ProgPhaseCurrent++ / this.ProgPhaseTotal);
             this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                 "",
                 Localizer.Instance[@"DinkInstaller/InstallingDmod/FinalUnzip/Done"],

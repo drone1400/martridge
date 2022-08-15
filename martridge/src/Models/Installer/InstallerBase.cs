@@ -75,10 +75,9 @@ namespace Martridge.Models.Installer {
         protected CancellationToken CancelToken => CancelTokenSource.Token;
 
         public MyTrace CustomTrace { get; }
-        private MyTraceListenerLogger? _traceLogger = null;
         
-        protected double _progPhaseCurrent = 0;
-        protected double _progPhaseTotal = 0;
+        protected double ProgPhaseCurrent = 0;
+        protected double ProgPhaseTotal = 0;
 
         //
         // Constructor
@@ -88,8 +87,8 @@ namespace Martridge.Models.Installer {
             this.CustomTrace = new MyTrace(this.GetType().ToString());
 
             // add text logger listener to trace...
-            this._traceLogger = new MyTraceListenerLogger(this.GetType().ToString());
-            this.CustomTrace.Listeners.Add(this._traceLogger);
+            MyTraceListenerLogger traceLogger = new MyTraceListenerLogger(this.GetType().ToString());
+            this.CustomTrace.Listeners.Add(traceLogger);
         }
         
         
@@ -97,7 +96,7 @@ namespace Martridge.Models.Installer {
         // Progress event
         //
 
-        public event EventHandler<InstallerProgressEventArgs> ProgressReport;
+        public event EventHandler<InstallerProgressEventArgs>? ProgressReport;
         protected void ReportProgress(InstallerReportLevel level, string heading, string detail, double percent) {
             this.ProgressReport?.Invoke(this, new InstallerProgressEventArgs(level, heading, detail, percent));
         }

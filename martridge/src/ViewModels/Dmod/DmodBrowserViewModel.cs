@@ -312,7 +312,7 @@ namespace Martridge.ViewModels.Dmod {
 
                 if (this._dmodManager != null) {
                     this._dmodManager.DmodListInitialized += this.DmodManager_DmodListInitialized;
-                    this.InitializeDmods();
+                    this.InitializeDmodsFromManager();
                 }
             }
         }
@@ -363,12 +363,14 @@ namespace Martridge.ViewModels.Dmod {
         // -----------------------------------------------------------------------------------------------------------------------------------
 
         private void DmodManager_DmodListInitialized(object? sender, EventArgs e) {
-            this.InitializeDmods();
+            this.InitializeDmodsFromManager();
         }
         
-        private void InitializeDmods() {
+        private void InitializeDmodsFromManager() {
+            if (this._dmodManager == null ||
+                this._cfgGeneral == null) { return; }
+            
             this.DmodDefinitions.Clear();
-            if (this._dmodManager == null) { return; }
 
             foreach (DmodFileDefinition dfd in this._dmodManager.DmodList) {
                 this.DmodDefinitions.Add(new DmodDefinition(dfd));
@@ -381,10 +383,7 @@ namespace Martridge.ViewModels.Dmod {
         /// Initializes filtered dmods list for the view using current <see cref="DmodDefinitions"/>
         /// </summary>
         private void InitializeFilteredDmods() {
-            if (this.DmodSearchString == null) {
-                // use all definitions
-                this.InitializeOrderedFilteredDmods(this.DmodDefinitions);
-            } else if (this.DmodSearchString.Length >= 2) {
+            if (this.DmodSearchString != null && this.DmodSearchString.Length >= 2) {
                 string searchStr = this.DmodSearchString.ToLowerInvariant();
                 
                 var filtered = this._dmodDefinitions.Where(definition => 
@@ -392,6 +391,9 @@ namespace Martridge.ViewModels.Dmod {
                 
                 // filter definitions
                 this.InitializeOrderedFilteredDmods(filtered);
+            } else {
+                // use all the definitions
+                this.InitializeOrderedFilteredDmods(this.DmodDefinitions);
             }
         }
         
@@ -451,9 +453,11 @@ namespace Martridge.ViewModels.Dmod {
         #region COMMANDS
 
         public void CmdRefreshDmods(object? parameter = null) {
-            if (this.DmodManager == null) { return; }
+            if (this.DmodManager == null || 
+                this.ConfigurationGeneral == null) { return; }
             this.DmodSearchString = null;
-            this.InitializeDmods();
+
+            this.DmodManager.Initialize(this.ConfigurationGeneral);
         }
 
         [DependsOn(nameof(DmodManager))]

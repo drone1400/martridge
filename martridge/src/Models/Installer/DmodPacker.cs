@@ -17,17 +17,16 @@ namespace Martridge.Models.Installer {
 
         public void StartPackingDmod(FileInfo destinationFile, DirectoryInfo sourceDirectory) {
             // only allow installer to run once
-            if (this.IsBusy || this.IsDone) {
-                return;
-            }
+            if (this.IsBusy || this.IsDone) return;
+            
+            this.IsBusy = true;
 
-            Task task = new Task(async () => {
+            Task task = new Task(() => {
                 bool cancelled = false;
                 Exception? exception = null;
 
                 try {
                     // starting...
-                    this.IsBusy = true;
                     this.StartTime = DateTime.Now;
                     this.ProgPhaseCurrent = 0;
                     this.ProgPhaseTotal = 5;

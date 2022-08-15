@@ -10,6 +10,7 @@ using Martridge.Models.Installer;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using Martridge.ViewModels.DinkyAlerts;
+using System.Threading.Tasks;
 
 namespace Martridge.ViewModels.Installer {
     public class DinkInstallerViewModel : InstallerViewModelBase {
@@ -102,7 +103,7 @@ namespace Martridge.ViewModels.Installer {
 
         private void DinkInstallerViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
             if (e.PropertyName == nameof(this.SelectedInstallableVersion)) {
-                this._installerDestinationAuto = Path.Combine(LocationHelper.AppBaseDirectory, this.SelectedInstallableVersion.InstallerName);
+                this._installerDestinationAuto = Path.Combine(LocationHelper.AppBaseDirectory, this.SelectedInstallableVersion?.InstallerName ?? "ERR_InstallerName");
                 this.InstallerDestination = this._installerDestinationAuto;
             }
         }
@@ -183,14 +184,14 @@ namespace Martridge.ViewModels.Installer {
             }
         }
 
-        public void CmdGoNext(object? parameter = null) {
+        public async void CmdGoNext(object? parameter = null) {
             switch (this.ActiveUserPage) {
                 case InstallerViewPage.VersionSelect:
                     this.ActiveUserPage = InstallerViewPage.InstallSettings;
-                    this.InstallerProgressTitle = this.SelectedInstallableVersion.InstallerName;
+                    this.InstallerProgressTitle = this.SelectedInstallableVersion?.InstallerName ?? "ERR_InstallerName";
                     break;
                 case InstallerViewPage.InstallSettings:
-                    this.StartInstallation();
+                    await this.StartInstallation();
                     break;
             }
         }
@@ -260,8 +261,9 @@ namespace Martridge.ViewModels.Installer {
         //      Installer logic
         //
 
-        private async void StartInstallation() {
-            if (this.SelectedInstallableVersion == null) {
+        private async Task StartInstallation() {
+            if (this.SelectedInstallableVersion == null ||
+                this.ParentWindow == null) {
                 // TODO throw some exception or something
                 return;
             }

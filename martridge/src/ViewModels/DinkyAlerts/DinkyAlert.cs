@@ -125,25 +125,30 @@ namespace Martridge.ViewModels.DinkyAlerts {
         );
 
 
-        public static async Task<AlertResults> ShowDialog(string title, string message, AlertResults resultButtons, AlertType type, Window parentWindow) {
+        public async static Task<AlertResults> ShowDialog(string title, string message, AlertResults resultButtons, AlertType type, Window parentWindow) {
             DinkyAlertWindowViewModel vm = new DinkyAlertWindowViewModel(title, message, resultButtons, type);
-            DinkyAlertWindow win = new DinkyAlertWindow();
-            win.DataContext = vm;
+            DinkyAlertWindow win = new DinkyAlertWindow {
+                DataContext = vm,
+            };
+            
             win.Closing += ( sender,  args) => {
                 // cancel closing if result is not set yet
                 if (vm.Result == AlertResults.None) {
                     args.Cancel = true;
                 }
             };
+            
+            Size? frameSize = parentWindow.FrameSize;
 
             // try to center on parent window
             int posX = parentWindow.Position.X;
             int posY = parentWindow.Position.Y;
-            if (parentWindow.FrameSize != null && 
+            if (frameSize != null && 
                 double.IsNaN(win.Width) == false &&
                 double.IsNaN(win.Height) == false ) {
-                posX += (int)(parentWindow.FrameSize?.Width / 2 - win.Width / 2);
-                posY += (int)(parentWindow.FrameSize?.Height / 2 - win.Height / 2);
+                
+                posX += ((int)(((Size)frameSize).Width / 2 - win.Width / 2));
+                posY += ((int)(((Size)frameSize).Height / 2 - win.Height / 2))!;
             } else {
                 posX += 100;
                 posY += 100;

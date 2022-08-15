@@ -198,7 +198,7 @@ namespace Martridge.ViewModels.Installer {
                     } else {
                         string title = Localizer.Instance[@"DinkInstallerView/MessageBox_DmodPackerError_BadFolder_Title"];
                         string message = Localizer.Instance[@"DinkInstallerView/MessageBox_DmodPackerError_BadFolder_Body"];
-                        DinkyAlert.ShowDialog(title, message, AlertResults.Ok, AlertType.Error, this.ParentWindow);
+                        await DinkyAlert.ShowDialog(title, message, AlertResults.Ok, AlertType.Error, this.ParentWindow);
                     }
                 }
 
@@ -240,7 +240,8 @@ namespace Martridge.ViewModels.Installer {
         }
 
         private void StartInstallation() {
-            if (this.SelectedDmodDestination == null) {
+            if (this.SelectedDmodDestination == null ||
+                this.SelectedDmodSourceDirectory == null) {
                 // TODO throw some exception or something
                 return;
             }

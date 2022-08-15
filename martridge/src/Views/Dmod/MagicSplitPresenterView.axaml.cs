@@ -105,7 +105,7 @@ namespace Martridge.Views.Dmod {
         // Constructor and logic
         // -----------------------------------------------------------------------------------------------------------------------------------
         
-        private Grid _theGrid;
+        private readonly Grid? _theGrid;
 
         public MagicSplitPresenterView() {
             this.InitializeComponent();
@@ -134,15 +134,19 @@ namespace Martridge.Views.Dmod {
                 this.LeftPanelColumnSpan = 1;
                 this.RightPanelColumn = 2;
                 this.RightPanelColumnSpan = 1;
-                this._theGrid.ColumnDefinitions[0].MinWidth = this.LeftPanelMinWidth;
-                this._theGrid.ColumnDefinitions[2].MinWidth = this.RightPanelMinWidth;
+                if (this._theGrid != null) {
+                    this._theGrid.ColumnDefinitions[0].MinWidth = this.LeftPanelMinWidth;
+                    this._theGrid.ColumnDefinitions[2].MinWidth = this.RightPanelMinWidth;
+                }
             } else {
                 this.LeftPanelColumn = 0;
                 this.LeftPanelColumnSpan = 3;
                 this.RightPanelColumn = 0;
                 this.RightPanelColumnSpan = 3;
-                this._theGrid.ColumnDefinitions[0].MinWidth = 0;
-                this._theGrid.ColumnDefinitions[2].MinWidth = 0;
+                if (this._theGrid != null) {
+                    this._theGrid.ColumnDefinitions[0].MinWidth = 0;
+                    this._theGrid.ColumnDefinitions[2].MinWidth = 0;
+                }
             }
         }
 

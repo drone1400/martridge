@@ -356,7 +356,8 @@ namespace Martridge.ViewModels.Dmod {
         /// </summary>
         /// <param name="forceReloadFromWeb">If true, will force attempt to get DMOD data from web</param>
         private async Task SelectedDmodDefinitionInitialize(bool forceReloadFromWeb) {
-            if (this.SelectedDmodDefinition != null) {
+            if (this.SelectedDmodDefinition != null &&
+                this.DmodCrawler != null) {
                 try {
                     this.ProgressBarPercent = 0;
                     this.ProgressIsIndeterminate = true;
@@ -365,7 +366,7 @@ namespace Martridge.ViewModels.Dmod {
                     this.SelectedDmodScreenshotVm = null;
                     this.SelectedDmodScreenshot = null;
 
-                    await this.DmodCrawler?.UpdateDmodData(this.SelectedDmodDefinition.DmodInfo, forceReloadFromWeb);
+                    await this.DmodCrawler.UpdateDmodData(this.SelectedDmodDefinition.DmodInfo, forceReloadFromWeb);
 
                     foreach (OnlineDmodReview rev in this.SelectedDmodDefinition.DmodInfo.DmodReviews) {
                         if (this._cachedUserViewModels.ContainsKey(rev.User.Name) == false) {

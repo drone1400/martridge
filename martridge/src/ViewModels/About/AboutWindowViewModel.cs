@@ -53,7 +53,9 @@ namespace Martridge.ViewModels.About {
         public string Version { get; }
 
         public AboutWindowViewModel() {
-            this.Version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Version? version = Assembly.GetExecutingAssembly().GetName().Version;
+            // note, this should be impossible i think?...
+            this.Version = version != null ? version.ToString() : "VersionError!!?!";
         }
 
         public void InitializeLocalizedPackageInfo() {

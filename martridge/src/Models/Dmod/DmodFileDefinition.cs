@@ -122,7 +122,7 @@ namespace Martridge.Models.Dmod {
                     return null;
                 }
 
-                string desc = File.ReadAllText(this.DmodDiz?.FullName);
+                string desc = File.ReadAllText(this.DmodDiz!.FullName);
 
                 return desc;
             } catch (Exception ex) {
@@ -137,7 +137,7 @@ namespace Martridge.Models.Dmod {
                     return null;
                 }
 
-                string[] lines = File.ReadAllLines(this.DmodDiz?.FullName);
+                string[] lines = File.ReadAllLines(this.DmodDiz!.FullName);
 
                 return lines[0];
             } catch (Exception ex) {

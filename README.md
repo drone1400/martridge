@@ -24,9 +24,23 @@ This application is a DMOD manager/launcher for Dink Smallwood.
 - DinkHD - the current official release of Dink, available on multiple platforms like Android or MacOS but unfortunately not on Linux systems
 - The original Dink Smallwood V1.08 - the decade old original release, still runs under Windows, although you probably don't wnat to use this anymore...
 
-
 3. Application Localization is WIP - Technically works but only english is available right now, I need to add more info about how to define the localization files using a template later...
 
+## Building
+Assuming that you're somewhat familiar with dotnet applications...
+1. Clone this git
+2. Restore submodules
+```git submodule update --init --recursive```
+3. Publish the project to folder using dotnet
+
+Here are my dotnet publish commandline options:
+- Windows x64 using NetCore 3.1 ```dotnet publish ./martridge/src/martridge.csproj --output ./publish/netcoreapp3.1_win-x64/martridge/ --configuration Release --framework netcoreapp3.1 --self-contained true --runtime win-x64 -p:PublishSingleFile=true```
+- Windows x86 using NetCore 3.1 ```dotnet publish ./martridge/src/martridge.csproj --output ./publish/netcoreapp3.1_win-x86/martridge/ --configuration Release --framework netcoreapp3.1 --self-contained true --runtime win-x86 -p:PublishSingleFile=true```
+- Windows x64 using Net 6.0 ```dotnet publish ./martridge/src/martridge.csproj --output ./publish/net6.0_win-x64/martridge/ --configuration Release --framework net6.0 --self-contained true --runtime win-x64 -p:PublishSingleFile=true```
+- Linux x64 using Net 6.0 ```dotnet publish ./martridge/src/martridge.csproj --output ./publish/net6.0_linux-x64/martridge/ --configuration Release --framework net6.0 --self-contained true --runtime linux-x64 -p:PublishSingleFile=true```
+
+If you are using JetBrains Rider, you should be able to use the run profiles included in the source.
+If you are using Visual Studio, you should be able to create your own publish profile based on the run profiles and the information above.
 
 ## Overview
 

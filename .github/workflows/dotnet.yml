@@ -13,8 +13,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+# ---- Checkout main source code
       - name: Checkout
         uses: actions/checkout@v3
+
+# ---- Get submodules
+      - name: Checkout submodules
+        run: git submodule update --init --recursive
       
       
 # ---- CSPROJ Version preparations

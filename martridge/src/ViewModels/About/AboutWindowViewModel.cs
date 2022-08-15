@@ -1,4 +1,3 @@
-using Avalonia;
 using Martridge.Models.Configuration;
 using Martridge.Models.Localization;
 using Martridge.ViewModels.DinkyAlerts;

@@ -2,7 +2,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Martridge.ViewModels.DinkyGraphics;
 using Martridge.Views.DinkyAlerts;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

@@ -1,6 +1,4 @@
-using Martridge.Models.Localization;
 using Martridge.Models.OnlineDmods;
-using System;
 
 namespace Martridge.ViewModels.Dmod {
     public class OnlineDmodVersionViewModel {

@@ -1,10 +1,8 @@
-using Avalonia;
 using Avalonia.Media.Imaging;
 using Martridge.Models.OnlineDmods;
 using Martridge.Trace;
 using ReactiveUI;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 

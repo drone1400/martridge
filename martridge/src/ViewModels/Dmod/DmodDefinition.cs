@@ -4,7 +4,6 @@ using Martridge.Models.Dmod;
 using Martridge.Models.Localization;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 
 namespace Martridge.ViewModels.Dmod {

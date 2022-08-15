@@ -1,5 +1,4 @@
-﻿using Martridge.Views.Installer;
-using Martridge.ViewModels;
+﻿using Martridge.ViewModels;
 using Martridge.Views;
 using Martridge.Views.Log;
 using System;

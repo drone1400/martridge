@@ -1,6 +1,4 @@
-﻿using Martridge.Models.Configuration;
-using System;
-using System.IO;
+﻿using System;
 
 namespace Martridge.Models.Installer {
     public enum DinkInstallerResult {

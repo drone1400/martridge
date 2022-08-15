@@ -10,7 +10,6 @@ using Martridge.Models.Installer;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using Martridge.ViewModels.DinkyAlerts;
-using System.Threading;
 
 namespace Martridge.ViewModels.Installer {
     public class DinkInstallerViewModel : InstallerViewModelBase {

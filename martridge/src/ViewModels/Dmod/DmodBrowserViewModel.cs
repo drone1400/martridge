@@ -1,6 +1,4 @@
 ﻿using Avalonia.Metadata;
-using Martridge.ViewModels.DinkyGraphics;
-using Martridge.Models;
 using Martridge.Models.Configuration;
 using Martridge.Models.Dmod;
 using Martridge.Trace;
@@ -8,7 +6,6 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Timers;

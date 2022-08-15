@@ -1,5 +1,4 @@
 ﻿using Avalonia.Threading;
-using Martridge.Models.Installer;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using Martridge.ViewModels.DinkyAlerts;

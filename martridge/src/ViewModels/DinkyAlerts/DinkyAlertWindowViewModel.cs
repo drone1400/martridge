@@ -1,8 +1,6 @@
 using Avalonia.Controls;
 using Martridge.ViewModels.DinkyGraphics;
 using ReactiveUI;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Martridge.ViewModels.DinkyAlerts {
     public class DinkyAlertWindowViewModel :ViewModelBase {

@@ -379,13 +379,13 @@ namespace Martridge.ViewModels.Dmod {
                     }
 
                     foreach (OnlineDmodScreenshot scr in this.SelectedDmodDefinition.DmodInfo.DmodScreenshots) {
-                        OnlineDmodCachedResource resPreview = OnlineDmodCachedResource.FromRelativeFileUrl(scr.RelativePreviewUrl);
-                        if (File.Exists(resPreview.Local) == false) {
+                        OnlineDmodCachedResource? resPreview = OnlineDmodCachedResource.FromRelativeFileUrl(scr.RelativePreviewUrl);
+                        if (resPreview != null && File.Exists(resPreview.Local) == false) {
                             HttpStatusCode result = await this.DmodCrawler.DownloadWebContent(resPreview);
                         }
 
-                        OnlineDmodCachedResource resScreenshot = OnlineDmodCachedResource.FromRelativeFileUrl(scr.RelativeScreenshotUrl);
-                        if (File.Exists(resScreenshot.Local) == false) {
+                        OnlineDmodCachedResource? resScreenshot = OnlineDmodCachedResource.FromRelativeFileUrl(scr.RelativeScreenshotUrl);
+                        if (resScreenshot != null && File.Exists(resScreenshot.Local) == false) {
                             HttpStatusCode result = await this.DmodCrawler.DownloadWebContent(resScreenshot);
                         }
                     }
@@ -419,8 +419,8 @@ namespace Martridge.ViewModels.Dmod {
                     return;
                 }
                 
-                OnlineDmodCachedResource resScreenshot = OnlineDmodCachedResource.FromRelativeFileUrl(this.SelectedDmodScreenshotVm.DmodScreenshot.RelativeScreenshotUrl);
-                if (File.Exists(resScreenshot.Local)) {
+                OnlineDmodCachedResource? resScreenshot = OnlineDmodCachedResource.FromRelativeFileUrl(this.SelectedDmodScreenshotVm.DmodScreenshot.RelativeScreenshotUrl);
+                if (resScreenshot != null && File.Exists(resScreenshot.Local)) {
                     this.SelectedDmodScreenshot = new Bitmap(resScreenshot.Local);
                 } else {
                     this.SelectedDmodScreenshot = null;
@@ -506,21 +506,24 @@ namespace Martridge.ViewModels.Dmod {
             if (!(parameter is OnlineDmodVersionViewModel def)) return;
 
             string url = def.DmodVersion.RelativeDownloadUrl;
-            OnlineDmodCachedResource resource = OnlineDmodCachedResource.FromRelativeFileUrl(url);
-            if (File.Exists(resource.Local) == false) {
-                this.ProgressBarPercent = 0;
-                this.ProgressIsIndeterminate = true;
-                this.ProgressMessage = Localizer.Instance[@"OnlineDmodBrowser/Progress/DownloadingData"];
-                this.ProgressIsVisible = true;
+            OnlineDmodCachedResource? resource = OnlineDmodCachedResource.FromRelativeFileUrl(url);
+            if (resource != null) {
 
-                await this.DmodCrawler.DownloadWebContent(resource);
+                if (File.Exists(resource.Local) == false) {
+                    this.ProgressBarPercent = 0;
+                    this.ProgressIsIndeterminate = true;
+                    this.ProgressMessage = Localizer.Instance[@"OnlineDmodBrowser/Progress/DownloadingData"];
+                    this.ProgressIsVisible = true;
 
-                this.ProgressIsVisible = false;
-            }
+                    await this.DmodCrawler.DownloadWebContent(resource);
 
-            if (File.Exists(resource.Local)) {
-                this.MainVm.VmDmodInstaller.SelectedDmodPacakge = resource.Local;
-                this.MainVm.CmdShowPageDmodInstaller();
+                    this.ProgressIsVisible = false;
+                }
+
+                if (File.Exists(resource.Local)) {
+                    this.MainVm.VmDmodInstaller.SelectedDmodPacakge = resource.Local;
+                    this.MainVm.CmdShowPageDmodInstaller();
+                }
             }
         }
         [DependsOn(nameof(ProgressIsVisible))]

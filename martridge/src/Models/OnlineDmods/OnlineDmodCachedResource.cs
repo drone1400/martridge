@@ -1,3 +1,4 @@
+using Martridge.Trace;
 using System;
 using System.IO;
 
@@ -7,7 +8,7 @@ namespace Martridge.Models.OnlineDmods {
         public string Url { get; private set; } = "";
         public static string DinkNetworkUrlBase => "https://www.dinknetwork.com";
         
-        public static OnlineDmodCachedResource FromDmodListPageNumber(int pageNumber) {
+        public static OnlineDmodCachedResource? FromDmodListPageNumber(int pageNumber) {
             return new OnlineDmodCachedResource() {
                 Local = Path.Combine(new [] {
                     LocationHelper.WebCache, "dinknetwork", "file", ".dmodlist", $"page{pageNumber}.html",
@@ -16,13 +17,18 @@ namespace Martridge.Models.OnlineDmods {
             };
         }
 
-        public static OnlineDmodCachedResource FromRelativeFileUrl(string relativeUrl) {
+        public static OnlineDmodCachedResource? FromRelativeFileUrl(string relativeUrl) {
             if (relativeUrl.StartsWith('/') == false ||
                 relativeUrl.EndsWith('/')) {
-                throw new ArgumentException("Invalid Relative DinkNetwork url...");
+                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
+                return null;
             }
 
-            string local = GetLocalPathFromRelativeUrl(relativeUrl);
+            string? local = GetLocalPathFromRelativeUrl(relativeUrl);
+            if (local == null) {
+                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
+                return null;
+            }
             
             return new OnlineDmodCachedResource() {
                 Local = local,
@@ -30,13 +36,19 @@ namespace Martridge.Models.OnlineDmods {
             };
         }
 
-        public static OnlineDmodCachedResource FromRelativeScreenshotPageUrl(string relativeUrl) {
+        public static OnlineDmodCachedResource? FromRelativeScreenshotPageUrl(string relativeUrl) {
             if (relativeUrl.StartsWith('/') == false ||
                 relativeUrl.EndsWith('/') == false) {
-                throw new ArgumentException("Invalid Relative DinkNetwork url...");
+                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
+                return null;
             }
 
-            string local = GetLocalPathFromRelativeUrl(relativeUrl);
+            string? local = GetLocalPathFromRelativeUrl(relativeUrl);
+            if (local == null) {
+                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
+                return null;
+            }
+            
             local = Path.Combine(local, "page.html");
             
             return new OnlineDmodCachedResource() {
@@ -45,9 +57,10 @@ namespace Martridge.Models.OnlineDmods {
             };
         }
 
-        public static string GetLocalPathFromRelativeUrl(string relativeUrl) {
+        public static string? GetLocalPathFromRelativeUrl(string relativeUrl) {
             if (relativeUrl.StartsWith('/') == false) {
-                throw new ArgumentException("Invalid Relative DinkNetwork url...");
+                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
+                return null;
             }
             
             string[] split = relativeUrl.Split('/', StringSplitOptions.RemoveEmptyEntries);

@@ -28,7 +28,7 @@ namespace Martridge.Models.Configuration {
                     fileInfo.Directory.Create();
                 }
 
-                using (FileStream fs = new FileStream(path, FileMode.Create))
+                using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write))
                 using (StreamWriter sw = new StreamWriter(fs)) {
                     sw.Write(JsonConvert.SerializeObject(this, Formatting.Indented));
                     sw.Flush();
@@ -48,7 +48,7 @@ namespace Martridge.Models.Configuration {
         public static ConfigInstallerList? LoadFromFile(string path) {
             try {
                 ConfigInstallerList? cfg;
-                using (FileStream fs = new FileStream(path, FileMode.Open))
+                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
                 using (StreamReader sr = new StreamReader(fs)) {
                     cfg = JsonConvert.DeserializeObject<ConfigInstallerList>(sr.ReadToEnd());
                     fs.Flush();

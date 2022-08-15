@@ -17,7 +17,7 @@ namespace Martridge.Models.Configuration.Save {
                     fileInfo.Directory.Create();
                 }
 
-                using (FileStream fs = new FileStream(path, FileMode.Create))
+                using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write))
                 using (StreamWriter sw = new StreamWriter(fs)) {
                     sw.Write(JsonConvert.SerializeObject(this, Formatting.Indented));
                     sw.Flush();
@@ -37,7 +37,7 @@ namespace Martridge.Models.Configuration.Save {
         public static ConfigData? LoadFromFile(string path) {
             try {
                 ConfigData? cfg;
-                using (FileStream fs = new FileStream(path, FileMode.Open))
+                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
                 using (StreamReader sr = new StreamReader(fs)) {
                     cfg = JsonConvert.DeserializeObject<ConfigData>(sr.ReadToEnd());
                     fs.Flush();

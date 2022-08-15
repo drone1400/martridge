@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Martridge.Models.OnlineDmods {
@@ -39,23 +40,25 @@ namespace Martridge.Models.OnlineDmods {
 
                 bool nextPageExists = false;
                 while (dmodPageIdx <= this._knownDmodPages || nextPageExists) {
-                    OnlineDmodCachedResource cachedResource = OnlineDmodCachedResource.FromDmodListPageNumber(dmodPageIdx);
-                    FileInfo localHtml = new FileInfo(cachedResource.Local);
-                    if (localHtml.Directory.Exists == false) {
-                        localHtml.Directory.Create();
-                    }
-                    if (localHtml.Exists == false || forceOnlineRefresh) {
-                        await this.DownloadWebContent(cachedResource);
-                    }
-                    localHtml.Refresh();
-                    if (localHtml.Exists) {
-                        if (localHtml.LastWriteTime > this.DmodPagesLastWriteTime) {
-                            this.DmodPagesLastWriteTime = localHtml.LastWriteTime;
+                    OnlineDmodCachedResource? cachedResource = OnlineDmodCachedResource.FromDmodListPageNumber(dmodPageIdx);
+                    if (cachedResource != null) {
+                        FileInfo localHtml = new FileInfo(cachedResource.Local);
+                        if (localHtml.Directory.Exists == false) {
+                            localHtml.Directory.Create();
                         }
-                        int dmodCount = this.ParseDmodsPage(cachedResource.Local, dmodEntries);
-                        nextPageExists = this.ParseDmodsNextPageExists(cachedResource.Local);
-                    } else {
-                        nextPageExists = false;
+                        if (localHtml.Exists == false || forceOnlineRefresh) {
+                            await this.DownloadWebContent(cachedResource);
+                        }
+                        localHtml.Refresh();
+                        if (localHtml.Exists) {
+                            if (localHtml.LastWriteTime > this.DmodPagesLastWriteTime) {
+                                this.DmodPagesLastWriteTime = localHtml.LastWriteTime;
+                            }
+                            int dmodCount = this.ParseDmodsPage(cachedResource.Local, dmodEntries);
+                            nextPageExists = this.ParseDmodsNextPageExists(cachedResource.Local);
+                        } else {
+                            nextPageExists = false;
+                        }
                     }
 
                     dmodPageIdx++;
@@ -108,15 +111,15 @@ namespace Martridge.Models.OnlineDmods {
         public async Task CacheUserData(OnlineUser user, bool forceRefresh) {
             List<OnlineDmodCachedResource> resources = new List<OnlineDmodCachedResource>();
             
-            OnlineDmodCachedResource pfpBack = OnlineDmodCachedResource.FromRelativeFileUrl(user.RelativePfpBackgroundUrl);
-            OnlineDmodCachedResource pfpFore = OnlineDmodCachedResource.FromRelativeFileUrl(user.RelativePfpForegroundUrl);
+            OnlineDmodCachedResource? pfpBack = OnlineDmodCachedResource.FromRelativeFileUrl(user.RelativePfpBackgroundUrl);
+            OnlineDmodCachedResource? pfpFore = OnlineDmodCachedResource.FromRelativeFileUrl(user.RelativePfpForegroundUrl);
 
-            resources.Add(pfpBack);
-            resources.Add(pfpFore);
+            if (pfpBack != null) resources.Add(pfpBack);
+            if (pfpFore != null) resources.Add(pfpFore);
             
             foreach (string badgeStr in user.RelativeBadgeIconUrls) {
-                OnlineDmodCachedResource badge = OnlineDmodCachedResource.FromRelativeFileUrl(badgeStr);
-                resources.Add(badge);
+                OnlineDmodCachedResource? badge = OnlineDmodCachedResource.FromRelativeFileUrl(badgeStr);
+                if (badge != null) resources.Add(badge);
             }
 
             foreach (OnlineDmodCachedResource res in resources) {
@@ -181,23 +184,27 @@ namespace Martridge.Models.OnlineDmods {
                         string previewUrl = screenshotLinks[i].SelectSingleNode(".//img").Attributes["src"].Value;
                         string screenshotUrl = "";
 
-                        OnlineDmodCachedResource res = OnlineDmodCachedResource.FromRelativeScreenshotPageUrl(pageUrl);
+                        OnlineDmodCachedResource? res = OnlineDmodCachedResource.FromRelativeScreenshotPageUrl(pageUrl);
 
-                        if (File.Exists(res.Local) == false) {
-                            HttpStatusCode result = await this.DownloadWebContent(res);
+                        if (res != null) {
+                            // add screenshot if resource for it is valid
+                            
+                            if (File.Exists(res.Local) == false) {
+                                HttpStatusCode result = await this.DownloadWebContent(res);
+                            }
+
+                            if (File.Exists(res.Local) == true) {
+                                HtmlDocument htmlDocScreenshot = new HtmlDocument();
+                                htmlDocScreenshot.Load(res.Local);
+
+                                HtmlNode screenshotPageLink =
+                                    htmlDocScreenshot.DocumentNode.SelectSingleNode("//div[@class='subcontent']//div[@class='infobox']//div[@class='infoboxcontent']//a");
+                                screenshotUrl = screenshotPageLink.SelectSingleNode(".//img").Attributes["src"].Value;
+                            }
+
+                            OnlineDmodScreenshot screenshot = new OnlineDmodScreenshot(previewUrl, pageUrl, screenshotUrl);
+                            screenshots.Add(screenshot);
                         }
-
-                        if (File.Exists(res.Local) == true) {
-                            HtmlDocument htmlDocScreenshot = new HtmlDocument();
-                            htmlDocScreenshot.Load(res.Local);
-
-                            HtmlNode screenshotPageLink =
-                                htmlDocScreenshot.DocumentNode.SelectSingleNode("//div[@class='subcontent']//div[@class='infobox']//div[@class='infoboxcontent']//a");
-                            screenshotUrl = screenshotPageLink.SelectSingleNode(".//img").Attributes["src"].Value;
-                        }
-
-                        OnlineDmodScreenshot screenshot = new OnlineDmodScreenshot(previewUrl, pageUrl, screenshotUrl);
-                        screenshots.Add(screenshot);
                     }
                 }
 
@@ -432,15 +439,12 @@ namespace Martridge.Models.OnlineDmods {
             // dirty and easy way to parse date, just remove the number suffix and use DateTime.Parse...
             // TODO maybe think up a better way to do this?...
             // does the date format ever change?...
-            dateStr = dateStr.ToLowerInvariant();
-            dateStr = dateStr.Replace("st", "");
-            dateStr = dateStr.Replace("nd", "");
-            dateStr = dateStr.Replace("rd", "");
-            dateStr = dateStr.Replace("th", "");
-                    
-            DateTime date = DateTime.MinValue;
-            if (!DateTime.TryParse(dateStr, out date)) {
+
+            dateStr = Regex.Replace(dateStr, @"([0-9]+)(st|nd|rd|th)", "$1", RegexOptions.IgnoreCase );
+
+            if (!DateTime.TryParse(dateStr, out DateTime date)) {
                 MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Error parsing dmod version release date...", MyTraceLevel.Warning);
+                date = DateTime.MinValue;
             }
 
             return date;

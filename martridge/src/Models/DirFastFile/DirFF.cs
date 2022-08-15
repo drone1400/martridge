@@ -20,7 +20,7 @@ namespace Martridge.Models.DirFastFile {
             if (SafetyChecksAreOk(directory)) {
                 string dirffFile = Path.Combine(directory, "dir.ff");
 
-                using (FileStream dirffStream = new FileStream(dirffFile, FileMode.Open)) {
+                using (FileStream dirffStream = new FileStream(dirffFile, FileMode.Open, FileAccess.Read)) {
                     using (BinaryReader dirffReader = new BinaryReader(dirffStream)) {
                         // read headers
                         int fileCount = dirffReader.ReadInt32();
@@ -53,7 +53,7 @@ namespace Martridge.Models.DirFastFile {
             string fileLower = file.ToLowerInvariant();
 
             if (SafetyChecksAreOk(dirffFile.Directory?.FullName)) {
-                using (FileStream dirffStream = new FileStream(dirffFile.FullName, FileMode.Open)) {
+                using (FileStream dirffStream = new FileStream(dirffFile.FullName, FileMode.Open, FileAccess.Read)) {
                     using (BinaryReader dirffReader = new BinaryReader(dirffStream)) {
                         // read headers
                         int fileCount = dirffReader.ReadInt32();
@@ -152,7 +152,7 @@ namespace Martridge.Models.DirFastFile {
                 offset += (int)file.Length;
             }
 
-            using (FileStream dirffStream = new FileStream(dirffFile, FileMode.Create)) {
+            using (FileStream dirffStream = new FileStream(dirffFile, FileMode.Create, FileAccess.Write)) {
                 using (BinaryWriter dirffWriter = new BinaryWriter(dirffStream)) {
                     // write block count as 4 bytes
                     dirffWriter.Write(blockCount);
@@ -168,7 +168,7 @@ namespace Martridge.Models.DirFastFile {
 
                     // write actual data...
                     foreach (FileInfo file in orderedBmps) {
-                        using (FileStream fileStream = new FileStream(file.FullName, FileMode.Open)) {
+                        using (FileStream fileStream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read)) {
                             using (BinaryReader binaryReader = new BinaryReader(fileStream)) {
                                 dirffWriter.Write(binaryReader.ReadBytes((int)file.Length));
                             }
@@ -189,7 +189,7 @@ namespace Martridge.Models.DirFastFile {
         //    for (int i = 0; i < this._BmpData.Count; i++) {
         //        string filePath = Path.Combine(this._DirectoryPath, this._BmpData[i].FileName);
 
-        //        using (FileStream bmpStream = new FileStream(filePath, FileMode.Create)) {
+        //        using (FileStream bmpStream = new FileStream(filePath, FileMode.Create, FileAccess.Write)) {
         //            using (BinaryWriter bmpWriter = new BinaryWriter(bmpStream)) {
         //                bmpWriter.Write(this._BmpData[i].RawData);
         //                bmpWriter.Close();

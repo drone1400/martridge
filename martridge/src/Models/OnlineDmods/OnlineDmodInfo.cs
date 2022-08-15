@@ -30,8 +30,15 @@ namespace Martridge.Models.OnlineDmods {
             this.Updated = updated;
             this.Downloads = downloads;
             this.Score = score;
+
+            string? localBase = OnlineDmodCachedResource.GetLocalPathFromRelativeUrl(relativeUrlMain);
+
+            if (localBase == null) {
+                // Note: this should be impossible, i think?
+                throw new ArgumentException($"Could not initialize local cache for online dmod info using relative url: \"{relativeUrlMain}\"");
+            }
             
-            this.LocalBase = OnlineDmodCachedResource.GetLocalPathFromRelativeUrl(relativeUrlMain);
+            this.LocalBase = localBase;
             
             this.ResMain = OnlineDmodCachedResource.FromManualInput(
                 local: Path.Combine(this.LocalBase, "page_main.html"),

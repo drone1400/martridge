@@ -39,11 +39,11 @@ namespace Martridge.ViewModels.Dmod {
         }
 
         public void ReloadImages() {
-            OnlineDmodCachedResource pfpBack = OnlineDmodCachedResource.FromRelativeFileUrl(this.User.RelativePfpBackgroundUrl);
-            OnlineDmodCachedResource pfpFore = OnlineDmodCachedResource.FromRelativeFileUrl(this.User.RelativePfpForegroundUrl);
+            OnlineDmodCachedResource? pfpBack = OnlineDmodCachedResource.FromRelativeFileUrl(this.User.RelativePfpBackgroundUrl);
+            OnlineDmodCachedResource? pfpFore = OnlineDmodCachedResource.FromRelativeFileUrl(this.User.RelativePfpForegroundUrl);
 
             try {
-                if (File.Exists(pfpBack.Local)) {
+                if (pfpBack != null && File.Exists(pfpBack.Local)) {
                     this.PfpImageBackground = new Bitmap(pfpBack.Local);
                 } else {
                     this.PfpImageBackground = null;
@@ -54,7 +54,7 @@ namespace Martridge.ViewModels.Dmod {
             }
 
             try {
-                if (File.Exists(pfpBack.Local)) {
+                if (pfpFore != null && File.Exists(pfpFore.Local)) {
                     this.PfpImageForeground = new Bitmap(pfpFore.Local);
                 } else {
                     this.PfpImageForeground = null;
@@ -67,8 +67,8 @@ namespace Martridge.ViewModels.Dmod {
             ObservableCollection<Bitmap> badges = new ObservableCollection<Bitmap>();
             foreach (string relativeImg in this.User.RelativeBadgeIconUrls) {
                 try {
-                    OnlineDmodCachedResource res = OnlineDmodCachedResource.FromRelativeFileUrl(relativeImg);
-                    if (File.Exists(res.Local)) {
+                    OnlineDmodCachedResource? res = OnlineDmodCachedResource.FromRelativeFileUrl(relativeImg);
+                    if (res != null && File.Exists(res.Local)) {
                         Bitmap image = new Bitmap(res.Local);
                         badges.Add(image);
                     }

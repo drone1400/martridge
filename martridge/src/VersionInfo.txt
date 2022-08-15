@@ -1,3 +1,9 @@
+--- V0.4.1 ---
+- fixed bug where dmod thumbnails from readonly dir.ff files not being opened
+- fixed bug where Online Dmod Browser would break when parsing user reviews without avatars
+- fixed bug where Online Dmod Browser would not parse date time correctly 
+
+
 --- V0.4.0 ---
 - added launch option: make path relative
 - added launch option: use quotation marks, if not used, quotation marks will be added anyway if path contains spaces

@@ -30,8 +30,8 @@ namespace Martridge.ViewModels.Dmod {
 
         public void ReloadScreenshotPreviewFile() {
             try {
-                OnlineDmodCachedResource res = OnlineDmodCachedResource.FromRelativeFileUrl(this.DmodScreenshot.RelativePreviewUrl);
-                if (File.Exists(res.Local)) {
+                OnlineDmodCachedResource? res = OnlineDmodCachedResource.FromRelativeFileUrl(this.DmodScreenshot.RelativePreviewUrl);
+                if (res != null && File.Exists(res.Local)) {
                     this.ScreenshotPreview = new Bitmap(res.Local);
                 } else {
                     this.ScreenshotPreview = null;
@@ -44,8 +44,8 @@ namespace Martridge.ViewModels.Dmod {
         
         public void ReloadScreenshotFile() {
             try {
-                OnlineDmodCachedResource res = OnlineDmodCachedResource.FromRelativeFileUrl(this.DmodScreenshot.RelativePreviewUrl);
-                if (File.Exists(res.Local)) {
+                OnlineDmodCachedResource? res = OnlineDmodCachedResource.FromRelativeFileUrl(this.DmodScreenshot.RelativeScreenshotUrl);
+                if (res != null && File.Exists(res.Local)) {
                     this.Screenshot = new Bitmap(res.Local);
                 } else {
                     this.Screenshot = null;

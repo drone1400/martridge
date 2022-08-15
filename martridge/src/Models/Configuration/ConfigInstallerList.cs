@@ -13,9 +13,9 @@ namespace Martridge.Models.Configuration {
             return new ConfigInstallerList() {
                 InstallableVersions = new List<ConfigInstaller>() {
                     ConfigInstaller.GetDefaultInstaller_DinkHD_LatestRTSoft(),
+                    ConfigInstaller.GetDefaultInstaller_DinkHD_198(),
                     ConfigInstaller.GetDefaultInstaller_FreeDinkWith108DataAndLocalizations(),
                     ConfigInstaller.GetDefaultInstaller_FreeDinkWith108Data(),
-                    ConfigInstaller.GetDefaultInstaller_DinkHD_193(),
                     ConfigInstaller.GetDefaultInstaller_Dink_108(),
                 },
             };

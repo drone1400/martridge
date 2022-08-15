@@ -49,6 +49,48 @@ namespace Martridge.Models.Configuration {
                 },
             };
         }
+        
+        public static ConfigInstaller GetDefaultInstaller_DinkHD_197() {
+            return new ConfigInstaller() {
+                GameExeName = "dink.exe",
+                InstallerName = "Dink HD V1.97",
+                InstallerComponents = new List<ConfigInstallerComponent>() {
+                    new ConfigInstallerComponent() {
+                        WebResource = new ConfigWebResource() {
+                            Sha256 = "ed3a2243df9dd9e89239206ada77decf2afa32dfb13515670e93099465d7a575",
+                            CheckSha256 = true,
+                            Name = "dink_smallwood_hd-1_97.exe",
+                            Uri = @"https://www.dinknetwork.com/download/dink_smallwood_hd-1_97.exe",
+                            ResourceArchiveFormat = "Nsis",
+                        },
+
+                        FileFilterMode = InstallerFiltering.NoFiltering,
+                        FileFilterList = new List<string>(),
+                    },
+                },
+            };
+        }
+        
+        public static ConfigInstaller GetDefaultInstaller_DinkHD_198() {
+            return new ConfigInstaller() {
+                GameExeName = "dink.exe",
+                InstallerName = "Dink HD V1.98",
+                InstallerComponents = new List<ConfigInstallerComponent>() {
+                    new ConfigInstallerComponent() {
+                        WebResource = new ConfigWebResource() {
+                            Sha256 = "1e6a76557955cb90f92a4102caf1ee6a8e7cc8f1c0815056e3420ac0bda290d4",
+                            CheckSha256 = true,
+                            Name = "dink_smallwood_hd-1_98.exe",
+                            Uri = @"https://www.dinknetwork.com/download/dink_smallwood_hd-1_98.exe",
+                            ResourceArchiveFormat = "Nsis",
+                        },
+
+                        FileFilterMode = InstallerFiltering.NoFiltering,
+                        FileFilterList = new List<string>(),
+                    },
+                },
+            };
+        }
 
         public static ConfigInstaller GetDefaultInstaller_Dink_108() {
             return new ConfigInstaller() {

@@ -10,7 +10,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         
         x:Class="Martridge.Views.Log.LogWindow"
-        Icon="/Assets/martridge.ico"
+        Icon="/Assets/martridge_new.ico"
         Title="{dloc:Localize LogWindow/Title}"
         
         Closed="OnWindowClosed">

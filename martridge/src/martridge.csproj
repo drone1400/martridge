@@ -6,8 +6,8 @@
     <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
     <TrimMode>copyused</TrimMode>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <ApplicationIcon>Assets\martridge.ico</ApplicationIcon>
-    <Version>0.4.3.0</Version>
+    <ApplicationIcon>Assets\martridge_new.ico</ApplicationIcon>
+    <Version>0.4.4.0</Version>
     <RootNamespace>Martridge</RootNamespace>
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU;win-x64</Platforms>

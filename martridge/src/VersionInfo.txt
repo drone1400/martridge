@@ -1,3 +1,7 @@
+--- V0.4.4 ---
+- added 'SDL_AUDIODRIVER' = 'winmm' environment variable when launching freedink under windows to fix an issue with WAV file playback not working
+- changed icon with new one made by Bluedy over on The Dink Network
+
 --- V0.4.3 ---
 - fixed issue with dmod browser not refreshing dmods correctly
 - added new DinkHD versions from TDN to default installer list (old configInstallerList.json needs to be manually deleted to take effect)

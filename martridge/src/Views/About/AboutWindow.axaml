@@ -11,7 +11,7 @@
         Width="800" Height="600"
         
         x:Class="Martridge.Views.About.AboutWindow"
-        Icon="/Assets/martridge.ico"
+        Icon="/Assets/martridge_new.ico"
         Title="{dloc:Localize AboutWindow/Title}">
 
     <Design.DataContext>

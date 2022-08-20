@@ -76,12 +76,21 @@ namespace Martridge.Models.Dmod
                 
                 // localization support for freedink
                 // localization = "es_ES";
-                if (Path.GetFileNameWithoutExtension(finfo.Name.ToLowerInvariant()) == "freedink" && localization != null)
+                if (Path.GetFileNameWithoutExtension(finfo.Name.ToLowerInvariant()) == "freedink")
                 {
-                    pinfo.Environment.RemoveIfContained("LANGUAGE");
-                    pinfo.Environment.RemoveIfContained("LC_ALL");
-                    
-                    pinfo.Environment.Add("LC_ALL",localization);
+                    if (localization != null) {
+                        pinfo.Environment.RemoveIfContained("LANGUAGE");
+                        pinfo.Environment.RemoveIfContained("LC_ALL");
+
+                        pinfo.Environment.Add("LC_ALL", localization);
+                        pinfo.Environment.Add("LANGUAGE", localization);
+                    }
+
+                    if (finfo.Extension == ".exe") {
+                        pinfo.Environment.RemoveIfContained("SDL_AUDIODRIVER");
+                        // this fixes a sound issue regarding playback of WAV files with FreeDink 109.6 under Windows 10 and 11
+                        pinfo.Environment.Add("SDL_AUDIODRIVER", "winmm");
+                    }
                 }
                 
                 Process? proc = Process.Start(pinfo);

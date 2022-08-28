@@ -523,7 +523,7 @@ namespace Martridge.Models.Installer {
                     if (format != expectedFormat) {
                         this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                             Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResourceUnzipping/Error"],
-                            $"    Archive  = \"{ expectedFormat }\"",
+                            $"    Archive  = \"{ format }\"",
                         });
 
                         success = this.TryUnzipFile_SingleFormat(file, destination, format);

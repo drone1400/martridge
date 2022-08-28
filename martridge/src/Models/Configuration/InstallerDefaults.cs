@@ -141,6 +141,11 @@ namespace Martridge.Models.Configuration {
             };
         }
         
+        
+        /*
+        // NOTE: Dink V1.07 Beta 3 and Dink V1.06 use a different installer than NSIS
+        // currently the installer handler can not actually extract the files from it... Oups! 
+         
         public static ConfigDataInstaller DinkClassic_V1_07B3() {
             return new ConfigDataInstaller() {
                 Category = "Dink Classic",
@@ -184,6 +189,8 @@ namespace Martridge.Models.Configuration {
                 },
             };
         }
+        
+        */
 
         #endregion
 

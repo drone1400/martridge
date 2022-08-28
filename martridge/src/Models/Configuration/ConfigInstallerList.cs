@@ -20,8 +20,8 @@ namespace Martridge.Models.Configuration {
                 InstallerDefaults.DinkHD_TDN_V1_93(),
                 // Classic Dink
                 InstallerDefaults.DinkClassic_V1_08(),
-                InstallerDefaults.DinkClassic_V1_07B3(),
-                InstallerDefaults.DinkClassic_V1_06(),
+                //InstallerDefaults.DinkClassic_V1_07B3(),
+                //InstallerDefaults.DinkClassic_V1_06(),
                 // FreeDink
                 InstallerDefaults.FreeDink_V1_09_6_With_V108Data_And_Localizations(),
                 InstallerDefaults.Freedink_V1_09_6_With_GnuData(),

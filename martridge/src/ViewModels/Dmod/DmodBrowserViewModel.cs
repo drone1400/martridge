@@ -54,6 +54,10 @@ namespace Martridge.ViewModels.Dmod {
                 if (args.PropertyName == nameof(this.DmodOrderBy)) {
                     this.InitializeFilteredDmods();
                 }
+
+                if (args.PropertyName == nameof(this.ActiveGameExeIndex)) {
+                    this.RefreshIsLauncherFreeDink();
+                }
             };
         }
         
@@ -271,6 +275,14 @@ namespace Martridge.ViewModels.Dmod {
         // Properties
         // -----------------------------------------------------------------------------------------------------------------------------------
 
+        
+        public bool IsLauncherFreeDink {
+            get => this._isLauncherFreeDink;
+            protected set => this.RaiseAndSetIfChanged(ref this._isLauncherFreeDink, value);
+        }
+
+        private bool _isLauncherFreeDink = false;
+        
         public LaunchDmodDelegate? DmodLauncher {
             get => this._dmodLauncher;
             set => this.RaiseAndSetIfChanged(ref this._dmodLauncher, value);
@@ -287,7 +299,26 @@ namespace Martridge.ViewModels.Dmod {
         // Methods
         // -----------------------------------------------------------------------------------------------------------------------------------
 
+        private void RefreshIsLauncherFreeDink() {
+            if (this.ConfigurationGeneral == null) {
+                this.IsLauncherFreeDink = false;
+                return;
+            }
+            if (this.ActiveGameExeIndex < 0 || this.ActiveGameExeIndex >= this.ConfigurationGeneral.GameExePaths.Count) {
+                this.IsLauncherFreeDink = false;
+                return;
+            }
 
+            string path = this.ConfigurationGeneral.GameExePaths[this.ActiveGameExeIndex];
+            FileInfo finfo = new FileInfo(path);
+            if (finfo.Name.ToLowerInvariant().Contains("freedink") == false) {
+                this.IsLauncherFreeDink = false;
+                return;
+            }
+            
+            this.IsLauncherFreeDink = true;
+        }
+        
         #endregion
         
 
@@ -375,7 +406,7 @@ namespace Martridge.ViewModels.Dmod {
 
             this.InitializeFilteredDmods();
         }
-        
+
         /// <summary>
         /// Initializes filtered dmods list for the view using current <see cref="DmodDefinitions"/>
         /// </summary>

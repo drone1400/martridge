@@ -96,11 +96,15 @@
                     <Grid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="5" 
                           ColumnDefinitions="Auto, *"
                           RowDefinitions="Auto, Auto">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{dloc:Localize DmodBrowser/FreeDinkLocalization}" Classes="Heading2B" />
+                        <TextBlock Grid.Row="0" Grid.Column="0" 
+                                   Text="{dloc:Localize DmodBrowser/FreeDinkLocalization}" 
+                                   Classes="Heading2B" 
+                                   IsVisible="{Binding IsLauncherFreeDink}"/>
                         <ComboBox Grid.Row="0" Grid.Column="1"
                                   HorizontalAlignment="Stretch"
                                   SelectedItem="{Binding SelectedLocalization}"
-                                  Items="{Binding  SelectedDmodDefinition.Localizations }">
+                                  Items="{Binding  SelectedDmodDefinition.Localizations }"
+                                  IsVisible="{Binding IsLauncherFreeDink}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="vm:DmodLocalizationDefinition">
                                     <Grid>

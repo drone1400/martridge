@@ -82,8 +82,45 @@ namespace Martridge.ViewModels.Installer {
         }
         private int _installerProgressLogCaretIndex = 0;
 
+        
+        // ------------------------------------------------------------------------------------------
+        //      Installer State 
+        //
+        
+        public bool IsInstallerStarted {
+            get => this._isInstallerStarted;
+            protected set => this.RaiseAndSetIfChanged(ref this._isInstallerStarted, value);
+        }
+        private bool _isInstallerStarted = false;
+
+        public bool IsInstallerFinished {
+            get => this._isInstallerFinished;
+            protected set => this.RaiseAndSetIfChanged(ref this._isInstallerFinished, value);
+        }
+        private bool _isInstallerFinished = false;
+
+        public bool IsInstallerCancelled {
+            get => this._isInstallerCancelled;
+            protected set => this.RaiseAndSetIfChanged(ref this._isInstallerCancelled, value);
+        }
+        private bool _isInstallerCancelled = false;
+
+        public bool IsFileBrowserActive {
+            get => this._isFileBrowserActive;
+            protected set => this.RaiseAndSetIfChanged(ref this._isFileBrowserActive, value);
+        }
+        private bool _isFileBrowserActive = false;
+        
         //
         //
+        //
+
+        public abstract void CmdStartInstall(object? parameter = null);
+        public abstract void CmdCancel(object? parameter = null);
+        public abstract void CmdExit(object? parameter = null);
+
+        // ------------------------------------------------------------------------------------------
+        //      Message box stuff
         //
 
         protected void ShowInstallerCancelledMessageBox() {

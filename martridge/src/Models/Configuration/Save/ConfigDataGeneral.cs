@@ -13,6 +13,11 @@ namespace Martridge.Models.Configuration.Save {
         /// Example: "en-US"
         /// </remarks>
         public string? LocalizationName { get; set; }
+        
+        /// <summary>
+        /// Indicates if the application should automatically update the existing 'configInstallerList.json' file
+        /// </summary>
+        public bool? AutoUpdateInstallerList { get; set; }
 
         /// <summary>
         /// Indicates if the application should enable certain advanced features...

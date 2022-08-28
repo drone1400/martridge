@@ -37,21 +37,8 @@ namespace Martridge.ViewModels.Installer {
         
         public event EventHandler<DmodPackerDoneEventArgs>? InstallerDone;
         private DmodPackerDoneEventArgs _lastInstallerDoneEventArgs = new DmodPackerDoneEventArgs(DinkInstallerResult.Cancelled);
-
-        public InstallerViewPage ActiveUserPage {
-            get => this._activeUserPage;
-            private set {
-                this.RaiseAndSetIfChanged(ref this._activeUserPage, value);
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, $"Switched DmodInstallerView active page to {this.ActiveUserPage}");
-            }
-        }
-        private InstallerViewPage _activeUserPage = InstallerViewPage.InstallSettings;
-
-        public bool IsBusy {
-            get => this._installerLogic != null;
-        }   
+        
         private DmodPacker? _installerLogic = null;
-
 
         // ------------------------------------------------------------------------------------------
         //      Constructor
@@ -72,119 +59,95 @@ namespace Martridge.ViewModels.Installer {
 
         #region Commands
 
-        public bool IsInstallerFinished {
-            get => this._isInstallerFinished;
-            private set => this.RaiseAndSetIfChanged(ref this._isInstallerFinished, value);
-        }
-        private bool _isInstallerFinished = false;
-
-        public bool IsInstallerCancelled {
-            get => this._isInstallerCancelled;
-            private set => this.RaiseAndSetIfChanged(ref this._isInstallerCancelled, value);
-        }
-        private bool _isInstallerCancelled = false;
-
-        public bool IsDmodBrowserActive {
-            get => this._isDmodBrowserActive;
-            private set => this.RaiseAndSetIfChanged(ref this._isDmodBrowserActive, value);
-        }
-        private bool _isDmodBrowserActive = false;
-
-
-        public void CmdFinish(object? parameter = null) {
-            this.ResetInstallerStateAndFireDoneEvent();
-        }
-        [DependsOn(nameof(IsInstallerFinished))]
-        public bool CanCmdFinish(object? parameter = null) {
-
-            return this.IsInstallerFinished;
-        }
-
-        public void CmdCancel(object? parameter = null) {
-            if (this._installerLogic == null) return;
-            this.IsInstallerCancelled = true;
-            this._installerLogic.CancelTokenSource.Cancel();
-        }
-        [DependsOn(nameof(IsBusy))]
-        [DependsOn(nameof(IsInstallerCancelled))]
-        [DependsOn(nameof(IsInstallerFinished))]
-        public bool CanCmdCancel(object? parameter = null) {
-            // can't cancel if the installer is null...
-            if (this.IsBusy == false) { return false; }
-            // can't cancel if already done
-            if (this.IsInstallerFinished) { return false; }
-            // can only cancel once
-            return !this.IsInstallerCancelled;
-        }
-
-
-        public void CmdGoBack(object? parameter = null) {
-            if (this.ActiveUserPage == InstallerViewPage.InstallSettings) {
+        public override void CmdExit(object? parameter = null) {
+            if (this.IsInstallerStarted == false) {
                 this._lastInstallerDoneEventArgs = new DmodPackerDoneEventArgs(DinkInstallerResult.Cancelled);
                 this.ResetInstallerStateAndFireDoneEvent();
             }
-        }
-        [DependsOn(nameof(ActiveUserPage))]
-        public bool CanCmdGoBack(object? parameter = null) {
-            switch (this.ActiveUserPage) {
-                case InstallerViewPage.InstallSettings: return true;
-                case InstallerViewPage.InstallProgress: return false;
-                default: return false;
+            if (this.IsInstallerFinished) {
+                this.ResetInstallerStateAndFireDoneEvent();
             }
+        }
+        
+        [DependsOn(nameof(IsInstallerStarted))]
+        [DependsOn(nameof(IsInstallerCancelled))]
+        [DependsOn(nameof(IsInstallerFinished))]
+        public bool CanCmdExit(object? parameter = null) {
+            if (this.IsInstallerCancelled) return false;
+            if (this.IsInstallerStarted == false) return true;
+            if (this.IsInstallerFinished) return true;
+            return false;
         }
 
-        public void CmdGoNext(object? parameter = null) {
-            switch (this.ActiveUserPage) {
-                case InstallerViewPage.InstallSettings:
-                    this.StartInstallation();
-                    break;
-            }
+        public override void CmdCancel(object? parameter = null) {
+            if (this.CanCmdCancel() == false) return;
+            
+            this.IsInstallerCancelled = true;
+            // null check done in CanCmdCancel
+            this._installerLogic!.CancelTokenSource.Cancel();
         }
-        [DependsOn(nameof(ActiveUserPage))]
+        
+        [DependsOn(nameof(IsInstallerStarted))]
+        [DependsOn(nameof(IsInstallerCancelled))]
+        [DependsOn(nameof(IsInstallerFinished))]
+        public bool CanCmdCancel(object? parameter = null) {
+            if (this._installerLogic == null) return false;
+            // can't cancel if the installer is not started
+            if (this.IsInstallerStarted == false) return false;
+            // can't cancel if already done
+            if (this.IsInstallerFinished) return false;
+            // can only cancel once
+            return !this.IsInstallerCancelled;
+        }
+        
+        public override void CmdStartInstall(object? parameter = null) {
+            if (this.CanCmdStartInstall() == false) return;
+
+            this.StartInstallation();
+        }
+        
+        [DependsOn(nameof(IsInstallerStarted))]
         [DependsOn(nameof(ParentWindow))]
         [DependsOn(nameof(SelectedDmodDestination))]
         [DependsOn(nameof(SelectedDmodSourceDirectory))]
-        public bool CanCmdGoNext(object? parameter = null) {
-            switch (this.ActiveUserPage) {
-                case InstallerViewPage.InstallSettings:
-                    if (this.ParentWindow == null) return false;
-                    if (string.IsNullOrEmpty(this.SelectedDmodDestination)) return false;
-                    if (string.IsNullOrEmpty(this.SelectedDmodSourceDirectory)) return false;
-                    if (Directory.Exists(this.SelectedDmodSourceDirectory) == false) return false;
-                    return true;
-                case InstallerViewPage.InstallProgress: return false;
-                default: return false;
-            }
+        public bool CanCmdStartInstall(object? parameter = null) {
+            if (this.IsInstallerStarted) return false;
+            if (this.ParentWindow == null) return false;
+            if (string.IsNullOrWhiteSpace(this.SelectedDmodSourceDirectory)) return false;
+            if (string.IsNullOrWhiteSpace(this.SelectedDmodDestination)) return false;
+            if (Directory.Exists(this.SelectedDmodSourceDirectory) == false) return false;
+            
+            return true;
         }
 
         public void CmdBrowseDmodSource(object? parameter = null) {
             this.BrowseDmodSource_Internal();
         }
 
-        [DependsOn(nameof(IsDmodBrowserActive))]
+        [DependsOn(nameof(IsFileBrowserActive))]
         [DependsOn(nameof(ParentWindow))]
         public bool CanCmdBrowseDmodSource(object? parameter = null) {
-            return !this.IsDmodBrowserActive && this.ParentWindow != null;
+            return !this.IsFileBrowserActive && this.ParentWindow != null;
         }
         
         public void CmdBrowseDmodDestination(object? parameter = null) {
             this.BrowseDmodDestination_Internal();
         }
 
-        [DependsOn(nameof(IsDmodBrowserActive))]
+        [DependsOn(nameof(IsFileBrowserActive))]
         [DependsOn(nameof(ParentWindow))]
         public bool CanCmdBrowseDmodDestination(object? parameter = null) {
-            return !this.IsDmodBrowserActive && this.ParentWindow != null;
+            return !this.IsFileBrowserActive && this.ParentWindow != null;
         }
 
         #endregion
 
 
         private async void BrowseDmodSource_Internal() {
-            if (this.ParentWindow == null) return;
+            if (this.ParentWindow == null || this.IsFileBrowserActive) return;
 
             try {
-                this.IsDmodBrowserActive = true;
+                this.IsFileBrowserActive = true;
 
                 OpenFolderDialog ofd = new OpenFolderDialog();
                 ofd.Directory = LocationHelper.AppBaseDirectory;
@@ -205,7 +168,7 @@ namespace Martridge.ViewModels.Installer {
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
             } finally {
-                this.IsDmodBrowserActive = false;                
+                this.IsFileBrowserActive = false;                
             }
         }
         
@@ -213,7 +176,7 @@ namespace Martridge.ViewModels.Installer {
             if (this.ParentWindow == null) return;
 
             try {
-                this.IsDmodBrowserActive = true;
+                this.IsFileBrowserActive = true;
 
                 SaveFileDialog sfd = new SaveFileDialog();
                 sfd.Directory = LocationHelper.AppBaseDirectory;
@@ -235,62 +198,54 @@ namespace Martridge.ViewModels.Installer {
                 MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
             } finally
             {
-                this.IsDmodBrowserActive = false;                
+                this.IsFileBrowserActive = false;
             }
         }
 
         private void StartInstallation() {
-            if (this.SelectedDmodDestination == null ||
-                this.SelectedDmodSourceDirectory == null) {
-                // TODO throw some exception or something
-                return;
-            }
+            if (this.CanCmdStartInstall() == false) return;
 
-            if (this._installerLogic == null) {
-                try {
-                    DirectoryInfo source = new DirectoryInfo(this.SelectedDmodSourceDirectory);
-                    FileInfo destination = new FileInfo(this.SelectedDmodDestination);
+            try {
+                this.IsInstallerStarted = true;
+                
+                DirectoryInfo source = new DirectoryInfo(this.SelectedDmodSourceDirectory);
+                FileInfo destination = new FileInfo(this.SelectedDmodDestination);
 
-                    // create installer trace listener
-                    this.InstallerTraceListener = new MyTraceListenerGui("Installer Trace Listener");
-                    this.InstallerTraceListener.ShowLevels = false;
-                    this.InstallerTraceListener.Levels = MyTraceLevel.Critical | MyTraceLevel.Error | MyTraceLevel.Warning | MyTraceLevel.Information;
-                    this.InstallerTraceListener.PropertyChanged += ( sender,  args) =>  {
-                        this.RaisePropertyChanged(nameof(this.InstallerProgressLog));
-                        this.InstallerProgressLogCaretIndex = int.MaxValue;
-                    };
+                // create installer trace listener
+                this.InstallerTraceListener = new MyTraceListenerGui("Installer Trace Listener");
+                this.InstallerTraceListener.ShowLevels = false;
+                this.InstallerTraceListener.Levels = MyTraceLevel.Critical | MyTraceLevel.Error | MyTraceLevel.Warning | MyTraceLevel.Information;
+                this.InstallerTraceListener.PropertyChanged += ( sender,  args) =>  {
+                    this.RaisePropertyChanged(nameof(this.InstallerProgressLog));
+                    this.InstallerProgressLogCaretIndex = int.MaxValue;
+                };
 
-                    // create installer logic
-                    this._installerLogic = new DmodPacker();
-                    this._installerLogic.CustomTrace.Listeners.Add(this.InstallerTraceListener);
-                    this._installerLogic.ProgressReport += this.InstallerOnProgressReport;
-                    this._installerLogic.InstallerDone += this.InstallerOnDone;
+                // create installer logic
+                this._installerLogic = new DmodPacker();
+                this._installerLogic.CustomTrace.Listeners.Add(this.InstallerTraceListener);
+                this._installerLogic.ProgressReport += this.InstallerOnProgressReport;
+                this._installerLogic.InstallerDone += this.InstallerOnDone;
 
-                    this.RaisePropertyChanged(nameof(this.IsBusy));
+                this.InstallerProgressTitle = source.Name;
 
-                    this.InstallerProgressTitle = source.Name;
-                    this.ActiveUserPage = InstallerViewPage.InstallProgress;
-
-                    //this._InstallerLogic.IsDebugMode = true;
-                    this._installerLogic.StartPackingDmod(destination, source);
-                } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
-                }
+                //this._InstallerLogic.IsDebugMode = true;
+                this._installerLogic.StartPackingDmod(destination, source);
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
             }
         }
 
         private void ResetInstallerStateAndFireDoneEvent() {
-            this.ActiveUserPage = InstallerViewPage.InstallSettings;
-            this.IsInstallerFinished = false;
-            this.IsInstallerCancelled = false;
-
             this._installerLogic?.CustomTrace.Flush();
             this._installerLogic?.CustomTrace.Close();
             this._installerLogic = null;
-            this.RaisePropertyChanged(nameof(this.IsBusy));
 
             this.InstallerTraceListener?.Close();
             this.InstallerTraceListener = null;
+            
+            this.IsInstallerStarted = false;
+            this.IsInstallerFinished = false;
+            this.IsInstallerCancelled = false;
 
             this.InstallerDone?.Invoke(this, this._lastInstallerDoneEventArgs);
         }

@@ -66,7 +66,7 @@ namespace Martridge.ViewModels {
             this.VmGeneralSettings.SettingsDone += this.VmGeneralSettingsOnSettingsDone;
             
             this.VmDinkInstaller.InstallerDone += this.VmDinkInstallerOnInstallerDone;
-            
+
             this.VmDmodInstaller.InstallerDone += this.VmDmodInstallerOnInstallerDone;
             this.VmDmodInstaller.InitializeConfiguration(this._logic.Config.General);
             
@@ -181,7 +181,7 @@ namespace Martridge.ViewModels {
             try {
                 // try to update exe path in settings...
                 if (e.Result == DinkInstallerResult.Success && e.UsedInstaller != null && e.Destination != null) {
-                    string path = Path.Combine(e.Destination.FullName, e.UsedInstaller.GameExeName);
+                    string path = Path.Combine(e.Destination.FullName, e.UsedInstaller.ApplicationFileName);
 
                     if (this._logic.Config.General.GameExePaths.Contains(path) == false) {
                         this._logic.Config.General.AddGameExePath(path);
@@ -214,6 +214,7 @@ namespace Martridge.ViewModels {
         public void CmdShowPageDinkInstaller(object? parameter = null) {
             if (this.ActiveUserPage == MainViewPage.MainView) {
                 this.ActiveUserPage = MainViewPage.DinkInstaller;
+                this.VmDinkInstaller.InitializeInstallerList(this._logic.Config.General.AutoUpdateInstallerList);
             }
         }
 

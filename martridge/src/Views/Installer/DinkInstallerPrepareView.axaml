@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             
+             xmlns:dloc="using:Martridge.ViewModels.Localization"
+             xmlns:vw="using:Martridge.Views.Installer"
+             xmlns:vm="using:Martridge.ViewModels.Installer"
+             
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Martridge.Views.Installer.DinkInstallerPrepareView">
+
+    <Design.DataContext>
+        <vm:DinkInstallerViewModel/>
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </UserControl.Styles>
+
+    <Grid Name="GridInstaller_Versions"
+          RowDefinitions="*,Auto">
+
+        <Grid Grid.Row="0" Grid.RowDefinitions="Auto,Auto,*" ColumnDefinitions="Auto,*">
+            <TextBlock Grid.Row="0"  Grid.Column="0" Classes="Heading2B"
+                       Text="{dloc:Localize DinkInstallerView/SelectVersion}"/>
+            
+            <ComboBox Grid.Row="1" Grid.Column="0"
+                     Items="{Binding InstallableCategories}"
+                     SelectedItem="{Binding SelectedInstallableCategory, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="2">
+                            <TextBlock  Classes="Heading2"
+                                        Text="{Binding}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            
+            <ListBox Grid.Row="2" Grid.Column="0"
+                     Items="{Binding InstallableNames}"
+                     SelectionMode="Single"
+                     SelectedItem="{Binding SelectedInstallableName, Mode=TwoWay}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="2">
+                            <TextBlock  Classes="Heading2"
+                                        Text="{Binding }"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            
+            <vw:DinkInstallerVersionInfoView Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" />
+        </Grid>
+
+        <TextBlock Grid.Row="1" Classes="Heading2I"
+                   Text="{dloc:Localize DinkInstallerView/InfoAdditionalVersions}"
+                   TextWrapping="Wrap"/>
+    </Grid>
+</UserControl>

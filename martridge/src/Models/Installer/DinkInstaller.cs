@@ -45,7 +45,7 @@ namespace Martridge.Models.Installer {
                     this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                         "",
                         Localizer.Instance[@"DinkInstaller/StartInstalling"],
-                        $"    {config.InstallerName}",
+                        $"    {config.Name}",
                     });
                     // prepare directories
                     this.PrepareLocations(config, webCacheDir, destinationDirectory, overrideDestination);

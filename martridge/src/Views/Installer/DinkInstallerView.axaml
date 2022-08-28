@@ -17,36 +17,46 @@
     <UserControl.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
     </UserControl.Styles>
-  
 
     <Grid Margin="8">
-        <Grid.Resources>
-            <vm:InstallerViewPageEnumConverter x:Key="ViewPageEnumConverter"/>
-        </Grid.Resources>
-
         <Grid IsVisible="{Binding Path=DinkInstallerNotSupported}">
-            <vw:InstallerViewPage0
+            <vw:DinkInstallerNotSupportedView
                 DataContext="{Binding DataContext, ElementName=DinkInstallerUserControl}"/>
         </Grid>
         
         <Grid IsVisible="{Binding Path=!DinkInstallerNotSupported}">
-            <vw:InstallerViewPage1 
-                DataContext="{Binding DataContext, ElementName=DinkInstallerUserControl}"
-                IsVisible="{Binding Path=ActiveUserPage,
-                              Converter={StaticResource ViewPageEnumConverter},
-                              ConverterParameter={x:Static vm:InstallerViewPage.VersionSelect }}"/>
-
-            <vw:InstallerViewPage2
-                DataContext="{Binding DataContext, ElementName=DinkInstallerUserControl}"
-                IsVisible="{Binding Path=ActiveUserPage,
-                              Converter={StaticResource ViewPageEnumConverter},
-                              ConverterParameter={x:Static vm:InstallerViewPage.InstallSettings }}"/>
-
-            <vw:InstallerViewPage3
-                DataContext="{Binding DataContext, ElementName=DinkInstallerUserControl}"
-                IsVisible="{Binding Path=ActiveUserPage,
-                              Converter={StaticResource ViewPageEnumConverter},
-                              ConverterParameter={x:Static vm:InstallerViewPage.InstallProgress }}"/>
+            <Grid RowDefinitions="*, Auto" IsVisible="{Binding Path=!IsInstallerStarted}">
+                <vw:DinkInstallerPrepareView
+                    Grid.Row="0"
+                    DataContext="{Binding DataContext, ElementName=DinkInstallerUserControl}"/>
+                
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="*,Auto,Auto">
+                    <Button Grid.Column="1"
+                            Content="{dloc:Localize Generic/ButtonBack}"
+                            Command="{Binding CmdExit}"/>
+                    <Button Grid.Column="2"
+                            Content="{dloc:Localize DinkInstallerView/StartInstall}"
+                            Command="{Binding CmdStartInstall}"/>
+                </Grid>
+            </Grid>
+                
+            <Grid RowDefinitions="*, Auto" IsVisible="{Binding Path=IsInstallerStarted}">
+                <vw:InstallerProgressView 
+                    Grid.Row="0"
+                    DataContext="{Binding DataContext, ElementName=DinkInstallerUserControl}"/>
+                
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="*,Auto,Auto">
+                    <Button Grid.Column="1"
+                            Content="{dloc:Localize Generic/ButtonCancel}"
+                            Command="{Binding CmdCancel}"/>
+                    <Button Grid.Column="2"
+                            Content="{dloc:Localize Generic/ButtonFinish}"
+                            Command="{Binding CmdExit}"/>
+                </Grid>
+            </Grid>
+                
         </Grid>
     </Grid>
 </UserControl>

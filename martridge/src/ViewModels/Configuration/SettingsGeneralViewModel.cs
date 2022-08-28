@@ -41,6 +41,13 @@ namespace Martridge.ViewModels.Configuration {
         //
         // General Configuration properties
         //
+        
+        public bool AutoUpdateInstallerList {
+            get => this._autoUpdateInstallerList;
+            set => this.RaiseAndSetIfChanged(ref this._autoUpdateInstallerList, value);
+        }
+        private bool _autoUpdateInstallerList = false;
+        
         public bool ShowAdvancedFeatures {
             get => this._showAdvancedFeatures;
             set => this.RaiseAndSetIfChanged(ref this._showAdvancedFeatures, value);
@@ -196,6 +203,7 @@ namespace Martridge.ViewModels.Configuration {
             this.Configuration.UpdateAll(
                 this._savedLocalization ?? "en-US",
                 this.ShowAdvancedFeatures,
+                this.AutoUpdateInstallerList,
                 this.ShowLogWindowOnStartup,
                 this.UseRelativePathForSubfolders,
                 this.ActiveGameExeIndex,

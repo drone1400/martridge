@@ -17,6 +17,12 @@ namespace Martridge.Models.Configuration {
         /// Example: "en-US"
         /// </remarks>
         public string LocalizationName { get; private set; } = "en-US";
+        
+        /// <summary>
+        /// Indicates if the application should automatically update the existing 'configInstallerList.json' file
+        /// </summary>
+        public bool AutoUpdateInstallerList { get; private set; } = true;
+
 
         /// <summary>
         /// Indicates if the application should enable certain advanced features...
@@ -104,6 +110,7 @@ namespace Martridge.Models.Configuration {
         public void UpdateAll(
             string? localizationName,
             bool showAdvancedFeatures,
+            bool autoUpdateInstallerList,
             bool showLogWindowOnStartup,
             bool useRelativePathForSubfolders,
             int activeGameExeIndex,
@@ -120,6 +127,11 @@ namespace Martridge.Models.Configuration {
             
             if (this.ShowAdvancedFeatures != showAdvancedFeatures) {
                 this.ShowAdvancedFeatures = showAdvancedFeatures;
+                hasChanges = true;
+            }
+            
+            if (this.AutoUpdateInstallerList != autoUpdateInstallerList) {
+                this.AutoUpdateInstallerList = autoUpdateInstallerList;
                 hasChanges = true;
             }
             
@@ -173,6 +185,11 @@ namespace Martridge.Models.Configuration {
             
             if (data.LocalizationName != null && this.LocalizationName != data.LocalizationName) {
                 this.LocalizationName = data.LocalizationName;
+                hasChanges = true;
+            }
+            
+            if (data.AutoUpdateInstallerList != null && this.AutoUpdateInstallerList != data.AutoUpdateInstallerList) {
+                this.AutoUpdateInstallerList = (bool)data.AutoUpdateInstallerList;
                 hasChanges = true;
             }
             
@@ -236,6 +253,7 @@ namespace Martridge.Models.Configuration {
 
             ConfigDataGeneral data = new ConfigDataGeneral()  {
                 LocalizationName = this.LocalizationName,
+                AutoUpdateInstallerList = this.AutoUpdateInstallerList,
                 ShowAdvancedFeatures = this.ShowAdvancedFeatures,
                 ShowLogWindowOnStartup = this.ShowLogWindowOnStartup,
                 UseRelativePathForSubfolders = this.UseRelativePathForSubfolders,

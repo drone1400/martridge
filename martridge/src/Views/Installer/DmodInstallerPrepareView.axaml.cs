@@ -2,8 +2,8 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 namespace Martridge.Views.Installer {
-    public partial class InstallerViewPage2 : UserControl {
-        public InstallerViewPage2() {
+    public partial class DmodInstallerPrepareView : UserControl {
+        public DmodInstallerPrepareView() {
             this.InitializeComponent();
         }
 

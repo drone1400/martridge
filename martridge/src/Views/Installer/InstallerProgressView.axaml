@@ -7,7 +7,7 @@
              xmlns:vm="using:Martridge.ViewModels.Installer"
              
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Martridge.Views.Installer.InstallerViewPage3">
+             x:Class="Martridge.Views.Installer.InstallerProgressView">
 
     <Design.DataContext>
         <vm:DmodInstallerViewModel/>
@@ -16,7 +16,7 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
     </UserControl.Styles>
 
-    <Grid RowDefinitions="40,80,80,*,Auto">
+    <Grid RowDefinitions="40,80,80,*">
 
         <TextBlock Grid.Row="0" Classes="HeadingTitle"
                    Text="{Binding InstallerProgressTitle}"/>
@@ -51,18 +51,5 @@
                      CaretIndex="{Binding InstallerProgressLogCaretIndex, Mode=TwoWay}"
             />
         </Border>
-
-
-
-        <Grid Grid.Row="4"
-              ColumnDefinitions="*,Auto,Auto">
-
-            <Button Grid.Column="1"
-                    Content="{dloc:Localize Generic/ButtonCancel}"
-                    Command="{Binding CmdCancel}"/>
-            <Button Grid.Column="2"
-                    Content="{dloc:Localize Generic/ButtonFinish}"
-                    Command="{Binding CmdFinish}"/>
-        </Grid>
     </Grid>
 </UserControl>

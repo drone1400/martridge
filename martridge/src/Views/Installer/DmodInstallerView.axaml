@@ -19,21 +19,36 @@
 
 
     <Grid Margin="8">
-        <Grid.Resources>
-            <vm:InstallerViewPageEnumConverter x:Key="ViewPageEnumConverter"/>
-        </Grid.Resources>
-
-        <vw:InstallerViewPage4
-            DataContext="{Binding DataContext, ElementName=DmodInstallerUserControl}"
-            IsVisible="{Binding Path=ActiveUserPage,
-                          Converter={StaticResource ViewPageEnumConverter},
-                          ConverterParameter={x:Static vm:InstallerViewPage.InstallSettings }}"/>
-
-        <vw:InstallerViewPage3
-            DataContext="{Binding DataContext, ElementName=DmodInstallerUserControl}"
-            IsVisible="{Binding Path=ActiveUserPage,
-                          Converter={StaticResource ViewPageEnumConverter},
-                          ConverterParameter={x:Static vm:InstallerViewPage.InstallProgress }}"/>
-
+        <Grid RowDefinitions="*, Auto" IsVisible="{Binding Path=!IsInstallerStarted}">
+            <vw:DmodInstallerPrepareView
+                Grid.Row="0"
+                DataContext="{Binding DataContext, ElementName=DmodInstallerUserControl}"/>
+                
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="*,Auto,Auto">
+                <Button Grid.Column="1"
+                        Content="{dloc:Localize Generic/ButtonBack}"
+                        Command="{Binding CmdExit}"/>
+                <Button Grid.Column="2"
+                        Content="{dloc:Localize Generic/StartInstall}"
+                        Command="{Binding CmdStartInstall}"/>
+            </Grid>
+        </Grid>
+                
+        <Grid RowDefinitions="*, Auto" IsVisible="{Binding Path=IsInstallerStarted}">
+            <vw:InstallerProgressView 
+                Grid.Row="0"
+                DataContext="{Binding DataContext, ElementName=DmodInstallerUserControl}"/>
+                
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="*,Auto,Auto">
+                <Button Grid.Column="1"
+                        Content="{dloc:Localize Generic/ButtonCancel}"
+                        Command="{Binding CmdCancel}"/>
+                <Button Grid.Column="2"
+                        Content="{dloc:Localize Generic/ButtonFinish}"
+                        Command="{Binding CmdExit}"/>
+            </Grid>
+        </Grid>
     </Grid>
 </UserControl>

@@ -748,7 +748,7 @@ namespace Martridge.Models.Installer {
                     this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                         "",
                         Localizer.Instance[@"DinkInstaller/NotSupportedInBuild"],
-                        $"    {config.InstallerName}",
+                        $"    {config.Name}",
                     });
                     
                     exception = new NotSupportedException(Localizer.Instance[@"DinkInstaller/NotSupportedInBuild"]);;

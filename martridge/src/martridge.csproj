@@ -7,7 +7,7 @@
     <TrimMode>copyused</TrimMode>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationIcon>Assets\martridge_new.ico</ApplicationIcon>
-    <Version>0.5.1.1</Version>
+    <Version>0.5.1.2</Version>
     <RootNamespace>Martridge</RootNamespace>
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU;win-x64</Platforms>
@@ -71,8 +71,21 @@
     <PackageReference Include="GetText.NET" Version="1.2.4-rc" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="SevenZipExtractor" Version="1.0.17" />
+    <PackageReference Condition="'$(IsWindows)'=='true'" Include="SevenZipExtractor" Version="1.0.17" />
   </ItemGroup>
+  
+  
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
+    <Reference Include="7z">
+      <HintPath>lib\7zip\x64\7z.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x86'">
+    <Reference Include="7z">
+      <HintPath>lib\7zip\x86\7z.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
   <ItemGroup>
     <Compile Update="Views\Dmod\OnlineDmodBrowserView.axaml.cs">
       <DependentUpon>OnlineDmodBrowserView.axaml</DependentUpon>

@@ -1,4 +1,5 @@
 ﻿using Avalonia.Metadata;
+using Martridge.Models;
 using Martridge.Models.Configuration;
 using Martridge.Models.Dmod;
 using Martridge.Models.Localization;
@@ -361,13 +362,14 @@ namespace Martridge.ViewModels.Dmod {
             string configExpectedName = "wdep2cnf.ini";
             string configBackupName = "dinksmallwood.ini";
             string configLocalPath = launcher.Directory != null ? Path.Combine(launcher.Directory.FullName, configExpectedName) : "";
+            string configLocalPath2 = Path.Combine(LocationHelper.AppBaseDirectory, configExpectedName);
             string configWindowsPath = Path.Combine(windowsPath, configExpectedName);
             string configWindowsPath2 = Path.Combine(windowsPath, configBackupName);
             string dinkPath = "";
 
             // first attempt to find the config file in the launcher directory
-            dinkPath = ReadDinkPathFromWdep2Cnf(configLocalPath);
-            
+            dinkPath = ReadDinkPathFromWdep2Cnf(configLocalPath2);
+            if (string.IsNullOrWhiteSpace(dinkPath)) dinkPath = ReadDinkPathFromWdep2Cnf(configLocalPath);
             if (string.IsNullOrWhiteSpace(dinkPath)) dinkPath = ReadDinkPathFromWdep2Cnf(configWindowsPath);
             if (string.IsNullOrWhiteSpace(dinkPath)) dinkPath = ReadDinkPathFromWdep2Cnf(configWindowsPath2);
             if (string.IsNullOrWhiteSpace(dinkPath)) {
@@ -716,12 +718,16 @@ namespace Martridge.ViewModels.Dmod {
                     this.SaveToConfigLauncher();
                     this.SaveToConfigGeneral();
 
-                    DmodLauncher.LaunchDmod(
-                        this.Configuration.General.GameExePaths[this.ActiveGameExeIndex],
-                        this._dmodLaunchSpecial_DmodPathOverride != null ? _dmodLaunchSpecial_DmodPathOverride : this.SelectedDmodDefinition.Path,
-                        this.Configuration.Launch,
-                        this._dmodLaunchSpecial_RunAsAdmin,
-                        this.SelectedLocalization?.CultureInfo?.Name);
+                    // launch dmod with separate task to prevent gui lockup
+                    Task.Run(() => {
+                        DmodLauncher.LaunchDmod(
+                            this.Configuration.General.GameExePaths[this.ActiveGameExeIndex],
+                            this._dmodLaunchSpecial_DmodPathOverride != null ? _dmodLaunchSpecial_DmodPathOverride : this.SelectedDmodDefinition.Path,
+                            this.Configuration.Launch,
+                            this._dmodLaunchSpecial_RunAsAdmin,
+                            this.SelectedLocalization?.CultureInfo?.Name);
+                    });
+
 
                     this._dmodLauncherDelay.Start();
                 }

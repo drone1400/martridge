@@ -29,27 +29,61 @@ namespace Martridge.Models.Dmod
             DirectoryInfo dinkDir = new DirectoryInfo(dinkPath);
             
             if (dmodDir.Exists == false) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, Localizer.Instance[@"DmodBrowser/ErrorMissingDirectory"] + $"\"{dmodPath}\"", MyTraceLevel.Error);
+                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
+                    Localizer.Instance[@"DmodBrowser/ErrorMissingDirectory"],
+                    $"    Path = \"{dmodPath}\""
+                }, MyTraceLevel.Error);
                 return false;
             }
             
             if (dinkDir.Exists == false) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, Localizer.Instance[@"DmodBrowser/ErrorMissingDirectory"] + $"\"{dinkPath}\"", MyTraceLevel.Error);
+                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
+                    Localizer.Instance[@"DmodBrowser/ErrorMissingDirectory"],
+                    $"    Path = \"{dmodPath}\""
+                }, MyTraceLevel.Error);
                 return false;
             }
 
-            symLinkPath = Path.Combine(dinkDir.FullName, dmodDir.Name);
+            symLinkPath = Path.Combine(dinkDir.FullName, $"SL_{dmodDir.Name}");
+            DirectoryInfo symLinkInfo = new DirectoryInfo(symLinkPath);
+            int index = 1;
             
+            while (symLinkInfo.Exists) {
+                if (symLinkInfo.Exists && symLinkInfo.FullName == dmodDir.FullName) {
+                    // dmod already in destination?!
+                    MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
+                        Localizer.Instance[@"DmodBrowser/ErrorDmodAlreadyInSymbolicLinkDestination"],
+                        $"    Path = \"{dmodPath}\""
+                    }, MyTraceLevel.Error);
+                    return false;
+                }
+                if (symLinkInfo.Exists && symLinkInfo.LinkTarget != null && symLinkInfo.LinkTarget == dmodDir.FullName) {
+                    // dmod already in destination?!
+                    MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
+                        Localizer.Instance[@"DmodBrowser/ErrorSymbolicLinkAlreadyExists"],
+                        $"    Path = \"{dmodPath}\""
+                    }, MyTraceLevel.Error);
+                    return false;
+                }
+                
+                // a directory with the same name already exists... try a different name
+                symLinkPath = Path.Combine(dinkDir.FullName, $"SL_{dmodDir.Name}_{index}" );
+                symLinkInfo = new DirectoryInfo(symLinkPath);
+                
+                // increment index for next attempt
+                index++;
+            }
+
             command = $"mklink /d \"{symLinkPath}\" \"{dmodDir.FullName}\"";
 
             return true;
         }
-        public static void LaunchWindowsCmdAsAdmin(string cmdCommand) {
+        public static int LaunchWindowsCmdAsAdmin(string cmdCommand) {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false) {
                 MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, "Operation only supported on windows...", MyTraceLevel.Error);
                 // TODO... maybe implement this for linux?..
                 // TODO... check if WDEP runs on linux with Wine or something?... hah
-                return;
+                return int.MinValue;
             }
 
             cmdCommand = $"/C {cmdCommand}";
@@ -72,6 +106,8 @@ namespace Martridge.Models.Dmod
                 $"    Args      = {cmdCommand}",
                 $"    Exit Code = {proc?.ExitCode}",
             });
+
+            return proc?.ExitCode ?? int.MinValue;
         }
         
         public static void LaunchDmod(string exePath, string dmodPath, ConfigLaunch launch, bool launchAsAdmin = false, string? localization = null)
@@ -132,12 +168,15 @@ namespace Martridge.Models.Dmod
                 {
                     FileName = exePath,
                     Arguments = arguments,
+                    WorkingDirectory = finfo.Directory?.FullName,
                 };
                 
                 // localization support for freedink
                 // localization = "es_ES";
-                if (Path.GetFileNameWithoutExtension(finfo.Name.ToLowerInvariant()) == "freedink")
+                string launcherExeNameLower = Path.GetFileNameWithoutExtension(finfo.Name.ToLowerInvariant());
+                if (launcherExeNameLower == "freedink")
                 {
+                    // try to add localization parameters
                     if (localization != null) {
                         pinfo.Environment.RemoveIfContained("LANGUAGE");
                         pinfo.Environment.RemoveIfContained("LC_ALL");
@@ -146,9 +185,9 @@ namespace Martridge.Models.Dmod
                         pinfo.Environment.Add("LANGUAGE", localization);
                     }
 
+                    // this fixes a sound issue regarding playback of WAV files with FreeDink 109.6 under Windows 10 and 11
                     if (finfo.Extension == ".exe") {
                         pinfo.Environment.RemoveIfContained("SDL_AUDIODRIVER");
-                        // this fixes a sound issue regarding playback of WAV files with FreeDink 109.6 under Windows 10 and 11
                         pinfo.Environment.Add("SDL_AUDIODRIVER", "winmm");
                     }
                 }

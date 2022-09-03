@@ -1,3 +1,7 @@
+--- V0.5.1 ---
+- Fixed some issues related to creating symbolic links for WinDinkEditPlus...
+- Self contained .net6 files are now really a single exe
+
 --- V0.5.0 ---
 - Some changes to Dink Installer interface, also can now install WinDinkEdit too!
 - Freedink localization options now only show up if freedink is selected...

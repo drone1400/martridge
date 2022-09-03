@@ -64,7 +64,7 @@ jobs:
 # ---- Publish and archive - net6.0 Windows x86
 
       - name: Publish net6.0 win-x86
-        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net6.0_win-x86/martridge/ --configuration Release --framework net6.0 --self-contained true --runtime win-x86 -p:PublishSingleFile=true
+        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net6.0_win-x86/martridge/ --configuration Release --framework net6.0 --self-contained true --runtime win-x86 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
       - name: Archive published net6.0 win-x86
         uses: ihiroky/archive-action@v1
         with:
@@ -76,7 +76,7 @@ jobs:
 # ---- Publish and archive - net6.0 Windows x64
 
       - name: Publish net6.0 win-x64
-        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net6.0_win-x64/martridge/ --configuration Release --framework net6.0 --self-contained true --runtime win-x64 -p:PublishSingleFile=true
+        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net6.0_win-x64/martridge/ --configuration Release --framework net6.0 --self-contained true --runtime win-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
       - name: Archive published net6.0 win-x64
         uses: ihiroky/archive-action@v1
         with:

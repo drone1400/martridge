@@ -13,15 +13,30 @@ namespace Martridge.Models.Dmod {
         public List<DmodFileDefinition> DmodList { get => this._dmodList; }
         private List<DmodFileDefinition> _dmodList = new List<DmodFileDefinition>();
 
+
+
         public void Initialize(ConfigGeneral cfg) {
             Task task = new Task(() => { 
                 try {
-                    List<DmodFileDefinition> dmodList = new List<DmodFileDefinition>();
+                    Dictionary<string, DmodFileDefinition> tempAddedDirectories = new Dictionary<string, DmodFileDefinition>();
+                    List<DmodFileDefinition> tempSymbolicLinks = new List<DmodFileDefinition>();
 
                     List<DirectoryInfo> directories = cfg.GetRealDmodDirectories();
 
                     foreach (DirectoryInfo dir in directories) {
-                        ScanDirectoryForDmods(dir, dmodList);
+                        ScanDirectoryForDmods(dir, tempAddedDirectories, tempSymbolicLinks);
+                    }
+
+                    foreach (DmodFileDefinition dfd in tempSymbolicLinks) {
+                        if (dfd.DmodRoot.LinkTarget != null && tempAddedDirectories.ContainsKey(dfd.DmodRoot.LinkTarget) == false) {
+                            tempAddedDirectories.Add(dfd.DmodRoot.LinkTarget, dfd);
+                        }
+                    }
+
+                    List<DmodFileDefinition> dmodList = new List<DmodFileDefinition>();
+
+                    foreach (var kvp in tempAddedDirectories) {
+                        dmodList.Add(kvp.Value);
                     }
 
                     this._dmodList = dmodList;
@@ -34,7 +49,7 @@ namespace Martridge.Models.Dmod {
             task.Start();
         }
 
-        private static void ScanDirectoryForDmods(DirectoryInfo dirInfo, List<DmodFileDefinition> dmodList) {
+        private static void ScanDirectoryForDmods(DirectoryInfo dirInfo, Dictionary<string, DmodFileDefinition> normalDmodDirs, List<DmodFileDefinition> symbolicLinkDmods) {
             dirInfo.Refresh();
             if (dirInfo.Exists == false) {
                 return;
@@ -46,7 +61,15 @@ namespace Martridge.Models.Dmod {
                 DmodFileDefinition dfd = new DmodFileDefinition(dir.FullName);
                 if (dfd.IsCorrectlyDefined) {
                     // found a dmod! add it to the list...
-                    dmodList.Add(dfd);
+                    if (dfd.DmodRoot.Attributes.HasFlag(FileAttributes.ReparsePoint)) {
+                        // add symbolic links to separate list for later processing
+                        symbolicLinkDmods.Add(dfd);
+                    } else {
+                        // add non duplicate normal directories to dictionary
+                        if (normalDmodDirs.ContainsKey(dfd.DmodRoot.FullName) == false) {
+                            normalDmodDirs.Add(dfd.DmodRoot.FullName, dfd);
+                        }
+                    }
                 }
             }
 

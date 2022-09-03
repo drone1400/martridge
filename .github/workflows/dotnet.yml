@@ -41,28 +41,39 @@ jobs:
 
 
 # ---- Publish and archive - netcoreapp3.1 Windows x64
+#
+#      - name: Publish netcoreapp3.1 win-x64
+#        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/netcoreapp3.1_win-x64/martridge/ --configuration Release --framework netcoreapp3.1 --self-contained true --runtime win-x64 -p:PublishSingleFile=true
+#      - name: Archive published netcoreapp3.1 win-x64
+#        uses: ihiroky/archive-action@v1
+#        with:
+#          root_dir: "./publish/netcoreapp3.1_win-x64/"
+#          file_path: "./publish/martridge_V${{steps.get-version.outputs.version}}_netcoreapp3.1_win-x64.zip"
+#
+#
+## ---- Publish and archive - netcoreapp3.1 Windows x86
+#
+#      - name: Publish netcoreapp3.1 win-x86
+#        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/netcoreapp3.1_win-x86/martridge/ --configuration Release --framework netcoreapp3.1 --self-contained true --runtime win-x86 -p:PublishSingleFile=true
+#      - name: Archive published netcoreapp3.1 win-x86
+#        uses: ihiroky/archive-action@v1
+#        with:
+#          root_dir: "./publish/netcoreapp3.1_win-x86/"
+#          file_path: "./publish/martridge_V${{steps.get-version.outputs.version}}_netcoreapp3.1_win-x86.zip"
+      
+# ---- Publish and archive - net6.0 Windows x86
 
-      - name: Publish netcoreapp3.1 win-x64
-        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/netcoreapp3.1_win-x64/martridge/ --configuration Release --framework netcoreapp3.1 --self-contained true --runtime win-x64 -p:PublishSingleFile=true
-      - name: Archive published netcoreapp3.1 win-x64
+      - name: Publish net6.0 win-x86
+        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net6.0_win-x86/martridge/ --configuration Release --framework net6.0 --self-contained true --runtime win-x86 -p:PublishSingleFile=true
+      - name: Archive published net6.0 win-x86
         uses: ihiroky/archive-action@v1
         with:
-          root_dir: "./publish/netcoreapp3.1_win-x64/"
-          file_path: "./publish/martridge_V${{steps.get-version.outputs.version}}_netcoreapp3.1_win-x64.zip"
+          root_dir: "./publish/net6.0_win-x86/"
+          file_path: "./publish/martridge_V${{steps.get-version.outputs.version}}_net6.0_win-x86.zip"
 
 
-# ---- Publish and archive - netcoreapp3.1 Windows x86
 
-      - name: Publish netcoreapp3.1 win-x86
-        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/netcoreapp3.1_win-x86/martridge/ --configuration Release --framework netcoreapp3.1 --self-contained true --runtime win-x86 -p:PublishSingleFile=true
-      - name: Archive published netcoreapp3.1 win-x86
-        uses: ihiroky/archive-action@v1
-        with:
-          root_dir: "./publish/netcoreapp3.1_win-x86/"
-          file_path: "./publish/martridge_V${{steps.get-version.outputs.version}}_netcoreapp3.1_win-x86.zip"
-
-
- # ---- Publish and archive - net6.0 Windows x86
+# ---- Publish and archive - net6.0 Windows x64
 
       - name: Publish net6.0 win-x64
         run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net6.0_win-x64/martridge/ --configuration Release --framework net6.0 --self-contained true --runtime win-x64 -p:PublishSingleFile=true
@@ -94,7 +105,8 @@ jobs:
           token: ${{github.token}}
           repository: ${{github.repository}}
           files: |
+            ./publish/martridge_V${{steps.get-version.outputs.version}}_net6.0_win-x86.zip
             ./publish/martridge_V${{steps.get-version.outputs.version}}_net6.0_win-x64.zip
             ./publish/martridge_V${{steps.get-version.outputs.version}}_net6.0_linux-x64.tar.gz
-            ./publish/martridge_V${{steps.get-version.outputs.version}}_netcoreapp3.1_win-x64.zip
-            ./publish/martridge_V${{steps.get-version.outputs.version}}_netcoreapp3.1_win-x86.zip
+#            ./publish/martridge_V${{steps.get-version.outputs.version}}_netcoreapp3.1_win-x64.zip
+#            ./publish/martridge_V${{steps.get-version.outputs.version}}_netcoreapp3.1_win-x86.zip

@@ -8,6 +8,7 @@ namespace Martridge.Models.Configuration.Save {
     public class ConfigData {
         public ConfigDataGeneral? General { get; set; }
         public ConfigDataLaunch? Launch { get; set; }
+        public ConfigDataAlertResults? AlertResults { get; set; }
         
         
         public void SaveToFile(string path) {

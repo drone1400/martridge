@@ -8,6 +8,6 @@ namespace Martridge.ViewModels.DinkyAlerts {
         Yes = 0x02,
         No = 0x04,
         Cancel = 0x08,
-        Abort = 0x10,
+        RememberResult = 0x8000,
     }
 }

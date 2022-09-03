@@ -5,10 +5,13 @@ namespace Martridge.Models.Configuration {
         public ConfigGeneral General { get; } = new ConfigGeneral();
         public ConfigLaunch Launch { get; } = new ConfigLaunch();
 
+        public ConfigAlertResults AlertResults { get; } = new ConfigAlertResults();
+
         public void SaveToFile(string path) {
             ConfigData data = new ConfigData() {
                 General = this.General.GetData(),
                 Launch = this.Launch.GetData(),
+                AlertResults = this.AlertResults.GetData(),
             };
 
             data.SaveToFile(path);
@@ -23,6 +26,10 @@ namespace Martridge.Models.Configuration {
             
             if (data?.Launch != null) {
                 this.Launch.UpdateFromData(data.Launch);
+            }
+
+            if (data?.AlertResults != null) {
+                this.AlertResults.UpdateFromData(data.AlertResults);
             }
         }
     }

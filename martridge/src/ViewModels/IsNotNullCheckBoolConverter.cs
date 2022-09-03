@@ -9,7 +9,7 @@ namespace Martridge.ViewModels {
             return value != null;
         }
         public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Reverse conversion not supported");
         }
     }
 }

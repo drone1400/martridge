@@ -1,13 +1,17 @@
 ﻿using Avalonia.Metadata;
 using Martridge.Models.Configuration;
 using Martridge.Models.Dmod;
+using Martridge.Models.Localization;
 using Martridge.Trace;
+using Martridge.ViewModels.DinkyAlerts;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Timers;
 using static Martridge.Models.AppLogic;
 
@@ -190,22 +194,22 @@ namespace Martridge.ViewModels.Dmod {
         // Properties
         // -----------------------------------------------------------------------------------------------------------------------------------
         
-        public ConfigGeneral? ConfigurationGeneral {
-            get => this._cfgGeneral;
+        public Config? Configuration {
+            get => this._configuration;
             set {
-                if (this._cfgGeneral != null) {
-                    this._cfgGeneral.Updated -= this.ConfigurationGeneralUpdated;
-                    this._cfgGeneral = null;
+                if (this._configuration != null) {
+                    this._configuration.General.Updated -= this.ConfigurationGeneralUpdated;
+                    this._configuration = null;
                 }
-                this.RaiseAndSetIfChanged(ref this._cfgGeneral, value);
+                this.RaiseAndSetIfChanged(ref this._configuration, value);
 
-                if (this._cfgGeneral != null) {
-                    this._cfgGeneral.Updated += this.ConfigurationGeneralUpdated;
+                if (this._configuration != null) {
+                    this._configuration.General.Updated += this.ConfigurationGeneralUpdated;
                     this.LoadFromConfigGeneral();
                 }
             }
         }
-        private ConfigGeneral? _cfgGeneral = null;
+        private Config? _configuration = null;
 
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Mirrored Main Configuration Properties
@@ -238,10 +242,10 @@ namespace Martridge.ViewModels.Dmod {
         }
         
         private void LoadFromConfigGeneral() {
-            if (this._cfgGeneral == null) { return; }
+            if (this._configuration == null) { return; }
 
             ObservableCollection<string> list = new ObservableCollection<string>();
-            foreach (string str in this._cfgGeneral.GameExePaths) {
+            foreach (string str in this._configuration.General.GameExePaths) {
                 FileInfo finfo = new FileInfo(str);
                 if (finfo.Exists) {
                     list.Add(str);
@@ -250,7 +254,7 @@ namespace Martridge.ViewModels.Dmod {
 
             this.ActiveGameExeIndex = -1;
             this.GameExePaths = list;
-            this.ActiveGameExeIndex = this._cfgGeneral.ActiveGameExeIndex;
+            this.ActiveGameExeIndex = this._configuration.General.ActiveGameExeIndex;
 
             this.RaisePropertyChanged(nameof(this.GameExeFound));
 
@@ -260,10 +264,10 @@ namespace Martridge.ViewModels.Dmod {
         }
 
         private void SaveToConfigGeneral() {
-            if (this._cfgGeneral == null) { return; }
+            if (this._configuration == null) { return; }
 
-            if (this.ActiveGameExeIndex != this._cfgGeneral.ActiveGameExeIndex) {
-                this._cfgGeneral.ActiveGameExeIndex = this.ActiveGameExeIndex;
+            if (this.ActiveGameExeIndex != this._configuration.General.ActiveGameExeIndex) {
+                this._configuration.General.ActiveGameExeIndex = this.ActiveGameExeIndex;
             }
         }
 
@@ -283,12 +287,6 @@ namespace Martridge.ViewModels.Dmod {
 
         private bool _isLauncherFreeDink = false;
         
-        public LaunchDmodDelegate? DmodLauncher {
-            get => this._dmodLauncher;
-            set => this.RaiseAndSetIfChanged(ref this._dmodLauncher, value);
-        }
-        private LaunchDmodDelegate? _dmodLauncher = null;
-        
         public bool DmodLauncherWaitingForDelay {
             get => this._dmodLauncherWaitingForDelay;
             set => this.RaiseAndSetIfChanged(ref this._dmodLauncherWaitingForDelay, value);
@@ -296,20 +294,28 @@ namespace Martridge.ViewModels.Dmod {
         private bool _dmodLauncherWaitingForDelay = false;
         
         // -----------------------------------------------------------------------------------------------------------------------------------
+        // properties
+        // -----------------------------------------------------------------------------------------------------------------------------------
+
+        private bool _dmodLaunchSpecial_IsWinDinkEdit = false;
+        private bool _dmodLaunchSpecial_RunAsAdmin = false;
+        private string? _dmodLaunchSpecial_DmodPathOverride = null;
+        
+        // -----------------------------------------------------------------------------------------------------------------------------------
         // Methods
         // -----------------------------------------------------------------------------------------------------------------------------------
 
         private void RefreshIsLauncherFreeDink() {
-            if (this.ConfigurationGeneral == null) {
+            if (this.Configuration?.General == null) {
                 this.IsLauncherFreeDink = false;
                 return;
             }
-            if (this.ActiveGameExeIndex < 0 || this.ActiveGameExeIndex >= this.ConfigurationGeneral.GameExePaths.Count) {
+            if (this.ActiveGameExeIndex < 0 || this.ActiveGameExeIndex >= this.Configuration.General.GameExePaths.Count) {
                 this.IsLauncherFreeDink = false;
                 return;
             }
 
-            string path = this.ConfigurationGeneral.GameExePaths[this.ActiveGameExeIndex];
+            string path = this.Configuration.General.GameExePaths[this.ActiveGameExeIndex];
             FileInfo finfo = new FileInfo(path);
             if (finfo.Name.ToLowerInvariant().Contains("freedink") == false) {
                 this.IsLauncherFreeDink = false;
@@ -317,6 +323,199 @@ namespace Martridge.ViewModels.Dmod {
             }
             
             this.IsLauncherFreeDink = true;
+        }
+
+        private async Task<bool> DmodLauncherPrechecks_WinDinkEditPlus2(FileInfo launcher, DirectoryInfo dmod) {
+
+            // local function for reading the Dink install path from WDE's config ini
+            string ReadDinkPathFromWdep2Cnf(string path) {
+                if (File.Exists(path) == false) return "";
+
+                using FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+                using StreamReader sr = new StreamReader(fs);
+
+                while (sr.EndOfStream == false) {
+                    string line = sr.ReadLine().Trim();
+                    if (line == "[Init]") {
+                        // next line should be the dink folder...
+                        line = sr.ReadLine().Trim();
+                        string[] split = line.Split('=');
+                        if (split.Length == 2 && split[0] == "DinkFolder") {
+                            return split[1];
+                        }
+                    }
+                }
+                return "";
+            }
+            
+            // log a warning if attempting to run WDEP2 on something other than windows...
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false) {
+                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/NotWindows"], MyTraceLevel.Warning);
+                // TODO: maybe disallow this completely by returning false?
+                // maybe do something to launch it using WINE on linux?... uh... hmm...
+            }
+            
+            // first, try to find the DINK install that WinDinkEdit is using...
+            string windowsPath = Environment.GetFolderPath( Environment.SpecialFolder.Windows );
+            string configExpectedName = "wdep2cnf.ini";
+            string configBackupName = "dinksmallwood.ini";
+            string configLocalPath = launcher.Directory != null ? Path.Combine(launcher.Directory.FullName, configExpectedName) : "";
+            string configWindowsPath = Path.Combine(windowsPath, configExpectedName);
+            string configWindowsPath2 = Path.Combine(windowsPath, configBackupName);
+            string dinkPath = "";
+
+            // first attempt to find the config file in the launcher directory
+            dinkPath = ReadDinkPathFromWdep2Cnf(configLocalPath);
+            
+            if (string.IsNullOrWhiteSpace(dinkPath)) dinkPath = ReadDinkPathFromWdep2Cnf(configWindowsPath);
+            if (string.IsNullOrWhiteSpace(dinkPath)) dinkPath = ReadDinkPathFromWdep2Cnf(configWindowsPath2);
+            if (string.IsNullOrWhiteSpace(dinkPath)) {
+                // --------------------------------------------------------------------------------------------------------------------
+                // seems config file could not be read... 
+                // is this the first time launching WDEP2?...
+                string alertTitle = Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/AlertTitle"];
+                string alertMessage = Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/ConfigFileNotFound"] +
+                        Environment.NewLine +
+                        Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/FirstTimeRunAsAdmin"];
+                string alertResultYes = Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/RunAsAdmin/ResultYes"];
+                string alertResultNo = Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/RunAsAdmin/ResultNo"];
+                // get user or saved result
+                AlertResults result = await DinkyAlert.GetRememberedResultOrShowDialog(
+                    this.Configuration.AlertResults, ConfigAlertResultMap.WinDinkEditLaunchAsAdmin,
+                    alertTitle, alertMessage, AlertResults.No | AlertResults.Yes, AlertType.Warning, this.ParentWindow,
+                    new Dictionary<AlertResults, string>() {
+                        [AlertResults.Yes] = alertResultYes,
+                        [AlertResults.No] = alertResultNo,
+                    });
+                if (result == AlertResults.Yes) { this._dmodLaunchSpecial_RunAsAdmin = true; }
+                return true;
+                // Launching WDEP2 for the first time or something like that
+                // --------------------------------------------------------------------------------------------------------------------
+            }
+            
+            DirectoryInfo editorDinkDir = new DirectoryInfo(dinkPath);
+
+            if (editorDinkDir.Exists == false) {
+                // --------------------------------------------------------------------------------------------------------------------
+                // seems config file was found but not the Dink folder?...
+                // are the config files invalid or something?...
+                string alertTitle = Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/AlertTitle"];
+                string alertMessage = Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/ConfigFileFoundButNotDink"] +
+                    Environment.NewLine +
+                    Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/FirstTimeRunAsAdmin"];
+                string alertResultYes = Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/RunAsAdmin/ResultYes"];
+                string alertResultNo = Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/RunAsAdmin/ResultNo"];
+                // get user or saved result
+                AlertResults result = await DinkyAlert.GetRememberedResultOrShowDialog(
+                    this.Configuration.AlertResults, ConfigAlertResultMap.WinDinkEditLaunchAsAdmin,
+                    alertTitle, alertMessage, AlertResults.No | AlertResults.Yes, AlertType.Warning, this.ParentWindow,
+                    new Dictionary<AlertResults, string>() {
+                        [AlertResults.Yes] = alertResultYes,
+                        [AlertResults.No] = alertResultNo,
+                    });
+                if (result == AlertResults.Yes) { this._dmodLaunchSpecial_RunAsAdmin = true; }
+                return true;
+                // Launching WDEP2 for the first time or something like that
+                // --------------------------------------------------------------------------------------------------------------------
+            }
+            
+            // editor's configured dink path was found correctly!
+            // check if the DMOD directory or a symbolic link exists in the dink installation directory..
+            DirectoryInfo[] dirInfos = editorDinkDir.GetDirectories();
+            foreach (DirectoryInfo dir in dirInfos) {
+                if (dir.FullName == dmod.FullName || (dir.LinkTarget != null && dir.LinkTarget == dmod.FullName)) {
+                    this._dmodLaunchSpecial_DmodPathOverride = dir.FullName;
+                    return true;
+                }
+                
+                /*
+                
+                if (dir.Attributes.HasFlag(FileAttributes.ReparsePoint)) {
+                    // this is a symbolic link directory...
+                    // using .NET 6 so we can check the symbolic link target now
+                    // an easy way to check if this is the same directory as the dmod is to create a temporary file inside the dmod dir, and see if it exists here too!
+                    string randFile = Path.GetRandomFileName();
+                    string randFileFull = Path.Combine(dmod.FullName, randFile);
+                    try {
+                        // create an empty file and close it immediately...
+                        File.CreateText(randFileFull)?.Close();
+                        FileInfo[] files = dir.GetFiles();
+                        foreach (FileInfo file in files) {
+                            if (file.Name == randFile) {
+                                // we are in the same directory!
+                                // we have a symbolic link in the Editor's DINK directory to the selected DMOD directory! nothing else to do
+                                this._dmodLaunchSpecial_DmodPathOverride = dir.FullName;
+                                return true;
+                            }
+                        }
+                    } finally {
+                        File.Delete(randFileFull);
+                    }
+                    // if we got here, it means the symbolic link directory is not the same as the dmod directory, ignore it!
+                } else {
+                    // this is a normal directory...
+                    if (dir.FullName == dmod.FullName) {
+                        // selected DMOD already in Editor's DINK directory! nothing else to do...
+                        this._dmodLaunchSpecial_DmodPathOverride = dir.FullName;
+                        return true;
+                    }
+                }
+                */
+            }
+            
+            // if we got here, it means the dmod can not be laucnhed correctly by WDEP without creating a symbolic link first!... 
+            // attempt to create a symbolic link...
+            {
+                string alertTitle = Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/AlertTitle"];
+                string alertMessage = Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/SymbolicLink"];
+                string alertResultYes = Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/SymbolicLink/ResultYes"];
+                string alertResultNo = Localizer.Instance["DmodBrowser/LaunchDmod/WinDinkEditPlus/SymbolicLink/ResultNo"];
+
+                DirectoryInfo dmodDir = new DirectoryInfo(this.SelectedDmodDefinition.Path);
+                
+                if (DmodLauncher.GetCreateSymbolicLinkCommandWindows(dmodDir.FullName, editorDinkDir.FullName, out string symLinkPath, out string cmdWin) == false) {
+                    // this should be impossible on windows?...
+                    // TODO better log message, also localize it i suppose
+                    MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, "This should be impossible...", MyTraceLevel.Error);
+                    return false;
+                }
+                
+                AlertResults result = await DinkyAlert.ShowDialog(
+                    alertTitle, alertMessage, AlertResults.No | AlertResults.Yes, AlertType.Warning, this.ParentWindow,
+                    new Dictionary<AlertResults, string>() {
+                        [AlertResults.Yes] = alertResultYes,
+                        [AlertResults.No] = alertResultNo,
+                    }, cmdWin);
+
+                if (result == AlertResults.Yes) {
+                    DmodLauncher.LaunchWindowsCmdAsAdmin(cmdWin);
+                }
+
+                _dmodLaunchSpecial_DmodPathOverride = symLinkPath;
+
+                return true;
+            }
+        }
+        
+        private async Task<bool> DmodLauncherPrechecks() {
+            this._dmodLaunchSpecial_IsWinDinkEdit = false;
+            this._dmodLaunchSpecial_RunAsAdmin = false;
+            this._dmodLaunchSpecial_DmodPathOverride = null;
+            
+            if (this.CanCmdLaunchDmod() == false) return false;
+            
+            string exePath = this.Configuration.General.GameExePaths[this.ActiveGameExeIndex];
+            string dmodPath = this.SelectedDmodDefinition.Path;
+            FileInfo finfo = new FileInfo(exePath);
+            DirectoryInfo dinfo = new DirectoryInfo(dmodPath);
+
+            if (finfo.Name.ToLowerInvariant().StartsWith("windinkeditplus2")) {
+                return await DmodLauncherPrechecks_WinDinkEditPlus2(finfo, dinfo);
+            }
+            
+
+            return true;
         }
         
         #endregion
@@ -396,7 +595,7 @@ namespace Martridge.ViewModels.Dmod {
         
         private void InitializeDmodsFromManager() {
             if (this._dmodManager == null ||
-                this._cfgGeneral == null) { return; }
+                this._configuration == null) { return; }
             
             this.DmodDefinitions.Clear();
 
@@ -416,6 +615,8 @@ namespace Martridge.ViewModels.Dmod {
                 
                 var filtered = this._dmodDefinitions.Where(definition => 
                     definition.Name?.ToLowerInvariant().Contains(searchStr) == true );
+                
+                
                 
                 // filter definitions
                 this.InitializeOrderedFilteredDmods(filtered);
@@ -482,10 +683,10 @@ namespace Martridge.ViewModels.Dmod {
 
         public void CmdRefreshDmods(object? parameter = null) {
             if (this.DmodManager == null || 
-                this.ConfigurationGeneral == null) { return; }
+                this.Configuration?.General == null) { return; }
             this.DmodSearchString = null;
 
-            this.DmodManager.Initialize(this.ConfigurationGeneral);
+            this.DmodManager.Initialize(this.Configuration.General);
         }
 
         [DependsOn(nameof(DmodManager))]
@@ -505,40 +706,49 @@ namespace Martridge.ViewModels.Dmod {
             return true;
         }
         
-        public void CmdLaunchDmod(object? parameter = null) {
-            if (!this.GameExeFound) { return; }
-            if (this.ConfigurationGeneral == null) { return; }
-            if (this.ConfigurationLauncher == null) { return; }
-            if (this.DmodLauncher == null) { return; }
-            if (this.DmodManager == null) { return; }
-            if (this.SelectedDmodDefinition == null) { return; }
+        public async void CmdLaunchDmod(object? parameter = null) {
+            try {
+                if (CanCmdLaunchDmod() == false) return;
+                
+                if (await this.DmodLauncherPrechecks()) {
 
-            this.DmodLauncherWaitingForDelay = true;
-            this.SaveToConfigLauncher();
-            this.SaveToConfigGeneral();
+                    this.DmodLauncherWaitingForDelay = true;
+                    this.SaveToConfigLauncher();
+                    this.SaveToConfigGeneral();
 
-            this.DmodLauncher(this.SelectedDmodDefinition.Path, this.SelectedLocalization?.CultureInfo?.Name);
-            
-            this._dmodLauncherDelay.Start();
+                    DmodLauncher.LaunchDmod(
+                        this.Configuration.General.GameExePaths[this.ActiveGameExeIndex],
+                        this._dmodLaunchSpecial_DmodPathOverride != null ? _dmodLaunchSpecial_DmodPathOverride : this.SelectedDmodDefinition.Path,
+                        this.Configuration.Launch,
+                        this._dmodLaunchSpecial_RunAsAdmin,
+                        this.SelectedLocalization?.CultureInfo?.Name);
+
+                    this._dmodLauncherDelay.Start();
+                }
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
+            }
         }
 
         [DependsOn(nameof(GameExeFound))]
-        [DependsOn(nameof(ConfigurationGeneral))]
+        [DependsOn(nameof(Configuration))]
         [DependsOn(nameof(ConfigurationLauncher))]
+        [DependsOn(nameof(ActiveGameExeIndex))]
         [DependsOn(nameof(DmodLauncher))]
         [DependsOn(nameof(DmodManager))]
         [DependsOn(nameof(SelectedDmodDefinition))]
         public bool CanCmdLaunchDmod(object? parameter = null) {
             try {
-                if (!this.GameExeFound) { return false; }
-                if (this.ConfigurationLauncher == null) { return false; }
-                if (this.DmodLauncher == null) { return false; }
-                if (this.DmodManager == null) { return false; }
-                if (this.SelectedDmodDefinition?.Path == null) { return false; }
-                if (this.ConfigurationGeneral?.GameExePaths.Count == 0) { return false; }
-                if (this.ConfigurationGeneral == null) { return false; }
+                if (!this.GameExeFound) return false;
+                if (this.Configuration == null) return false;
+                if (this.ConfigurationLauncher == null) return false;
+                if (this.Configuration.General.GameExePaths.Count == 0) return false;
+                if (this.ActiveGameExeIndex < 0 || this.ActiveGameExeIndex >= this.Configuration.General.GameExePaths.Count) return false;
+                if (this.DmodManager == null) return false; 
+                if (this.SelectedDmodDefinition?.Path == null) return false;
+                
 
-                string exePath = this.ConfigurationGeneral.GameExePaths[this.ActiveGameExeIndex];
+                string exePath = this.Configuration.General.GameExePaths[this.ActiveGameExeIndex];
                 string dmodPath = this.SelectedDmodDefinition.Path;
                 FileInfo finfo = new FileInfo(exePath);
                 DirectoryInfo dinfo = new DirectoryInfo(dmodPath);

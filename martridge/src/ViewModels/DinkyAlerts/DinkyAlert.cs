@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Martridge.Models.Configuration;
 using Martridge.ViewModels.DinkyGraphics;
 using Martridge.Views.DinkyAlerts;
 using System.Collections.Generic;
@@ -124,36 +125,86 @@ namespace Martridge.ViewModels.DinkyAlerts {
             }
         );
 
-
-        public async static Task<AlertResults> ShowDialog(string title, string message, AlertResults resultButtons, AlertType type, Window parentWindow) {
-            DinkyAlertWindowViewModel vm = new DinkyAlertWindowViewModel(title, message, resultButtons, type);
-            DinkyAlertWindow win = new DinkyAlertWindow {
-                DataContext = vm,
-            };
-            
-            win.Closing += ( sender,  args) => {
-                // cancel closing if result is not set yet
-                if (vm.Result == AlertResults.None) {
-                    args.Cancel = true;
-                }
-            };
-            
-            Size? frameSize = parentWindow.FrameSize;
-
-            // try to center on parent window
-            int posX = parentWindow.Position.X;
-            int posY = parentWindow.Position.Y;
+        public static void CenterOnParentWindow(Window window, Window parent) {
+            Size? frameSize = parent.FrameSize;
+            int posX = parent.Position.X;
+            int posY = parent.Position.Y;
             if (frameSize != null && 
-                double.IsNaN(win.Width) == false &&
-                double.IsNaN(win.Height) == false ) {
+                double.IsNaN(window.Width) == false &&
+                double.IsNaN(window.Height) == false ) {
                 
-                posX += ((int)(((Size)frameSize).Width / 2 - win.Width / 2));
-                posY += ((int)(((Size)frameSize).Height / 2 - win.Height / 2))!;
+                posX += ((int)(((Size)frameSize).Width / 2 - window.Width / 2));
+                posY += ((int)(((Size)frameSize).Height / 2 - window.Height / 2))!;
             } else {
                 posX += 100;
                 posY += 100;
             }
-            win.Position = new PixelPoint(posX, posY);
+            window.Position = new PixelPoint(posX, posY);
+        }
+
+        public async static Task<AlertResults> GetRememberedResultOrShowDialog(
+            ConfigAlertResults config, 
+            ConfigAlertResultMap rememberId, 
+            string title, 
+            string message, 
+            AlertResults resultButtons, 
+            AlertType type, 
+            Window parentWindow, 
+            Dictionary<AlertResults, string>? customButtonText = null, 
+            string? specialMessage = null) {
+
+            AlertResults result = config.GetResult(rememberId);
+            
+            // check if result is remembered
+            if (result != AlertResults.None) {
+                return result;
+            }
+            
+            DinkyAlertWindowViewModel vm = new DinkyAlertWindowViewModel(title, message, resultButtons, type, customButtonText, specialMessage);
+            DinkyAlertWindow win = new DinkyAlertWindow { DataContext = vm, };
+            
+            // cancel closing if result is not set yet
+            win.Closing += ( sender,  args) => { if (vm.Result == AlertResults.None) args.Cancel = true; };
+
+            // try to center on parent window
+            CenterOnParentWindow(win, parentWindow);
+
+            // show dialog and get result when done
+            await win.ShowDialog(parentWindow);
+
+            List<AlertResults> resultPriority = new List<AlertResults>() {
+                AlertResults.Cancel,
+                AlertResults.No,
+                AlertResults.Yes,
+                AlertResults.Ok,
+            };
+
+            result = vm.Result;
+
+            if (result.HasFlag(AlertResults.RememberResult)) {
+                foreach (AlertResults res in resultPriority) {
+                    if (result.HasFlag(res)) {
+                        config.SaveResult(rememberId, AlertResults.Cancel);
+                        return res;
+                    }
+                }
+                return AlertResults.None;
+            }
+            
+            return result;
+        }
+        
+
+        public async static Task<AlertResults> ShowDialog(string title, string message, AlertResults resultButtons, AlertType type, Window parentWindow, Dictionary<AlertResults, string>? customButtonText = null, string? specialMessage = null) {
+            
+            DinkyAlertWindowViewModel vm = new DinkyAlertWindowViewModel(title, message, resultButtons, type, customButtonText, specialMessage);
+            DinkyAlertWindow win = new DinkyAlertWindow { DataContext = vm, };
+            
+            // cancel closing if result is not set yet
+            win.Closing += ( sender,  args) => { if (vm.Result == AlertResults.None) args.Cancel = true; };
+            
+            // try to center on parent window
+            CenterOnParentWindow(win, parentWindow);
             
             // show dialog and get result when done
             await win.ShowDialog(parentWindow);

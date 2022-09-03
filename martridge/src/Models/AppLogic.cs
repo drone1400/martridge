@@ -65,13 +65,5 @@ namespace Martridge.Models {
             // reinitialize dmod manager..
             this.DmodManager.Initialize(this.Config.General);
         }
-
-        public delegate void LaunchDmodDelegate(string? pathDmod, string? localization); 
-        
-        public void LaunchDmod(string? path, string?localization) {
-            Task launcher = new Task(() => DmodLauncher.LaunchDmod(this.Config, path, localization));
-            launcher.Start();
-        }
-
     }
 }

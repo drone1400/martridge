@@ -315,8 +315,7 @@ namespace Martridge.ViewModels.Installer {
                     body = body.Replace("\n\r", Environment.NewLine);
                     
                     var result = await DinkyAlert.ShowDialog(title, body, AlertResults.Yes | AlertResults.No | AlertResults.Cancel, AlertType.Warning, this.ParentWindow);
-                    if (result == AlertResults.Cancel ||
-                        result == AlertResults.Abort) {
+                    if (result == AlertResults.Cancel) {
                         return;
                     }
                     if (result == AlertResults.Yes) {

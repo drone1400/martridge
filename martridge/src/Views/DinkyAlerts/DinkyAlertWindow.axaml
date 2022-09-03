@@ -10,8 +10,8 @@
         
         Title="{Binding Title }"
         Name="Alert"
-        MinWidth="520" MinHeight="300"
-        Width="520" Height="300">
+        MinWidth="560" MinHeight="340"
+        Width="560" Height="340">
     <Design.DataContext>
         <vm:DinkyAlertWindowViewModel/>
     </Design.DataContext>
@@ -20,7 +20,7 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
     </Window.Styles>
   
-    <Grid RowDefinitions="*, Auto" 
+    <Grid RowDefinitions="*, Auto, Auto, Auto" 
           ColumnDefinitions="128, *" 
           Margin="10">
     
@@ -31,38 +31,45 @@
                    Text="{Binding Message}"
                    Classes="Heading2I"
                    TextWrapping="Wrap"/>
+        
+        <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                 Text="{Binding SpecialMessage}"
+                 IsReadOnly="True"
+                 Margin="6"
+                 IsVisible="{Binding ShowSpecialMessage}"
+                 />
+        
+        <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" 
+                  Content="{dloc:Localize DinkyAlertWindow/CheckBoxRememberResult}"
+                  IsChecked="{Binding IsResultRemembered}"
+                  IsVisible="{Binding ShowRememberResultCheckbox}"
+                  />
     
-        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-              ColumnDefinitions="*, Auto, Auto, Auto, Auto, Auto, *">
+        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+              ColumnDefinitions="*, Auto, Auto, Auto, Auto, *">
             <Button Grid.Column="1"
-                    Content="{dloc:Localize DinkyAlertWindow/ButtonOk}"
+                    Content="{Binding ButtonTextOk}"
                     Command="{Binding CmdExitOk}"
                     CommandParameter="{Binding ElementName=Alert}"
                     IsVisible="{Binding ShowButtonOk}"/>
         
             <Button Grid.Column="2"
-                    Content="{dloc:Localize DinkyAlertWindow/ButtonYes}"
+                    Content="{Binding ButtonTextYes}"
                     Command="{Binding CmdExitYes}"
                     CommandParameter="{Binding ElementName=Alert}"
                     IsVisible="{Binding ShowButtonYes}"/>
         
             <Button Grid.Column="3"
-                    Content="{dloc:Localize DinkyAlertWindow/ButtonNo}"
+                    Content="{Binding ButtonTextNo}"
                     Command="{Binding CmdExitNo}"
                     CommandParameter="{Binding ElementName=Alert}"
                     IsVisible="{Binding ShowButtonNo}"/>
         
             <Button Grid.Column="4"
-                    Content="{dloc:Localize DinkyAlertWindow/ButtonCancel}"
+                    Content="{Binding ButtonTextCancel}"
                     Command="{Binding CmdExitCancel}"
                     CommandParameter="{Binding ElementName=Alert}"
                     IsVisible="{Binding ShowButtonCancel}"/>
-        
-            <Button Grid.Column="5"
-                    Content="{dloc:Localize DinkyAlertWindow/ButtonAbort}"
-                    Command="{Binding CmdExitAbort}"
-                    CommandParameter="{Binding ElementName=Alert}"
-                    IsVisible="{Binding ShowButtonAbort}"/>
         </Grid>
     </Grid>
   

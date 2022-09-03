@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
+    <TargetFramework>net6</TargetFramework>
     <Nullable>enable</Nullable>
     <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
     <TrimMode>copyused</TrimMode>
@@ -119,6 +119,7 @@
   
   <ItemGroup>
     <Folder Include="Assets\graphics" />
+    <Folder Include="ViewModels\Dmod\Launcher" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\sharpcompress\src\SharpCompress\SharpCompress.csproj" />

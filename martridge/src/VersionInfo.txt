@@ -1,3 +1,10 @@
+--- V0.5.0 ---
+- Some changes to Dink Installer interface, also can now install WinDinkEdit too!
+- Freedink localization options now only show up if freedink is selected...
+- Launching WinDinkEditPlus will prompt user to launch as admin if WinDinkEditPlus has not had its Dink folder configured
+- Launching WinDinkEditPlus can now atttempt to create a symbolic link for dmod paths that would otherwise be invalid
+ 
+
 --- V0.4.4 ---
 - added 'SDL_AUDIODRIVER' = 'winmm' environment variable when launching freedink under windows to fix an issue with WAV file playback not working
 - changed icon with new one made by Bluedy over on The Dink Network

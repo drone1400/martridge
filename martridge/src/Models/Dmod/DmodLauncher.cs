@@ -3,52 +3,112 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using DynamicData.Kernel;
+using Martridge.Models.Configuration;
+using Martridge.Models.Localization;
 using Martridge.Trace;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Martridge.Models.Dmod
 {
     public static class DmodLauncher
     {
-        public static void LaunchDmod(Configuration.Config config, string? path, string? localization = null)
+
+        public static bool GetCreateSymbolicLinkCommandWindows(string dmodPath, string dinkPath, out string? symLinkPath, out string? command) {
+            symLinkPath = null;
+            command = null;
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false) {
+                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, "Automatic symbolic link creation is only supported on windows for now!....", MyTraceLevel.Error);
+                // TODO... maybe implement this for linux?..
+                // TODO... check if WDEP runs on linux with Wine or something?... hah
+                return false;
+            }
+
+            DirectoryInfo dmodDir = new DirectoryInfo(dmodPath);
+            DirectoryInfo dinkDir = new DirectoryInfo(dinkPath);
+            
+            if (dmodDir.Exists == false) {
+                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, Localizer.Instance[@"DmodBrowser/ErrorMissingDirectory"] + $"\"{dmodPath}\"", MyTraceLevel.Error);
+                return false;
+            }
+            
+            if (dinkDir.Exists == false) {
+                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, Localizer.Instance[@"DmodBrowser/ErrorMissingDirectory"] + $"\"{dinkPath}\"", MyTraceLevel.Error);
+                return false;
+            }
+
+            symLinkPath = Path.Combine(dinkDir.FullName, dmodDir.Name);
+            
+            command = $"mklink /d \"{symLinkPath}\" \"{dmodDir.FullName}\"";
+
+            return true;
+        }
+        public static void LaunchWindowsCmdAsAdmin(string cmdCommand) {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false) {
+                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, "Operation only supported on windows...", MyTraceLevel.Error);
+                // TODO... maybe implement this for linux?..
+                // TODO... check if WDEP runs on linux with Wine or something?... hah
+                return;
+            }
+
+            cmdCommand = $"/C {cmdCommand}";
+            
+            ProcessStartInfo pinfo = new ProcessStartInfo()
+            {
+                WindowStyle = ProcessWindowStyle.Normal,
+                FileName = "cmd.exe",
+                Arguments = cmdCommand,
+                UseShellExecute = true,
+                Verb = "runas",
+            };
+            
+            Process? proc = Process.Start(pinfo);
+                
+            proc?.WaitForExit();
+            MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
+                "<Running CMD>",
+                $"    Dink      = \"cmd.exe\"",
+                $"    Args      = {cmdCommand}",
+                $"    Exit Code = {proc?.ExitCode}",
+            });
+        }
+        
+        public static void LaunchDmod(string exePath, string dmodPath, ConfigLaunch launch, bool launchAsAdmin = false, string? localization = null)
         {
             try {
-                if (path == null) return;
-                
-                string gameExe = config.General.GameExePaths[config.General.ActiveGameExeIndex];
-
                 string arguments = "";
-                if (config.Launch.TrueColor) {
+                if (launch.TrueColor) {
                     arguments += " -truecolor";
                 }
-                if (config.Launch.Windowed) {
+                if (launch.Windowed) {
                     arguments += " -window";
                 }
-                if (config.Launch.Sound == false) {
+                if (launch.Sound == false) {
                     arguments += " -nosound";
                 }
-                if (config.Launch.Joystick == false) {
+                if (launch.Joystick == false) {
                     arguments += " -nojoy";
                 }
-                if (config.Launch.Debug) {
+                if (launch.Debug) {
                     arguments += " -debug";
                 }
-                if (config.Launch.V107Mode) {
+                if (launch.V107Mode) {
                     arguments += " --v1.07";
                 }
 
-                FileInfo finfo = new FileInfo(gameExe);
-                DirectoryInfo dinfo = new DirectoryInfo(path);
+                FileInfo finfo = new FileInfo(exePath);
+                DirectoryInfo dinfo = new DirectoryInfo(dmodPath);
                 
                 if (dinfo.Name.ToLowerInvariant() != "dink") {
-                    string finalPath = path;
+                    string finalPath = dmodPath;
                     
-                    if (config.Launch.UsePathRelativeToGame && finfo.DirectoryName != null) {
-                        finalPath = Path.GetRelativePath(finfo.DirectoryName, path);
+                    if (launch.UsePathRelativeToGame && finfo.DirectoryName != null) {
+                        finalPath = Path.GetRelativePath(finfo.DirectoryName, dmodPath);
                     }
 
                     // NOTE: If path contains whitespace, force quotation marks on since otherwise you can't launch the DMOD
-                    if (config.Launch.UsePathQuotationMarks ||
+                    if (launch.UsePathQuotationMarks ||
                         finalPath.Any(c => Char.IsWhiteSpace(c))) {
                         finalPath = $"\"{finalPath}\"";
                     }
@@ -57,20 +117,20 @@ namespace Martridge.Models.Dmod
                     arguments += finalPath;
                 }
 
-                if (!string.IsNullOrWhiteSpace(config.Launch.CustomUserArguments)) {
+                if (!string.IsNullOrWhiteSpace(launch.CustomUserArguments)) {
                     arguments += " ";
-                    arguments += config.Launch.CustomUserArguments;
+                    arguments += launch.CustomUserArguments;
                 }
 
                 MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
                     "<Attempting to start dmod>",
-                    $"    Dink = \"{gameExe}\"",
+                    $"    Dink = \"{exePath}\"",
                     $"    Args = {arguments}",
                     });
 
                 ProcessStartInfo pinfo = new ProcessStartInfo()
                 {
-                    FileName = gameExe,
+                    FileName = exePath,
                     Arguments = arguments,
                 };
                 
@@ -92,13 +152,18 @@ namespace Martridge.Models.Dmod
                         pinfo.Environment.Add("SDL_AUDIODRIVER", "winmm");
                     }
                 }
+
+                if (launchAsAdmin) {
+                    pinfo.UseShellExecute = true;
+                    pinfo.Verb = "runas";
+                }
                 
                 Process? proc = Process.Start(pinfo);
                 
                 proc?.WaitForExit();
                 MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
                     "<Dmod process ended>",
-                    $"    Dink      = \"{gameExe}\"",
+                    $"    Dink      = \"{exePath}\"",
                     $"    Args      = {arguments}",
                     $"    Exit Code = {proc?.ExitCode}",
                 });

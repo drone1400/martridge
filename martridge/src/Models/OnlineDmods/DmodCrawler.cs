@@ -423,9 +423,6 @@ namespace Martridge.Models.OnlineDmods {
 
         private static DateTime ShittyParseDateTime(string dateStr) {
             // dirty and easy way to parse date, just remove the number suffix and use DateTime.Parse...
-            // TODO maybe think up a better way to do this?...
-            // does the date format ever change?...
-
             dateStr = Regex.Replace(dateStr, @"([0-9]+)(st|nd|rd|th)", "$1", RegexOptions.IgnoreCase );
 
             if (!DateTime.TryParse(dateStr, out DateTime date)) {

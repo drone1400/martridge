@@ -42,16 +42,14 @@
                           Command="{Binding CmdShowPageDmodPackerAndBrowse}"/>
                 <MenuItem Header="{dloc:Localize MainWindow/MenuDinkInstaller}"
                           Command="{Binding CmdShowPageDinkInstaller}"/>
+                <MenuItem Header="{dloc:Localize MainWindow/MenuLogWindow}"
+                          Command="{Binding CmdShowLogWindow}"/>
                 <MenuItem Header="{dloc:Localize MainWindow/MenuExit}"
                           Click="CloseWindow"/>
             </MenuItem>
 
-            <MenuItem Header="{dloc:Localize MainWindow/MenuTools}">
-                <MenuItem Header="{dloc:Localize MainWindow/MenuSettings}"
-                          Command="{Binding CmdShowPageSettings}"/>
-                <MenuItem Header="{dloc:Localize MainWindow/MenuLogWindow}"
-                          Command="{Binding CmdShowLogWindow}"/>
-            </MenuItem>
+            <MenuItem Header="{dloc:Localize MainWindow/MenuSettings}"
+                      Command="{Binding CmdShowPageSettings}"/>
 
             <MenuItem Header="{dloc:Localize MainWindow/MenuAbout}"
                       Click="ShowAboutWindow"/>

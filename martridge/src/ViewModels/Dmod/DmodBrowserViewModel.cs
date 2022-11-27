@@ -227,12 +227,8 @@ namespace Martridge.ViewModels.Dmod {
             set => this.RaiseAndSetIfChanged(ref this._gameExePaths, value);
         }
         private ObservableCollection<string> _gameExePaths = new ObservableCollection<string>();
-        
-        public bool GameExeFound {
-            get => this._gameExeFound;
-            private set => this.RaiseAndSetIfChanged(ref this._gameExeFound, value);
-        }
-        private bool _gameExeFound = false;
+
+        public bool GameExeFound => this.GameExePaths.Count > 0;
         
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Methods
@@ -252,15 +248,11 @@ namespace Martridge.ViewModels.Dmod {
                     list.Add(str);
                 }
             }
-
+            
             this.ActiveGameExeIndex = -1;
             this.GameExePaths = list;
             this.ActiveGameExeIndex = this._configuration.General.ActiveGameExeIndex;
-
-            this.RaisePropertyChanged(nameof(this.GameExeFound));
-
-            this._gameExeFound = list.Count > 0;
-
+            
             this.RaisePropertyChanged(nameof(this.GameExeFound));
         }
 
@@ -336,10 +328,10 @@ namespace Martridge.ViewModels.Dmod {
                 using StreamReader sr = new StreamReader(fs);
 
                 while (sr.EndOfStream == false) {
-                    string line = sr.ReadLine().Trim();
+                    string line = sr.ReadLine()!.Trim();
                     if (line == "[Init]") {
                         // next line should be the dink folder...
-                        line = sr.ReadLine().Trim();
+                        line = sr.ReadLine()!.Trim();
                         string[] split = line.Split('=');
                         if (split.Length == 2 && split[0] == "DinkFolder") {
                             return split[1];
@@ -476,7 +468,7 @@ namespace Martridge.ViewModels.Dmod {
 
                 DirectoryInfo dmodDir = new DirectoryInfo(this.SelectedDmodDefinition.Path);
                 
-                if (DmodLauncher.GetCreateSymbolicLinkCommandWindows(dmodDir.FullName, editorDinkDir.FullName, out string symLinkPath, out string cmdWin) == false) {
+                if (DmodLauncher.GetCreateSymbolicLinkCommandWindows(dmodDir.FullName, editorDinkDir.FullName, out string? symLinkPath, out string? cmdWin) == false) {
                     // this should be impossible on windows?...
                     // TODO better log message, also localize it i suppose
                     MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, "This should be impossible...", MyTraceLevel.Error);
@@ -494,7 +486,7 @@ namespace Martridge.ViewModels.Dmod {
                     DmodLauncher.LaunchWindowsCmdAsAdmin(cmdWin);
                 }
 
-                _dmodLaunchSpecial_DmodPathOverride = symLinkPath;
+                this._dmodLaunchSpecial_DmodPathOverride = symLinkPath;
 
                 return true;
             }
@@ -507,15 +499,15 @@ namespace Martridge.ViewModels.Dmod {
             
             if (this.CanCmdLaunchDmod() == false) return false;
             
-            string exePath = this.Configuration.General.GameExePaths[this.ActiveGameExeIndex];
-            string dmodPath = this.SelectedDmodDefinition.Path;
+            // nullables checked in CanCmdLaunchDmod!!!
+            string exePath = this.Configuration!.General.GameExePaths[this.ActiveGameExeIndex];
+            string dmodPath = this.SelectedDmodDefinition!.Path!;
             FileInfo finfo = new FileInfo(exePath);
             DirectoryInfo dinfo = new DirectoryInfo(dmodPath);
 
             if (finfo.Name.ToLowerInvariant().StartsWith("windinkeditplus2")) {
                 return await DmodLauncherPrechecks_WinDinkEditPlus2(finfo, dinfo);
             }
-            
 
             return true;
         }
@@ -536,13 +528,11 @@ namespace Martridge.ViewModels.Dmod {
                     this._dmodManager.DmodListInitialized -= this.DmodManager_DmodListInitialized;
                     this._dmodManager = null;
                 }
-                this._dmodManager = value;
-                this.RaisePropertyChanged(nameof(this.DmodManager));
-
+                this.RaiseAndSetIfChanged(ref this._dmodManager, value);
                 if (this._dmodManager != null) {
                     this._dmodManager.DmodListInitialized += this.DmodManager_DmodListInitialized;
-                    this.InitializeDmodsFromManager();
                 }
+                this.InitializeDmodsFromManager();
             }
         }
         private DmodManager? _dmodManager = null;
@@ -559,21 +549,19 @@ namespace Martridge.ViewModels.Dmod {
         }
         private string? _dmodSearchString = null;
         
-        public ObservableCollection<DmodDefinition> DmodDefinitions { get => this._dmodDefinitions; }
-        private ObservableCollection<DmodDefinition> _dmodDefinitions = new ObservableCollection<DmodDefinition>();
-        
-        public ObservableCollection<DmodDefinition> DmodDefinitionsFiltered {
+        public IEnumerable<DmodDefinition> DmodDefinitionsFiltered {
             get => this._dmodDefinitionsFiltered;
-            set => this.RaiseAndSetIfChanged(ref this._dmodDefinitionsFiltered, value);
+            set {
+                this.RaiseAndSetIfChanged(ref this._dmodDefinitionsFiltered, value);
+                this.RaisePropertyChanged(nameof(this.DmodDefinitionsFilteredHasItems));
+            }
         }
-        private ObservableCollection<DmodDefinition> _dmodDefinitionsFiltered = new ObservableCollection<DmodDefinition>();
+        private IEnumerable<DmodDefinition> _dmodDefinitionsFiltered = new List<DmodDefinition>();
         
-        public bool DmodDefinitionsFilteredHasItems {
-            get => this.DmodDefinitionsFiltered.Count > 0;
-        }
-        
-        public ObservableCollection<DmodOrderBy> DmodOrderByList { get => this._dmodOrderByList; }
-        private ObservableCollection<DmodOrderBy> _dmodOrderByList = new ObservableCollection<DmodOrderBy>() {
+        public bool DmodDefinitionsFilteredHasItems => this.DmodDefinitionsFiltered.Any();
+        private List<DmodDefinition> _dmodDefinitions = new List<DmodDefinition>();
+
+        public List<DmodOrderBy> DmodOrderByList { get; } = new List<DmodOrderBy>() {
             DmodOrderBy.NameAsc,
             DmodOrderBy.NameDesc,
             DmodOrderBy.PathAsc,
@@ -596,68 +584,50 @@ namespace Martridge.ViewModels.Dmod {
         }
         
         private void InitializeDmodsFromManager() {
-            if (this._dmodManager == null ||
-                this._configuration == null) { return; }
-            
-            this.DmodDefinitions.Clear();
-
-            foreach (DmodFileDefinition dfd in this._dmodManager.DmodList) {
-                this.DmodDefinitions.Add(new DmodDefinition(dfd));
+            if (this._dmodManager == null || this._configuration == null) {
+                this._dmodDefinitions = new List<DmodDefinition>();
+            } else {
+                List<DmodDefinition> dmodDefs  = new List<DmodDefinition>();
+                foreach (DmodFileDefinition dfd in this._dmodManager.DmodList) {
+                    dmodDefs.Add(new DmodDefinition(dfd));
+                }
+                this._dmodDefinitions = dmodDefs;
             }
 
             this.InitializeFilteredDmods();
         }
 
         /// <summary>
-        /// Initializes filtered dmods list for the view using current <see cref="DmodDefinitions"/>
+        /// Initializes filtered dmods list for the view using current <see cref="_dmodDefinitions"/>
         /// </summary>
         private void InitializeFilteredDmods() {
+            void SetFilteredDmods(IEnumerable<DmodDefinition> dmods) {
+                this.DmodDefinitionsFiltered = this.DmodOrderBy switch {
+                    DmodOrderBy.NameAsc => dmods.OrderBy(x => x.Name),
+                    DmodOrderBy.NameDesc => dmods.OrderByDescending(x => x.Name),
+                    DmodOrderBy.PathAsc => dmods.OrderBy(x => x.Path),
+                    DmodOrderBy.PathDesc => dmods.OrderBy(x => x.Path),
+                    _ => dmods.AsEnumerable(),
+                };
+            }
+            
             if (this.DmodSearchString != null && this.DmodSearchString.Length >= 2) {
                 string searchStr = this.DmodSearchString.ToLowerInvariant();
                 
-                var filtered = this._dmodDefinitions.Where(definition => 
+                IEnumerable<DmodDefinition> filtered = this._dmodDefinitions.Where(definition => 
                     definition.Name?.ToLowerInvariant().Contains(searchStr) == true );
-                
-                
-                
+
                 // filter definitions
-                this.InitializeOrderedFilteredDmods(filtered);
+                SetFilteredDmods(filtered);
             } else {
                 // use all the definitions
-                this.InitializeOrderedFilteredDmods(this.DmodDefinitions);
+                SetFilteredDmods(this._dmodDefinitions);
             }
         }
-        
-        private void InitializeOrderedFilteredDmods(IEnumerable<DmodDefinition> dmods) {
-            switch (this.DmodOrderBy) {
-                default: 
-                    this.DmodDefinitionsFiltered = new ObservableCollection<DmodDefinition>(dmods);
-                    break;
-                
-                case DmodOrderBy.NameAsc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<DmodDefinition>(
-                        dmods.OrderBy(x => x.Name));
-                    break;
-                case DmodOrderBy.NameDesc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<DmodDefinition>(
-                        dmods.OrderByDescending(x => x.Name));
-                    break;
-                
-                case DmodOrderBy.PathAsc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<DmodDefinition>(
-                        dmods.OrderBy(x => x.Path));
-                    break;
-                case DmodOrderBy.PathDesc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<DmodDefinition>(
-                        dmods.OrderBy(x => x.Path));
-                    break;
-            }
-        }
-        
+
         #endregion
-        
-        
-                
+
+
         #region DMOD Selected - Properties and methods related to the currently selected online DMOD are here
         
         // -----------------------------------------------------------------------------------------------------------------------------------
@@ -687,6 +657,9 @@ namespace Martridge.ViewModels.Dmod {
             if (this.DmodManager == null || 
                 this.Configuration?.General == null) { return; }
             this.DmodSearchString = null;
+
+            // reload configuration just in case something was not synchronized previously...
+            this.LoadFromConfigGeneral();
 
             this.DmodManager.Initialize(this.Configuration.General);
         }
@@ -720,9 +693,13 @@ namespace Martridge.ViewModels.Dmod {
 
                     // launch dmod with separate task to prevent gui lockup
                     Task.Run(() => {
+                        
+                        if (this.Configuration == null ||
+                            this.SelectedDmodDefinition?.Path == null) return;
+                        
                         DmodLauncher.LaunchDmod(
                             this.Configuration.General.GameExePaths[this.ActiveGameExeIndex],
-                            this._dmodLaunchSpecial_DmodPathOverride != null ? _dmodLaunchSpecial_DmodPathOverride : this.SelectedDmodDefinition.Path,
+                            this._dmodLaunchSpecial_DmodPathOverride ?? this.SelectedDmodDefinition.Path,
                             this.Configuration.Launch,
                             this._dmodLaunchSpecial_RunAsAdmin,
                             this.SelectedLocalization?.CultureInfo?.Name);
@@ -740,7 +717,6 @@ namespace Martridge.ViewModels.Dmod {
         [DependsOn(nameof(Configuration))]
         [DependsOn(nameof(ConfigurationLauncher))]
         [DependsOn(nameof(ActiveGameExeIndex))]
-        [DependsOn(nameof(DmodLauncher))]
         [DependsOn(nameof(DmodManager))]
         [DependsOn(nameof(SelectedDmodDefinition))]
         public bool CanCmdLaunchDmod(object? parameter = null) {

@@ -83,12 +83,15 @@ namespace Martridge.Models.Configuration {
 
         public static ConfigInstallerList? LoadFromFile(string path) {
             try {
-                ConfigDataInstallerList? cfgJ;
-                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
-                using (StreamReader sr = new StreamReader(fs)) {
-                    cfgJ = JsonConvert.DeserializeObject<ConfigDataInstallerList>(sr.ReadToEnd());
-                    fs.Flush();
-                    fs.Close();
+                ConfigDataInstallerList? cfgJ = null;
+                
+                if (File.Exists(path)) {
+                    using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+                    using (StreamReader sr = new StreamReader(fs)) {
+                        cfgJ = JsonConvert.DeserializeObject<ConfigDataInstallerList>(sr.ReadToEnd());
+                        fs.Flush();
+                        fs.Close();
+                    }
                 }
 
                 if (cfgJ == null || cfgJ.InstallerDefinitions == null) {

@@ -1,140 +1,103 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
-    <TrimMode>copyused</TrimMode>
-    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
-    <ApplicationIcon>Assets\martridge_new.ico</ApplicationIcon>
-    <Version>0.5.1.4</Version>
-    <RootNamespace>Martridge</RootNamespace>
-    <Configurations>Debug;Release</Configurations>
-    <Platforms>AnyCPU;win-x64</Platforms>
-  </PropertyGroup>
-  
-  <PropertyGroup>
-    <IsWindows Condition="'$(RuntimeIdentifier)' == 'win-x64' or '$(RuntimeIdentifier)' == 'win-x86' or '$(Platform)' == 'Any CPU' or '$(Platform)' == 'AnyCPU' ">true</IsWindows>
-    <IsLinux Condition="'$(RuntimeIdentifier)' == 'linux-x64'">true</IsLinux>
-    <IsMacOs Condition="'$(RuntimeIdentifier)' == 'osx-x64'">true</IsMacOs>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
+        <TrimMode>copyused</TrimMode>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationIcon>Assets\martridge_new.ico</ApplicationIcon>
+        <Version>0.5.1.4</Version>
+        <RootNamespace>Martridge</RootNamespace>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU;win-x64</Platforms>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(IsWindows)'=='true'">
-    <DefineConstants>PLATF_WINDOWS</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(IsMacOs)'=='true'">
-    <DefineConstants>PLATF_MACOS</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(IsLinux)'=='true'">
-    <DefineConstants>PLATF_LINUX</DefineConstants>
-  </PropertyGroup>
+    <PropertyGroup>
+        <IsWindows Condition="'$(RuntimeIdentifier)' == 'win-x64' or '$(RuntimeIdentifier)' == 'win-x86' or '$(Platform)' == 'Any CPU' or '$(Platform)' == 'AnyCPU' ">true</IsWindows>
+        <IsLinux Condition="'$(RuntimeIdentifier)' == 'linux-x64'">true</IsLinux>
+        <IsMacOs Condition="'$(RuntimeIdentifier)' == 'osx-x64'">true</IsMacOs>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <PropertyGroup Condition="'$(IsWindows)'=='true'">
+        <DefineConstants>PLATF_WINDOWS</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(IsMacOs)'=='true'">
+        <DefineConstants>PLATF_MACOS</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(IsLinux)'=='true'">
+        <DefineConstants>PLATF_LINUX</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+
+        <BaseIntermediateOutputPath>..\output.obj\</BaseIntermediateOutputPath>
+        <IntermediateOutputPath>..\output.obj\$(TargetFramework)_$(Configuration)_$(Platform)_$(OS)\Martridge\</IntermediateOutputPath>
+        <OutputPath>..\output\$(TargetFramework)_$(Configuration)_$(Platform)_$(OS)\Martridge\</OutputPath>
+        <WarningLevel>4</WarningLevel>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaXaml Remove="AppStyles.axaml"/>
+        <None Remove=".gitignore"/>
+        <None Remove="Assets\dloc\en-US.json"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="AppStyles.axaml"/>
+    </ItemGroup>
+    <ItemGroup>
+        <!--This helps with theme dll-s trimming.
+        If you will publish your application in self-contained mode with p:PublishTrimmed=true and it will use Fluent theme Default theme will be trimmed from the output and vice versa.
+        https://github.com/AvaloniaUI/Avalonia/issues/5593 -->
+        <TrimmableAssembly Include="Avalonia.Themes.Fluent"/>
+        <TrimmableAssembly Include="Avalonia.Themes.Default"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="0.10.18"/>
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.18"/>
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.18"/>
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18"/>
+        <PackageReference Include="Citrus.Avalonia" Version="1.6.1"/>
+        <PackageReference Include="GetText.NET" Version="1.2.4-rc"/>
+        <PackageReference Include="HtmlAgilityPack" Version="1.11.42"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
+        <PackageReference Condition="'$(IsWindows)'=='true'" Include="SevenZipExtractor" Version="1.0.17"/>
+    </ItemGroup>
+
+
+    <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
+        <None Include="$(ProjectDir)\lib\7zip\x64\7z.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+    <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x86'">
+        <None Include="$(ProjectDir)\lib\7zip\x86\7z.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <!-- old versions that are no longer included in the project...-->
+    <ItemGroup>
+        <Compile Remove="Views\Dmod\SplitListPresenterListShowConverter.cs"/>
+        <Compile Remove="Views\Dmod\SplitListPresenterSelectedShowConverter.cs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Assets\graphics"/>
+        <Folder Include="ViewModels\Dmod\Launcher"/>
+    </ItemGroup>
     
-    <BaseIntermediateOutputPath>..\output.obj\</BaseIntermediateOutputPath>
-    <IntermediateOutputPath>..\output.obj\$(TargetFramework)_$(Configuration)_$(Platform)_$(OS)\Martridge\</IntermediateOutputPath>
-    <OutputPath>..\output\$(TargetFramework)_$(Configuration)_$(Platform)_$(OS)\Martridge\</OutputPath>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  
-  <PropertyGroup>
-    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-  </PropertyGroup>
-    
-
-  <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
-    <AvaloniaXaml Remove="AppStyles.axaml" />
-    <None Remove=".gitignore" />
-    <None Remove="Assets\dloc\en-US.json" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <AvaloniaResource Include="AppStyles.axaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <!--This helps with theme dll-s trimming.
-	If you will publish your application in self-contained mode with p:PublishTrimmed=true and it will use Fluent theme Default theme will be trimmed from the output and vice versa.
-	https://github.com/AvaloniaUI/Avalonia/issues/5593 -->
-    <TrimmableAssembly Include="Avalonia.Themes.Fluent" />
-    <TrimmableAssembly Include="Avalonia.Themes.Default" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.18" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.18" />
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.18" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18" />
-    <PackageReference Include="Citrus.Avalonia" Version="1.6.1" />
-    <PackageReference Include="GetText.NET" Version="1.2.4-rc" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Condition="'$(IsWindows)'=='true'" Include="SevenZipExtractor" Version="1.0.17" />
-  </ItemGroup>
-  
-  
-  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
-    <None Include="$(ProjectDir)\lib\7zip\x64\7z.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x86'">
-    <None Include="$(ProjectDir)\lib\7zip\x86\7z.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Compile Update="Views\Dmod\OnlineDmodBrowserView.axaml.cs">
-      <DependentUpon>OnlineDmodBrowserView.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\Installer\InstallerView_Page1.axaml.cs">
-      <DependentUpon>InstallerView_Page1.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Installer\DinkInstallerVersionInfoView.axaml.cs">
-      <DependentUpon>InstallerView_Page2.axaml</DependentUpon>
-    </Compile>   
-    <Compile Update="Views\Installer\InstallerProgressView.axaml.cs">
-      <DependentUpon>InstallerView_Page3.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Installer\DmodPackerPrepareView.axaml.cs">
-      <DependentUpon>InstallerVIew_Page5.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\Log\LogWindow.axaml.cs">
-      <DependentUpon>LogWindow.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Configuration\SettingsGeneralView.axaml.cs">
-      <DependentUpon>SettingsGeneralView.axaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Installer\DmodPackerView.axaml.cs">
-      <DependentUpon>DmodPackerView.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\Installer\DinkInstallerNotSupportedView.axaml.cs">
-      <DependentUpon>InstallerView_Page0.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\About\AboutWindow.axaml.cs">
-      <DependentUpon>AboutWindow.axaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Remove="Views\Dmod\SplitListPresenterListShowConverter.cs" />
-    <Compile Remove="Views\Dmod\SplitListPresenterSelectedShowConverter.cs" />
-    <Compile Update="Views\Installer\DinkInstallerPrepareView.cs">
-      <DependentUpon>DinkInstallerPrepareView.axaml</DependentUpon>
-    </Compile>
-
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Assets\graphics" />
-    <Folder Include="ViewModels\Dmod\Launcher" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\sharpcompress\src\SharpCompress\SharpCompress.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\sharpcompress\src\SharpCompress\SharpCompress.csproj"/>
+    </ItemGroup>
 </Project>

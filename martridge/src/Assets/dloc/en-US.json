@@ -179,8 +179,6 @@
   "DmodBrowser/LaunchDmod/WinDinkEditPlus/SymbolicLink/ResultYes": "Let Martridge do it",
   "DmodBrowser/LaunchDmod/WinDinkEditPlus/SymbolicLink/ResultNo": "I already did it",
   "DmodBrowser/ErrorMissingDirectory" : "Directory not found at path!",
-  "DmodBrowser/ErrorDmodAlreadyInSymbolicLinkDestination" : "DMOD is already at symbolic link destination! No need to create it!",
-  "DmodBrowser/ErrorSymbolicLinkAlreadyExists" : "Symbolic link already exists for this DMOD at destination! No need to create it!",
   "DmodBrowser/Refresh" : "Refresh",
   "DmodBrowser/RefreshTooltip" : "Refreshes the dmod list and clears the search",
   "DmodBrowser/Search" : "Search",

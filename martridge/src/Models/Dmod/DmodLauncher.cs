@@ -13,104 +13,7 @@ namespace Martridge.Models.Dmod
 {
     public static class DmodLauncher
     {
-
-        public static bool GetCreateSymbolicLinkCommandWindows(string dmodPath, string dinkPath, out string? symLinkPath, out string? command) {
-            symLinkPath = null;
-            command = null;
-            
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, "Automatic symbolic link creation is only supported on windows for now!....", MyTraceLevel.Error);
-                // TODO... maybe implement this for linux?..
-                // TODO... check if WDEP runs on linux with Wine or something?... hah
-                return false;
-            }
-
-            DirectoryInfo dmodDir = new DirectoryInfo(dmodPath);
-            DirectoryInfo dinkDir = new DirectoryInfo(dinkPath);
-            
-            if (dmodDir.Exists == false) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
-                    Localizer.Instance[@"DmodBrowser/ErrorMissingDirectory"],
-                    $"    Path = \"{dmodPath}\""
-                }, MyTraceLevel.Error);
-                return false;
-            }
-            
-            if (dinkDir.Exists == false) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
-                    Localizer.Instance[@"DmodBrowser/ErrorMissingDirectory"],
-                    $"    Path = \"{dmodPath}\""
-                }, MyTraceLevel.Error);
-                return false;
-            }
-
-            symLinkPath = Path.Combine(dinkDir.FullName, $"SL_{dmodDir.Name}");
-            DirectoryInfo symLinkInfo = new DirectoryInfo(symLinkPath);
-            int index = 1;
-            
-            while (symLinkInfo.Exists) {
-                if (symLinkInfo.Exists && symLinkInfo.FullName == dmodDir.FullName) {
-                    // dmod already in destination?!
-                    MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
-                        Localizer.Instance[@"DmodBrowser/ErrorDmodAlreadyInSymbolicLinkDestination"],
-                        $"    Path = \"{dmodPath}\""
-                    }, MyTraceLevel.Error);
-                    return false;
-                }
-                if (symLinkInfo.Exists && symLinkInfo.LinkTarget != null && symLinkInfo.LinkTarget == dmodDir.FullName) {
-                    // dmod already in destination?!
-                    MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
-                        Localizer.Instance[@"DmodBrowser/ErrorSymbolicLinkAlreadyExists"],
-                        $"    Path = \"{dmodPath}\""
-                    }, MyTraceLevel.Error);
-                    return false;
-                }
-                
-                // a directory with the same name already exists... try a different name
-                symLinkPath = Path.Combine(dinkDir.FullName, $"SL_{dmodDir.Name}_{index}" );
-                symLinkInfo = new DirectoryInfo(symLinkPath);
-                
-                // increment index for next attempt
-                index++;
-            }
-
-            command = $"mklink /d \"{symLinkPath}\" \"{dmodDir.FullName}\"";
-
-            return true;
-        }
-        public static int LaunchWindowsCmdAsAdmin(string cmdCommand) {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, "Operation only supported on windows...", MyTraceLevel.Error);
-                // TODO... maybe implement this for linux?..
-                // TODO... check if WDEP runs on linux with Wine or something?... hah
-                return int.MinValue;
-            }
-
-            cmdCommand = $"/C {cmdCommand}";
-            
-            ProcessStartInfo pinfo = new ProcessStartInfo()
-            {
-                WindowStyle = ProcessWindowStyle.Normal,
-                FileName = "cmd.exe",
-                Arguments = cmdCommand,
-                UseShellExecute = true,
-                Verb = "runas",
-            };
-            
-            Process? proc = Process.Start(pinfo);
-                
-            proc?.WaitForExit();
-            MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
-                "<Running CMD>",
-                $"    Dink      = \"cmd.exe\"",
-                $"    Args      = {cmdCommand}",
-                $"    Exit Code = {proc?.ExitCode}",
-            });
-
-            return proc?.ExitCode ?? int.MinValue;
-        }
-        
-        public static void LaunchDmod(string exePath, string dmodPath, ConfigLaunch launch, bool launchAsAdmin = false, string? localization = null)
+        public static void LaunchDmod(string exePath, string dmodPath, ConfigLaunch launch, string? localization = null)
         {
             try {
                 string arguments = "";
@@ -190,11 +93,6 @@ namespace Martridge.Models.Dmod
                         pinfo.Environment.RemoveIfContained("SDL_AUDIODRIVER");
                         pinfo.Environment.Add("SDL_AUDIODRIVER", "winmm");
                     }
-                }
-
-                if (launchAsAdmin) {
-                    pinfo.UseShellExecute = true;
-                    pinfo.Verb = "runas";
                 }
                 
                 Process? proc = Process.Start(pinfo);

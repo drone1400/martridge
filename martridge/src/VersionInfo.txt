@@ -1,3 +1,10 @@
+--- V0.6.0 ---
+- removed the whole symbolic link mess since there is a new version of WinDinkEditPlus2 that doesn't need any of that anymore, yay
+
+--- V0.5.2 ---
+- Fixed some issue with the Dmod Browser not showing any Dmods after just installing Dink...
+- Moved Settings menu to be more accessible (before it was nested in a "Tools" menu)
+
 --- V0.5.1 ---
 - Fixed some issues related to creating symbolic links for WinDinkEditPlus...
 - Self contained .net6 files are now really a single exe

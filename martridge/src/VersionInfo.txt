@@ -1,5 +1,9 @@
+--- V0.6.2 ---
+- fixed old issue where having a game exe that doesn't exist in the game exe list, would make you unable to launch a dmod or launch it using the wrong exe!
+- made dmod launcher game selection combo box look nicer
+
 --- V0.6.1 ---
-- fix issue with 7zip dll not being included in x86 release by copying dll along with published exe...
+- fixed issue with 7zip dll not being included in x86 release by copying dll along with published exe...
 
 --- V0.6.0 ---
 - removed the whole symbolic link mess since there is a new version of WinDinkEditPlus2 that doesn't need any of that anymore, yay

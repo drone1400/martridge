@@ -9,8 +9,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpCompress", "..\sharpco
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Debug|x64 = Debug|x64
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{0F6B7C4D-1617-4D75-9B4C-29FAD8E1663B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -21,11 +25,27 @@ Global
 		{53566BD1-BB3D-453F-BB36-3ED64E2845A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53566BD1-BB3D-453F-BB36-3ED64E2845A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53566BD1-BB3D-453F-BB36-3ED64E2845A7}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A2A0B444-19CD-4EBE-84D7-55AD64987695}
-	EndGlobalSection
+        {0F6B7C4D-1617-4D75-9B4C-29FAD8E1663B}.Debug|x86.ActiveCfg = Debug|x86
+        {0F6B7C4D-1617-4D75-9B4C-29FAD8E1663B}.Debug|x86.Build.0 = Debug|x86
+        {0F6B7C4D-1617-4D75-9B4C-29FAD8E1663B}.Release|x86.ActiveCfg = Release|x86
+        {0F6B7C4D-1617-4D75-9B4C-29FAD8E1663B}.Release|x86.Build.0 = Release|x86
+        {53566BD1-BB3D-453F-BB36-3ED64E2845A7}.Debug|x86.ActiveCfg = Debug|x86
+        {53566BD1-BB3D-453F-BB36-3ED64E2845A7}.Debug|x86.Build.0 = Debug|x86
+        {53566BD1-BB3D-453F-BB36-3ED64E2845A7}.Release|x86.ActiveCfg = Release|x86
+        {53566BD1-BB3D-453F-BB36-3ED64E2845A7}.Release|x86.Build.0 = Release|x86
+        {0F6B7C4D-1617-4D75-9B4C-29FAD8E1663B}.Debug|x64.ActiveCfg = Debug|x64
+        {0F6B7C4D-1617-4D75-9B4C-29FAD8E1663B}.Debug|x64.Build.0 = Debug|x64
+        {0F6B7C4D-1617-4D75-9B4C-29FAD8E1663B}.Release|x64.ActiveCfg = Release|x64
+        {0F6B7C4D-1617-4D75-9B4C-29FAD8E1663B}.Release|x64.Build.0 = Release|x64
+        {53566BD1-BB3D-453F-BB36-3ED64E2845A7}.Debug|x64.ActiveCfg = Debug|x64
+        {53566BD1-BB3D-453F-BB36-3ED64E2845A7}.Debug|x64.Build.0 = Debug|x64
+        {53566BD1-BB3D-453F-BB36-3ED64E2845A7}.Release|x64.ActiveCfg = Release|x64
+        {53566BD1-BB3D-453F-BB36-3ED64E2845A7}.Release|x64.Build.0 = Release|x64
+    EndGlobalSection
+    GlobalSection(SolutionProperties) = preSolution
+        HideSolutionNode = FALSE
+    EndGlobalSection
+    GlobalSection(ExtensibilityGlobals) = postSolution
+        SolutionGuid = {A2A0B444-19CD-4EBE-84D7-55AD64987695}
+    EndGlobalSection
 EndGlobal

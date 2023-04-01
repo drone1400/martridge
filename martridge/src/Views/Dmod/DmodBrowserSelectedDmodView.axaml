@@ -56,9 +56,27 @@
                 <ComboBox   Grid.Row="1"
                             HorizontalAlignment="Stretch"
                             Items="{Binding GameExePaths}"
-                            SelectedIndex="{Binding ActiveGameExeIndex, Mode=TwoWay}"/>
-
-                <Grid Grid.Row="2"
+                            SelectedItem="{Binding ActiveGameExePath, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="vm:DmodLauncherSelectionViewModel">
+                            <TextBlock Classes="Heading2B" Text="{Binding DisplayName}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Grid Grid.Row="2" RowDefinitions="Auto,Auto">
+                    <TextBlock  Grid.Row="0" Classes="Heading2B"
+                                Text="{dloc:Localize DmodBrowser/ExeNotFound}"
+                                IsVisible="{Binding !ActiveGameExePath.PathExists, FallbackValue=False}"/>
+                    <TextBlock Grid.Row="1" Classes="Heading2I"
+                               Text="{Binding ActiveGameExePath.Path, 
+                      FallbackValue={StaticResource DataNotAvailable},
+                      TargetNullValue={StaticResource DataNotAvailable} }" 
+                               TextWrapping="Wrap"
+                               ToolTip.Tip="{Binding ActiveGameExePath.Path, 
+                      FallbackValue={StaticResource DataNotAvailable},
+                      TargetNullValue={StaticResource DataNotAvailable} }"/>
+                </Grid>
+                <Grid Grid.Row="3"
                       RowDefinitions="Auto,Auto,Auto"
                       ColumnDefinitions="*, Auto, Auto, Auto, Auto">
                     <CheckBox   Grid.Row="0"  Grid.Column="1" 

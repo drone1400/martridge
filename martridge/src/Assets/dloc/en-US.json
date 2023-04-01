@@ -158,6 +158,7 @@
   "DmodBrowser/NoDmodSelectedTitle": "No DMOD Selected!",
   "DmodBrowser/NoDmodSelectedBody": "Select a DMOD and see what happens!",
   "DmodBrowser/SelectExe": "Launch game using this engine:",
+  "DmodBrowser/ExeNotFound": "FILE NOT FOUND",
   "DmodBrowser/LaunchDmod": "Start DMOD!",
   "DmodBrowser/FreeDinkLocalization": "FreeDink Localization",
   "DmodBrowser/LaunchTrueColor": "True Color",

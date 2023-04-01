@@ -45,41 +45,39 @@
 
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**"/>
-        <AvaloniaXaml Remove="AppStyles.axaml"/>
-        <None Remove=".gitignore"/>
-        <None Remove="Assets\dloc\en-US.json"/>
+        <AvaloniaResource Include="Assets\**" />
+        <AvaloniaXaml Remove="AppStyles.axaml" />
+        <None Remove=".gitignore" />
+        <None Remove="Assets\dloc\en-US.json" />
     </ItemGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="AppStyles.axaml"/>
+        <AvaloniaResource Include="AppStyles.axaml" />
     </ItemGroup>
     <ItemGroup>
         <!--This helps with theme dll-s trimming.
         If you will publish your application in self-contained mode with p:PublishTrimmed=true and it will use Fluent theme Default theme will be trimmed from the output and vice versa.
         https://github.com/AvaloniaUI/Avalonia/issues/5593 -->
-        <TrimmableAssembly Include="Avalonia.Themes.Fluent"/>
-        <TrimmableAssembly Include="Avalonia.Themes.Default"/>
+        <TrimmableAssembly Include="Avalonia.Themes.Fluent" />
+        <TrimmableAssembly Include="Avalonia.Themes.Default" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.18"/>
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.18"/>
+        <PackageReference Include="Avalonia" Version="0.10.18" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.18" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.18"/>
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18"/>
-        <PackageReference Include="Citrus.Avalonia" Version="1.6.1"/>
-        <PackageReference Include="GetText.NET" Version="1.2.4-rc"/>
-        <PackageReference Include="HtmlAgilityPack" Version="1.11.42"/>
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
-        <PackageReference Condition="'$(IsWindows)'=='true'" Include="SevenZipExtractor" Version="1.0.17"/>
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.18" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18" />
+        <PackageReference Include="Citrus.Avalonia" Version="1.6.1" />
+        <PackageReference Include="GetText.NET" Version="1.2.4-rc" />
+        <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Condition="'$(IsWindows)'=='true'" Include="SevenZipExtractor" Version="1.0.17" />
     </ItemGroup>
 
     <Target Name="Copy7zipLibs" AfterTargets="Publish" Condition="'$(IsWindows)'=='true'">
         <!-- for some reason the x86 binary from the SevenZipExtractor nuget package doesn't get included in the published exe... -->
         <!-- copy it manually here after publishing... -->
-        <Copy Condition="'$(Platform)' == 'x86'"
-              SourceFiles="$(ProjectDir)\lib\7zip\x86\7z.dll" 
-              DestinationFiles="$(PublishDir)\x86\7z.dll"/>
+        <Copy Condition="'$(Platform)' == 'x86'" SourceFiles="$(ProjectDir)\lib\7zip\x86\7z.dll" DestinationFiles="$(PublishDir)\x86\7z.dll" />
         
         <!-- x64 binary from nuget package seems to get included in published single file automagically.. no need to copy it.. -->
 <!--        <Copy Condition="'$(Platform)' == 'x64'"-->
@@ -87,22 +85,21 @@
 <!--              DestinationFiles="$(PublishDir)\x64\7z.dll"/>-->
         
         <!-- copy license file too.. i think i was supposed to do this before as well but didn't notice?... oops! -->
-        <Copy SourceFiles="$(ProjectDir)\lib\7zip\7ZipLicense.txt" 
-              DestinationFiles="$(PublishDir)\7ZipLicense.txt"/>
+        <Copy SourceFiles="$(ProjectDir)\lib\7zip\7ZipLicense.txt" DestinationFiles="$(PublishDir)\7ZipLicense.txt" />
     </Target>
 
     <!-- old versions that are no longer included in the project...-->
     <ItemGroup>
-        <Compile Remove="Views\Dmod\SplitListPresenterListShowConverter.cs"/>
-        <Compile Remove="Views\Dmod\SplitListPresenterSelectedShowConverter.cs"/>
+        <Compile Remove="Views\Dmod\SplitListPresenterListShowConverter.cs" />
+        <Compile Remove="Views\Dmod\SplitListPresenterSelectedShowConverter.cs" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Assets\graphics"/>
-        <Folder Include="ViewModels\Dmod\Launcher"/>
+        <Folder Include="Assets\graphics" />
+        <Folder Include="ViewModels\Dmod\Launcher" />
     </ItemGroup>
     
     <ItemGroup>
-        <ProjectReference Include="..\..\sharpcompress\src\SharpCompress\SharpCompress.csproj"/>
+        <ProjectReference Include="..\..\sharpcompress\src\SharpCompress\SharpCompress.csproj" />
     </ItemGroup>
 </Project>

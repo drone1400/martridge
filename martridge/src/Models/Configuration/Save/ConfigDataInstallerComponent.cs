@@ -11,5 +11,7 @@ namespace Martridge.Models.Configuration.Save {
         public List<string>? FileFilterList { get; set; }
 
         public InstallerFiltering? FileFilterMode { get; set; }
+
+        public string? SourceSubFolder { get; set; }
     }
 }

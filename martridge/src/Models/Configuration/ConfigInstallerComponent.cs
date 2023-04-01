@@ -10,8 +10,11 @@ namespace Martridge.Models.Configuration {
 
         public InstallerFiltering FileFilterMode { get; private set; } = InstallerFiltering.NoFiltering;
 
+        public string SourceSubFolder { get; set; } = "";
+
         public ConfigInstallerComponent Clone() {
             ConfigInstallerComponent comp = new ConfigInstallerComponent {
+                SourceSubFolder = this.SourceSubFolder,
                 FileFilterMode = this.FileFilterMode,
                 WebResource = this.WebResource.Clone(),
             };
@@ -29,6 +32,7 @@ namespace Martridge.Models.Configuration {
 
                 if (webResource != null) {
                     ConfigInstallerComponent comp = new ConfigInstallerComponent() {
+                        SourceSubFolder = data.SourceSubFolder ?? "",
                         WebResource = webResource,
                         FileFilterMode = InstallerFiltering.NoFiltering,
                     };
@@ -55,6 +59,7 @@ namespace Martridge.Models.Configuration {
             return new ConfigDataInstallerComponent() {
                 WebResource = this.WebResource.ToJsonData(),
                 FileFilterMode = this.FileFilterMode,
+                SourceSubFolder = this.SourceSubFolder,
                 FileFilterList = filtered,
             };
         }

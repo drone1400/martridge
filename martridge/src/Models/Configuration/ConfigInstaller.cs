@@ -5,6 +5,11 @@ namespace Martridge.Models.Configuration {
     public class ConfigInstaller {
 
         /// <summary>
+        /// This is the name of the folder in which to install
+        /// </summary>
+        public string DestinationName { get; set; } = "";
+        
+        /// <summary>
         /// This is the versioned name of the application being installed, ex: 'Dink HD V1.9.9', 'Dink V108', etc
         /// </summary>
         public string Name { get; set; } = "";
@@ -24,6 +29,7 @@ namespace Martridge.Models.Configuration {
         public ConfigInstaller Clone() {
             ConfigInstaller cfg = new ConfigInstaller {
                 ApplicationFileName = this.ApplicationFileName,
+                DestinationName = this.DestinationName,
                 Name = this.Name,
             };
             for (int i = 0; i < this.InstallerComponents.Count; i++) {
@@ -41,6 +47,7 @@ namespace Martridge.Models.Configuration {
                 data.InstallerComponents != null) {
                 ConfigInstaller cfg = new ConfigInstaller() {
                     Name = data.Name,
+                    DestinationName = data.DestinationName ?? "",
                     Category = data.Category,
                     ApplicationFileName = data.ApplicationFileName,
                 };
@@ -66,6 +73,7 @@ namespace Martridge.Models.Configuration {
 
             return new ConfigDataInstaller() {
                 Name = this.Name,
+                DestinationName = this.Name,
                 Category = this.Category,
                 ApplicationFileName = this.ApplicationFileName,
                 InstallerComponents = list,

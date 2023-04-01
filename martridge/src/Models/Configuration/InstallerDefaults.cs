@@ -8,7 +8,8 @@ namespace Martridge.Models.Configuration {
         public static ConfigDataInstaller DinkHD_LatestRtSoft() {
             return new ConfigDataInstaller() {
                 Category = "Dink HD",
-                Name = "Dink HD",
+                Name = "DinkHD",
+                DestinationName = "DinkHD",
                 ApplicationFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
@@ -30,7 +31,8 @@ namespace Martridge.Models.Configuration {
         public static ConfigDataInstaller DinkHD_TDN_V1_93() {
             return new ConfigDataInstaller() {
                 Category = "Dink HD",
-                Name = "Dink HD V1.93",
+                Name = "DinkHD V1.93",
+                DestinationName = "DinkHD_V1.93",
                 ApplicationFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
@@ -52,7 +54,8 @@ namespace Martridge.Models.Configuration {
         public static ConfigDataInstaller DinkHD_TDN_V1_97() {
             return new ConfigDataInstaller() {
                 Category = "Dink HD",
-                Name = "Dink HD V1.97",
+                Name = "DinkHD V1.97",
+                DestinationName = "DinkHD_V1.97",
                 ApplicationFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
@@ -74,7 +77,8 @@ namespace Martridge.Models.Configuration {
         public static ConfigDataInstaller DinkHD_TDN_V1_98() {
             return new ConfigDataInstaller() {
                 Category = "Dink HD",
-                Name = "Dink HD V1.98",
+                Name = "DinkHD V1.98",
+                DestinationName = "DinkHD_V1.98",
                 ApplicationFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
@@ -96,7 +100,8 @@ namespace Martridge.Models.Configuration {
         public static ConfigDataInstaller DinkHD_TDN_V1_99() {
             return new ConfigDataInstaller() {
                 Category = "Dink HD",
-                Name = "Dink HD V1.99",
+                Name = "DinkHD V1.99",
+                DestinationName = "DinkHD_V1.99",
                 ApplicationFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
@@ -123,6 +128,7 @@ namespace Martridge.Models.Configuration {
             return new ConfigDataInstaller() {
                 Category = "Dink Classic",
                 Name = "Dink V1.08",
+                DestinationName = "Dink_V1.08",
                 ApplicationFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
@@ -194,12 +200,57 @@ namespace Martridge.Models.Configuration {
 
         #endregion
 
+        #region YEOLDEDINK
+
+        public static ConfigDataInstaller YeOldeDink_V05_With_V108Data_And_Localizations() {
+            return new ConfigDataInstaller() {
+                Category = "YeOldeDink",
+                Name = "YeOldeDink V0.5",
+                DestinationName = "yeoldedink05",
+                ApplicationFileName = "yedink05.exe",
+                
+                InstallerComponents = new List<ConfigDataInstallerComponent>() {
+                    // The DinkV108 data
+                    new ConfigDataInstallerComponent() {
+                        WebResource = new ConfigDataWebResource() {
+                            Sha256 = "d6be28b01602813df02439d4d2974bd38820dc9ce0ea71da5110fc825a360d8e",
+                            CheckSha256 = true,
+                            Name = "dinksmallwood108.exe",
+                            Uri = @"https://www.dinknetwork.com/download/dinksmallwood108.exe",
+                            ResourceArchiveFormat = "Nsis",
+                        },
+
+                        FileFilterMode = InstallerFiltering.UseWhiteList,
+                        FileFilterList = new List<string>() {
+                            @"dink",
+                            @"island",
+                        },
+                    },
+                    // The Ye Olde Dink
+                    new ConfigDataInstallerComponent() {
+                        WebResource = new ConfigDataWebResource() {
+                            Sha256 = "fe5dc1462908b7ba79688b519b0e5c1425bf34ece45f29a2eb06b756e6ec3a3e",
+                            CheckSha256 = true,
+                            Name = "yeoldedinkV0.5.7z",
+                            Uri = @"https://files.catbox.moe/oi5vnz.7z",
+                            ResourceArchiveFormat = "SevenZip",
+                        },
+                        SourceSubFolder = "yeoldedink05",
+                        FileFilterMode = InstallerFiltering.NoFiltering,
+                    },
+                },
+            };
+        }
+
+        #endregion
+
         #region FREEDINK
         
         public static ConfigDataInstaller FreeDink_V1_09_6_With_V108Data_And_Localizations() {
             return new ConfigDataInstaller() {
                 Category = "Freedink",
                 Name = "FreeDink V1.09.6",
+                DestinationName = "FreeDink_V1.09.6",
                 ApplicationFileName = "freedink.exe",
                 
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
@@ -259,7 +310,8 @@ namespace Martridge.Models.Configuration {
         public static ConfigDataInstaller Freedink_V1_09_6_With_GnuData() {
             return new ConfigDataInstaller() {
                 Category = "Freedink",
-                Name = "FreeDink V1.09.6 (GNU assets)",
+                Name = "FreeDink V1.09.6 (GNU Assets)",
+                DestinationName = "FreeDink_V1.09.6_GNUAssets",
                 ApplicationFileName = "freedink.exe",
                 
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
@@ -300,7 +352,8 @@ namespace Martridge.Models.Configuration {
         public static ConfigDataInstaller WinDinkEdit_V1_4B2() {
             return new ConfigDataInstaller() {
                 Category = "WinDinkEdit",
-                Name = "WinDinkEdit V1.4 Beta 2",
+                Name = "WinDinkEdit V1.4 Beta2",
+                DestinationName = "WinDinkEdit_V1.4_Beta2",
                 ApplicationFileName = "WinDinkedit.exe",
                 
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
@@ -323,7 +376,8 @@ namespace Martridge.Models.Configuration {
         public static ConfigDataInstaller WinDinkEditPlus_V1_2() {
             return new ConfigDataInstaller() {
                 Category = "WinDinkEdit",
-                Name = "WinDinkEdit Plus V1.2",
+                Name = "WinDinkEditPlus V1.2",
+                DestinationName = "WinDinkEditPlus_V1.2",
                 ApplicationFileName = "WinDinkeditPlus.exe",
                 
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
@@ -346,7 +400,8 @@ namespace Martridge.Models.Configuration {
         public static ConfigDataInstaller WinDinkEditPlus2_V2_3_2() {
             return new ConfigDataInstaller() {
                 Category = "WinDinkEdit",
-                Name = "WinDinkEdit Plus V2.3.2",
+                Name = "WinDinkEditPlus V2.3.2",
+                DestinationName = "WinDinkEditPlus_V2.3.2",
                 ApplicationFileName = "WinDinkeditPlus2.exe",
                 
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {

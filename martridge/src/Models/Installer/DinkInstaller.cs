@@ -237,7 +237,13 @@ namespace Martridge.Models.Installer {
                     throw new DinkInstallerUnzipException(finfo.FullName);
                 }
 
-                this.MoveDirectoryContents(tempDirInfo, destinationDirectory, comp.FileFilterMode, comp.FileFilterList);
+                DirectoryInfo sourceDirectory = tempDirInfo;
+
+                if (!string.IsNullOrWhiteSpace(comp.SourceSubFolder)) {
+                    sourceDirectory = new DirectoryInfo(Path.Combine(tempDirInfo.FullName, comp.SourceSubFolder));
+                } 
+                
+                this.MoveDirectoryContents(sourceDirectory, destinationDirectory, comp.FileFilterMode, comp.FileFilterList);
             }
             
             this.ReportProgress(InstallerReportLevel.Primary,

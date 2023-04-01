@@ -111,7 +111,10 @@ namespace Martridge.ViewModels.Installer {
 
         private void DinkInstallerViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
             if (e.PropertyName == nameof(this.SelectedInstallable)) {
-                this._installerDestinationAuto = Path.Combine(LocationHelper.AppBaseDirectory, this.SelectedInstallable?.Name ?? "ERR_InstallerName");
+                this._installerDestinationAuto = Path.Combine(LocationHelper.AppBaseDirectory, 
+                    !string.IsNullOrWhiteSpace(this.SelectedInstallable?.DestinationName)
+                    ?   this.SelectedInstallable.DestinationName
+                    :   this.SelectedInstallable?.Name ?? "ERR_InstallerName");
                 this.InstallerDestination = this._installerDestinationAuto;
             }
         }
@@ -276,7 +279,10 @@ namespace Martridge.ViewModels.Installer {
                 if (result != null) {
                     DirectoryInfo dirInfo = new DirectoryInfo(result);
                     if (dirInfo.Exists && dirInfo.Parent != null) {
-                        this._installerDestinationAuto = Path.Combine(dirInfo.FullName, this.SelectedInstallable!.Name);
+                        this._installerDestinationAuto = Path.Combine(dirInfo.FullName, 
+                            !string.IsNullOrWhiteSpace(this.SelectedInstallable?.DestinationName) 
+                                ?   this.SelectedInstallable.DestinationName
+                                :   this.SelectedInstallable?.Name ?? "ERR_InstallerName");
                         this.InstallerDestination = this._installerDestinationAuto;
                     }
                 }

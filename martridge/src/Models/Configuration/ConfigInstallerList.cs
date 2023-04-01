@@ -25,6 +25,8 @@ namespace Martridge.Models.Configuration {
                 // FreeDink
                 InstallerDefaults.FreeDink_V1_09_6_With_V108Data_And_Localizations(),
                 InstallerDefaults.Freedink_V1_09_6_With_GnuData(),
+                // YeOldeDink
+                InstallerDefaults.YeOldeDink_V05_With_V108Data_And_Localizations(),
                 // WinDinkEdit
                 InstallerDefaults.WinDinkEditPlus2_V2_3_2(),
                 InstallerDefaults.WinDinkEditPlus_V1_2(),

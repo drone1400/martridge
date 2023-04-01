@@ -7,6 +7,7 @@ namespace Martridge.Models.Configuration.Save {
     /// </summary>
     public class ConfigDataInstaller {
         public string? Name { get; set; }
+        public string? DestinationName { get; set; }
         public string? ApplicationFileName { get; set; }
         public string? Category { get; set; }
 

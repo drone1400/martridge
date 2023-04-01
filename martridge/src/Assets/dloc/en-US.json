@@ -86,6 +86,7 @@
   "DinkInstallerView/WebResourceUri": "Uri:",
   "DinkInstallerView/WebResourceSha256": "SHA256:",
   "DinkInstallerView/WebResourceType": "Type:",
+  "DinkInstallerView/WebResourceSourceSubFolder": "Archive Subdirectory:",
   "DinkInstallerView/WebResourceFilterType": "Filter:",
   "DinkInstallerView/StartInstall": "Install",
   "DinkInstallerView/MessageBox_DmodPackerError_BadFolder_Title": "DMOD Directory error!",

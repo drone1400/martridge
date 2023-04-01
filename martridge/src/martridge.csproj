@@ -74,17 +74,22 @@
         <PackageReference Condition="'$(IsWindows)'=='true'" Include="SevenZipExtractor" Version="1.0.17"/>
     </ItemGroup>
 
-
-    <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x64'">
-        <None Include="$(ProjectDir)\lib\7zip\x64\7z.dll">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-    </ItemGroup>
-    <ItemGroup Condition="'$(RuntimeIdentifier)' == 'win-x86'">
-        <None Include="$(ProjectDir)\lib\7zip\x86\7z.dll">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-    </ItemGroup>
+    <Target Name="Copy7zipLibs" AfterTargets="Publish" Condition="'$(IsWindows)'=='true'">
+        <!-- for some reason the x86 binary from the SevenZipExtractor nuget package doesn't get included in the published exe... -->
+        <!-- copy it manually here after publishing... -->
+        <Copy Condition="'$(Platform)' == 'x86'"
+              SourceFiles="$(ProjectDir)\lib\7zip\x86\7z.dll" 
+              DestinationFiles="$(PublishDir)\x86\7z.dll"/>
+        
+        <!-- x64 binary from nuget package seems to get included in published single file automagically.. no need to copy it.. -->
+<!--        <Copy Condition="'$(Platform)' == 'x64'"-->
+<!--              SourceFiles="$(ProjectDir)\lib\7zip\x64\7z.dll"-->
+<!--              DestinationFiles="$(PublishDir)\x64\7z.dll"/>-->
+        
+        <!-- copy license file too.. i think i was supposed to do this before as well but didn't notice?... oops! -->
+        <Copy SourceFiles="$(ProjectDir)\lib\7zip\7ZipLicense.txt" 
+              DestinationFiles="$(PublishDir)\7ZipLicense.txt"/>
+    </Target>
 
     <!-- old versions that are no longer included in the project...-->
     <ItemGroup>

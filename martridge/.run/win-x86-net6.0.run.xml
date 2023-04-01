@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="win-x86-net6.0" type="DotNetFolderPublish" factoryName="Publish to folder">
-    <riderPublish configuration="Release" include_native_libs_for_self_extract="true" platform="Any CPU" produce_single_file="true" runtime="win-x86" self_contained="true" target_folder="$PROJECT_DIR$/publish-win-x86-net6.0" target_framework="net6.0" uuid_high="1111118403601911157" uuid_low="-7256378742243498437" />
+    <riderPublish configuration="Release" include_native_libs_for_self_extract="true" platform="x86" produce_single_file="true" runtime="win-x86" self_contained="true" target_folder="$PROJECT_DIR$/publish-win-x86-net6.0" target_framework="net6.0" uuid_high="1111118403601911157" uuid_low="-7256378742243498437" />
     <method v="2">
       <option name="Build" default="false" projectName="martridge" projectPath="file://$PROJECT_DIR$/src/martridge.csproj" />
     </method>

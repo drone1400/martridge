@@ -201,6 +201,45 @@ namespace Martridge.Models.Configuration {
         #endregion
 
         #region YEOLDEDINK
+        
+        public static ConfigDataInstaller YeOldeDink_V062_With_V108Data_And_Localizations() {
+            return new ConfigDataInstaller() {
+                Category = "YeOldeDink",
+                Name = "YeOldeDink V0.6.2",
+                DestinationName = "yeoldedink062",
+                ApplicationFileName = "yedink062.exe",
+                
+                InstallerComponents = new List<ConfigDataInstallerComponent>() {
+                    // The DinkV108 data
+                    new ConfigDataInstallerComponent() {
+                        WebResource = new ConfigDataWebResource() {
+                            Sha256 = "d6be28b01602813df02439d4d2974bd38820dc9ce0ea71da5110fc825a360d8e",
+                            CheckSha256 = true,
+                            Name = "dinksmallwood108.exe",
+                            Uri = @"https://www.dinknetwork.com/download/dinksmallwood108.exe",
+                            ResourceArchiveFormat = "Nsis",
+                        },
+
+                        FileFilterMode = InstallerFiltering.UseWhiteList,
+                        FileFilterList = new List<string>() {
+                            @"dink",
+                            @"island",
+                        },
+                    },
+                    // The Ye Olde Dink
+                    new ConfigDataInstallerComponent() {
+                        WebResource = new ConfigDataWebResource() {
+                            Sha256 = "472ddef0cea5daa824f4f68e48871e836b2b83ecdbff947a462472c9c2dc49f7",
+                            CheckSha256 = true,
+                            Name = "yeoldedinkV0.6.2.7z",
+                            Uri = @"https://files.catbox.moe/tx41ug.7z",
+                            ResourceArchiveFormat = "SevenZip",
+                        },
+                        FileFilterMode = InstallerFiltering.NoFiltering,
+                    },
+                },
+            };
+        }
 
         public static ConfigDataInstaller YeOldeDink_V05_With_V108Data_And_Localizations() {
             return new ConfigDataInstaller() {

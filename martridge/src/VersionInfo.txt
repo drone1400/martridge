@@ -1,3 +1,6 @@
+--- V0.6.4 ---
+- added yeoldedink V0.6 rev 2 to default auto-magic installer list...
+
 --- V0.6.3 ---
 - fixed another old issue where dmod list would get reinitialized each time you changed the selected Dink Exe used to launch dmods... 
 (hopefully this time, without adding any more bugs)

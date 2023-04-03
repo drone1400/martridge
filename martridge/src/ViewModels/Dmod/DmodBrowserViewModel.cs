@@ -235,9 +235,9 @@ namespace Martridge.ViewModels.Dmod {
         
         private void LoadFromConfigGeneral() {
             if (this._configuration == null) { return; }
-
+            ObservableCollection<DmodLauncherSelectionViewModel> list = new ObservableCollection<DmodLauncherSelectionViewModel>();
             try {
-                ObservableCollection<DmodLauncherSelectionViewModel> list = new ObservableCollection<DmodLauncherSelectionViewModel>();
+                
                 foreach (string str in this._configuration.General.GameExePaths) {
                     FileInfo finfo = new FileInfo(str);
                     string? dirName = finfo.Directory?.Name; 
@@ -248,11 +248,15 @@ namespace Martridge.ViewModels.Dmod {
                 }
                 
                 this.GameExePaths = list;
-                this.ActiveGameExePath = this.GameExePaths[this._configuration.General.ActiveGameExeIndex];
+                if (this._configuration.General.ActiveGameExeIndex > 0 && this._configuration.General.ActiveGameExeIndex < this._configuration.General.GameExePaths.Count) {
+                    this.ActiveGameExePath = this.GameExePaths[this._configuration.General.ActiveGameExeIndex];
+                } else {
+                    this.ActiveGameExePath = null;
+                }
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
+                this.GameExePaths = list;
                 this.ActiveGameExePath = null;
-                this.GameExePaths = new ObservableCollection<DmodLauncherSelectionViewModel>();
             }
 
             this.RaisePropertyChanged(nameof(this.GameExeFound));
@@ -267,6 +271,7 @@ namespace Martridge.ViewModels.Dmod {
                 if (path == this.ActiveGameExePath?.Path) {
                     if (i != this._configuration.General.ActiveGameExeIndex) {
                         this._configuration.General.ActiveGameExeIndex = i;
+                        break;
                     }
                 }
             }
@@ -406,6 +411,8 @@ namespace Martridge.ViewModels.Dmod {
         /// </summary>
         private void InitializeFilteredDmods() {
             void SetFilteredDmods(IEnumerable<DmodDefinition> dmods) {
+                string oldSelPath = this.SelectedDmodDefinition?.Path ?? "";
+                
                 this.DmodDefinitionsFiltered = this.DmodOrderBy switch {
                     DmodOrderBy.NameAsc => dmods.OrderBy(x => x.Name),
                     DmodOrderBy.NameDesc => dmods.OrderByDescending(x => x.Name),
@@ -413,6 +420,14 @@ namespace Martridge.ViewModels.Dmod {
                     DmodOrderBy.PathDesc => dmods.OrderBy(x => x.Path),
                     _ => dmods.AsEnumerable(),
                 };
+
+                // restore selected dmod!
+                foreach (var def in this.DmodDefinitionsFiltered) {
+                    if (def.Path == oldSelPath) {
+                        this.SelectedDmodDefinition = def;
+                        break;
+                    }
+                }
             }
             
             if (this.DmodSearchString != null && this.DmodSearchString.Length >= 2) {
@@ -526,8 +541,9 @@ namespace Martridge.ViewModels.Dmod {
                 if (this.Configuration.General.GameExePaths.Count == 0) return false;
                 if (this.DmodManager == null) return false; 
                 if (this.SelectedDmodDefinition?.Path == null) return false;
+                if (string.IsNullOrEmpty(this.ActiveGameExePath?.Path)) return false;
 
-                string exePath = this.ActiveGameExePath?.Path ?? "";
+                string exePath = this.ActiveGameExePath.Path;
                 string dmodPath = this.SelectedDmodDefinition.Path;
                 FileInfo finfo = new FileInfo(exePath);
                 DirectoryInfo dinfo = new DirectoryInfo(dmodPath);

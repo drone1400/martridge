@@ -9,6 +9,7 @@ namespace Martridge.Models.Configuration {
     public class ConfigGeneral  {
 
         public event EventHandler? Updated;
+        public event EventHandler? UpdatedActiveExe;
         
         /// <summary>
         /// The name of the localization table to use int he application.
@@ -47,8 +48,10 @@ namespace Martridge.Models.Configuration {
         public int ActiveGameExeIndex {
             get => this._activeGameExeIndex;
             set {
-                this._activeGameExeIndex = value;
-                this.FireUpdatedEvent();
+                if (this._activeGameExeIndex != value) {
+                    this._activeGameExeIndex = value;
+                    this.FireUpdatedActiveExeEvent();
+                }
             }
         }
         private int _activeGameExeIndex = 0;
@@ -78,6 +81,10 @@ namespace Martridge.Models.Configuration {
         private void FireUpdatedEvent() {
             this.Updated?.Invoke(this, EventArgs.Empty);
         }
+        
+        private void FireUpdatedActiveExeEvent() {
+            this.UpdatedActiveExe?.Invoke(this, EventArgs.Empty);
+        }
 
         private static bool ListsAreDifferent(List<string> list1, List<string> list2) {
             if (list1.Count != list2.Count) {
@@ -94,87 +101,17 @@ namespace Martridge.Models.Configuration {
         }
 
         public void AddGameExePath(string path) {
-            if (this._gameExePaths.Contains(path)) return;
+            if (this._gameExePaths.Contains(path) || string.IsNullOrWhiteSpace(path)) return;
             
             this._gameExePaths.Add(path);
             this.FireUpdatedEvent();
         }
         
         public void AddAdditionalDmodPath(string path) {
-            if (this._additionalDmodLocations.Contains(path)) return;
+            if (this._additionalDmodLocations.Contains(path) || string.IsNullOrWhiteSpace(path)) return;
             
             this._additionalDmodLocations.Add(path);
             this.FireUpdatedEvent();
-        }
-
-        public void UpdateAll(
-            string? localizationName,
-            bool showAdvancedFeatures,
-            bool autoUpdateInstallerList,
-            bool showLogWindowOnStartup,
-            bool useRelativePathForSubfolders,
-            int activeGameExeIndex,
-            List<string> gameExePaths,
-            string defaultDmodLocation,
-            List<string> additionalDmodsLocations) {
-
-            bool hasChanges = false;
-            
-            if (localizationName != null && this.LocalizationName != localizationName) {
-                this.LocalizationName = localizationName;
-                hasChanges = true;
-            }
-            
-            if (this.ShowAdvancedFeatures != showAdvancedFeatures) {
-                this.ShowAdvancedFeatures = showAdvancedFeatures;
-                hasChanges = true;
-            }
-            
-            if (this.AutoUpdateInstallerList != autoUpdateInstallerList) {
-                this.AutoUpdateInstallerList = autoUpdateInstallerList;
-                hasChanges = true;
-            }
-            
-            if (this.ShowLogWindowOnStartup != showLogWindowOnStartup) {
-                this.ShowLogWindowOnStartup = showLogWindowOnStartup;
-                hasChanges = true;
-            }
-            
-            if (this.UseRelativePathForSubfolders != useRelativePathForSubfolders) {
-                this.UseRelativePathForSubfolders = useRelativePathForSubfolders;
-                hasChanges = true;
-            }
-            
-            
-            if (this.ActiveGameExeIndex != activeGameExeIndex) {
-                this.ActiveGameExeIndex = activeGameExeIndex;
-                hasChanges = true;
-            }
-            
-            if (this.DefaultDmodLocation != defaultDmodLocation) {
-                this.DefaultDmodLocation = defaultDmodLocation;
-                hasChanges = true;
-            }
-
-            if (ListsAreDifferent(this._gameExePaths, gameExePaths)) {
-                this._gameExePaths.Clear();
-                foreach (string s in gameExePaths) {
-                    this._gameExePaths.Add(s);
-                }
-                hasChanges = true;
-            }
-            
-            if (ListsAreDifferent(this._additionalDmodLocations, additionalDmodsLocations)) {
-                this._additionalDmodLocations.Clear();
-                foreach (string s in additionalDmodsLocations) {
-                    this._additionalDmodLocations.Add(s);
-                }
-                hasChanges = true;
-            }
-
-            if (hasChanges) {
-                this.FireUpdatedEvent();
-            }
         }
 
         public void UpdateFromData(ConfigDataGeneral data) {
@@ -221,7 +158,9 @@ namespace Martridge.Models.Configuration {
             if (data.GameExePaths != null && ListsAreDifferent(this._gameExePaths, data.GameExePaths)) {
                 this._gameExePaths.Clear();
                 foreach (string s in data.GameExePaths) {
-                    this._gameExePaths.Add(s);
+                    if (string.IsNullOrWhiteSpace(s) == false) {
+                        this._gameExePaths.Add(s);
+                    }
                 }
                 hasChanges = true;
             }
@@ -229,7 +168,9 @@ namespace Martridge.Models.Configuration {
             if (data.AdditionalDmodLocations != null && ListsAreDifferent(this._additionalDmodLocations, data.AdditionalDmodLocations)) {
                 this._additionalDmodLocations.Clear();
                 foreach (string s in data.AdditionalDmodLocations) {
-                    this._additionalDmodLocations.Add(s);
+                    if (string.IsNullOrWhiteSpace(s) == false) {
+                        this._additionalDmodLocations.Add(s);
+                    }
                 }
                 hasChanges = true;
             }

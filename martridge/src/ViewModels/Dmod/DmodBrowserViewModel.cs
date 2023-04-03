@@ -1,5 +1,6 @@
 ﻿using Avalonia.Metadata;
 using Martridge.Models.Configuration;
+using Martridge.Models.Configuration.Save;
 using Martridge.Models.Dmod;
 using Martridge.Trace;
 using ReactiveUI;
@@ -40,7 +41,7 @@ namespace Martridge.ViewModels.Dmod {
             };
             this._dmodSearchTimer.Elapsed += ( sender,  args) => {
                 this._dmodSearchTimer.Stop();
-                this.InitializeFilteredDmods();
+                this.InitializeFilteredDmods(this._lastusedDmodDefinitions);
             };
             
             // self properties changed
@@ -52,7 +53,7 @@ namespace Martridge.ViewModels.Dmod {
                 }
 
                 if (args.PropertyName == nameof(this.DmodOrderBy)) {
-                    this.InitializeFilteredDmods();
+                    this.InitializeFilteredDmods(this._lastusedDmodDefinitions);
                 }
 
                 if (args.PropertyName == nameof(this.ActiveGameExePath)) {
@@ -62,32 +63,37 @@ namespace Martridge.ViewModels.Dmod {
         }
         
         #endregion
-        
 
-        #region CONFIGURATION - Launch
-        
+        #region CONFIGURATION
+
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Properties
         // -----------------------------------------------------------------------------------------------------------------------------------
-
-        public ConfigLaunch? ConfigurationLauncher {
-            get => this._cfgLauncher;
+        
+        public Config? Configuration {
+            get => this._configuration;
             set {
-                if (this._cfgLauncher != null) {
-                    this._cfgLauncher.Updated -= this.ConfigurationLauncherUpdated;
-                    this._cfgLauncher = null;
+                if (this._configuration != null) {
+                    this._configuration.General.Updated -= this.ConfigurationGeneralUpdated;
+                    this._configuration.Launch.Updated -= this.ConfigurationLauncherUpdated;
+                    this._configuration = null;
                 }
-                this._cfgLauncher = value;
-                this.RaisePropertyChanged(nameof(this.ConfigurationLauncher));
+                this.RaiseAndSetIfChanged(ref this._configuration, value);
 
-                if (this._cfgLauncher != null) {
-                    this._cfgLauncher.Updated += this.ConfigurationLauncherUpdated;
-                    this.LoadFromConfigLauncher();
+                if (this._configuration != null) {
+                    this._configuration.General.Updated += this.ConfigurationGeneralUpdated;
+                    this._configuration.Launch.Updated += this.ConfigurationLauncherUpdated;
+                    this.LoadFromConfigGeneral(this._configuration.General);
+                    this.LoadFromConfigLauncher(this._configuration.Launch);
                 }
             }
         }
-        private ConfigLaunch? _cfgLauncher = null;
+        private Config? _configuration = null;
 
+        #endregion
+        
+
+        #region CONFIGURATION - Launch
 
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Mirrored Launch Configuration Properties
@@ -152,60 +158,39 @@ namespace Martridge.ViewModels.Dmod {
         // -----------------------------------------------------------------------------------------------------------------------------------
         
         private void ConfigurationLauncherUpdated(object? sender, EventArgs e) {
-            this.LoadFromConfigLauncher();
+            if (sender is not ConfigLaunch cfg) return;
+            this.LoadFromConfigLauncher(cfg);
         }
         
-        private void LoadFromConfigLauncher() {
-            if (this._cfgLauncher == null) { return; }
-
-            this.LaunchTrueColor = this._cfgLauncher.TrueColor;
-            this.LaunchWindowed = this._cfgLauncher.Windowed;
-            this.LaunchSound = this._cfgLauncher.Sound;
-            this.LaunchJoystick = this._cfgLauncher.Joystick;
-            this.LaunchDebug = this._cfgLauncher.Debug;
-            this.LaunchV107Mode = this._cfgLauncher.V107Mode;
-            this.LaunchUsePathQuotationMarks = this._cfgLauncher.UsePathQuotationMarks;
-            this.LaunchUsePathRelativeToGame = this._cfgLauncher.UsePathRelativeToGame;
-            this.LaunchCustomUserArguments = this._cfgLauncher.CustomUserArguments;
+        private void LoadFromConfigLauncher(ConfigLaunch cfg) {
+            this.LaunchTrueColor = cfg.TrueColor;
+            this.LaunchWindowed = cfg.Windowed;
+            this.LaunchSound = cfg.Sound;
+            this.LaunchJoystick = cfg.Joystick;
+            this.LaunchDebug = cfg.Debug;
+            this.LaunchV107Mode = cfg.V107Mode;
+            this.LaunchUsePathQuotationMarks = cfg.UsePathQuotationMarks;
+            this.LaunchUsePathRelativeToGame = cfg.UsePathRelativeToGame;
+            this.LaunchCustomUserArguments = cfg.CustomUserArguments;
         }
 
-        private void SaveToConfigLauncher() {
-            this._cfgLauncher?.UpdateAll(
-                this.LaunchTrueColor,
-                this.LaunchWindowed,
-                this.LaunchSound,
-                this.LaunchJoystick,
-                this.LaunchDebug,
-                this.LaunchV107Mode,
-                this.LaunchUsePathQuotationMarks,
-                this.LaunchUsePathRelativeToGame,
-                this.LaunchCustomUserArguments);
+        private void SaveToConfigLauncher(ConfigLaunch cfg) {
+            cfg.UpdateFromData( new ConfigDataLaunch() {
+                TrueColor = this.LaunchTrueColor,
+                Windowed = this.LaunchWindowed,
+                Sound = this.LaunchSound,
+                Joystick = this.LaunchJoystick,
+                Debug = this.LaunchDebug,
+                V107Mode = this.LaunchV107Mode,
+                UsePathQuotationMarks = this.LaunchUsePathQuotationMarks,
+                UsePathRelativeToGame = this.LaunchUsePathRelativeToGame,
+                CustomUserArguments = this.LaunchCustomUserArguments,
+            });
         }
         
         #endregion
 
         #region CONFIGURATION - General
-
-        // -----------------------------------------------------------------------------------------------------------------------------------
-        // Properties
-        // -----------------------------------------------------------------------------------------------------------------------------------
-        
-        public Config? Configuration {
-            get => this._configuration;
-            set {
-                if (this._configuration != null) {
-                    this._configuration.General.Updated -= this.ConfigurationGeneralUpdated;
-                    this._configuration = null;
-                }
-                this.RaiseAndSetIfChanged(ref this._configuration, value);
-
-                if (this._configuration != null) {
-                    this._configuration.General.Updated += this.ConfigurationGeneralUpdated;
-                    this.LoadFromConfigGeneral();
-                }
-            }
-        }
-        private Config? _configuration = null;
 
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Mirrored Main Configuration Properties
@@ -230,26 +215,42 @@ namespace Martridge.ViewModels.Dmod {
         // -----------------------------------------------------------------------------------------------------------------------------------
         
         private void ConfigurationGeneralUpdated(object? sender, EventArgs e) {
-            this.LoadFromConfigGeneral();
+            if (this.Configuration?.General is not ConfigGeneral cfg) return;
+            this.LoadFromConfigGeneral(cfg);
         }
         
-        private void LoadFromConfigGeneral() {
-            if (this._configuration == null) { return; }
+        private void LoadFromConfigGeneral(ConfigGeneral cfg) {
             ObservableCollection<DmodLauncherSelectionViewModel> list = new ObservableCollection<DmodLauncherSelectionViewModel>();
             try {
-                
-                foreach (string str in this._configuration.General.GameExePaths) {
-                    FileInfo finfo = new FileInfo(str);
+                bool hasChanges = false;
+
+                if (this.GameExePaths.Count != cfg.GameExePaths.Count) {
+                    hasChanges = true;
+                } else {
+                    for (int i = 0; i < cfg.GameExePaths.Count; i++) {
+                        if (cfg.GameExePaths[i] != this.GameExePaths[i].Path) {
+                            hasChanges = true;
+                            break;
+                        }
+                    }
+                }
+
+                // if view model exe paths are the same as cfg, don't do anything...
+                if (hasChanges == false) return;
+
+
+                for (int i = 0; i < cfg.GameExePaths.Count; i++) {
+                    FileInfo finfo = new FileInfo(cfg.GameExePaths[i]);
                     string? dirName = finfo.Directory?.Name; 
                     list.Add(new DmodLauncherSelectionViewModel() {
-                        Path = str,
+                        Path = cfg.GameExePaths[i],
                         DisplayName = dirName != null ? Path.Combine(dirName,finfo.Name) : finfo.Name,
                     });
                 }
                 
                 this.GameExePaths = list;
-                if (this._configuration.General.ActiveGameExeIndex > 0 && this._configuration.General.ActiveGameExeIndex < this._configuration.General.GameExePaths.Count) {
-                    this.ActiveGameExePath = this.GameExePaths[this._configuration.General.ActiveGameExeIndex];
+                if (cfg.ActiveGameExeIndex > 0 && cfg.ActiveGameExeIndex < cfg.GameExePaths.Count) {
+                    this.ActiveGameExePath = this.GameExePaths[cfg.ActiveGameExeIndex];
                 } else {
                     this.ActiveGameExePath = null;
                 }
@@ -262,15 +263,12 @@ namespace Martridge.ViewModels.Dmod {
             this.RaisePropertyChanged(nameof(this.GameExeFound));
         }
 
-        private void SaveToConfigGeneral() {
-            if (this._configuration == null) { return; }
-
-            int activeIndex = 0;
-            for (int i = 0; i < this._configuration.General.GameExePaths.Count; i++) {
-                string path = this._configuration.General.GameExePaths[i];
+        private void SaveActiveIndexToConfigGeneral(ConfigGeneral cfg) {
+            for (int i = 0; i < cfg.GameExePaths.Count; i++) {
+                string path = cfg.GameExePaths[i];
                 if (path == this.ActiveGameExePath?.Path) {
-                    if (i != this._configuration.General.ActiveGameExeIndex) {
-                        this._configuration.General.ActiveGameExeIndex = i;
+                    if (i != cfg.ActiveGameExeIndex) {
+                        cfg.ActiveGameExeIndex = i;
                         break;
                     }
                 }
@@ -368,7 +366,7 @@ namespace Martridge.ViewModels.Dmod {
         private IEnumerable<DmodDefinition> _dmodDefinitionsFiltered = new List<DmodDefinition>();
         
         public bool DmodDefinitionsFilteredHasItems => this.DmodDefinitionsFiltered.Any();
-        private List<DmodDefinition> _dmodDefinitions = new List<DmodDefinition>();
+        private List<DmodDefinition> _lastusedDmodDefinitions = new List<DmodDefinition>();
 
         public List<DmodOrderBy> DmodOrderByList { get; } = new List<DmodOrderBy>() {
             DmodOrderBy.NameAsc,
@@ -393,23 +391,20 @@ namespace Martridge.ViewModels.Dmod {
         }
         
         private void InitializeDmodsFromManager() {
-            if (this._dmodManager == null || this._configuration == null) {
-                this._dmodDefinitions = new List<DmodDefinition>();
-            } else {
-                List<DmodDefinition> dmodDefs  = new List<DmodDefinition>();
-                foreach (DmodFileDefinition dfd in this._dmodManager.DmodList) {
-                    dmodDefs.Add(new DmodDefinition(dfd));
+            List<DmodDefinition> newDmodList = new List<DmodDefinition>();
+            if (this._dmodManager is DmodManager dMan) {
+                foreach (DmodFileDefinition dfd in dMan.DmodList) {
+                    newDmodList.Add(new DmodDefinition(dfd));
                 }
-                this._dmodDefinitions = dmodDefs;
             }
-
-            this.InitializeFilteredDmods();
+            
+            this.InitializeFilteredDmods(newDmodList);
         }
 
         /// <summary>
-        /// Initializes filtered dmods list for the view using current <see cref="_dmodDefinitions"/>
+        /// Initializes filtered dmods list for the view using current <see cref="_lastusedDmodDefinitions"/>
         /// </summary>
-        private void InitializeFilteredDmods() {
+        private void InitializeFilteredDmods(List<DmodDefinition> newDmodList) {
             void SetFilteredDmods(IEnumerable<DmodDefinition> dmods) {
                 string oldSelPath = this.SelectedDmodDefinition?.Path ?? "";
                 
@@ -430,17 +425,19 @@ namespace Martridge.ViewModels.Dmod {
                 }
             }
             
+            this._lastusedDmodDefinitions = newDmodList;
+            
             if (this.DmodSearchString != null && this.DmodSearchString.Length >= 2) {
                 string searchStr = this.DmodSearchString.ToLowerInvariant();
                 
-                IEnumerable<DmodDefinition> filtered = this._dmodDefinitions.Where(definition => 
+                IEnumerable<DmodDefinition> filtered = newDmodList.Where(definition => 
                     definition.Name?.ToLowerInvariant().Contains(searchStr) == true );
 
                 // filter definitions
                 SetFilteredDmods(filtered);
             } else {
                 // use all the definitions
-                SetFilteredDmods(this._dmodDefinitions);
+                SetFilteredDmods(newDmodList);
             }
         }
 
@@ -473,53 +470,42 @@ namespace Martridge.ViewModels.Dmod {
         #region COMMANDS
 
         public void CmdRefreshDmods(object? parameter = null) {
-            if (this.DmodManager == null || 
-                this.Configuration?.General == null) { return; }
+            if (this.DmodManager is not DmodManager manager ||
+                this.Configuration?.General is not ConfigGeneral cfgGen) { return; }
             this.DmodSearchString = null;
 
             // reload configuration just in case something was not synchronized previously...
-            this.LoadFromConfigGeneral();
-
-            this.DmodManager.Initialize(this.Configuration.General);
+            this.LoadFromConfigGeneral(cfgGen);
+            manager.Initialize(cfgGen);
         }
 
         [DependsOn(nameof(DmodManager))]
-        public bool CanCmdRefreshDmods(object? parameter = null) {
-            if (this.DmodManager == null) { return false; }
-            return true;
-        }
-        
+        public bool CanCmdRefreshDmods(object? parameter = null) => this.DmodManager != null;
         public void CmdClearSelectedDmod(object? parameter = null) {
-            if (this.SelectedDmodDefinition == null) { return; }
             this.SelectedDmodDefinition = null;
         }
 
         [DependsOn(nameof(SelectedDmodDefinition))]
-        public bool CanCmdClearSelectedDmod(object? parameter = null) {
-            if (this.SelectedDmodDefinition == null) { return false; }
-            return true;
-        }
+        public bool CanCmdClearSelectedDmod(object? parameter = null) => this.SelectedDmodDefinition != null;
         
         public async void CmdLaunchDmod(object? parameter = null) {
             try {
-                if (CanCmdLaunchDmod() == false) return;
+                if (this.Configuration is not Config cfg) return;
+                if (this.DmodManager is not DmodManager dmodMan) return;
+                if (!this.GameExeFound) return;
+                if (string.IsNullOrEmpty(this.ActiveGameExePath?.Path)) return;
+                if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.Path)) return;
+
+                string exePath = this.ActiveGameExePath.Path;
+                string dmodPath = this.SelectedDmodDefinition.Path;
                 
                 this.DmodLauncherWaitingForDelay = true;
-                this.SaveToConfigLauncher();
-                this.SaveToConfigGeneral();
+                this.SaveToConfigLauncher(cfg.Launch);
+                this.SaveActiveIndexToConfigGeneral(cfg.General);
 
                 // launch dmod with separate task to prevent gui lockup
                 await Task.Run(() => {
-                        
-                    if (this.Configuration == null ||
-                        this.ActiveGameExePath == null ||
-                        this.SelectedDmodDefinition?.Path == null) return;
-                        
-                    DmodLauncher.LaunchDmod(
-                        this.ActiveGameExePath.Path,
-                        this.SelectedDmodDefinition.Path,
-                        this.Configuration.Launch,
-                        this.SelectedLocalization?.CultureInfo?.Name);
+                    DmodLauncher.LaunchDmod(exePath, dmodPath, cfg.Launch, this.SelectedLocalization?.CultureInfo?.Name);
                 });
                 this._dmodLauncherDelay.Start();
             } catch (Exception ex) {
@@ -527,21 +513,18 @@ namespace Martridge.ViewModels.Dmod {
             }
         }
 
-        [DependsOn(nameof(GameExeFound))]
         [DependsOn(nameof(Configuration))]
-        [DependsOn(nameof(ConfigurationLauncher))]
-        [DependsOn(nameof(ActiveGameExePath))]
         [DependsOn(nameof(DmodManager))]
+        [DependsOn(nameof(GameExeFound))]
+        [DependsOn(nameof(ActiveGameExePath))]
         [DependsOn(nameof(SelectedDmodDefinition))]
         public bool CanCmdLaunchDmod(object? parameter = null) {
             try {
-                if (!this.GameExeFound) return false;
                 if (this.Configuration == null) return false;
-                if (this.ConfigurationLauncher == null) return false;
-                if (this.Configuration.General.GameExePaths.Count == 0) return false;
-                if (this.DmodManager == null) return false; 
-                if (this.SelectedDmodDefinition?.Path == null) return false;
+                if (this.DmodManager == null) return false;
+                if (!this.GameExeFound) return false;
                 if (string.IsNullOrEmpty(this.ActiveGameExePath?.Path)) return false;
+                if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.Path)) return false;
 
                 string exePath = this.ActiveGameExePath.Path;
                 string dmodPath = this.SelectedDmodDefinition.Path;

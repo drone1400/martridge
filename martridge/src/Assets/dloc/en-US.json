@@ -112,6 +112,7 @@
   "General/ConfigurationSaved": "Configuration saved to file",
   "General/ConfigurationLoaded": "Configuration loaded from file",
   "General/ConfigurationChanged": "Configuration changed",
+  "General/ConfigurationChangedActiveExe": "Configuration changed [only selected game launcher was changed]",
   "General/ConfigurationInstallerSaveFailure": "Installer Configuration saving FAILURE!",
   "General/ConfigurationInstallerSaved": "Installer Configuration saved to file",
   "General/ConfigurationInstallerLoad/Failure": "Installer Configuration could not be loaded!",

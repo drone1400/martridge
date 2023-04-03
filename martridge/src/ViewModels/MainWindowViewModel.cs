@@ -71,8 +71,7 @@ namespace Martridge.ViewModels {
             this.VmDmodInstaller.InitializeConfiguration(this._logic.Config.General);
             
             this.VmDmodPacker.InstallerDone += this.VmDmodPackerOnInstallerDone;
-
-            this.VmDmodBrowser.ConfigurationLauncher = this._logic.Config.Launch;
+            
             this.VmDmodBrowser.Configuration = this._logic.Config;
             this.VmDmodBrowser.DmodManager = this._logic.DmodManager;
             

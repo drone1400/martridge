@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using Martridge.Models.Configuration.Save;
 
 namespace Martridge.ViewModels.Configuration {
     public class SettingsGeneralViewModel : ViewModelBase {
@@ -200,16 +201,17 @@ namespace Martridge.ViewModels.Configuration {
 
             this._savedLocalization = Localizer.Instance.Language;
 
-            this.Configuration.UpdateAll(
-                this._savedLocalization ?? "en-US",
-                this.ShowAdvancedFeatures,
-                this.AutoUpdateInstallerList,
-                this.ShowLogWindowOnStartup,
-                this.UseRelativePathForSubfolders,
-                this.ActiveGameExeIndex,
-                listExe,
-                this.DefaultDmodLocation,
-                listDmod
+            this.Configuration.UpdateFromData(new ConfigDataGeneral(){
+                LocalizationName = this._savedLocalization ?? "en-US",
+                ShowAdvancedFeatures = this.ShowAdvancedFeatures,
+                AutoUpdateInstallerList = this.AutoUpdateInstallerList,
+                ShowLogWindowOnStartup = this.ShowLogWindowOnStartup,
+                UseRelativePathForSubfolders = this.UseRelativePathForSubfolders,
+                ActiveGameExeIndex = this.ActiveGameExeIndex,
+                GameExePaths = listExe,
+                DefaultDmodLocation = this.DefaultDmodLocation,
+                AdditionalDmodLocations = listDmod
+                }
             );
         }
         

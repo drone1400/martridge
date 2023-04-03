@@ -49,12 +49,18 @@ namespace Martridge.Models {
             #endif
             
             this.Config.General.Updated += this.GeneralOnUpdated;
-            this.Config.Launch.Updated += LaunchOnUpdated;
+            this.Config.General.UpdatedActiveExe += this.GeneralOnUpdatedActiveExe;
+            this.Config.Launch.Updated += this.LaunchOnUpdated;
 
             this.DmodManager.Initialize(this.Config.General);
         }
         private void LaunchOnUpdated(object? sender, EventArgs e) {
             MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationChanged"]);
+            this.Config.SaveToFile(this.ConfigFile);
+        }
+
+        private void GeneralOnUpdatedActiveExe(object? sender, EventArgs e) {
+            MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationChangedActiveExe"]);
             this.Config.SaveToFile(this.ConfigFile);
         }
 

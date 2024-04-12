@@ -1,12 +1,12 @@
 ﻿using Martridge.Models.Localization;
 using Martridge.Trace;
 using SharpCompress.Common;
-using SharpCompress.Compressors.BZip2;
 using SharpCompress.Writers.Tar;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using SharpCompress.Compressors.PBZip2;
 
 namespace Martridge.Models.Installer {
     public class DmodPacker : InstallerBase {

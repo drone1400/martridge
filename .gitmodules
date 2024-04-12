@@ -1,4 +1,4 @@
 [submodule "sharpcompress"]
 	path = sharpcompress
 	url = https://github.com/drone1400/sharpcompress
-	branch = drone-modifications
+	branch = drone-modifications-2024

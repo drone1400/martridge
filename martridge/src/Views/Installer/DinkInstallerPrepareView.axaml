@@ -25,8 +25,8 @@
                        Text="{dloc:Localize DinkInstallerView/SelectVersion}"/>
             
             <ComboBox Grid.Row="1" Grid.Column="0"
-                     Items="{Binding InstallableCategories}"
-                     SelectedItem="{Binding SelectedInstallableCategory, Mode=TwoWay}">
+                      ItemsSource="{Binding InstallableCategories}"
+                      SelectedItem="{Binding SelectedInstallableCategory, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="2">
@@ -38,7 +38,7 @@
             </ComboBox>
             
             <ListBox Grid.Row="2" Grid.Column="0"
-                     Items="{Binding InstallableNames}"
+                     ItemsSource="{Binding InstallableNames}"
                      SelectionMode="Single"
                      SelectedItem="{Binding SelectedInstallableName, Mode=TwoWay}">
                 <ListBox.ItemTemplate>

@@ -55,7 +55,7 @@
                             Text="{dloc:Localize DmodBrowser/SelectExe}"/>
                 <ComboBox   Grid.Row="1"
                             HorizontalAlignment="Stretch"
-                            Items="{Binding GameExePaths}"
+                            ItemsSource="{Binding GameExePaths}"
                             SelectedItem="{Binding ActiveGameExePath, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate DataType="vm:DmodLauncherSelectionViewModel">
@@ -121,7 +121,7 @@
                         <ComboBox Grid.Row="0" Grid.Column="1"
                                   HorizontalAlignment="Stretch"
                                   SelectedItem="{Binding SelectedLocalization}"
-                                  Items="{Binding  SelectedDmodDefinition.Localizations }"
+                                  ItemsSource="{Binding  SelectedDmodDefinition.Localizations }"
                                   IsVisible="{Binding IsLauncherFreeDink}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="vm:DmodLocalizationDefinition">

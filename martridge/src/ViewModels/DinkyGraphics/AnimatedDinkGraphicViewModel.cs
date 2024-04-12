@@ -31,19 +31,13 @@ namespace Martridge.ViewModels.DinkyGraphics {
         }
 
         public AnimatedDinkGraphicViewModel(string assetImagePrefix, List<int> frameTimes) {
-            IAssetLoader? assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-
-            if (assets == null) {
-                throw new Exception("Could not initialize Avalonia IAssetLoader");
-            }
-
             assetImagePrefix = @"avares://martridge/Assets/" + assetImagePrefix;
             
             for (int i = 0; i < frameTimes.Count; i++) {
                 string fullName = assetImagePrefix + String.Format("{0:00}", i + 1) + ".png";
                 this._frameTicks.Add(frameTimes[i]);
 
-                Bitmap bmp = new Bitmap(assets.Open(new Uri(fullName)));
+                Bitmap bmp = new Bitmap(AssetLoader.Open(new Uri(fullName)));
                 this._frames.Add(bmp);
             }
 
@@ -56,12 +50,6 @@ namespace Martridge.ViewModels.DinkyGraphics {
         }
         
         public AnimatedDinkGraphicViewModel(List<string> imageResoruces, List<int> frameTimes) {
-            IAssetLoader? assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-            
-            if (assets == null) {
-                throw new Exception("Could not initialize Avalonia IAssetLoader");
-            }
-            
             string assetImagePrefix = @"avares://martridge/Assets/";
 
             if (imageResoruces.Count != frameTimes.Count) {
@@ -72,7 +60,7 @@ namespace Martridge.ViewModels.DinkyGraphics {
                 string fullName = assetImagePrefix + imageResoruces[i];
                 this._frameTicks.Add(frameTimes[i]);
 
-                Bitmap bmp = new Bitmap(assets.Open(new Uri(fullName)));
+                Bitmap bmp = new Bitmap(AssetLoader.Open(new Uri(fullName)));
                 this._frames.Add(bmp);
             }
 

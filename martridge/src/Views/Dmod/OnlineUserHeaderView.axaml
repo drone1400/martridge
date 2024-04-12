@@ -26,7 +26,7 @@
                    Text="{Binding Name}"/>
         <ItemsRepeater Grid.Row="1" Grid.Column="1"
                        Margin="10,3"
-                       Items="{Binding BadgeImages}">
+                       ItemsSource="{Binding BadgeImages}">
             <ItemsRepeater.Layout>
                 <StackLayout Spacing="4" Orientation="Horizontal"/>
             </ItemsRepeater.Layout>

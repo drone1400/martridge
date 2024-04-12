@@ -42,7 +42,7 @@
 
         <ListBox Grid.Row="6"
                  Margin="6"
-                 Items="{Binding InstallableDestinations}"
+                 ItemsSource="{Binding InstallableDestinations}"
                  SelectionMode="Single"
                  SelectedItem="{Binding SelectedInstallableDestination}">
             <ListBox.ItemTemplate>

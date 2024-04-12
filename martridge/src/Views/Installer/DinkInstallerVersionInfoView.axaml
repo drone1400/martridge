@@ -47,7 +47,7 @@
         <ScrollViewer Grid.Row="5">
             <ItemsRepeater 
                 Margin="6"
-                Items="{Binding SelectedInstallable.InstallerComponents}">
+                ItemsSource="{Binding SelectedInstallable.InstallerComponents}">
                 <ItemsRepeater.Layout>
                     <StackLayout Spacing="4" Orientation="Vertical"/>
                 </ItemsRepeater.Layout>

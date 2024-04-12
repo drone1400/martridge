@@ -44,7 +44,7 @@
                      VerticalContentAlignment="Center"
                      Text="{Binding DmodSearchString}"/>
             <ComboBox Grid.Row="1" Grid.Column="2" 
-                      Items="{Binding DmodOrderByList}"
+                      ItemsSource="{Binding DmodOrderByList}"
                       SelectedItem="{Binding DmodOrderBy}">
                 <ComboBox.Resources>
                     <vm:DmodOrderByEnumTextConverter x:Key="DmodOrderByEnumTextConverter"/>
@@ -60,7 +60,7 @@
         </Grid>
         <ListBox Grid.Row="1" Name="DmodList" 
                  IsVisible="{Binding DmodDefinitionsFilteredHasItems}"
-                 Items="{Binding DmodDefinitionsFiltered}" 
+                 ItemsSource="{Binding DmodDefinitionsFiltered}" 
                  SelectedItem="{Binding SelectedDmodDefinition, Mode=TwoWay}"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemTemplate>

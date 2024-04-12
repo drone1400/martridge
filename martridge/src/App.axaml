@@ -3,6 +3,6 @@
              xmlns:local="using:Martridge"
              x:Class="Martridge.App">
     <Application.DataTemplates>
-        <local:ViewLocator/>
+        
     </Application.DataTemplates>
 </Application>

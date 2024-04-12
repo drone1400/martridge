@@ -107,17 +107,9 @@ namespace Martridge.Models.Localization {
         }
 
         private void LoadLanguageFromInternalAssets(string language = "en-US") {
-            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-
-            if (assets == null) {
-                Exception ex = new NullReferenceException("Could not initialize Avalonia Asset loader for loading default localization! This should be impossible?...");
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex, MyTraceLevel.Critical);
-                throw ex;
-            }
-
             Uri uri = new Uri($"avares://martridge/Assets/dloc/{language}.json");
-            if (assets.Exists(uri)) {
-                using (StreamReader sr = new StreamReader(assets.Open(uri), Encoding.UTF8)) {
+            if (AssetLoader.Exists(uri)) {
+                using (StreamReader sr = new StreamReader(AssetLoader.Open(uri), Encoding.UTF8)) {
                     this._mStrings = JsonConvert.DeserializeObject<Dictionary<string, string>>(sr.ReadToEnd());
                 }
                 this.Language = language;

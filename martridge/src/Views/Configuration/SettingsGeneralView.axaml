@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:dloc="using:Martridge.ViewModels.Localization"
              xmlns:vm="using:Martridge.ViewModels.Configuration"
-             
+             xmlns:globalization="clr-namespace:System.Globalization;assembly=System.Runtime"
+
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Martridge.Views.Configuration.SettingsGeneralView"
              
@@ -27,12 +28,12 @@
             <CheckBox IsChecked="{Binding UseRelativePathForSubfolders}" Content="{dloc:Localize SettingsGeneral/UseRelativePathForSubfolders}"/>
             <TextBlock Classes="Heading2B"
                        Text="{dloc:Localize SettingsGeneral/Localization}"/>
-            <ComboBox Items="{Binding Localizations}"
+            <ComboBox ItemsSource="{Binding Localizations}"
                       HorizontalAlignment="Left"
                       SelectedItem="{Binding SelectedLocalization}"
                       Width="360">
                 <ComboBox.DataTemplates>
-                    <DataTemplate>
+                    <DataTemplate DataType="globalization:CultureInfo">
                         <TextBlock  Classes="Heading2I"
                                     Text="{Binding NativeName}"/>
                     </DataTemplate>
@@ -71,7 +72,7 @@
                          Command="{Binding CmdAdditionalDmodsRemoveSelected}"/>
 
                 <ListBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                         Items="{Binding AdditionalDmodLocations}"
+                         ItemsSource="{Binding AdditionalDmodLocations}"
                          SelectedIndex="{Binding AdditionalDmodLocationsIndex}"/>
             </Grid>
         </Border>
@@ -91,7 +92,7 @@
                          Command="{Binding CmdGameExeRemoveSelected}"/>
 
                 <ListBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" 
-                         Items="{Binding GameExePaths}" 
+                         ItemsSource="{Binding GameExePaths}" 
                          SelectedIndex="{Binding ActiveGameExeIndex}"/>
             </Grid>
         </Border>

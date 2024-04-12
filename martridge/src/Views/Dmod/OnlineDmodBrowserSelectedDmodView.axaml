@@ -160,7 +160,7 @@
                                   VerticalScrollBarVisibility="Visible"
                                   VerticalAlignment="Stretch"
                                   Margin="4">
-                        <ItemsRepeater Items="{Binding SelectedDmodDefinition.Versions}">
+                        <ItemsRepeater ItemsSource="{Binding SelectedDmodDefinition.Versions}">
                             <ItemsRepeater.Layout>
                                 <StackLayout Spacing="4" Orientation="Vertical" />
                             </ItemsRepeater.Layout>
@@ -217,7 +217,7 @@
                                   VerticalScrollBarVisibility="Visible"
                                   VerticalAlignment="Stretch"
                                   Margin="4">
-                        <ItemsRepeater Items="{Binding SelectedDmodDefinition.Reviews}">
+                        <ItemsRepeater ItemsSource="{Binding SelectedDmodDefinition.Reviews}">
                             <ItemsRepeater.Layout>
                                 <StackLayout Spacing="4" Orientation="Vertical"/>
                             </ItemsRepeater.Layout>
@@ -273,7 +273,7 @@
                                 Width="200"
                                 Margin="0,0,2,0"
                                 VerticalAlignment="Stretch">
-                            <ListBox Items="{Binding SelectedDmodDefinition.Screenshots}"
+                            <ListBox ItemsSource="{Binding SelectedDmodDefinition.Screenshots}"
                                      SelectedItem="{Binding SelectedDmodScreenshotVm}"
                                      ScrollViewer.VerticalScrollBarVisibility="Visible"
                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">

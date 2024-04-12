@@ -81,7 +81,7 @@
             <ScrollViewer Grid.Row="1">
                 <ItemsRepeater 
                     Margin="6"
-                    Items="{Binding UsedPackages}">
+                    ItemsSource="{Binding UsedPackages}">
                     <ItemsRepeater.Layout>
                         <StackLayout Spacing="4" Orientation="Vertical"/>
                     </ItemsRepeater.Layout>

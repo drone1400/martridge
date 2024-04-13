@@ -124,6 +124,10 @@
                 <Grid Grid.Row="1"
                       RowDefinitions="Auto,Auto,Auto"
                       ColumnDefinitions="*, *, *, *, *">
+                    
+                    <CheckBox   Grid.Row="0"  Grid.Column="0" 
+                                Content="{dloc:Localize DmodBrowser/LaunchSkip}"
+                                IsChecked="{Binding LaunchSkip}"/>
                     <CheckBox   Grid.Row="0"  Grid.Column="1" 
                                 Content="{dloc:Localize DmodBrowser/LaunchTrueColor}"
                                 IsChecked="{Binding LaunchTrueColor}"/>

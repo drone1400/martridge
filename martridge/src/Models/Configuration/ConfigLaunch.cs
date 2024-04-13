@@ -24,7 +24,7 @@ namespace Martridge.Models.Configuration {
         /// <summary>
         /// Launches the game in true color mode
         /// </summary>
-        public bool TrueColor { get; private set; } = false;
+        public bool TrueColor { get; private set; } = true;
         
         /// <summary>
         /// Launches the game in windowed mode
@@ -53,6 +53,11 @@ namespace Martridge.Models.Configuration {
         private void FireUpdatedEvent() {
             this.Updated?.Invoke(this, EventArgs.Empty);
         }
+        
+        /// <summary>
+        /// Skip update check and stuff in DinkHD
+        /// </summary>
+        public bool Skip { get; private set; } = true;
 
         public void UpdateFromData(ConfigDataLaunch data) {
             bool hasChanges = false;
@@ -98,6 +103,11 @@ namespace Martridge.Models.Configuration {
             
             if (data.CustomUserArguments != null && this.CustomUserArguments != data.CustomUserArguments) {
                 this.CustomUserArguments = data.CustomUserArguments;
+                hasChanges = true;
+            }
+            
+            if (data.Skip is bool skip && this.Skip != skip) {
+                this.Skip = skip;
                 hasChanges = true;
             }
 

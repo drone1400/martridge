@@ -152,6 +152,12 @@ namespace Martridge.ViewModels.Dmod {
             set => this.RaiseAndSetIfChanged(ref this._launchCustomUserArguments, value);
         }
         private string _launchCustomUserArguments= "";
+        
+        public bool LaunchSkip {
+            get => this._launchSkip;
+            set => this.RaiseAndSetIfChanged(ref this._launchSkip, value);
+        }
+        private bool _launchSkip= true;
 
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Methods
@@ -172,6 +178,7 @@ namespace Martridge.ViewModels.Dmod {
             this.LaunchUsePathQuotationMarks = cfg.UsePathQuotationMarks;
             this.LaunchUsePathRelativeToGame = cfg.UsePathRelativeToGame;
             this.LaunchCustomUserArguments = cfg.CustomUserArguments;
+            this.LaunchSkip = cfg.Skip;
         }
 
         private void SaveToConfigLauncher(ConfigLaunch cfg) {
@@ -185,6 +192,7 @@ namespace Martridge.ViewModels.Dmod {
                 UsePathQuotationMarks = this.LaunchUsePathQuotationMarks,
                 UsePathRelativeToGame = this.LaunchUsePathRelativeToGame,
                 CustomUserArguments = this.LaunchCustomUserArguments,
+                Skip = this.LaunchSkip,
             });
         }
         

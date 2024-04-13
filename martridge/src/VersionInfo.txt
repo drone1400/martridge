@@ -4,6 +4,7 @@
 - workaround for issue with some screenshot preview images being corrupted on TDN
 - adjustments to Online DMOD GUI
 - added options for launching editor and game separately
+- added "-skip" launch parameter
 
 --- V0.6.4 ---
 - added yeoldedink V0.6 rev 2 to default auto-magic installer list...

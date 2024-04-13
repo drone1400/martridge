@@ -35,6 +35,9 @@ namespace Martridge.Models.Dmod
                 if (launch.V107Mode) {
                     arguments += " --v1.07";
                 }
+                if (launch.Skip) {
+                    arguments += " -skip";
+                }
 
                 FileInfo finfo = new FileInfo(exePath);
                 DirectoryInfo dinfo = new DirectoryInfo(dmodPath);

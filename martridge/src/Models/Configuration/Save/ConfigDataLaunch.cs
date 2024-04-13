@@ -45,5 +45,10 @@ namespace Martridge.Models.Configuration.Save {
         /// Launches the game in V1.07 compatibility mode
         /// </summary>
         public bool? V107Mode { get; set; }
+        
+        /// <summary>
+        /// Skip update check and stuff in DinkHD
+        /// </summary>
+        public bool? Skip { get; set; }
     }
 }

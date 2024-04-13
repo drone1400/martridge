@@ -1,6 +1,7 @@
 --- V0.7.0 ---
 - updated SharpCompress
 - updated Avalonia to V11.0.10
+- workaround for issue with some screenshot preview images being corrupted on TDN
 
 --- V0.6.4 ---
 - added yeoldedink V0.6 rev 2 to default auto-magic installer list...

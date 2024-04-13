@@ -32,7 +32,17 @@ namespace Martridge.ViewModels.Dmod {
             try {
                 OnlineDmodCachedResource? res = OnlineDmodCachedResource.FromRelativeFileUrl(this.DmodScreenshot.RelativePreviewUrl);
                 if (res != null && File.Exists(res.Local)) {
-                    this.ScreenshotPreview = new Bitmap(res.Local);
+                    try {
+                        this.ScreenshotPreview = new Bitmap(res.Local);
+                    } catch (Exception ex) {
+                        // some of the preview files are corrupted... if we can't load them, use the full image for preview i guess
+                        OnlineDmodCachedResource? res2 = OnlineDmodCachedResource.FromRelativeFileUrl(this.DmodScreenshot.RelativeScreenshotUrl);
+                        if (res2 != null && File.Exists(res2.Local)) {
+                            this.ScreenshotPreview = new Bitmap(res2.Local);
+                        } else {
+                            this.ScreenshotPreview = null;
+                        }
+                    }
                 } else {
                     this.ScreenshotPreview = null;
                 }

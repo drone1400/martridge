@@ -203,12 +203,26 @@ namespace Martridge.ViewModels.Dmod {
         private ObservableCollection<DmodLauncherSelectionViewModel> _gameExePaths = new ObservableCollection<DmodLauncherSelectionViewModel>();
         
         public DmodLauncherSelectionViewModel? ActiveGameExePath {
-            get => this._activeExePath;
-            set => this.RaiseAndSetIfChanged(ref this._activeExePath, value);
+            get => this._activeGameExePath;
+            set => this.RaiseAndSetIfChanged(ref this._activeGameExePath, value);
         }
-        private DmodLauncherSelectionViewModel? _activeExePath = null;
+        private DmodLauncherSelectionViewModel? _activeGameExePath = null;
 
         public bool GameExeFound => this.GameExePaths.Count > 0;
+        
+        public ObservableCollection<DmodLauncherSelectionViewModel> EditorExePaths {
+            get => this._editorExePaths;
+            set => this.RaiseAndSetIfChanged(ref this._editorExePaths, value);
+        }
+        private ObservableCollection<DmodLauncherSelectionViewModel> _editorExePaths = new ObservableCollection<DmodLauncherSelectionViewModel>();
+        
+        public DmodLauncherSelectionViewModel? ActiveEditorExePath {
+            get => this._activeEditorExePath;
+            set => this.RaiseAndSetIfChanged(ref this._activeEditorExePath, value);
+        }
+        private DmodLauncherSelectionViewModel? _activeEditorExePath = null;
+
+        public bool EditorExeFound => this.EditorExePaths.Count > 0;
         
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Methods
@@ -220,55 +234,107 @@ namespace Martridge.ViewModels.Dmod {
         }
         
         private void LoadFromConfigGeneral(ConfigGeneral cfg) {
-            ObservableCollection<DmodLauncherSelectionViewModel> list = new ObservableCollection<DmodLauncherSelectionViewModel>();
+            ObservableCollection<DmodLauncherSelectionViewModel> listGameExe = new ObservableCollection<DmodLauncherSelectionViewModel>();
             try {
-                bool hasChanges = false;
+                bool gamePathsChanged = false;
 
+                // check if game exe paths differ
                 if (this.GameExePaths.Count != cfg.GameExePaths.Count) {
-                    hasChanges = true;
+                    gamePathsChanged = true;
                 } else {
                     for (int i = 0; i < cfg.GameExePaths.Count; i++) {
                         if (cfg.GameExePaths[i] != this.GameExePaths[i].Path) {
-                            hasChanges = true;
+                            gamePathsChanged = true;
                             break;
                         }
                     }
                 }
 
-                // if view model exe paths are the same as cfg, don't do anything...
-                if (hasChanges == false) return;
-
-
-                for (int i = 0; i < cfg.GameExePaths.Count; i++) {
-                    FileInfo finfo = new FileInfo(cfg.GameExePaths[i]);
-                    string? dirName = finfo.Directory?.Name; 
-                    list.Add(new DmodLauncherSelectionViewModel() {
-                        Path = cfg.GameExePaths[i],
-                        DisplayName = dirName != null ? Path.Combine(dirName,finfo.Name) : finfo.Name,
-                    });
-                }
-                
-                this.GameExePaths = list;
-                if (cfg.ActiveGameExeIndex > 0 && cfg.ActiveGameExeIndex < cfg.GameExePaths.Count) {
-                    this.ActiveGameExePath = this.GameExePaths[cfg.ActiveGameExeIndex];
-                } else {
-                    this.ActiveGameExePath = null;
+                if (gamePathsChanged) {
+                    // update game exe paths
+                    for (int i = 0; i < cfg.GameExePaths.Count; i++) {
+                        FileInfo finfo = new FileInfo(cfg.GameExePaths[i]);
+                        string? dirName = finfo.Directory?.Name; 
+                        listGameExe.Add(new DmodLauncherSelectionViewModel() {
+                            Path = cfg.GameExePaths[i],
+                            DisplayName = dirName != null ? Path.Combine(dirName,finfo.Name) : finfo.Name,
+                        });
+                    }
+                    this.GameExePaths = listGameExe;
+                    if (cfg.ActiveGameExeIndex >= 0 && cfg.ActiveGameExeIndex < cfg.GameExePaths.Count) {
+                        this.ActiveGameExePath = this.GameExePaths[cfg.ActiveGameExeIndex];
+                    } else {
+                        this.ActiveGameExePath = null;
+                    }
                 }
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
-                this.GameExePaths = list;
+                this.GameExePaths = listGameExe;
                 this.ActiveGameExePath = null;
             }
 
+
+
+            ObservableCollection<DmodLauncherSelectionViewModel> listEditorExe = new ObservableCollection<DmodLauncherSelectionViewModel>();
+            try {
+                bool editorPathsChanged = false;
+                
+                // check if editor exe paths differ
+                if (this.EditorExePaths.Count != cfg.EditorExePaths.Count) {
+                    editorPathsChanged = true;
+                } else {
+                    for (int i = 0; i < cfg.EditorExePaths.Count; i++) {
+                        if (cfg.EditorExePaths[i] != this.EditorExePaths[i].Path) {
+                            editorPathsChanged = true;
+                            break;
+                        }
+                    }
+                }
+                if (editorPathsChanged) {
+                    // update editor exe paths
+                    for (int i = 0; i < cfg.EditorExePaths.Count; i++) {
+                        FileInfo finfo = new FileInfo(cfg.EditorExePaths[i]);
+                        string? dirName = finfo.Directory?.Name; 
+                        listEditorExe.Add(new DmodLauncherSelectionViewModel() {
+                            Path = cfg.EditorExePaths[i],
+                            DisplayName = dirName != null ? Path.Combine(dirName,finfo.Name) : finfo.Name,
+                        });
+                    }
+                    this.EditorExePaths = listEditorExe;
+                    if (cfg.ActiveEditorExeIndex >= 0 && cfg.ActiveEditorExeIndex < cfg.EditorExePaths.Count) {
+                        this.ActiveEditorExePath = this.EditorExePaths[cfg.ActiveEditorExeIndex];
+                    } else {
+                        this.ActiveEditorExePath = null;
+                    }
+                }
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
+                this.EditorExePaths = listGameExe;
+                this.ActiveEditorExePath = null;
+            }
+
             this.RaisePropertyChanged(nameof(this.GameExeFound));
+            this.RaisePropertyChanged(nameof(this.EditorExeFound));
         }
 
         private void SaveActiveIndexToConfigGeneral(ConfigGeneral cfg) {
+            // update game index
             for (int i = 0; i < cfg.GameExePaths.Count; i++) {
                 string path = cfg.GameExePaths[i];
                 if (path == this.ActiveGameExePath?.Path) {
                     if (i != cfg.ActiveGameExeIndex) {
                         cfg.ActiveGameExeIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+            // update editor index too
+            for (int i = 0; i < cfg.EditorExePaths.Count; i++) {
+                string path = cfg.EditorExePaths[i];
+                if (path == this.ActiveEditorExePath?.Path) {
+                    if (i != cfg.ActiveEditorExeIndex) {
+                        cfg.ActiveEditorExeIndex = i;
                         break;
                     }
                 }
@@ -283,6 +349,7 @@ namespace Martridge.ViewModels.Dmod {
         // Properties
         // -----------------------------------------------------------------------------------------------------------------------------------
 
+        public string LaunchEditorParameter => "editor";
         
         public bool IsLauncherFreeDink {
             get => this._isLauncherFreeDink;
@@ -490,13 +557,25 @@ namespace Martridge.ViewModels.Dmod {
         
         public async void CmdLaunchDmod(object? parameter = null) {
             try {
+                bool launchEditor = false;
+                if (parameter is string str && str == this.LaunchEditorParameter) launchEditor = true;
+                
+                
                 if (this.Configuration is not Config cfg) return;
                 if (this.DmodManager is not DmodManager dmodMan) return;
                 if (!this.GameExeFound) return;
-                if (string.IsNullOrEmpty(this.ActiveGameExePath?.Path)) return;
                 if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.Path)) return;
 
-                string exePath = this.ActiveGameExePath.Path;
+                string exePath;
+                
+                if (launchEditor) {
+                    if (string.IsNullOrEmpty(this.ActiveEditorExePath?.Path)) return;
+                    exePath = this.ActiveEditorExePath.Path;
+                } else {
+                    if (string.IsNullOrEmpty(this.ActiveGameExePath?.Path)) return;
+                    exePath = this.ActiveGameExePath.Path;
+                }
+                
                 string dmodPath = this.SelectedDmodDefinition.Path;
                 
                 this.DmodLauncherWaitingForDelay = true;
@@ -517,16 +596,27 @@ namespace Martridge.ViewModels.Dmod {
         [DependsOn(nameof(DmodManager))]
         [DependsOn(nameof(GameExeFound))]
         [DependsOn(nameof(ActiveGameExePath))]
+        [DependsOn(nameof(ActiveEditorExePath))]
         [DependsOn(nameof(SelectedDmodDefinition))]
         public bool CanCmdLaunchDmod(object? parameter = null) {
             try {
+                bool launchEditor = false;
+                if (parameter is string str && str == this.LaunchEditorParameter) launchEditor = true;
+                
                 if (this.Configuration == null) return false;
                 if (this.DmodManager == null) return false;
                 if (!this.GameExeFound) return false;
-                if (string.IsNullOrEmpty(this.ActiveGameExePath?.Path)) return false;
                 if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.Path)) return false;
 
-                string exePath = this.ActiveGameExePath.Path;
+                string exePath;
+                
+                if (launchEditor) {
+                    if (string.IsNullOrEmpty(this.ActiveEditorExePath?.Path)) return false;
+                    exePath = this.ActiveEditorExePath.Path;
+                } else {
+                    if (string.IsNullOrEmpty(this.ActiveGameExePath?.Path)) return false;
+                    exePath = this.ActiveGameExePath.Path;
+                }
                 string dmodPath = this.SelectedDmodDefinition.Path;
                 FileInfo finfo = new FileInfo(exePath);
                 DirectoryInfo dinfo = new DirectoryInfo(dmodPath);

@@ -9,7 +9,8 @@ namespace Martridge.Models.Configuration {
     public class ConfigGeneral  {
 
         public event EventHandler? Updated;
-        public event EventHandler? UpdatedActiveExe;
+        public event EventHandler? UpdatedActiveGameExe;
+        public event EventHandler? UpdatedActiveEditorExe;
         
         /// <summary>
         /// The name of the localization table to use int he application.
@@ -50,17 +51,41 @@ namespace Martridge.Models.Configuration {
             set {
                 if (this._activeGameExeIndex != value) {
                     this._activeGameExeIndex = value;
-                    this.FireUpdatedActiveExeEvent();
+                    this.FireUpdatedActiveGameExeEvent();
                 }
             }
         }
         private int _activeGameExeIndex = 0;
+        
+        /// <summary>
+        /// Last selected editor executable for launching Dink
+        /// </summary>
+        public int ActiveEditorExeIndex {
+            get => this._activeEditorExeIndex;
+            set {
+                if (this._activeEditorExeIndex != value) {
+                    this._activeEditorExeIndex = value;
+                    this.FireUpdatedActiveEditorExeEvent();
+                }
+            }
+        }
+        private int _activeEditorExeIndex = 0;
+
 
         /// <summary>
         /// List of paths to Dink executable files
         /// </summary>
         public ReadOnlyCollection<string> GameExePaths {get; }
         private readonly List<string> _gameExePaths = new List<string>();
+        
+        /// <summary>
+        /// List of paths to Dink editor executable files
+        /// </summary>
+        /// <remarks>
+        /// For all intents and purposes, Editors are the same as the Game, but for user convenience, it makes sense to separate them.
+        /// </remarks>
+        public ReadOnlyCollection<string> EditorExePaths { get; }
+        private readonly List<string> _editorExePaths = new List<string>();
         
         /// <summary>
         /// The default location where DMODS should get installed by the application
@@ -75,6 +100,7 @@ namespace Martridge.Models.Configuration {
 
         public ConfigGeneral() {
             this.GameExePaths = new ReadOnlyCollection<string>(this._gameExePaths);
+            this.EditorExePaths = new ReadOnlyCollection<string>(this._editorExePaths);
             this.AdditionalDmodLocations = new ReadOnlyCollection<string>(this._additionalDmodLocations);
         }
         
@@ -82,8 +108,12 @@ namespace Martridge.Models.Configuration {
             this.Updated?.Invoke(this, EventArgs.Empty);
         }
         
-        private void FireUpdatedActiveExeEvent() {
-            this.UpdatedActiveExe?.Invoke(this, EventArgs.Empty);
+        private void FireUpdatedActiveGameExeEvent() {
+            this.UpdatedActiveGameExe?.Invoke(this, EventArgs.Empty);
+        }
+        
+        private void FireUpdatedActiveEditorExeEvent() {
+            this.UpdatedActiveEditorExe?.Invoke(this, EventArgs.Empty);
         }
 
         private static bool ListsAreDifferent(List<string> list1, List<string> list2) {
@@ -150,6 +180,11 @@ namespace Martridge.Models.Configuration {
                 hasChanges = true;
             }
             
+            if (data.ActiveEditorExeIndex != null && this.ActiveEditorExeIndex != data.ActiveEditorExeIndex) {
+                this.ActiveEditorExeIndex = (int)data.ActiveEditorExeIndex;
+                hasChanges = true;
+            }
+            
             if (data.DefaultDmodLocation != null && this.DefaultDmodLocation != data.DefaultDmodLocation) {
                 this.DefaultDmodLocation = data.DefaultDmodLocation;
                 hasChanges = true;
@@ -160,6 +195,16 @@ namespace Martridge.Models.Configuration {
                 foreach (string s in data.GameExePaths) {
                     if (string.IsNullOrWhiteSpace(s) == false) {
                         this._gameExePaths.Add(s);
+                    }
+                }
+                hasChanges = true;
+            }
+            
+            if (data.EditorExePaths != null && ListsAreDifferent(this._editorExePaths, data.EditorExePaths)) {
+                this._editorExePaths.Clear();
+                foreach (string s in data.EditorExePaths) {
+                    if (string.IsNullOrWhiteSpace(s) == false) {
+                        this._editorExePaths.Add(s);
                     }
                 }
                 hasChanges = true;
@@ -182,10 +227,15 @@ namespace Martridge.Models.Configuration {
 
         public ConfigDataGeneral GetData() {
             List<string> gameExePaths = new List<string>();
+            List<string> editorExePaths = new List<string>();
             List<string> additionalDmodLocations = new List<string>();
             
             foreach (string s in this._gameExePaths) {
                 gameExePaths.Add(s);
+            }
+            
+            foreach (string s in this._editorExePaths) {
+                editorExePaths.Add(s);
             }
             
             foreach (string s in this._additionalDmodLocations) {
@@ -200,6 +250,8 @@ namespace Martridge.Models.Configuration {
                 UseRelativePathForSubfolders = this.UseRelativePathForSubfolders,
                 ActiveGameExeIndex = this.ActiveGameExeIndex,
                 GameExePaths = gameExePaths,
+                ActiveEditorExeIndex = this.ActiveEditorExeIndex,
+                EditorExePaths = editorExePaths,
                 DefaultDmodLocation = this.DefaultDmodLocation,
                 AdditionalDmodLocations = additionalDmodLocations,
             };

@@ -19,26 +19,34 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
     </UserControl.Styles>
   
-    <Grid RowDefinitions="Auto,Auto,Auto,*,*,Auto"
+    <Grid RowDefinitions="Auto,Auto,Auto,*,*,*,Auto"
           Margin="8">
+        
         <StackPanel Grid.Row="0">
-            <CheckBox IsChecked="{Binding ShowLogWindowOnStartup}" Content="{dloc:Localize SettingsGeneral/ShowLogWindowOnStartup}"/>
-            <CheckBox IsChecked="{Binding AutoUpdateInstallerList}" Content="{dloc:Localize SettingsGeneral/AutoUpdateInstallerList}"/>
-            <CheckBox IsChecked="{Binding ShowAdvancedFeatures}" Content="{dloc:Localize SettingsGeneral/ShowAdvancedFeatures}"/>
-            <CheckBox IsChecked="{Binding UseRelativePathForSubfolders}" Content="{dloc:Localize SettingsGeneral/UseRelativePathForSubfolders}"/>
-            <TextBlock Classes="Heading2B"
-                       Text="{dloc:Localize SettingsGeneral/Localization}"/>
-            <ComboBox ItemsSource="{Binding Localizations}"
-                      HorizontalAlignment="Left"
-                      SelectedItem="{Binding SelectedLocalization}"
-                      Width="360">
-                <ComboBox.DataTemplates>
-                    <DataTemplate DataType="globalization:CultureInfo">
-                        <TextBlock  Classes="Heading2I"
-                                    Text="{Binding NativeName}"/>
-                    </DataTemplate>
-                </ComboBox.DataTemplates>
-            </ComboBox>
+            <Grid ColumnDefinitions="Auto,*" 
+                  RowDefinitions="Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0 " Classes="Heading2B"
+                           Text="{dloc:Localize SettingsGeneral/Localization}"/>
+                <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Localizations}"
+                          HorizontalAlignment="Left"
+                          SelectedItem="{Binding SelectedLocalization}"
+                          Width="360">
+                    <ComboBox.DataTemplates>
+                        <DataTemplate DataType="globalization:CultureInfo">
+                            <TextBlock  Classes="Heading2I"
+                                        Text="{Binding NativeName}"/>
+                        </DataTemplate>
+                    </ComboBox.DataTemplates>
+                </ComboBox>
+            </Grid>
+            
+            <Grid ColumnDefinitions="*,*" 
+                  RowDefinitions="Auto,Auto">
+                <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding ShowLogWindowOnStartup}" Content="{dloc:Localize SettingsGeneral/ShowLogWindowOnStartup}"/>
+                <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding AutoUpdateInstallerList}" Content="{dloc:Localize SettingsGeneral/AutoUpdateInstallerList}"/>
+                <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding ShowAdvancedFeatures}" Content="{dloc:Localize SettingsGeneral/ShowAdvancedFeatures}"/>
+                <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding UseRelativePathForSubfolders}" Content="{dloc:Localize SettingsGeneral/UseRelativePathForSubfolders}"/>
+            </Grid>
         </StackPanel>
 
         <Border Grid.Row="2" 
@@ -60,7 +68,7 @@
         <Border Grid.Row="3" 
                 BorderThickness="1" 
                 BorderBrush="{DynamicResource ThemeBorderHighBrush}" 
-                Margin="6">
+                Margin="6,3">
             <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,*">
                 <TextBlock  Grid.Row="1" Grid.Column="0" Classes="Heading2B"
                             Text="{dloc:Localize SettingsGeneral/AdditionalDmodLocations}"/>
@@ -79,7 +87,7 @@
 
         <Border Grid.Row="4" 
                 BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}"
-                Margin="6">
+                Margin="6,3">
             <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,*">
                 <TextBlock  Grid.Row="1" Grid.Column="0"  Classes="Heading2B"
                             Text="{dloc:Localize SettingsGeneral/GameExePaths}"/>
@@ -96,9 +104,29 @@
                          SelectedIndex="{Binding ActiveGameExeIndex}"/>
             </Grid>
         </Border>
+        
+        <Border Grid.Row="5" 
+                BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}"
+                Margin="6,3">
+            <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,*">
+                <TextBlock  Grid.Row="1" Grid.Column="0"  Classes="Heading2B"
+                            Text="{dloc:Localize SettingsGeneral/EditorExePaths}"/>
+
+                <Button  Grid.Row="1" Grid.Column="1" 
+                         Content="{dloc:Localize SettingsGeneral/EditorExePaths_Add}"
+                         Command="{Binding CmdEditorExeAddNew}"/>
+                <Button  Grid.Row="1" Grid.Column="2" 
+                         Content="{dloc:Localize SettingsGeneral/EditorExePaths_Remove}"
+                         Command="{Binding CmdEditorExeRemoveSelected}"/>
+
+                <ListBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" 
+                         ItemsSource="{Binding EditorExePaths}" 
+                         SelectedIndex="{Binding ActiveEditorExeIndex}"/>
+            </Grid>
+        </Border>
 
 
-        <Grid Grid.Row="5" ColumnDefinitions="*,Auto,Auto">
+        <Grid Grid.Row="6" ColumnDefinitions="*,Auto,Auto">
             <Button Grid.Column="1" Content="{dloc:Localize Generic/ButtonOk}"
                     Command="{Binding CmdSettingsOk}"/>
             <Button Grid.Column="2" Content="{dloc:Localize Generic/ButtonCancel}"

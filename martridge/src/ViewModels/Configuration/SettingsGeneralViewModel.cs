@@ -84,6 +84,18 @@ namespace Martridge.ViewModels.Configuration {
             set => this.RaiseAndSetIfChanged(ref this._gameExePaths, value);
         }
         private ObservableCollection<string> _gameExePaths = new ObservableCollection<string>();
+        
+        public int ActiveEditorExeIndex {
+            get => this._activeEditorExeIndex;
+            set => this.RaiseAndSetIfChanged(ref this._activeEditorExeIndex, value);
+        }
+        private int _activeEditorExeIndex = 0;
+
+        public ObservableCollection<string> EditorExePaths {
+            get => this._EditorExePaths;
+            set => this.RaiseAndSetIfChanged(ref this._EditorExePaths, value);
+        }
+        private ObservableCollection<string> _EditorExePaths = new ObservableCollection<string>();
 
         public ObservableCollection<CultureInfo> Localizations {
             get => this._localizations;
@@ -155,9 +167,14 @@ namespace Martridge.ViewModels.Configuration {
             if (this._cfg == null) { return; }
 
 
-            ObservableCollection<string> listExe = new ObservableCollection<string>();
+            ObservableCollection<string> listGameExe = new ObservableCollection<string>();
             foreach (string str in this._cfg.GameExePaths) {
-                listExe.Add(str);
+                listGameExe.Add(str);
+            }
+            
+            ObservableCollection<string> listEditorExe = new ObservableCollection<string>();
+            foreach (string str in this._cfg.EditorExePaths) {
+                listEditorExe.Add(str);
             }
 
             ObservableCollection<string> listDmod = new ObservableCollection<string>();
@@ -169,13 +186,16 @@ namespace Martridge.ViewModels.Configuration {
             this.ShowAdvancedFeatures = this._cfg.ShowAdvancedFeatures;
             this.UseRelativePathForSubfolders = this._cfg.UseRelativePathForSubfolders;
             this.AdditionalDmodLocationsIndex = -1;
-            this.ActiveGameExeIndex = -1;
             this.AdditionalDmodLocations = listDmod;
-            this.GameExePaths = listExe;
             this.AdditionalDmodLocationsIndex = 0;
-            this.ActiveGameExeIndex = this._cfg.ActiveGameExeIndex;
             this.DefaultDmodLocation = this._cfg.DefaultDmodLocation;
-
+            this.ActiveGameExeIndex = -1;
+            this.GameExePaths = listGameExe;
+            this.ActiveGameExeIndex = this._cfg.ActiveGameExeIndex;
+            this.ActiveEditorExeIndex = -1;
+            this.EditorExePaths = listEditorExe;
+            this.ActiveEditorExeIndex = this._cfg.ActiveEditorExeIndex;
+            
             // find and select the right localization
             foreach (CultureInfo ci in this._localizations) {
                 if (ci.Name == this._cfg.LocalizationName) {
@@ -189,9 +209,14 @@ namespace Martridge.ViewModels.Configuration {
         private void SaveToConfig() {
             if (this.Configuration == null) { return; }
 
-            List<string> listExe = new List<string>();
+            List<string> listGameExe = new List<string>();
             foreach (string str in this.GameExePaths) {
-                listExe.Add(str);
+                listGameExe.Add(str);
+            }
+            
+            List<string> listEditorExe = new List<string>();
+            foreach (string str in this.EditorExePaths) {
+                listEditorExe.Add(str);
             }
 
             List<string> listDmod = new List<string>();
@@ -201,6 +226,14 @@ namespace Martridge.ViewModels.Configuration {
 
             this._savedLocalization = Localizer.Instance.Language;
 
+            if (this.ActiveGameExeIndex < 0 && this.GameExePaths.Count > 0) {
+                this.ActiveGameExeIndex = 0;
+            }
+            
+            if (this.ActiveEditorExeIndex < 0 && this.EditorExePaths.Count > 0) {
+                this.ActiveEditorExeIndex = 0;
+            }
+
             this.Configuration.UpdateFromData(new ConfigDataGeneral(){
                 LocalizationName = this._savedLocalization ?? "en-US",
                 ShowAdvancedFeatures = this.ShowAdvancedFeatures,
@@ -208,7 +241,9 @@ namespace Martridge.ViewModels.Configuration {
                 ShowLogWindowOnStartup = this.ShowLogWindowOnStartup,
                 UseRelativePathForSubfolders = this.UseRelativePathForSubfolders,
                 ActiveGameExeIndex = this.ActiveGameExeIndex,
-                GameExePaths = listExe,
+                GameExePaths = listGameExe,
+                ActiveEditorExeIndex = this.ActiveEditorExeIndex,
+                EditorExePaths = listEditorExe,
                 DefaultDmodLocation = this.DefaultDmodLocation,
                 AdditionalDmodLocations = listDmod
                 }
@@ -217,7 +252,7 @@ namespace Martridge.ViewModels.Configuration {
         
         #endregion
 
-        #region COMMANDS
+        #region COMMANDS - OK / CANCEL
 
         public void CmdSettingsOk(object? parameter = null) {
             this.SaveToConfig();
@@ -247,6 +282,10 @@ namespace Martridge.ViewModels.Configuration {
             //if (this.Configuration == null) { return false; }
             return true;
         }
+        
+        #endregion
+        
+        #region COMMANDS - DMODs
         
         //
         // Default dmods
@@ -350,6 +389,10 @@ namespace Martridge.ViewModels.Configuration {
             // specific conditions
             return true;
         }
+        
+        #endregion
+        
+        #region COMMANDS - GAME EXE
 
         //
         // Game exe paths
@@ -418,6 +461,85 @@ namespace Martridge.ViewModels.Configuration {
         [DependsOn(nameof(ParentWindow))]
         [DependsOn(nameof(IsBusy))]
         public bool CanCmdGameExeAddNew(object? parameter = null) {
+            // general conditions
+            if (this.Configuration == null ||
+                this.ParentWindow == null ||
+                this.IsBusy ) return false;
+            // specific conditions
+            return true;
+        }
+        
+        #endregion
+        
+        #region COMMANDS - EDITOR EXE
+
+        //
+        // Editor exe paths
+        //
+        public void CmdEditorExeRemoveSelected(object? parameter = null) {
+            if (this.Configuration == null ||
+                this.ParentWindow == null ||
+                this.IsBusy ) return;
+
+            if (this.ActiveEditorExeIndex >= 0 && this.ActiveEditorExeIndex < this.EditorExePaths.Count) {
+                this.EditorExePaths.RemoveAt(this.ActiveEditorExeIndex);
+            }
+        }
+        
+        [DependsOn(nameof(Configuration))]
+        [DependsOn(nameof(ParentWindow))]
+        [DependsOn(nameof(IsBusy))]
+        [DependsOn(nameof(ActiveEditorExeIndex))]
+        [DependsOn(nameof(EditorExePaths))]
+        public bool CanCmdEditorExeRemoveSelected(object? parameter = null) {
+            // general conditions
+            if (this.Configuration == null ||
+                this.ParentWindow == null ||
+                this.IsBusy ) return false;
+            // specific conditions
+            return this.ActiveEditorExeIndex >= 0 && this.ActiveEditorExeIndex < this.EditorExePaths.Count;
+        }
+
+
+        public async void CmdEditorExeAddNew(object? parameter = null) {
+            if (this.Configuration == null ||
+                this.ParentWindow == null ||
+                this.IsBusy ) return;
+
+            try {
+                this.IsBusy = true;
+
+                OpenFileDialog ofd = new OpenFileDialog();
+                ofd.Directory = LocationHelper.AppBaseDirectory;
+                ofd.AllowMultiple = false;
+
+#if PLATF_WINDOWS
+                // on windows, Dink executables need to have .exe extension...
+                ofd.Filters = new List<FileDialogFilter>() {
+                    new FileDialogFilter() {
+                        Name = Localizer.Instance[@"Generic/FileTypeExecutable"],
+                        Extensions = new List<string>() { "exe" },
+                    },
+                };
+#endif
+
+                string[]? result = await ofd.ShowAsync(this.ParentWindow);
+                if (result == null) return;
+                
+                // result is ok, add it
+                string file = result[0];
+                this.EditorExePaths.Add(file);
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+            } finally {
+                this.IsBusy = false;
+            }
+        }
+
+        [DependsOn(nameof(Configuration))]
+        [DependsOn(nameof(ParentWindow))]
+        [DependsOn(nameof(IsBusy))]
+        public bool CanCmdEditorExeAddNew(object? parameter = null) {
             // general conditions
             if (this.Configuration == null ||
                 this.ParentWindow == null ||

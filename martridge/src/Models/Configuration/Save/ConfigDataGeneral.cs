@@ -40,11 +40,21 @@ namespace Martridge.Models.Configuration.Save {
         /// Last selected game executable for launching Dink
         /// </summary>
         public int? ActiveGameExeIndex { get; set; }
+        
+        /// <summary>
+        /// Last selected editor executable for editing DMODs
+        /// </summary>
+        public int? ActiveEditorExeIndex { get; set; }
 
         /// <summary>
         /// List of paths to Dink executable files
         /// </summary>
         public List<string>? GameExePaths { get; set; }
+        
+        /// <summary>
+        /// List of paths to Dink editor executable files
+        /// </summary>
+        public List<string>? EditorExePaths { get; set; }
         
         /// <summary>
         /// The default location where DMODS should get installed by the application
@@ -78,6 +88,14 @@ namespace Martridge.Models.Configuration.Save {
                 }
                 this.GameExePaths = newGameExePaths;
             }
+            
+            if (this.EditorExePaths != null) {
+                List<string> newEditorExePaths = new List<string>();
+                foreach (string path in this.EditorExePaths) {
+                    newEditorExePaths.Add(LocationHelper.TryGetRelativeSubdirectory(path));
+                }
+                this.EditorExePaths = newEditorExePaths;
+            }
         }
 
         public void ConvertPathsToAbsolute() {
@@ -99,6 +117,14 @@ namespace Martridge.Models.Configuration.Save {
                     newGameExePaths.Add(LocationHelper.TryGetAbsoluteFromSubdirectoryRelative(path));
                 }
                 this.GameExePaths = newGameExePaths;
+            }
+            
+            if (this.EditorExePaths != null) {
+                List<string> newEditorExePaths = new List<string>();
+                foreach (string path in this.EditorExePaths) {
+                    newEditorExePaths.Add(LocationHelper.TryGetAbsoluteFromSubdirectoryRelative(path));
+                }
+                this.EditorExePaths = newEditorExePaths;
             }
         }
     }

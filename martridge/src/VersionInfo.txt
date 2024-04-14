@@ -6,6 +6,11 @@
 - added options for launching editor and game separately
 - added "-skip" launch parameter
 - added theme selection to configuration and menus
+- removed hardcoded dink installer json configs
+- dink installer json configs now downloaded from github
+- fixed some bugs in dink installer
+- temporarily removed YeOldeDink prereleases from dink installer because downloads aren't working for now...
+- various internal changes and GUI tweaks
 
 --- V0.6.4 ---
 - added yeoldedink V0.6 rev 2 to default auto-magic installer list...

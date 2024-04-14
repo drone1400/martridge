@@ -13,7 +13,6 @@ using Martridge.ViewModels.DinkyAlerts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DynamicData;
 
 namespace Martridge.ViewModels.Installer {
     public class DinkInstallerViewModel : InstallerViewModelBase {
@@ -46,6 +45,7 @@ namespace Martridge.ViewModels.Installer {
         private DinkInstallerDoneEventArgs _lastInstallerDoneEventArgs = new DinkInstallerDoneEventArgs(DinkInstallerResult.Cancelled);
         
         private DinkInstaller? _installerLogic = null;
+        private DinkInstallerOnlineListHelper? _installerOnlineHelper = null;
         
 #if PLATF_WINDOWS
         public bool DinkInstallerNotSupported {
@@ -62,6 +62,19 @@ namespace Martridge.ViewModels.Installer {
         // ------------------------------------------------------------------------------------------
         //      Pre-Install Info... 
         //
+
+        public bool IsInstallableInitialized {
+            get => this._isInstallableInitialized;
+            private set => this.RaiseAndSetIfChanged(ref this._isInstallableInitialized, value);
+        }
+        private bool _isInstallableInitialized = false;
+        
+        public bool IsInstallableInitializing {
+            get => this._isInstallableInitializing;
+            private set => this.RaiseAndSetIfChanged(ref this._isInstallableInitializing, value);
+        }
+        private bool _isInstallableInitializing = false;
+        
         public string InstallerDestination {
             get => this._installerDestination;
             private set =>
@@ -99,37 +112,49 @@ namespace Martridge.ViewModels.Installer {
             }
         }
 
-        public void InitializeInstallerList(bool updateDefaultsIfFileExists) {
-            string configFileInstaller = Path.Combine(LocationHelper.AppBaseDirectory, "config", "configInstallerList.json");
-            ConfigInstallerList? cfgInst = ConfigInstallerList.LoadFromFile(configFileInstaller);
-            if (cfgInst == null || cfgInst.Installables.Count == 0) {
-                cfgInst = new ConfigInstallerList();
-                cfgInst.AddMissingDefaults();
-                cfgInst.SaveToFile(configFileInstaller);
-            } else if (updateDefaultsIfFileExists) {
-                if (cfgInst.AddMissingDefaults()) {
-                    cfgInst.SaveToFile(configFileInstaller);
-                }
-            }
-            
-            this.SelectedInstallable = null;
-            this.SelectedInstallableCategory = null;
-            this.InstallableCategories.Clear();
+        public async void InitializeInstallerList(bool updateDefaultsIfFileExists) {
+            try {
+                if (this._installerOnlineHelper != null) return;
+                this.IsInstallableInitializing = true;
+                this.IsInstallableInitialized = false;
+                
+                this.SelectedInstallable = null;
+                this.SelectedInstallableCategory = null;
+                this.InstallableCategories.Clear();
+                
+                this._installerOnlineHelper = new DinkInstallerOnlineListHelper();
 
-            Dictionary<string, DinkInstallableCategory> tempDict = new Dictionary<string, DinkInstallableCategory>();
-            foreach (var kvp in cfgInst.Installables) {
-                foreach (var kvp2 in kvp.Value) {
-                    if (tempDict.ContainsKey(kvp2.Value.Category) == false) {
-                        DinkInstallableCategory cat = new DinkInstallableCategory(kvp2.Value.Category);
-                        tempDict.Add(kvp2.Value.Category, cat);
-                        this.InstallableCategories.Add(cat);
+                ConfigInstallerList? cfgInst = await this._installerOnlineHelper.GetConfigInstallerList();
+
+                if (cfgInst == null) return;
+
+                this.SelectedInstallable = null;
+                this.SelectedInstallableCategory = null;
+                this.InstallableCategories.Clear();
+
+                Dictionary<string, DinkInstallableCategory> tempDict = new Dictionary<string, DinkInstallableCategory>();
+                foreach (var kvp in cfgInst.Installables) {
+                    foreach (var kvp2 in kvp.Value) {
+                        if (tempDict.ContainsKey(kvp2.Value.Category) == false) {
+                            DinkInstallableCategory cat = new DinkInstallableCategory(kvp2.Value.Category);
+                            tempDict.Add(kvp2.Value.Category, cat);
+                            this.InstallableCategories.Add(cat);
+                        }
+                        tempDict[kvp2.Value.Category].AddDinkInstallerdata(kvp2.Value);
                     }
-                    tempDict[kvp2.Value.Category].AddDinkInstallerdata(kvp2.Value);
                 }
-            }
 
-            this.SelectedInstallableCategory = this.InstallableCategories.First();
-            this.SelectedInstallable = this.SelectedInstallableCategory?.InstallerEntries.First();
+                this.SelectedInstallableCategory = this.InstallableCategories.First();
+                this.SelectedInstallable = this.SelectedInstallableCategory?.InstallerEntries.First();
+
+                this.IsInstallableInitialized = true;
+            } catch (Exception ex) {
+                MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Error initializing installables from configInstallerList.json");
+                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+            } finally {
+                this.IsInstallableInitializing = false;
+                this._installerOnlineHelper = null;
+            }
         }
 
         // ------------------------------------------------------------------------------------------
@@ -139,6 +164,8 @@ namespace Martridge.ViewModels.Installer {
         #region Commands
 
         public override void CmdExit(object? parameter = null) {
+            this._installerOnlineHelper?.CancelTokenSource.Cancel();
+            
             if (this.IsInstallerStarted == false || this.DinkInstallerNotSupported) {
                 this._lastInstallerDoneEventArgs = new DinkInstallerDoneEventArgs(DinkInstallerResult.Cancelled);
                 this.ResetInstallerStateAndFireDoneEvent();

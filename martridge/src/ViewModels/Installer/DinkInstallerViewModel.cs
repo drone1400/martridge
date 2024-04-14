@@ -289,6 +289,15 @@ namespace Martridge.ViewModels.Installer {
                 
                 DirectoryInfo destination = new DirectoryInfo(this.InstallerDestination);
                 bool removeOldFiles = false;
+                
+                // create installer trace listener
+                this.InstallerTraceListener = new MyTraceListenerGui("Installer Trace Listener");
+                this.InstallerTraceListener.ShowLevels = false;
+                this.InstallerTraceListener.Levels = MyTraceLevel.Critical | MyTraceLevel.Error | MyTraceLevel.Warning | MyTraceLevel.Information;
+                this.InstallerTraceListener.PropertyChanged += ( sender,  args) => {
+                    this.RaisePropertyChanged(nameof(this.InstallerProgressLog));
+                    this.InstallerProgressLogCaretIndex = int.MaxValue;
+                };
 
                 // Check if destination already exists
                 if (destination.Exists && (destination.GetDirectories().Length > 0 ||
@@ -304,6 +313,7 @@ namespace Martridge.ViewModels.Installer {
                     
                     var result = await DinkyAlert.ShowDialog(title, body, AlertResults.Yes | AlertResults.No | AlertResults.Cancel, AlertType.Warning, this.ParentWindow);
                     if (result == AlertResults.Cancel) {
+                        this.InstallerOnDone(this, new DinkInstallerDoneEventArgs(DinkInstallerResult.Cancelled));
                         return;
                     }
                     if (result == AlertResults.Yes) {
@@ -315,19 +325,11 @@ namespace Martridge.ViewModels.Installer {
                         if (result == AlertResults.Yes) {
                             removeOldFiles = true;
                         } else {
+                            this.InstallerOnDone(this, new DinkInstallerDoneEventArgs(DinkInstallerResult.Cancelled));
                             return;
                         }
                     }
                 }
-
-                // create installer trace listener
-                this.InstallerTraceListener = new MyTraceListenerGui("Installer Trace Listener");
-                this.InstallerTraceListener.ShowLevels = false;
-                this.InstallerTraceListener.Levels = MyTraceLevel.Critical | MyTraceLevel.Error | MyTraceLevel.Warning | MyTraceLevel.Information;
-                this.InstallerTraceListener.PropertyChanged += ( sender,  args) => {
-                    this.RaisePropertyChanged(nameof(this.InstallerProgressLog));
-                    this.InstallerProgressLogCaretIndex = int.MaxValue;
-                };
 
                 // create installer logic
                 this._installerLogic = new DinkInstaller();

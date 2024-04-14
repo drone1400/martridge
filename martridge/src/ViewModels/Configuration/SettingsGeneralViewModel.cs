@@ -397,7 +397,7 @@ namespace Martridge.ViewModels.Configuration {
 
                 string? result = await ofd.ShowAsync(this.ParentWindow);
                 if (result != null) {
-                    this.AdditionalDmodLocations.Add(result);
+                    this.Configuration.AddAdditionalDmodPath(result);
                 }
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);
@@ -502,7 +502,7 @@ namespace Martridge.ViewModels.Configuration {
                 
                 // result is ok, add it
                 string file = result[0];
-                this.GameExePaths.Add(file);
+                this.Configuration.AddGameExePath(file);
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);
             } finally {
@@ -581,7 +581,7 @@ namespace Martridge.ViewModels.Configuration {
                 
                 // result is ok, add it
                 string file = result[0];
-                this.EditorExePaths.Add(file);
+                this.Configuration.AddEditorExePath(file);
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);
             } finally {

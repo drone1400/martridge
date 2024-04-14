@@ -119,23 +119,36 @@ namespace Martridge.Models.Configuration {
             return false;
         }
 
-        public void AddGameExePath(string path) {
-            if (this._gameExePaths.Contains(path) || string.IsNullOrWhiteSpace(path)) return;
+        private bool CheckDuplicate(List<string> list, string path) {
+            #if PLATF_WINDOWS
+            // on windows, ignore uppercase...
+            string pathLow = path.ToLowerInvariant();
+            foreach (string s in list) {
+                if (s.ToLowerInvariant() == pathLow) return true;
+            }
+            #else
+            if (this._gameExePaths.Contains(path)) return true;
+            #endif
+            return false;
+        }
 
+        public void AddGameExePath(string path) {
+            if (string.IsNullOrWhiteSpace(path)) return;
+            if (this.CheckDuplicate(this._gameExePaths, path)) return;
             this._gameExePaths.Add(path);
             this.FireUpdatedEvent(nameof(this.GameExePaths));
         }
         
         public void AddEditorExePath(string path) {
-            if (this._editorExePaths.Contains(path) || string.IsNullOrWhiteSpace(path)) return;
-
+            if (string.IsNullOrWhiteSpace(path)) return;
+            if (this.CheckDuplicate(this._editorExePaths, path)) return;
             this._editorExePaths.Add(path);
             this.FireUpdatedEvent(nameof(this.EditorExePaths));
         }
 
         public void AddAdditionalDmodPath(string path) {
-            if (this._additionalDmodLocations.Contains(path) || string.IsNullOrWhiteSpace(path)) return;
-
+            if (string.IsNullOrWhiteSpace(path)) return;
+            if (this.CheckDuplicate(this._additionalDmodLocations, path)) return;
             this._additionalDmodLocations.Add(path);
             this.FireUpdatedEvent(nameof(this.AdditionalDmodLocations));
         }
@@ -155,8 +168,10 @@ namespace Martridge.Models.Configuration {
                     List<string> listAbs = LocationHelper.TryGetAbsoluteFromSubdirectoryRelative(list);
                     if (ListsAreDifferent(myValues, listAbs)) {
                         myValues.Clear();
-                        foreach (string s in list) {
-                            if (string.IsNullOrWhiteSpace(s) == false) {
+                        foreach (string s in listAbs) {
+                            if (string.IsNullOrWhiteSpace(s) == false &&
+                                // make sure to also check not to add duplicate paths...
+                                this.CheckDuplicate(myValues, s) == false) {
                                 myValues.Add(s);
                             }
                         }

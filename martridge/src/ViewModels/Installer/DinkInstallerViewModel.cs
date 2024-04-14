@@ -145,7 +145,7 @@ namespace Martridge.ViewModels.Installer {
                 }
 
                 this.SelectedInstallableCategory = this.InstallableCategories.First();
-                this.SelectedInstallable = this.SelectedInstallableCategory?.InstallerEntries.First();
+                //this.SelectedInstallable = this.SelectedInstallableCategory?.InstallerEntries.First();
 
                 this.IsInstallableInitialized = true;
             } catch (Exception ex) {

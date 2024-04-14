@@ -93,6 +93,8 @@
   "DinkInstallerView/InstallableInitializing_Body" : "Downloading Dink install configurations.. Please wait.",
   "DinkInstallerView/InstallableNotInitialized_Title" : "Data not initialized",
   "DinkInstallerView/InstallableNotInitialized_Body" : "Dink install configuration is not loaded. Can not continue...",
+  "DinkInstallerView/InstallableNotSelected_Title" : "...",
+  "DinkInstallerView/InstallableNotSelected_Body" : "Please select an install configuration first...",
   "DinkInstallerView/MessageBox_DmodPackerError_BadFolder_Title": "DMOD Directory error!",
   "DinkInstallerView/MessageBox_DmodPackerError_BadFolder_Body": "Error! A valid DMOD could not be detected in the selected directory!",
   "DinkInstallerView/MessageBox_Error_Title": "Installation Error!",

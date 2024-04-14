@@ -16,6 +16,16 @@ namespace Martridge.Models.Dmod
         public static void LaunchDmod(string exePath, string dmodPath, ConfigLaunch launch, string? localization = null)
         {
             try {
+                bool isProbablyFreedink = false;
+                
+                FileInfo finfo = new FileInfo(exePath);
+                DirectoryInfo dinfo = new DirectoryInfo(dmodPath);
+                string launcherExeNameLower = Path.GetFileNameWithoutExtension(finfo.Name.ToLowerInvariant());
+
+                if (launcherExeNameLower.StartsWith("freedink")) {
+                    isProbablyFreedink = true;
+                }
+                
                 string arguments = "";
                 if (launch.TrueColor) {
                     arguments += " -truecolor";
@@ -35,12 +45,13 @@ namespace Martridge.Models.Dmod
                 if (launch.V107Mode) {
                     arguments += " --v1.07";
                 }
-                if (launch.Skip) {
+                
+                // NOTE: the -skip parameter crashes freedink and freedinkedit, so don't automatically pass it there...
+                // NOTE: not sure if this is the best idea or the user should just manually disable it if launching freedink?...
+                //          maybe a future version of freedink would support this? ah well, i guess i'll just update martridge then...
+                if (launch.Skip && isProbablyFreedink == false) {
                     arguments += " -skip";
                 }
-
-                FileInfo finfo = new FileInfo(exePath);
-                DirectoryInfo dinfo = new DirectoryInfo(dmodPath);
                 
                 if (dinfo.Name.ToLowerInvariant() != "dink") {
                     string finalPath = dmodPath;
@@ -79,8 +90,7 @@ namespace Martridge.Models.Dmod
                 
                 // localization support for freedink
                 // localization = "es_ES";
-                string launcherExeNameLower = Path.GetFileNameWithoutExtension(finfo.Name.ToLowerInvariant());
-                if (launcherExeNameLower == "freedink")
+                if (isProbablyFreedink)
                 {
                     // try to add localization parameters
                     if (localization != null) {

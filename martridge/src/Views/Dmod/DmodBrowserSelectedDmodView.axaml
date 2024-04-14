@@ -153,7 +153,7 @@
                 </Grid>
                 
                 <Grid RowDefinitions="Auto" ColumnDefinitions="160, *"
-                      >
+                      IsVisible="{Binding ShowAdvancedFeatures}">
                     <Button Grid.Row="0" Grid.Column="0"
                             Content="{dloc:Localize DmodBrowser/EditDmod}"
                             HorizontalAlignment="Stretch"
@@ -173,7 +173,8 @@
                     </ComboBox>
                 </Grid>
                 
-                <Grid  RowDefinitions="Auto,Auto">
+                <Grid  RowDefinitions="Auto,Auto"
+                       IsVisible="{Binding ShowAdvancedFeatures}">
                     <TextBlock  Grid.Row="0" Classes="Heading2B"
                                 Text="{dloc:Localize DmodBrowser/ExeNotFound}"
                                 IsVisible="{Binding !ActiveEditorExePath.PathExists, FallbackValue=False}"/>

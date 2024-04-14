@@ -41,7 +41,8 @@
                 <MenuItem Header="{dloc:Localize MainWindow/MenuDmodInstaller}"
                           Command="{Binding CmdShowPageDmodInstallerAndBrowse}"/>
                 <MenuItem Header="{dloc:Localize MainWindow/MenuDmodPacker}"
-                          Command="{Binding CmdShowPageDmodPackerAndBrowse}"/>
+                          Command="{Binding CmdShowPageDmodPackerAndBrowse}"
+                          IsVisible="{Binding VmGeneralSettings.ShowAdvancedFeatures}"/>
                 <MenuItem Header="{dloc:Localize MainWindow/MenuDinkInstaller}"
                           Command="{Binding CmdShowPageDinkInstaller}"/>
                 <MenuItem Header="{dloc:Localize MainWindow/MenuLogWindow}"

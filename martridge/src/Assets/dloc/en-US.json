@@ -151,7 +151,7 @@
 
   "SettingsGeneral/ShowLogWindowOnStartup": "Show App Log Window on start up",
   "SettingsGeneral/UseRelativePathForSubfolders": "Try to use relative paths in config files",
-  "SettingsGeneral/ShowAdvancedFeatures": "Show advanced features",
+  "SettingsGeneral/ShowAdvancedFeatures": "Show DMOD developer features",
   "SettingsGeneral/AutoUpdateInstallerList": "Auto update existing configInstallerList.json file",
   "SettingsGeneral/DefaultDmodLocation": "Default DMOD location",
   "SettingsGeneral/AdditionalDmodLocations": "Additional DMOD locations",

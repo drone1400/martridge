@@ -231,6 +231,12 @@ namespace Martridge.ViewModels.Dmod {
         private DmodLauncherSelectionViewModel? _activeEditorExePath = null;
 
         public bool EditorExeFound => this.EditorExePaths.Count > 0;
+
+        public bool ShowAdvancedFeatures {
+            get => this._showAdvancedFeatures;
+            private set => this.RaiseAndSetIfChanged(ref this._showAdvancedFeatures, value);
+        }
+        private bool _showAdvancedFeatures = false;
         
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Methods
@@ -323,6 +329,8 @@ namespace Martridge.ViewModels.Dmod {
 
             this.RaisePropertyChanged(nameof(this.GameExeFound));
             this.RaisePropertyChanged(nameof(this.EditorExeFound));
+            
+            this.ShowAdvancedFeatures = cfg.ShowAdvancedFeatures;
         }
 
         private void SaveActiveIndexToConfigGeneral(ConfigGeneral cfg) {

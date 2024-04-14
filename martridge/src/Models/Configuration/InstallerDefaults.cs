@@ -10,7 +10,7 @@ namespace Martridge.Models.Configuration {
                 Category = "Dink HD",
                 Name = "DinkHD",
                 DestinationName = "DinkHD",
-                ApplicationFileName = "dink.exe",
+                GameFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
                         WebResource = new ConfigDataWebResource() {
@@ -33,7 +33,7 @@ namespace Martridge.Models.Configuration {
                 Category = "Dink HD",
                 Name = "DinkHD V1.93",
                 DestinationName = "DinkHD_V1.93",
-                ApplicationFileName = "dink.exe",
+                GameFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
                         WebResource = new ConfigDataWebResource() {
@@ -56,7 +56,7 @@ namespace Martridge.Models.Configuration {
                 Category = "Dink HD",
                 Name = "DinkHD V1.97",
                 DestinationName = "DinkHD_V1.97",
-                ApplicationFileName = "dink.exe",
+                GameFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
                         WebResource = new ConfigDataWebResource() {
@@ -79,7 +79,7 @@ namespace Martridge.Models.Configuration {
                 Category = "Dink HD",
                 Name = "DinkHD V1.98",
                 DestinationName = "DinkHD_V1.98",
-                ApplicationFileName = "dink.exe",
+                GameFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
                         WebResource = new ConfigDataWebResource() {
@@ -102,7 +102,7 @@ namespace Martridge.Models.Configuration {
                 Category = "Dink HD",
                 Name = "DinkHD V1.99",
                 DestinationName = "DinkHD_V1.99",
-                ApplicationFileName = "dink.exe",
+                GameFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
                         WebResource = new ConfigDataWebResource() {
@@ -129,7 +129,7 @@ namespace Martridge.Models.Configuration {
                 Category = "Dink Classic",
                 Name = "Dink V1.08",
                 DestinationName = "Dink_V1.08",
-                ApplicationFileName = "dink.exe",
+                GameFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
                         WebResource = new ConfigDataWebResource() {
@@ -156,7 +156,7 @@ namespace Martridge.Models.Configuration {
             return new ConfigDataInstaller() {
                 Category = "Dink Classic",
                 Name = "Dink V1.07 Beta3",
-                ApplicationFileName = "dink.exe",
+                GameFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
                         WebResource = new ConfigDataWebResource() {
@@ -178,7 +178,7 @@ namespace Martridge.Models.Configuration {
             return new ConfigDataInstaller() {
                 Category = "Dink Classic",
                 Name = "Dink V1.06",
-                ApplicationFileName = "dink.exe",
+                GameFileName = "dink.exe",
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
                         WebResource = new ConfigDataWebResource() {
@@ -207,7 +207,7 @@ namespace Martridge.Models.Configuration {
                 Category = "YeOldeDink",
                 Name = "YeOldeDink V0.6.2",
                 DestinationName = "yeoldedink062",
-                ApplicationFileName = "yedink062.exe",
+                GameFileName = "yedink062.exe",
                 
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     // The DinkV108 data
@@ -246,7 +246,7 @@ namespace Martridge.Models.Configuration {
                 Category = "YeOldeDink",
                 Name = "YeOldeDink V0.5",
                 DestinationName = "yeoldedink05",
-                ApplicationFileName = "yedink05.exe",
+                GameFileName = "yedink05.exe",
                 
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     // The DinkV108 data
@@ -290,7 +290,8 @@ namespace Martridge.Models.Configuration {
                 Category = "Freedink",
                 Name = "FreeDink V1.09.6",
                 DestinationName = "FreeDink_V1.09.6",
-                ApplicationFileName = "freedink.exe",
+                GameFileName = "freedink.exe",
+                EditorFileName = "freedinkedit.exe",
                 
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     // The DinkV108 data
@@ -351,7 +352,8 @@ namespace Martridge.Models.Configuration {
                 Category = "Freedink",
                 Name = "FreeDink V1.09.6 (GNU Assets)",
                 DestinationName = "FreeDink_V1.09.6_GNUAssets",
-                ApplicationFileName = "freedink.exe",
+                GameFileName = "freedink.exe",
+                EditorFileName = "freedinkedit.exe",
                 
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     // Freedink V1.09.6
@@ -393,7 +395,7 @@ namespace Martridge.Models.Configuration {
                 Category = "WinDinkEdit",
                 Name = "WinDinkEdit V1.4 Beta2",
                 DestinationName = "WinDinkEdit_V1.4_Beta2",
-                ApplicationFileName = "WinDinkedit.exe",
+                EditorFileName = "WinDinkedit.exe",
                 
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
@@ -417,7 +419,7 @@ namespace Martridge.Models.Configuration {
                 Category = "WinDinkEdit",
                 Name = "WinDinkEditPlus V1.2",
                 DestinationName = "WinDinkEditPlus_V1.2",
-                ApplicationFileName = "WinDinkeditPlus.exe",
+                EditorFileName = "WinDinkeditPlus.exe",
                 
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
@@ -441,7 +443,7 @@ namespace Martridge.Models.Configuration {
                 Category = "WinDinkEdit",
                 Name = "WinDinkEditPlus V2.3.2",
                 DestinationName = "WinDinkEditPlus_V2.3.2",
-                ApplicationFileName = "WinDinkeditPlus2.exe",
+                EditorFileName = "WinDinkeditPlus2.exe",
                 
                 InstallerComponents = new List<ConfigDataInstallerComponent>() {
                     new ConfigDataInstallerComponent() {
@@ -459,8 +461,61 @@ namespace Martridge.Models.Configuration {
                 },
             };
         }
+        
+        public static ConfigDataInstaller WinDinkEditPlus2_V2_5() {
+            return new ConfigDataInstaller() {
+                Category = "WinDinkEdit",
+                Name = "WinDinkEditPlus V2.5",
+                DestinationName = "WinDinkEditPlus_V2.5",
+                EditorFileName = "WinDinkeditPlus2.exe",
+                
+                InstallerComponents = new List<ConfigDataInstallerComponent>() {
+                    new ConfigDataInstallerComponent() {
+                        WebResource = new ConfigDataWebResource() {
+                            Sha256 = "629ee6d784514f2ea78c6ee68fde17ec4bc467a04868477b2c1389d07da67ae8",
+                            CheckSha256 = true,
+                            Name = "windinkedit_plus_2-2_5.zip",
+                            Uri = @"https://www.dinknetwork.com/download/windinkedit_plus_2-2_5.zip",
+                            ResourceArchiveFormat = "Zip",
+                        },
+
+                        FileFilterMode = InstallerFiltering.NoFiltering,
+                        FileFilterList = new List<string>(),
+                    },
+                },
+            };
+        }
+        
+        #endregion
+        
+        #region WinDinkedit - drone edition
+        
+        public static ConfigDataInstaller WinDinkEditPlus2_V2_5_7_8() {
+            return new ConfigDataInstaller() {
+                Category = "WinDinkEditDrone",
+                Name = "WinDinkEditPlusDrone V2.5.7.8",
+                DestinationName = "WDED_V2.5.7.8",
+                EditorFileName = "WinDinkeditPlus2.exe",
+                
+                InstallerComponents = new List<ConfigDataInstallerComponent>() {
+                    new ConfigDataInstallerComponent() {
+                        WebResource = new ConfigDataWebResource() {
+                            Sha256 = "3496150c568c3eaab3217fea5638976818d68b4fb71deeda337e97d39f63d5bb",
+                            CheckSha256 = true,
+                            Name = "windinkedit_plus_2_drone_edition-v2_5_7_8.zip",
+                            Uri = @"https://www.dinknetwork.com/download/windinkedit_plus_2_drone_edition-v2_5_7_8.zip",
+                            ResourceArchiveFormat = "Zip",
+                        },
+                        SourceSubFolder = "WDED_V2.5.7.8",
+                        FileFilterMode = InstallerFiltering.NoFiltering,
+                        FileFilterList = new List<string>(),
+                    },
+                },
+            };
+        }
 
         #endregion
+        
 
         
     }

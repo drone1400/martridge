@@ -26,9 +26,13 @@ namespace Martridge.Models.Configuration {
                 InstallerDefaults.FreeDink_V1_09_6_With_V108Data_And_Localizations(),
                 InstallerDefaults.Freedink_V1_09_6_With_GnuData(),
                 // YeOldeDink
-                InstallerDefaults.YeOldeDink_V05_With_V108Data_And_Localizations(),
-                InstallerDefaults.YeOldeDink_V062_With_V108Data_And_Localizations(),
+                // NOTE: for now, catbox seems to reject the .NET client requests, 
+                //InstallerDefaults.YeOldeDink_V05_With_V108Data_And_Localizations(),
+                //InstallerDefaults.YeOldeDink_V062_With_V108Data_And_Localizations(),
+                // WinDinkEdit DroneEdition
+                InstallerDefaults.WinDinkEditPlus2_V2_5_7_8(),
                 // WinDinkEdit
+                InstallerDefaults.WinDinkEditPlus2_V2_5(),
                 InstallerDefaults.WinDinkEditPlus2_V2_3_2(),
                 InstallerDefaults.WinDinkEditPlus_V1_2(),
                 InstallerDefaults.WinDinkEdit_V1_4B2(),

@@ -97,7 +97,6 @@
 
     <ItemGroup>
         <Folder Include="Assets\graphics" />
-        <Folder Include="ViewModels\Dmod\Launcher" />
     </ItemGroup>
     
     <ItemGroup>

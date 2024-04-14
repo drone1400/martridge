@@ -179,8 +179,18 @@ namespace Martridge.ViewModels {
             try {
                 // try to update exe path in settings...
                 if (e.Result == DinkInstallerResult.Success && e.UsedInstaller != null && e.Destination != null) {
-                    string path = Path.Combine(e.Destination.FullName, e.UsedInstaller.ApplicationFileName);
-                    this._logic.Config.General.AddGameExePath(path);
+                    if (string.IsNullOrWhiteSpace(e.UsedInstaller.GameFileName) == false) {
+                        string pathGame = Path.Combine(e.Destination.FullName, e.UsedInstaller.GameFileName);
+                        if (File.Exists(pathGame)) {
+                            this._logic.Config.General.AddGameExePath(pathGame);
+                        }
+                    }
+                    if (string.IsNullOrWhiteSpace(e.UsedInstaller.EditorFileName) == false) {
+                        string pathGame = Path.Combine(e.Destination.FullName, e.UsedInstaller.EditorFileName);
+                        if (File.Exists(pathGame)) {
+                            this._logic.Config.General.AddEditorExePath(pathGame);
+                        }
+                    }
                 }
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);

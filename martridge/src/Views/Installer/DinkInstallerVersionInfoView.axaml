@@ -17,7 +17,7 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
     </UserControl.Styles>
 
-    <Grid RowDefinitions="40,Auto,Auto,Auto,Auto,*,Auto,Auto">
+    <Grid RowDefinitions="40,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto">
     
         <Grid.Resources>
             <vm:InstallerFileFilterConverter x:Key="ListStringConverter"/>
@@ -41,13 +41,20 @@
                    Text="{dloc:Localize DinkInstallerView/GameExeName}"/>
 
         <TextBox   Grid.Row="4"
-                   Text="{Binding SelectedInstallable.ApplicationFileName}"
+                   Text="{Binding SelectedInstallable.InstallerData.GameFileName}"
+                   IsReadOnly="True"/>
+        
+        <TextBlock Grid.Row="5" Classes="Heading2B"
+                   Text="{dloc:Localize DinkInstallerView/EditorExeName}"/>
+
+        <TextBox   Grid.Row="6"
+                   Text="{Binding SelectedInstallable.InstallerData.EditorFileName}"
                    IsReadOnly="True"/>
 
-        <ScrollViewer Grid.Row="5">
+        <ScrollViewer Grid.Row="7">
             <ItemsRepeater 
                 Margin="6"
-                ItemsSource="{Binding SelectedInstallable.InstallerComponents}">
+                ItemsSource="{Binding SelectedInstallable.InstallerData.InstallerComponents}">
                 <ItemsRepeater.Layout>
                     <StackLayout Spacing="4" Orientation="Vertical"/>
                 </ItemsRepeater.Layout>

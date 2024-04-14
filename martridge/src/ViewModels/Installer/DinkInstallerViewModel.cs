@@ -13,6 +13,7 @@ using Martridge.ViewModels.DinkyAlerts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DynamicData;
 
 namespace Martridge.ViewModels.Installer {
     public class DinkInstallerViewModel : InstallerViewModelBase {
@@ -21,51 +22,20 @@ namespace Martridge.ViewModels.Installer {
         //      Installable Selection 
         //
 
-        public ConfigInstallerList InstallableDefinitions {
-            get => _installableDefinitions;
-            set {
-                this.RaiseAndSetIfChanged(ref this._installableDefinitions, value);
-                this.RefreshInstallableCategories();
-            }
-        }
-        private ConfigInstallerList _installableDefinitions = new ConfigInstallerList();
-
-        public ObservableCollection<string>  InstallableCategories {
-            get => this._installableCategories;
-            private set => this.RaiseAndSetIfChanged(ref this._installableCategories, value);
-        }
-        private ObservableCollection<string>  _installableCategories = new ObservableCollection<string>();
-
-        public string? SelectedInstallableCategory {
+        public ObservableCollection<DinkInstallableCategory> InstallableCategories { get; } = new ObservableCollection<DinkInstallableCategory>();
+        
+        public DinkInstallableCategory? SelectedInstallableCategory {
             get => this._selectedInstallableCategory;
-            set {
-                this.RaiseAndSetIfChanged(ref this._selectedInstallableCategory, value);
-                this.RefreshInstallableNames();
-            }
+            set => this.RaiseAndSetIfChanged(ref this._selectedInstallableCategory, value);
         }
-        private string? _selectedInstallableCategory = null;
+        private DinkInstallableCategory? _selectedInstallableCategory = null;
 
-        public ObservableCollection<string>  InstallableNames {
-            get => this._installableNames;
-            private set => this.RaiseAndSetIfChanged(ref this._installableNames, value);
-        }
-        private ObservableCollection<string>  _installableNames = new ObservableCollection<string>();
-
-        public string? SelectedInstallableName {
-            get => this._selectedInstallableName;
-            set {
-                this.RaiseAndSetIfChanged(ref this._selectedInstallableName, value);
-                this.RefreshInstallable();
-            }
-        }
-        private string? _selectedInstallableName = null;
-
-        public ConfigInstaller? SelectedInstallable {
+        public DinkInstallableEntry? SelectedInstallable {
             get => this._selectedInstallable;
             set => this.RaiseAndSetIfChanged(ref this._selectedInstallable, value);
         }
-
-        private ConfigInstaller? _selectedInstallable = null;
+        private DinkInstallableEntry? _selectedInstallable = null;
+        
 
 
         // ------------------------------------------------------------------------------------------
@@ -111,11 +81,21 @@ namespace Martridge.ViewModels.Installer {
 
         private void DinkInstallerViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
             if (e.PropertyName == nameof(this.SelectedInstallable)) {
-                this._installerDestinationAuto = Path.Combine(LocationHelper.AppBaseDirectory, 
-                    !string.IsNullOrWhiteSpace(this.SelectedInstallable?.DestinationName)
-                    ?   this.SelectedInstallable.DestinationName
-                    :   this.SelectedInstallable?.Name ?? "ERR_InstallerName");
-                this.InstallerDestination = this._installerDestinationAuto;
+                if (this.SelectedInstallable != null) {
+                    this._installerDestinationAuto = Path.Combine(LocationHelper.AppBaseDirectory,
+                        !string.IsNullOrWhiteSpace(this.SelectedInstallable.InstallerData.DestinationName)
+                            ?   this.SelectedInstallable.InstallerData.DestinationName
+                            :   this.SelectedInstallable.InstallerData.Name );
+                    this.InstallerDestination = this._installerDestinationAuto;
+                    this.InstallerProgressTitle = this.SelectedInstallable.DisplayName;
+                } else {
+                    this.InstallerDestination = "";
+                }
+            } else if (e.PropertyName == nameof(this.SelectedInstallableCategory)) {
+                // NOTE: it seems that automatically selecting an installable like this sometimes leads to the GUI TextBoxes not being properly updated...
+                // need to investigate later, but for now just let the user manually select instead
+                // I guess this has something to do with the ItemSource and SelectedItem for the ListBox changing?... 
+                //this.SelectedInstallable = this.SelectedInstallableCategory?.InstallerEntries.First();
             }
         }
 
@@ -131,51 +111,26 @@ namespace Martridge.ViewModels.Installer {
                     cfgInst.SaveToFile(configFileInstaller);
                 }
             }
-
-            this.InstallableDefinitions = cfgInst;
-        }
-
-        private void RefreshInstallableCategories() {
-            this.InstallableCategories.Clear();
-            this.SelectedInstallableCategory = null;
-            foreach (var kvp in this.InstallableDefinitions.Installables) {
-                this.InstallableCategories.Add(kvp.Key);
-            }
-            if (this.InstallableCategories.Count > 0) {
-                this.SelectedInstallableCategory = this.InstallableCategories.First();
-            }
-        }
-
-        private void RefreshInstallableNames() {
-            this.InstallableNames.Clear();
-            this.SelectedInstallableName = null;
-            if (this.SelectedInstallableCategory == null) return;
-
-            if (this.InstallableDefinitions.Installables.ContainsKey(this.SelectedInstallableCategory)) {
-                foreach (var kvp in this.InstallableDefinitions.Installables[this.SelectedInstallableCategory]) {
-                    this.InstallableNames.Add(kvp.Key);
-                }
-                
-                if (this.InstallableNames.Count > 0) {
-                    this.SelectedInstallableName = this.InstallableNames.First();
-                }
-            }
-        }
-
-        private void RefreshInstallable() {
-            this.SelectedInstallable = null;
-            this.InstallerProgressTitle = this.SelectedInstallable?.Name ?? "";
-            if (this.SelectedInstallableCategory != null &&
-                this.SelectedInstallableName != null &&
-                this.InstallableDefinitions.Installables.ContainsKey(this.SelectedInstallableCategory) &&
-                this.InstallableDefinitions.Installables[this.SelectedInstallableCategory].ContainsKey(this.SelectedInstallableName)
-                ) {
-                this.SelectedInstallable = this.InstallableDefinitions.Installables[this.SelectedInstallableCategory][this.SelectedInstallableName];
-                this.InstallerProgressTitle = this.SelectedInstallable.Name;
-            }
             
-        }
+            this.SelectedInstallable = null;
+            this.SelectedInstallableCategory = null;
+            this.InstallableCategories.Clear();
 
+            Dictionary<string, DinkInstallableCategory> tempDict = new Dictionary<string, DinkInstallableCategory>();
+            foreach (var kvp in cfgInst.Installables) {
+                foreach (var kvp2 in kvp.Value) {
+                    if (tempDict.ContainsKey(kvp2.Value.Category) == false) {
+                        DinkInstallableCategory cat = new DinkInstallableCategory(kvp2.Value.Category);
+                        tempDict.Add(kvp2.Value.Category, cat);
+                        this.InstallableCategories.Add(cat);
+                    }
+                    tempDict[kvp2.Value.Category].AddDinkInstallerdata(kvp2.Value);
+                }
+            }
+
+            this.SelectedInstallableCategory = this.InstallableCategories.First();
+            this.SelectedInstallable = this.SelectedInstallableCategory?.InstallerEntries.First();
+        }
 
         // ------------------------------------------------------------------------------------------
         //      Commands
@@ -279,10 +234,10 @@ namespace Martridge.ViewModels.Installer {
                 if (result != null) {
                     DirectoryInfo dirInfo = new DirectoryInfo(result);
                     if (dirInfo.Exists && dirInfo.Parent != null) {
-                        this._installerDestinationAuto = Path.Combine(dirInfo.FullName, 
-                            !string.IsNullOrWhiteSpace(this.SelectedInstallable?.DestinationName) 
-                                ?   this.SelectedInstallable.DestinationName
-                                :   this.SelectedInstallable?.Name ?? "ERR_InstallerName");
+                        this._installerDestinationAuto = Path.Combine(LocationHelper.AppBaseDirectory,
+                            !string.IsNullOrWhiteSpace(this.SelectedInstallable.InstallerData.DestinationName)
+                                ?   this.SelectedInstallable.InstallerData.DestinationName
+                                :   this.SelectedInstallable.InstallerData.Name );
                         this.InstallerDestination = this._installerDestinationAuto;
                     }
                 }
@@ -354,7 +309,7 @@ namespace Martridge.ViewModels.Installer {
                 this._installerLogic.InstallerDone += this.InstallerOnDone;
 
                 // start installation
-                this._installerLogic.StartInstallingDink(destination, removeOldFiles,  this.SelectedInstallable);
+                this._installerLogic.StartInstallingDink(destination, removeOldFiles,  this.SelectedInstallable!.InstallerData);
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
             }

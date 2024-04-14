@@ -8,7 +8,12 @@ namespace Martridge.Models.Configuration.Save {
     public class ConfigDataInstaller {
         public string? Name { get; set; }
         public string? DestinationName { get; set; }
+        
+        // legacy property from V2...
         public string? ApplicationFileName { get; set; }
+        
+        public string? GameFileName { get; set; }
+        public string? EditorFileName { get; set; }
         public string? Category { get; set; }
 
         public List<ConfigDataInstallerComponent>? InstallerComponents { get; set; }

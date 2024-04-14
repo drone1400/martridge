@@ -31,21 +31,21 @@
                     <DataTemplate>
                         <Grid Margin="2">
                             <TextBlock  Classes="Heading2"
-                                        Text="{Binding}"/>
+                                        Text="{Binding CategoryName}"/>
                         </Grid>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
             
             <ListBox Grid.Row="2" Grid.Column="0"
-                     ItemsSource="{Binding InstallableNames}"
+                     ItemsSource="{Binding SelectedInstallableCategory.InstallerEntries}"
                      SelectionMode="Single"
-                     SelectedItem="{Binding SelectedInstallableName, Mode=TwoWay}">
+                     SelectedItem="{Binding SelectedInstallable, Mode=TwoWay}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="2">
                             <TextBlock  Classes="Heading2"
-                                        Text="{Binding }"/>
+                                        Text="{Binding DisplayName }"/>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

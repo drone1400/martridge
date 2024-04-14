@@ -1,5 +1,6 @@
 ﻿using Martridge.Models.Configuration.Save;
 using System.Collections.Generic;
+using SharpCompress;
 
 namespace Martridge.Models.Configuration {
     public class ConfigInstaller {
@@ -7,33 +8,45 @@ namespace Martridge.Models.Configuration {
         /// <summary>
         /// This is the name of the folder in which to install
         /// </summary>
-        public string DestinationName { get; set; } = "";
+        public string DestinationName { get; private init; } = "";
         
         /// <summary>
         /// This is the versioned name of the application being installed, ex: 'Dink HD V1.9.9', 'Dink V108', etc
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; private init; } = "";
         
         /// <summary>
-        /// This is the file name of the main application being installed. It is used to determine what executable file to add to the list of Dink launchers.
+        /// This is the file name of the main application being installed. It is used to determine what executable file to add to the list of Dink games.
         /// </summary>
-        public string ApplicationFileName { get; set; } = "";
+        public string GameFileName { get; private init;  } = "";
+        
+        /// <summary>
+        /// This is the file name of the editor being installed. It is used to determine what executable file to add to the list of Dink editors.
+        /// </summary>
+        public string EditorFileName { get; private init; } = "";
 
         /// <summary>
         /// This is the specific name of the application being installed, ex: 'Dink HD', 'Dink', 'Feedink', 'Freedinkedit', 'WinDinkedit' etc
         /// </summary>
-        public string Category { get; set; } = "";
+        public string Category { get; private init;  } = "";
 
-        public List<ConfigInstallerComponent> InstallerComponents { get; set; } = new List<ConfigInstallerComponent>();
+        public ReadOnlyCollection<ConfigInstallerComponent> InstallerComponents { get; }
+        private readonly List<ConfigInstallerComponent> _installerComponents = new List<ConfigInstallerComponent>();
 
+        public ConfigInstaller() {
+            this.InstallerComponents = new ReadOnlyCollection<ConfigInstallerComponent>(this._installerComponents);
+        }
+        
         public ConfigInstaller Clone() {
             ConfigInstaller cfg = new ConfigInstaller {
-                ApplicationFileName = this.ApplicationFileName,
+                GameFileName = this.GameFileName,
+                EditorFileName = this.EditorFileName,
                 DestinationName = this.DestinationName,
                 Name = this.Name,
             };
-            for (int i = 0; i < this.InstallerComponents.Count; i++) {
-                ConfigInstallerComponent comp = this.InstallerComponents[i];
+            
+            for (int i = 0; i < this._installerComponents.Count; i++) {
+                ConfigInstallerComponent comp = this._installerComponents[i];
                 cfg.InstallerComponents.Add(comp.Clone());
             }
 
@@ -43,20 +56,21 @@ namespace Martridge.Models.Configuration {
         public static ConfigInstaller? FromJsonData(ConfigDataInstaller data) {
             if (data.Name != null &&
                 data.Category != null &&
-                data.ApplicationFileName != null &&
                 data.InstallerComponents != null) {
+                
                 ConfigInstaller cfg = new ConfigInstaller() {
                     Name = data.Name,
                     DestinationName = data.DestinationName ?? "",
                     Category = data.Category,
-                    ApplicationFileName = data.ApplicationFileName,
+                    GameFileName = data.GameFileName ?? data.ApplicationFileName ?? "",
+                    EditorFileName = data.EditorFileName ?? "",
                 };
 
                 foreach (ConfigDataInstallerComponent compJ in data.InstallerComponents) {
                     ConfigInstallerComponent? comp = ConfigInstallerComponent.FromJsonData(compJ);
                     // if installer definition is incomplete, abort
                     if (comp == null) return null;
-                    cfg.InstallerComponents.Add(comp);
+                    cfg._installerComponents.Add(comp);
                 }
 
                 return cfg;
@@ -73,9 +87,11 @@ namespace Martridge.Models.Configuration {
 
             return new ConfigDataInstaller() {
                 Name = this.Name,
-                DestinationName = this.Name,
+                DestinationName = this.DestinationName,
                 Category = this.Category,
-                ApplicationFileName = this.ApplicationFileName,
+                ApplicationFileName = null,
+                GameFileName = string.IsNullOrWhiteSpace(this.GameFileName) == false ? this.GameFileName : null,
+                EditorFileName = string.IsNullOrWhiteSpace(this.EditorFileName) == false ? this.EditorFileName : null,
                 InstallerComponents = list,
             };
         }

@@ -125,6 +125,13 @@ namespace Martridge.Models.Configuration {
             this._gameExePaths.Add(path);
             this.FireUpdatedEvent(nameof(this.GameExePaths));
         }
+        
+        public void AddEditorExePath(string path) {
+            if (this._editorExePaths.Contains(path) || string.IsNullOrWhiteSpace(path)) return;
+
+            this._editorExePaths.Add(path);
+            this.FireUpdatedEvent(nameof(this.EditorExePaths));
+        }
 
         public void AddAdditionalDmodPath(string path) {
             if (this._additionalDmodLocations.Contains(path) || string.IsNullOrWhiteSpace(path)) return;

@@ -4,7 +4,6 @@ namespace Martridge.Models.Configuration {
     public class Config {
         public ConfigGeneral General { get; } = new ConfigGeneral();
         public ConfigLaunch Launch { get; } = new ConfigLaunch();
-
         public ConfigAlertResults AlertResults { get; } = new ConfigAlertResults();
 
         public void SaveToFile(string path) {
@@ -21,7 +20,7 @@ namespace Martridge.Models.Configuration {
             ConfigData? data = ConfigData.LoadFromFile(path);
             
             if (data?.General != null) {
-                this.General.UpdateFromData(data.General);
+                this.General.UpdateProperties(data.General.GetValues());
             }
             
             if (data?.Launch != null) {

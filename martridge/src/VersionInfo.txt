@@ -5,6 +5,7 @@
 - adjustments to Online DMOD GUI
 - added options for launching editor and game separately
 - added "-skip" launch parameter
+- added theme selection to configuration and menus
 
 --- V0.6.4 ---
 - added yeoldedink V0.6 rev 2 to default auto-magic installer list...

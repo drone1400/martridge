@@ -22,8 +22,13 @@ namespace Martridge.Models {
             this.ConfigFile = Path.Combine(LocationHelper.AppBaseDirectory, "config", "config.json");
             System.Diagnostics.Trace.WriteLine("SOMETHING");
             this.Config.LoadFromFile(this.ConfigFile);
-            
-            
+
+            // try to set loaded theme...
+            string themeName = this.Config.General.ThemeName;
+            if (Enum.TryParse(themeName, out ApplicationTheme themeValue)) {
+                StyleManager.Instance.UseTheme(themeValue);
+            }
+
             #if PLATF_LINUX
             
             string defaultLinuxFreedinkExe = "/usr/games/freedink";
@@ -49,8 +54,6 @@ namespace Martridge.Models {
             #endif
             
             this.Config.General.Updated += this.GeneralOnUpdated;
-            this.Config.General.UpdatedActiveGameExe += this.GeneralOnUpdatedActiveGameExe;
-            this.Config.General.UpdatedActiveEditorExe += this.GeneralOnUpdatedActiveEditorExe;
             this.Config.Launch.Updated += this.LaunchOnUpdated;
 
             this.DmodManager.Initialize(this.Config.General);
@@ -60,22 +63,20 @@ namespace Martridge.Models {
             this.Config.SaveToFile(this.ConfigFile);
         }
 
-        private void GeneralOnUpdatedActiveGameExe(object? sender, EventArgs e) {
-            MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationChangedActiveGameExe"]);
-            this.Config.SaveToFile(this.ConfigFile);
-        }
-        
-        private void GeneralOnUpdatedActiveEditorExe(object? sender, EventArgs e) {
-            MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationChangedActiveEditorExe"]);
-            this.Config.SaveToFile(this.ConfigFile);
-        }
-
-        private void GeneralOnUpdated(object? sender, EventArgs e) {
+        private void GeneralOnUpdated(object? sender, ConfigUpdateEventArgs e) {
             MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationChanged"]);
             this.Config.SaveToFile(this.ConfigFile);
-
-            // reinitialize dmod manager..
-            this.DmodManager.Initialize(this.Config.General);
+            
+            
+            // reinitialize dmod manager if need be..
+            foreach (string name in e.UpdatedProperties) {
+                if (name == nameof(ConfigGeneral.AdditionalDmodLocations) ||
+                    name == nameof(ConfigGeneral.DefaultDmodLocation) ||
+                    name == nameof(ConfigGeneral.GameExePaths)) {
+                    this.DmodManager.Initialize(this.Config.General);
+                    break;
+                }
+            }
         }
     }
 }

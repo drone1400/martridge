@@ -1,7 +1,9 @@
 ﻿using Martridge.Trace;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using DynamicData;
 
 namespace Martridge.Models {
 
@@ -70,6 +72,14 @@ namespace Martridge.Models {
 
             return newPath;
         }
+        
+        public static List<string> TryGetRelativeSubdirectory(List<string> paths) {
+            List<string> newPaths = new List<string>();
+            foreach (string path in paths) {
+                newPaths.Add(TryGetRelativeSubdirectory(path));
+            }
+            return newPaths;
+        }
 
         public static string TryGetAbsoluteFromSubdirectoryRelative(string path) {
             if (Path.IsPathRooted(path)) {
@@ -78,6 +88,14 @@ namespace Martridge.Models {
             }
             
             return Path.Combine(AppBaseDirectory, path);
+        }
+        
+        public static List<string> TryGetAbsoluteFromSubdirectoryRelative(List<string> paths) {
+            List<string> newPaths = new List<string>();
+            foreach (string path in paths) {
+                newPaths.Add(TryGetAbsoluteFromSubdirectoryRelative(path));
+            }
+            return newPaths;
         }
     }
 }

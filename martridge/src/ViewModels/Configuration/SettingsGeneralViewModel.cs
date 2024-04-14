@@ -42,6 +42,12 @@ namespace Martridge.ViewModels.Configuration {
         //
         // General Configuration properties
         //
+
+        public ApplicationTheme ThemeName {
+            get => this._themeName;
+            set => this.RaiseAndSetIfChanged(ref this._themeName, value);
+        }
+        private ApplicationTheme _themeName;
         
         public bool AutoUpdateInstallerList {
             get => this._autoUpdateInstallerList;
@@ -92,10 +98,10 @@ namespace Martridge.ViewModels.Configuration {
         private int _activeEditorExeIndex = 0;
 
         public ObservableCollection<string> EditorExePaths {
-            get => this._EditorExePaths;
-            set => this.RaiseAndSetIfChanged(ref this._EditorExePaths, value);
+            get => this._editorExePaths;
+            set => this.RaiseAndSetIfChanged(ref this._editorExePaths, value);
         }
-        private ObservableCollection<string> _EditorExePaths = new ObservableCollection<string>();
+        private ObservableCollection<string> _editorExePaths = new ObservableCollection<string>();
 
         public ObservableCollection<CultureInfo> Localizations {
             get => this._localizations;
@@ -132,6 +138,10 @@ namespace Martridge.ViewModels.Configuration {
         private readonly object _isBusyLock = new object();
 
         public SettingsGeneralViewModel() {
+            // set current theme...
+            this._themeName = StyleManager.Instance.CurrentApplicationTheme;
+            StyleManager.Instance.ThemeChanged += InstanceOnThemeChanged;
+            
             try {
                 this._localizations.Clear();
                 List<string> languages = Localizer.Instance.GetAvailableLanguages();
@@ -149,15 +159,28 @@ namespace Martridge.ViewModels.Configuration {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);
             }
             
-            this.PropertyChanged += OnPropertyChanged; 
+            this.PropertyChanged += OnPropertyChanged;
+
+            
         }
-        
+        private void InstanceOnThemeChanged(object? sender, EventArgs e) {
+            if (sender is not StyleManager styleMan) return;
+            this.ThemeName = styleMan.CurrentApplicationTheme;
+        }
+
         private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
             if (e.PropertyName == nameof(this.SelectedLocalization)) {
                 if (this.SelectedLocalization != null &&
                     Localizer.Instance.Language != this.SelectedLocalization.Name) {
                     Localizer.Instance.LoadLanguage(this.SelectedLocalization.Name);
                 }
+            } else if (e.PropertyName == nameof(this.ThemeName)) {
+                // update in configuration...
+                this.Configuration?.UpdateProperties(new Dictionary<string, object?>() {
+                    [nameof(ConfigGeneral.ThemeName)] = this.ThemeName.ToString(),
+                });
+                // update in style manager...
+                StyleManager.Instance.UseTheme(this.ThemeName);
             }
         }
 
@@ -182,9 +205,14 @@ namespace Martridge.ViewModels.Configuration {
                 listDmod.Add(str);
             }
 
+            if (Enum.TryParse(this._cfg.ThemeName, out ApplicationTheme theme )) {
+                this.ThemeName = theme;
+            }
+            
             this.ShowLogWindowOnStartup = this._cfg.ShowLogWindowOnStartup;
             this.ShowAdvancedFeatures = this._cfg.ShowAdvancedFeatures;
             this.UseRelativePathForSubfolders = this._cfg.UseRelativePathForSubfolders;
+            this.AutoUpdateInstallerList = this._cfg.AutoUpdateInstallerList;
             this.AdditionalDmodLocationsIndex = -1;
             this.AdditionalDmodLocations = listDmod;
             this.AdditionalDmodLocationsIndex = 0;
@@ -234,20 +262,20 @@ namespace Martridge.ViewModels.Configuration {
                 this.ActiveEditorExeIndex = 0;
             }
 
-            this.Configuration.UpdateFromData(new ConfigDataGeneral(){
-                LocalizationName = this._savedLocalization ?? "en-US",
-                ShowAdvancedFeatures = this.ShowAdvancedFeatures,
-                AutoUpdateInstallerList = this.AutoUpdateInstallerList,
-                ShowLogWindowOnStartup = this.ShowLogWindowOnStartup,
-                UseRelativePathForSubfolders = this.UseRelativePathForSubfolders,
-                ActiveGameExeIndex = this.ActiveGameExeIndex,
-                GameExePaths = listGameExe,
-                ActiveEditorExeIndex = this.ActiveEditorExeIndex,
-                EditorExePaths = listEditorExe,
-                DefaultDmodLocation = this.DefaultDmodLocation,
-                AdditionalDmodLocations = listDmod
-                }
-            );
+            this.Configuration.UpdateProperties(new Dictionary<string, object?>() {
+                [nameof(ConfigGeneral.ThemeName)] = this.ThemeName.ToString(),
+                [nameof(ConfigGeneral.LocalizationName)] = this._savedLocalization ?? "en-US",
+                [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
+                [nameof(ConfigGeneral.ShowAdvancedFeatures)] = this.ShowAdvancedFeatures,
+                [nameof(ConfigGeneral.ShowLogWindowOnStartup)] = this.ShowLogWindowOnStartup,
+                [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,
+                [nameof(ConfigGeneral.ActiveGameExeIndex)] = this.ActiveGameExeIndex,
+                [nameof(ConfigGeneral.ActiveEditorExeIndex)] = this.ActiveEditorExeIndex,
+                [nameof(ConfigGeneral.GameExePaths)] = listGameExe,
+                [nameof(ConfigGeneral.EditorExePaths)] = listEditorExe,
+                [nameof(ConfigGeneral.DefaultDmodLocation)] = this.DefaultDmodLocation,
+                [nameof(ConfigGeneral.AdditionalDmodLocations)] = listDmod,
+            });
         }
         
         #endregion
@@ -388,6 +416,31 @@ namespace Martridge.ViewModels.Configuration {
                 this.IsBusy ) return false;
             // specific conditions
             return true;
+        }
+        
+        #endregion
+        
+        #region COMMANDS - THEME
+
+        public void CmdSetApplicationTheme(object? parameter = null) {
+            if (parameter is string themeName) {
+                if (Enum.TryParse(themeName, out ApplicationTheme themeValue )) {
+                    this.ThemeName = themeValue;
+                }
+            } else if (parameter is ApplicationTheme themeValue) {
+                this.ThemeName = themeValue;
+            }
+        }
+        
+        public bool CanCmdSetApplicationTheme(object? parameter = null) {
+            if (parameter is string themeName) {
+                if (Enum.TryParse(themeName, out ApplicationTheme themeValue )) {
+                    return true;
+                }
+            } else if (parameter is ApplicationTheme) {
+                return true;
+            }
+            return false;
         }
         
         #endregion

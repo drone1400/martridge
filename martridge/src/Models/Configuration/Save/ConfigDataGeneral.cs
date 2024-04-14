@@ -15,6 +15,11 @@ namespace Martridge.Models.Configuration.Save {
         public string? LocalizationName { get; set; }
         
         /// <summary>
+        /// Name of the current Citrus.Avalonia theme
+        /// </summary>
+        public string? ThemeName { get; set; }
+        
+        /// <summary>
         /// Indicates if the application should automatically update the existing 'configInstallerList.json' file
         /// </summary>
         public bool? AutoUpdateInstallerList { get; set; }
@@ -66,6 +71,22 @@ namespace Martridge.Models.Configuration.Save {
         /// </summary>
         public List<string>? AdditionalDmodLocations { get; set; }
 
+        public Dictionary<string, object?> GetValues() {
+            return new Dictionary<string, object?>() {
+                [nameof(ConfigGeneral.ThemeName)] = this.ThemeName,
+                [nameof(ConfigGeneral.LocalizationName)] = this.LocalizationName,
+                [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
+                [nameof(ConfigGeneral.ShowAdvancedFeatures)] = this.ShowAdvancedFeatures,
+                [nameof(ConfigGeneral.ShowLogWindowOnStartup)] = this.ShowLogWindowOnStartup,
+                [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,
+                [nameof(ConfigGeneral.ActiveGameExeIndex)] = this.ActiveGameExeIndex,
+                [nameof(ConfigGeneral.ActiveEditorExeIndex)] = this.ActiveEditorExeIndex,
+                [nameof(ConfigGeneral.GameExePaths)] = this.GameExePaths,
+                [nameof(ConfigGeneral.EditorExePaths)] = this.EditorExePaths,
+                [nameof(ConfigGeneral.DefaultDmodLocation)] = this.DefaultDmodLocation,
+                [nameof(ConfigGeneral.AdditionalDmodLocations)] = this.AdditionalDmodLocations,
+            };
+        }
 
         
         public void ConvertPathsToRelative() {

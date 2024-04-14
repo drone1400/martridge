@@ -326,12 +326,14 @@ namespace Martridge.ViewModels.Dmod {
         }
 
         private void SaveActiveIndexToConfigGeneral(ConfigGeneral cfg) {
+            Dictionary<string, object?> updates = new Dictionary<string, object?>();
+            
             // update game index
             for (int i = 0; i < cfg.GameExePaths.Count; i++) {
                 string path = cfg.GameExePaths[i];
                 if (path == this.ActiveGameExePath?.Path) {
                     if (i != cfg.ActiveGameExeIndex) {
-                        cfg.ActiveGameExeIndex = i;
+                        updates.Add(nameof(ConfigGeneral.ActiveGameExeIndex), i);
                         break;
                     }
                 }
@@ -342,11 +344,13 @@ namespace Martridge.ViewModels.Dmod {
                 string path = cfg.EditorExePaths[i];
                 if (path == this.ActiveEditorExePath?.Path) {
                     if (i != cfg.ActiveEditorExeIndex) {
-                        cfg.ActiveEditorExeIndex = i;
+                        updates.Add(nameof(ConfigGeneral.ActiveEditorExeIndex), i);
                         break;
                     }
                 }
             }
+
+            cfg.UpdateProperties(updates);
         }
 
         #endregion

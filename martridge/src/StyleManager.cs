@@ -4,11 +4,13 @@ using System;
 using System.Collections.Generic;
 
 namespace Martridge {
+    
+    public enum ApplicationTheme { Default, Citrus, Sea, Rust, Candy, Magma }
     public class StyleManager {
 
-        public static StyleManager Instance { get; } = new StyleManager();
+        public event EventHandler? ThemeChanged;
 
-        public enum Theme { Default, Citrus, Sea, Rust, Candy, Magma }
+        public static StyleManager Instance { get; } = new StyleManager();
 
         private Uri _styleOverrideUri = new Uri(@"avares://martridge/AppStyles.axaml");
 
@@ -38,7 +40,7 @@ namespace Martridge {
 
         private List<Window> _windows;
 
-        public Theme CurrentTheme { get; private set; } = Theme.Citrus;
+        public ApplicationTheme CurrentApplicationTheme { get; private set; } = ApplicationTheme.Citrus;
 
         public StyleManager() {
             this._windows = new List<Window>();
@@ -60,12 +62,20 @@ namespace Martridge {
             this._windows.Remove(window);
         }
 
-        public void UseTheme(Theme theme) {
-            this.CurrentTheme = theme;
+        public void UseTheme(ApplicationTheme applicationTheme) {
+            if (this.CurrentApplicationTheme != applicationTheme) {
+                this.CurrentApplicationTheme = applicationTheme;
 
-            foreach (Window window in this._windows) {
-                this.UseCurrentThemeInWindow(window);
-            }
+                foreach (Window window in this._windows) {
+                    this.UseCurrentThemeInWindow(window);
+                }
+
+                try {
+                    this.ThemeChanged?.Invoke(this, EventArgs.Empty);
+                } catch (Exception ex) {
+                    // TODO
+                }
+            } 
         }
 
         private void UseCurrentThemeInWindow(Window window) {
@@ -76,42 +86,42 @@ namespace Martridge {
         }
 
         private StyleInclude GetCurrentStyle() {
-            return this.GetStyle(this.CurrentTheme);
+            return this.GetStyle(this.CurrentApplicationTheme);
         }
 
-        private Uri GetStyleUri(Theme theme) {
-            return theme switch {
-                Theme.Default => this._citrusStyleUri,
-                Theme.Citrus => this._citrusStyleUri,
-                Theme.Sea => this._seaStyleUri,
-                Theme.Rust => this._rustStyleUri,
-                Theme.Candy => this._candyStyleUri,
-                Theme.Magma => this._magmaStyleUri,
-                _ => throw new ArgumentOutOfRangeException(nameof(theme))
+        private Uri GetStyleUri(ApplicationTheme applicationTheme) {
+            return applicationTheme switch {
+                ApplicationTheme.Default => this._citrusStyleUri,
+                ApplicationTheme.Citrus => this._citrusStyleUri,
+                ApplicationTheme.Sea => this._seaStyleUri,
+                ApplicationTheme.Rust => this._rustStyleUri,
+                ApplicationTheme.Candy => this._candyStyleUri,
+                ApplicationTheme.Magma => this._magmaStyleUri,
+                _ => throw new ArgumentOutOfRangeException(nameof(applicationTheme))
             };
         }
 
-        private StyleInclude GetStyle(Theme theme) {
-            return theme switch {
-                Theme.Default => this.CitrusStyle,
-                Theme.Citrus => this.CitrusStyle,
-                Theme.Sea => this.SeaStyle,
-                Theme.Rust => this.RustStyle,
-                Theme.Candy => this.CandyStyle,
-                Theme.Magma => this.MagmaStyle,
-                _ => throw new ArgumentOutOfRangeException(nameof(theme))
+        private StyleInclude GetStyle(ApplicationTheme applicationTheme) {
+            return applicationTheme switch {
+                ApplicationTheme.Default => this.CitrusStyle,
+                ApplicationTheme.Citrus => this.CitrusStyle,
+                ApplicationTheme.Sea => this.SeaStyle,
+                ApplicationTheme.Rust => this.RustStyle,
+                ApplicationTheme.Candy => this.CandyStyle,
+                ApplicationTheme.Magma => this.MagmaStyle,
+                _ => throw new ArgumentOutOfRangeException(nameof(applicationTheme))
             };
         }
 
         public void UseNextTheme() {
-            this.UseTheme(this.CurrentTheme switch {
-                Theme.Default => Theme.Sea,
-                Theme.Citrus => Theme.Sea,
-                Theme.Sea => Theme.Rust,
-                Theme.Rust => Theme.Candy,
-                Theme.Candy => Theme.Magma,
-                Theme.Magma => Theme.Citrus,
-                _ => Theme.Default,
+            this.UseTheme(this.CurrentApplicationTheme switch {
+                ApplicationTheme.Default => ApplicationTheme.Sea,
+                ApplicationTheme.Citrus => ApplicationTheme.Sea,
+                ApplicationTheme.Sea => ApplicationTheme.Rust,
+                ApplicationTheme.Rust => ApplicationTheme.Candy,
+                ApplicationTheme.Candy => ApplicationTheme.Magma,
+                ApplicationTheme.Magma => ApplicationTheme.Citrus,
+                _ => ApplicationTheme.Default,
             });
         }
 

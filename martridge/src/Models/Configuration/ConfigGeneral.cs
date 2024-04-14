@@ -35,8 +35,8 @@ namespace Martridge.Models.Configuration {
         /// Indicates if the application should enable certain advanced features...
         /// </summary>
         /// <remarks>NOTE: Not really used much right now...</remarks>
-        public bool ShowAdvancedFeatures { get => this._showAdvancedFeatures; }
-        private bool _showAdvancedFeatures = true;
+        public bool ShowDmodDevFeatures { get => this._ShowDmodDevFeatures; }
+        private bool _ShowDmodDevFeatures = true;
 
         /// <summary>
         /// Indicates if the application should show the info/error log window when starting
@@ -163,7 +163,7 @@ namespace Martridge.Models.Configuration {
                     case nameof(this.ThemeName): TryUpdateGeneric(kvp, ref this._themeName); break;
                     case nameof(this.LocalizationName): TryUpdateGeneric(kvp, ref this._localizationName); break;
                     case nameof(this.AutoUpdateInstallerList): TryUpdateGeneric(kvp, ref this._autoUpdateInstallerList); break;
-                    case nameof(this.ShowAdvancedFeatures): TryUpdateGeneric(kvp, ref this._showAdvancedFeatures); break;
+                    case nameof(this.ShowDmodDevFeatures): TryUpdateGeneric(kvp, ref this._ShowDmodDevFeatures); break;
                     case nameof(this.ShowLogWindowOnStartup): TryUpdateGeneric(kvp, ref this._showLogWindowOnStartup); break;
                     case nameof(this.UseRelativePathForSubfolders): TryUpdateGeneric(kvp, ref this._useRelativePathForSubfolders); break;
                     case nameof(this.ActiveGameExeIndex): TryUpdateGeneric(kvp, ref this._activeGameExeIndex); break;
@@ -202,7 +202,7 @@ namespace Martridge.Models.Configuration {
                     ThemeName = this.ThemeName,
                     LocalizationName = this.LocalizationName,
                     AutoUpdateInstallerList = this.AutoUpdateInstallerList,
-                    ShowAdvancedFeatures = this.ShowAdvancedFeatures,
+                    ShowDmodDevFeatures = this.ShowDmodDevFeatures,
                     ShowLogWindowOnStartup = this.ShowLogWindowOnStartup,
                     UseRelativePathForSubfolders = this.UseRelativePathForSubfolders,
                     ActiveGameExeIndex = this.ActiveGameExeIndex,

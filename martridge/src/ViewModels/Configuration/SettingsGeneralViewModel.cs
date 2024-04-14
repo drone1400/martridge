@@ -55,11 +55,11 @@ namespace Martridge.ViewModels.Configuration {
         }
         private bool _autoUpdateInstallerList = false;
         
-        public bool ShowAdvancedFeatures {
-            get => this._showAdvancedFeatures;
-            set => this.RaiseAndSetIfChanged(ref this._showAdvancedFeatures, value);
+        public bool ShowDmodDevFeatures {
+            get => this._ShowDmodDevFeatures;
+            set => this.RaiseAndSetIfChanged(ref this._ShowDmodDevFeatures, value);
         }
-        private bool _showAdvancedFeatures = false;
+        private bool _ShowDmodDevFeatures = false;
 
         public bool ShowLogWindowOnStartup {
             get => this._showLogWindowOnStartup;
@@ -210,7 +210,7 @@ namespace Martridge.ViewModels.Configuration {
             }
             
             this.ShowLogWindowOnStartup = this._cfg.ShowLogWindowOnStartup;
-            this.ShowAdvancedFeatures = this._cfg.ShowAdvancedFeatures;
+            this.ShowDmodDevFeatures = this._cfg.ShowDmodDevFeatures;
             this.UseRelativePathForSubfolders = this._cfg.UseRelativePathForSubfolders;
             this.AutoUpdateInstallerList = this._cfg.AutoUpdateInstallerList;
             this.AdditionalDmodLocationsIndex = -1;
@@ -266,7 +266,7 @@ namespace Martridge.ViewModels.Configuration {
                 [nameof(ConfigGeneral.ThemeName)] = this.ThemeName.ToString(),
                 [nameof(ConfigGeneral.LocalizationName)] = this._savedLocalization ?? "en-US",
                 [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
-                [nameof(ConfigGeneral.ShowAdvancedFeatures)] = this.ShowAdvancedFeatures,
+                [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
                 [nameof(ConfigGeneral.ShowLogWindowOnStartup)] = this.ShowLogWindowOnStartup,
                 [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,
                 [nameof(ConfigGeneral.ActiveGameExeIndex)] = this.ActiveGameExeIndex,

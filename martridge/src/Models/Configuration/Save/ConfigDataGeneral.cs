@@ -28,7 +28,7 @@ namespace Martridge.Models.Configuration.Save {
         /// Indicates if the application should enable certain advanced features...
         /// </summary>
         /// <remarks>NOTE: Not really used much right now...</remarks>
-        public bool? ShowAdvancedFeatures { get; set; }
+        public bool? ShowDmodDevFeatures { get; set; }
         
         /// <summary>
         /// Indicates if the application should show the info/error log window when starting
@@ -76,7 +76,7 @@ namespace Martridge.Models.Configuration.Save {
                 [nameof(ConfigGeneral.ThemeName)] = this.ThemeName,
                 [nameof(ConfigGeneral.LocalizationName)] = this.LocalizationName,
                 [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
-                [nameof(ConfigGeneral.ShowAdvancedFeatures)] = this.ShowAdvancedFeatures,
+                [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
                 [nameof(ConfigGeneral.ShowLogWindowOnStartup)] = this.ShowLogWindowOnStartup,
                 [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,
                 [nameof(ConfigGeneral.ActiveGameExeIndex)] = this.ActiveGameExeIndex,

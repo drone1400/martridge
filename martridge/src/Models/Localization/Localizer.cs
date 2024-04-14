@@ -1,5 +1,4 @@
-﻿using Avalonia;
-using Avalonia.Platform;
+﻿using Avalonia.Platform;
 using Martridge.Trace;
 using Newtonsoft.Json;
 using System;

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using Avalonia.Data;
 using Avalonia.Data.Converters;
 namespace Martridge.ViewModels {
     public class GenericEqualsBoolConverter : IValueConverter{

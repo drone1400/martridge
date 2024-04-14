@@ -4,9 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Avalonia.Controls.Documents;
 using Martridge.Models.Configuration;
-using Martridge.Models.OnlineDmods;
 using Martridge.Trace;
 namespace Martridge.Models.Installer {
     public class DinkInstallerOnlineListHelper {

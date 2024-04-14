@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using Martridge.Models.Configuration;
-using Martridge.Models.Installer;
 namespace Martridge.ViewModels.Installer {
     public class DinkInstallableCategory : ViewModelBase {
         

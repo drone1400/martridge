@@ -6,87 +6,86 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Martridge.Models.Configuration {
-    public class ConfigAlertResults {
-        public event EventHandler? Updated;
-        
-        public AlertResults WinDinkEditLaunchAsAdmin { get; private set; } = AlertResults.None;
-        public AlertResults WinDinkEditCreateSymbolicLink { get; private set; } = AlertResults.None;
+    
+    /// <summary>
+    /// This class was used in a previous version to keep track of remembered results for popup-alert prompts...
+    /// Those are no longer used currently, but I left it here in case it might be useful in the future I suppose?
+    /// </summary>
+    public class ConfigAlertResults : IConfigGeneric {
+        public event EventHandler<ConfigUpdateEventArgs>? Updated;
 
+        private readonly Dictionary<ConfigAlertResultMap, AlertResults> _rememberedResultMap;
+        private readonly Dictionary<ConfigAlertResultMap, string> _propNameMap;
+        private readonly Dictionary<string, ConfigAlertResultMap> _propNameMapReverse;
+
+        public AlertResults Placeholder { get => this._rememberedResultMap[ConfigAlertResultMap.Placeholder]; }
 
         public ConfigAlertResults() {
+            this._rememberedResultMap = new Dictionary<ConfigAlertResultMap, AlertResults>() {
+                [ConfigAlertResultMap.Placeholder] = AlertResults.None,
+            };
 
+            this._propNameMap = new Dictionary<ConfigAlertResultMap, string>() {
+                [ConfigAlertResultMap.Placeholder] = nameof(this.Placeholder),
+            };
+
+            this._propNameMapReverse = new Dictionary<string, ConfigAlertResultMap>();
+            foreach (var kvp in this._propNameMap) {
+                this._propNameMapReverse.Add(kvp.Value, kvp.Key);
+            }
         }
         
-        private void FireUpdatedEvent() {
-            this.Updated?.Invoke(this, EventArgs.Empty);
-        }
-
-        private static bool ListsAreDifferent(List<string> list1, List<string> list2) {
-            if (list1.Count != list2.Count) {
-                return true;
-            }
-            
-            for (int i = 0; i < list1.Count; i++) {
-                if (list1[i] != list2[i]) {
-                    return true;
-                }
-            }
-
-            return false;
+        private void FireUpdatedEvent(List<string> updatedProperties) {
+            this.Updated?.Invoke(this, new ConfigUpdateEventArgs(updatedProperties));
         }
 
         public AlertResults GetResult(ConfigAlertResultMap id) {
-            return id switch {
-                ConfigAlertResultMap.WinDinkEditLaunchAsAdmin => this.WinDinkEditLaunchAsAdmin,
-                ConfigAlertResultMap.WinDinkEditCreateSymbolicLink => this.WinDinkEditCreateSymbolicLink,
-                _ => AlertResults.None,
-            };
+            if (this._rememberedResultMap.TryGetValue(id, out AlertResults result)) return result;
+            return AlertResults.None;
         }
 
         public void SaveResult(ConfigAlertResultMap id, AlertResults result) {
-            bool hasChanges = false;
+            List<string> updatedProperties = new List<string>();
 
-            switch (id) {
-                case ConfigAlertResultMap.WinDinkEditLaunchAsAdmin:
-                    if (this.WinDinkEditLaunchAsAdmin != result) {
-                        this.WinDinkEditLaunchAsAdmin = result;
-                        hasChanges = true;
-                    }
-                    break;
-                case ConfigAlertResultMap.WinDinkEditCreateSymbolicLink:
-                    if (this.WinDinkEditCreateSymbolicLink != result) {
-                        this.WinDinkEditCreateSymbolicLink = result;
-                        hasChanges = true;
-                    }
-                    break;
+            if (this._rememberedResultMap.ContainsKey(id)) {
+                if (this._rememberedResultMap[id] != result) {
+                    this._rememberedResultMap[id] = result;
+                    updatedProperties.Add(this._propNameMap[id]);
+                }
             }
 
-            if (hasChanges) {
-                this.FireUpdatedEvent();
+            if (updatedProperties.Count > 0) {
+                this.FireUpdatedEvent(updatedProperties);
             }
         }
+        
+        public void UpdateProperties(Dictionary<string, object?> newValues) {
+            List<string> updatedProperties = new List<string>();
 
-        public void UpdateFromData(ConfigDataAlertResults data) {
-            bool hasChanges = false;
+            foreach (var kvp in newValues) {
+                if (kvp.Value is string resultStr && Enum.TryParse(resultStr, out AlertResults result)) {
+                    if (this._propNameMapReverse.TryGetValue(kvp.Key, out ConfigAlertResultMap idVal)) {
 
-            if (data.RememberWinDinkEditLaunchAsAdmin != null && 
-                Enum.TryParse(data.RememberWinDinkEditLaunchAsAdmin, true, out AlertResults alertResult) && 
-                this.WinDinkEditLaunchAsAdmin != alertResult ) {
-                this.WinDinkEditLaunchAsAdmin = alertResult;
-                hasChanges = true;
+                        if (this._rememberedResultMap[idVal] != result) {
+                            this._rememberedResultMap[idVal] = result;
+                            updatedProperties.Add(this._propNameMap[idVal]);
+                        }
+                    }
+                }
             }
             
-            if (hasChanges) {
-                this.FireUpdatedEvent();
+            if (updatedProperties.Count > 0) {
+                this.FireUpdatedEvent(updatedProperties);
             }
         }
 
         public ConfigDataAlertResults GetData() {
            
             ConfigDataAlertResults data = new ConfigDataAlertResults()  {
-                RememberWinDinkEditLaunchAsAdmin = this.WinDinkEditLaunchAsAdmin.ToString(),
+                Placeholder = this.Placeholder.ToString(),
             };
 
             return data;

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 namespace Martridge.Models.Configuration.Save {
     
     /// <summary>
@@ -5,7 +6,13 @@ namespace Martridge.Models.Configuration.Save {
     /// </summary>
     public class ConfigDataAlertResults {
 
-        public string? RememberWinDinkEditLaunchAsAdmin { get; set; }
-        public string? RememberWinDinkEditCreateSymbolicLink { get; set; }
+        public string? Placeholder { get; set; }
+
+        public Dictionary<string, object?> GetValues() {
+            return new Dictionary<string, object?>() {
+                // TODO... map property values here...
+                [nameof(ConfigDataAlertResults.Placeholder)] = this.Placeholder,
+            };
+        }
     }
 }

@@ -12,13 +12,15 @@ namespace Martridge.Models.Configuration.Save {
         
         
         public void SaveToFile(string path) {
+            string pathTemp = path + ".temp";
+            
             try {
-                FileInfo fileInfo = new FileInfo(path);
+                FileInfo fileInfo = new FileInfo(pathTemp);
                 if (fileInfo.Directory?.Exists == false) {
                     fileInfo.Directory.Create();
                 }
 
-                using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write))
+                using (FileStream fs = new FileStream(pathTemp, FileMode.Create, FileAccess.Write))
                 using (StreamWriter sw = new StreamWriter(fs)) {
                     sw.Write(JsonConvert.SerializeObject(this, Formatting.Indented));
                     sw.Flush();
@@ -27,11 +29,21 @@ namespace Martridge.Models.Configuration.Save {
                     fs.Close();
                 }
 
+                // if we got here, we successfully saved the data to a temporary path, time to move it to the real path
+                if (File.Exists(pathTemp)) {
+                    File.Move(pathTemp, path, true);
+                }
+
                 MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationSaved"]);
                 MyTrace.Global.WriteMessage(MyTraceCategory.General, $"    \"{path}\"");
             } catch (Exception ex) {
                 MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationSaveFailure"]);
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+
+                // remove temporary file if it was partially created...
+                if (File.Exists(pathTemp)) {
+                    File.Delete(pathTemp);
+                }
             }
         }
 

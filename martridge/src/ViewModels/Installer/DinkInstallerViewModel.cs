@@ -83,6 +83,7 @@ namespace Martridge.ViewModels.Installer {
         }
         private string _installerDestination = "";
         private string _installerDestinationAuto = "";
+        private string _installerDestinationAutoPreviousName = "";
 
         // ------------------------------------------------------------------------------------------
         //      Constructor 
@@ -95,10 +96,21 @@ namespace Martridge.ViewModels.Installer {
         private void DinkInstallerViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
             if (e.PropertyName == nameof(this.SelectedInstallable)) {
                 if (this.SelectedInstallable != null) {
-                    this._installerDestinationAuto = Path.Combine(LocationHelper.AppBaseDirectory,
-                        !string.IsNullOrWhiteSpace(this.SelectedInstallable.InstallerData.DestinationName)
-                            ?   this.SelectedInstallable.InstallerData.DestinationName
-                            :   this.SelectedInstallable.InstallerData.Name );
+                    string name = !string.IsNullOrWhiteSpace(this.SelectedInstallable.InstallerData.DestinationName)
+                        ?   this.SelectedInstallable.InstallerData.DestinationName
+                        :   this.SelectedInstallable.InstallerData.Name;
+
+                    if (string.IsNullOrWhiteSpace(this._installerDestinationAutoPreviousName) == false &&
+                        this._installerDestinationAuto.EndsWith(this._installerDestinationAutoPreviousName)) {
+                        string baseStr = this._installerDestinationAuto.Substring(0, this._installerDestinationAuto.Length-this._installerDestinationAutoPreviousName.Length);
+                        // maintain same base destination
+                        this._installerDestinationAuto = Path.Combine(baseStr, name);
+                    } else {
+                        this._installerDestinationAuto = Path.Combine(LocationHelper.AppBaseDirectory, name);
+                    }
+                    
+                    
+                    this._installerDestinationAutoPreviousName = name;
                     this.InstallerDestination = this._installerDestinationAuto;
                     this.InstallerProgressTitle = this.SelectedInstallable.DisplayName;
                 } else {
@@ -261,10 +273,25 @@ namespace Martridge.ViewModels.Installer {
                 if (result != null) {
                     DirectoryInfo dirInfo = new DirectoryInfo(result);
                     if (dirInfo.Exists && dirInfo.Parent != null) {
-                        this._installerDestinationAuto = Path.Combine(LocationHelper.AppBaseDirectory,
-                            !string.IsNullOrWhiteSpace(this.SelectedInstallable.InstallerData.DestinationName)
-                                ?   this.SelectedInstallable.InstallerData.DestinationName
-                                :   this.SelectedInstallable.InstallerData.Name );
+                        string name = !string.IsNullOrWhiteSpace(this.SelectedInstallable.InstallerData.DestinationName)
+                            ?   this.SelectedInstallable.InstallerData.DestinationName
+                            :   this.SelectedInstallable.InstallerData.Name;
+
+                        if (
+                        // name sameness check depends on platform...
+                        #if PLATF_WINDOWS
+                        dirInfo.Name.ToLowerInvariant() == name.ToLowerInvariant()
+                        #else
+                        dirInfo.Name == name
+                        #endif
+                            ) {
+                            string basePath = dirInfo.FullName.Substring(0, dirInfo.FullName.Length - name.Length);
+                            this._installerDestinationAuto = Path.Combine(basePath, name);
+                        } else {
+                            this._installerDestinationAuto = Path.Combine(dirInfo.FullName, name);
+                        }
+
+                        this._installerDestinationAutoPreviousName = name;
                         this.InstallerDestination = this._installerDestinationAuto;
                     }
                 }

@@ -1,3 +1,6 @@
+--- V0.7.1 ---
+- fixed dink install path issue where path wouldn't change when browsing new destination
+
 --- V0.7.0 ---
 - updated SharpCompress
 - updated Avalonia to V11.0.10

@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using Avalonia.Collections;
 
 namespace Martridge.ViewModels.Dmod {
     public class DmodBrowserViewModel : ViewModelBase {
@@ -52,12 +53,14 @@ namespace Martridge.ViewModels.Dmod {
                     }
                 }
 
-                if (args.PropertyName == nameof(this.DmodOrderBy)) {
-                    this.InitializeFilteredDmods(this._lastusedDmodDefinitions);
-                }
-
                 if (args.PropertyName == nameof(this.ActiveGameExePath)) {
                     this.RefreshIsLauncherFreeDink();
+                }
+
+                if (args.PropertyName == nameof(this.DmodDefinitionsFiltered)) {
+                    var collectionView = new DataGridCollectionView(this.DmodDefinitionsFiltered);
+                    collectionView.GroupDescriptions.Add(new DataGridPathGroupDescription("DmodParentDirectory"));
+                    this.DmodDefinitionsCollection = collectionView;
                 }
             };
         }
@@ -451,23 +454,15 @@ namespace Martridge.ViewModels.Dmod {
             }
         }
         private IEnumerable<DmodDefinition> _dmodDefinitionsFiltered = new List<DmodDefinition>();
+
+        public DataGridCollectionView? DmodDefinitionsCollection {
+            get => this._dmodDefinitionsCollection;
+            set => this.RaiseAndSetIfChanged(ref this._dmodDefinitionsCollection, value);
+        }
+        private DataGridCollectionView? _dmodDefinitionsCollection = null;
         
         public bool DmodDefinitionsFilteredHasItems => this.DmodDefinitionsFiltered.Any();
         private List<DmodDefinition> _lastusedDmodDefinitions = new List<DmodDefinition>();
-
-        public List<DmodOrderBy> DmodOrderByList { get; } = new List<DmodOrderBy>() {
-            DmodOrderBy.NameAsc,
-            DmodOrderBy.NameDesc,
-            DmodOrderBy.PathAsc,
-            DmodOrderBy.PathDesc,
-        };
-
-        public DmodOrderBy DmodOrderBy {
-            get => this._dmodOrderBy;
-            set => this.RaiseAndSetIfChanged(ref this._dmodOrderBy, value);
-        }
-        private DmodOrderBy _dmodOrderBy = DmodOrderBy.NameAsc;
-
 
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Methods
@@ -493,19 +488,13 @@ namespace Martridge.ViewModels.Dmod {
         /// </summary>
         private void InitializeFilteredDmods(List<DmodDefinition> newDmodList) {
             void SetFilteredDmods(IEnumerable<DmodDefinition> dmods) {
-                string oldSelPath = this.SelectedDmodDefinition?.Path ?? "";
-                
-                this.DmodDefinitionsFiltered = this.DmodOrderBy switch {
-                    DmodOrderBy.NameAsc => dmods.OrderBy(x => x.Name),
-                    DmodOrderBy.NameDesc => dmods.OrderByDescending(x => x.Name),
-                    DmodOrderBy.PathAsc => dmods.OrderBy(x => x.Path),
-                    DmodOrderBy.PathDesc => dmods.OrderBy(x => x.Path),
-                    _ => dmods.AsEnumerable(),
-                };
+                string oldSelPath = this.SelectedDmodDefinition?.DmodDirectory ?? "";
+
+                this.DmodDefinitionsFiltered = dmods.AsEnumerable();
 
                 // restore selected dmod!
                 foreach (var def in this.DmodDefinitionsFiltered) {
-                    if (def.Path == oldSelPath) {
+                    if (def.DmodDirectory == oldSelPath) {
                         this.SelectedDmodDefinition = def;
                         break;
                     }
@@ -584,7 +573,7 @@ namespace Martridge.ViewModels.Dmod {
                 if (this.Configuration is not Config cfg) return;
                 if (this.DmodManager is not DmodManager dmodMan) return;
                 if (!this.GameExeFound) return;
-                if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.Path)) return;
+                if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.DmodDirectory)) return;
 
                 string exePath;
                 
@@ -596,7 +585,7 @@ namespace Martridge.ViewModels.Dmod {
                     exePath = this.ActiveGameExePath.Path;
                 }
                 
-                string dmodPath = this.SelectedDmodDefinition.Path;
+                string dmodPath = this.SelectedDmodDefinition.DmodDirectory;
                 
                 this.DmodLauncherWaitingForDelay = true;
                 this.SaveToConfigLauncher(cfg.Launch);
@@ -626,7 +615,7 @@ namespace Martridge.ViewModels.Dmod {
                 if (this.Configuration == null) return false;
                 if (this.DmodManager == null) return false;
                 if (!this.GameExeFound) return false;
-                if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.Path)) return false;
+                if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.DmodDirectory)) return false;
 
                 string exePath;
                 
@@ -637,7 +626,7 @@ namespace Martridge.ViewModels.Dmod {
                     if (string.IsNullOrEmpty(this.ActiveGameExePath?.Path)) return false;
                     exePath = this.ActiveGameExePath.Path;
                 }
-                string dmodPath = this.SelectedDmodDefinition.Path;
+                string dmodPath = this.SelectedDmodDefinition.DmodDirectory;
                 FileInfo finfo = new FileInfo(exePath);
                 DirectoryInfo dinfo = new DirectoryInfo(dmodPath);
                 if (finfo.Exists == false || dinfo.Exists == false) { return false; }

@@ -14,6 +14,7 @@ using Martridge.ViewModels.Installer;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -263,20 +264,54 @@ namespace Martridge.ViewModels {
         public bool CanCmdShowPageDmodPackerAndBrowse(object? parameter = null) {
             return this.ActiveUserPage == MainViewPage.MainView;
         }
+        
+        
+        public void CmdOpenLocation(object? parameter) {
+            if (parameter is not string path) return;
+
+            string targetPath = "";
+
+            if (File.Exists(path)) {
+                // if path is a file, open its directory
+                FileInfo finfo = new FileInfo(path);
+                if (finfo.Exists && finfo.Directory?.Exists == true) {
+                    targetPath = finfo.Directory.FullName;
+                }
+            } else if (Directory.Exists(path)) {
+                targetPath = path;
+            }
+
+            if (string.IsNullOrWhiteSpace(targetPath)) return;
+            
+            // open directory...
+            ProcessStartInfo pinfo = new ProcessStartInfo(targetPath) {
+                UseShellExecute = true,
+                Verb = "open",
+            };
+            Process.Start(pinfo);
+        }
+        public bool CanCmdOpenLocation(object? parameter) {
+            if (parameter is not string path) return false;
+            if (File.Exists(path) || Directory.Exists(path)) return true;
+            return false;
+        }
+
 
         public void CmdShowPageDmodPacker(object? parameter = null) {
-            if (this.ActiveUserPage == MainViewPage.MainView) {
-                if (parameter is string path &&
-                    Directory.Exists(path) && 
-                    new DmodFileDefinition(path).IsCorrectlyDefined) {
-                    this.VmDmodPacker.SelectedDmodSourceDirectory = path;
-                }
+            if (parameter is not string path) return;
+            if (Directory.Exists(path) == false) return;
+            if (this.ActiveUserPage != MainViewPage.MainView) return;
+            
+            if (new DmodFileDefinition(path).IsCorrectlyDefined) {
+                this.VmDmodPacker.SelectedDmodSourceDirectory = path;
                 this.ActiveUserPage = MainViewPage.DmodPacker;
             }
         }
         [DependsOn(nameof(ActiveUserPage))]
         public bool CanCmdShowPageDmodPacker(object? parameter = null) {
-            return this.ActiveUserPage == MainViewPage.MainView;
+            if (parameter is not string path) return false;
+            if (Directory.Exists(path)) return this.ActiveUserPage == MainViewPage.MainView;
+            return false;
         }
 
         public void CmdShowLogWindow(object? parameter = null) {

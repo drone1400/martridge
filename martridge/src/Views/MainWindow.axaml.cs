@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
@@ -8,6 +9,11 @@ namespace Martridge.Views {
     public partial class MainWindow : ReactiveWindow<MainWindowViewModel> {
         public MainWindow() {
             this.InitializeComponent();
+            
+#if DEBUG
+            this.AttachDevTools();
+#endif
+            
             StyleManager.Instance.AddWindow(this);
         }
 

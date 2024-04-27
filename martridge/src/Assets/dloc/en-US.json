@@ -213,6 +213,9 @@
   "DmodBrowser/Search" : "Search",
   "DmodBrowser/NoDmodsFound" : "No DMODs found!",
   "DmodBrowser/OrderBy" : "Order By",
+  "DmodBrowser/DataGrid/ColumnHeader/Thumbnail" : "Thumbnail",
+  "DmodBrowser/DataGrid/ColumnHeader/Name" : "DMOD Name",
+  "DmodBrowser/DataGrid/ColumnHeader/Path" : "Path",
 
   "OnlineDmodBrowser/ReloadDmod" : "Reload DMOD Info",
   "OnlineDmodBrowser/ReloadDmods" : "Reload DMOD List",
@@ -247,6 +250,11 @@
   "OnlineDmodBrowser/OrderBy/AuthorDesc" : "Author (Descending)",
   "OnlineDmodBrowser/OrderBy/PathAsc" : "Path (Ascending)",
   "OnlineDmodBrowser/OrderBy/PathDesc" : "Path (Descending)",
+  "OnlineDmodBrowser/DataGrid/ColumnHeader/Name" : "DMOD Name",
+  "OnlineDmodBrowser/DataGrid/ColumnHeader/Author" : "Author",
+  "OnlineDmodBrowser/DataGrid/ColumnHeader/Score" : "Score",
+  "OnlineDmodBrowser/DataGrid/ColumnHeader/Downloads" : "Downloads",
+  "OnlineDmodBrowser/DataGrid/ColumnHeader/Updated" : "Updated",
   
   "Generic/ButtonDebug": "Debug...",
   "Generic/ButtonBack": "Back",

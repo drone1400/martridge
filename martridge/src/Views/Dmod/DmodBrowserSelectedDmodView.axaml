@@ -41,11 +41,11 @@
                       FallbackValue={StaticResource DataNotAvailable},
                       TargetNullValue={StaticResource DataNotAvailable} }" />
             <TextBlock Grid.Row="1" Classes="Heading2I"
-                       Text="{Binding SelectedDmodDefinition.Path, 
+                       Text="{Binding SelectedDmodDefinition.DmodDirectory, 
                       FallbackValue={StaticResource DataNotAvailable},
                       TargetNullValue={StaticResource DataNotAvailable} }" 
                        TextWrapping="Wrap"
-                       ToolTip.Tip="{Binding SelectedDmodDefinition.Path, 
+                       ToolTip.Tip="{Binding SelectedDmodDefinition.DmodDirectory, 
                       FallbackValue={StaticResource DataNotAvailable},
                       TargetNullValue={StaticResource DataNotAvailable} }"/>
 
@@ -189,15 +189,27 @@
                 </Grid>
             </StackPanel>
       
-            <TextBox Grid.Row="3" 
-                     Text="{Binding SelectedDmodDefinition.Description, 
-                    FallbackValue={StaticResource DataNotAvailable},
-                    TargetNullValue={StaticResource DataNotAvailable}  }" 
-                     HorizontalAlignment="Stretch" 
-                     VerticalAlignment="Stretch"
-                     TextWrapping="Wrap"
-                     ScrollViewer.VerticalScrollBarVisibility="Visible"
-                     IsReadOnly="True"/>
+            <Grid Grid.Row="3"
+                  ColumnDefinitions="Auto, *">
+                
+                <Image Grid.Column="0" 
+                       Source="{Binding SelectedDmodDefinition.Thumbnail}"
+                       Margin="2"
+                       Width="260" Height="NaN"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Stretch="Uniform" />
+                
+                <TextBox Grid.Column="1" 
+                         Text="{Binding SelectedDmodDefinition.Description, 
+                            FallbackValue={StaticResource DataNotAvailable},
+                            TargetNullValue={StaticResource DataNotAvailable}  }" 
+                         HorizontalAlignment="Stretch" 
+                         VerticalAlignment="Stretch"
+                         TextWrapping="Wrap"
+                         ScrollViewer.VerticalScrollBarVisibility="Visible"
+                         IsReadOnly="True"/>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

@@ -1,9 +1,11 @@
+using System;
 using Martridge.Models.OnlineDmods;
 using ReactiveUI;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Martridge.ViewModels.Dmod {
     public class OnlineDmodInfoViewModel : ViewModelBase{
@@ -14,10 +16,12 @@ namespace Martridge.ViewModels.Dmod {
         public OnlineDmodInfo DmodInfo { get;}
 
         public string Name { get => this.DmodInfo.Name; }
-        public string Author { get => this.DmodInfo.Author; }
+        public string Author { get => _author; }
+        private string _author = "";
         public string UrlMain { get => this.DmodInfo.ResMain.Url; }
         public int Downloads { get => this.DmodInfo.Downloads; }
-        public string Updated { get => this.DmodInfo.Updated.ToString("d"); }
+        public string Updated { get => this._updated; }
+        private string _updated;
         
         public double ScoreValue { get => this.DmodInfo.Score; }
         public string Score { get => $"{this.DmodInfo.Score:0.0}"; }
@@ -52,6 +56,9 @@ namespace Martridge.ViewModels.Dmod {
         
         public OnlineDmodInfoViewModel(OnlineDmodInfo dmodInfo) {
             this.DmodInfo = dmodInfo;
+
+            this._author = Regex.Replace(this.DmodInfo.Author, @",\s+", Environment.NewLine);
+            this._updated = this.DmodInfo.Updated.ToString("d");
         }
 
         public void RefreshOnlineData(Dictionary<string, OnlineUserViewModel> cachedUsersViewModels) {

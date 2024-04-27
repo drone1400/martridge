@@ -250,6 +250,11 @@
   "OnlineDmodBrowser/OrderBy/AuthorDesc" : "Author (Descending)",
   "OnlineDmodBrowser/OrderBy/PathAsc" : "Path (Ascending)",
   "OnlineDmodBrowser/OrderBy/PathDesc" : "Path (Descending)",
+  "OnlineDmodBrowser/DataGrid/ColumnHeader/Name" : "DMOD Name",
+  "OnlineDmodBrowser/DataGrid/ColumnHeader/Author" : "Author",
+  "OnlineDmodBrowser/DataGrid/ColumnHeader/Score" : "Score",
+  "OnlineDmodBrowser/DataGrid/ColumnHeader/Downloads" : "Downloads",
+  "OnlineDmodBrowser/DataGrid/ColumnHeader/Updated" : "Updated",
   
   "Generic/ButtonDebug": "Debug...",
   "Generic/ButtonBack": "Back",

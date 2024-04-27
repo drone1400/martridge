@@ -52,10 +52,6 @@ namespace Martridge.ViewModels.Dmod {
                     }
                 }
 
-                if (args.PropertyName == nameof(this.DmodOrderBy)) {
-                    this.InitializeFilteredDmods();
-                }
-
                 if (args.PropertyName == nameof(this.SelectedDmodDefinition)) {
                     this.SelectedDmodDefinitionInitialize(false);
                 }
@@ -126,26 +122,6 @@ namespace Martridge.ViewModels.Dmod {
             get => this.DmodDefinitionsFiltered.Count > 0;
         }
         
-        public ObservableCollection<DmodOrderBy> DmodOrderByList { get => this._dmodOrderByList; }
-        private ObservableCollection<DmodOrderBy> _dmodOrderByList = new ObservableCollection<DmodOrderBy>() {
-            DmodOrderBy.NameAsc,
-            DmodOrderBy.NameDesc,
-            DmodOrderBy.ScoreAsc,
-            DmodOrderBy.ScoreDesc,
-            DmodOrderBy.DownloadsAsc,
-            DmodOrderBy.DownloadsDesc,
-            DmodOrderBy.UpdatedAsc,
-            DmodOrderBy.UpdatedDesc,
-            DmodOrderBy.AuthorAsc,
-            DmodOrderBy.AuthorDesc,
-        };
-
-        public DmodOrderBy DmodOrderBy {
-            get => this._dmodOrderBy;
-            set => this.RaiseAndSetIfChanged(ref this._dmodOrderBy, value);
-        }
-        private DmodOrderBy _dmodOrderBy = DmodOrderBy.UpdatedDesc;
-        
         
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Methods
@@ -180,7 +156,8 @@ namespace Martridge.ViewModels.Dmod {
         private void InitializeFilteredDmods() {
             if (this.DmodSearchString == null) {
                 // use all definitions
-                this.InitializeOrderedFilteredDmods(this.DmodDefinitions);
+                this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(this.DmodDefinitions);
+                this.RaisePropertyChanged(nameof(this.DmodDefinitionsFilteredHasItems));
             } else if (this.DmodSearchString.Length >= 2) {
                 string searchStr = this.DmodSearchString.ToLowerInvariant();
                 
@@ -190,76 +167,9 @@ namespace Martridge.ViewModels.Dmod {
                     definition.Author.ToLowerInvariant().Contains(searchStr) );
                 
                 // filter definitions
-                this.InitializeOrderedFilteredDmods(filtered);
+                this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(filtered);
+                this.RaisePropertyChanged(nameof(this.DmodDefinitionsFilteredHasItems));
             }
-        }
-        
-        /// <summary>
-        /// Initializess the Filtered Dmods and orders them according to <see cref="DmodOrderBy"/>
-        /// </summary>
-        /// <param name="dmods">The dmod info to load into the filtered list, is an <see cref="IEnumerable{T}"/> containing <see cref="OnlineDmodInfoViewModel"/></param>
-        private void InitializeOrderedFilteredDmods(IEnumerable<OnlineDmodInfoViewModel> dmods) {
-            switch (this.DmodOrderBy) {
-                default: 
-                    this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(dmods);
-                    break;
-                
-                case DmodOrderBy.NameAsc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(
-                        dmods.OrderBy(x => x.Name));
-                    break;
-                case DmodOrderBy.NameDesc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(
-                        dmods.OrderByDescending(x => x.Name));
-                    break;
-                
-                case DmodOrderBy.ScoreAsc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(
-                        dmods.OrderBy(x => x.DmodInfo.Score));
-                    break;
-                case DmodOrderBy.ScoreDesc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(
-                        dmods.OrderByDescending(x => x.DmodInfo.Score));
-                    break;
-                
-                case DmodOrderBy.DownloadsAsc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(
-                        dmods.OrderBy(x => x.Downloads));
-                    break;
-                case DmodOrderBy.DownloadsDesc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(
-                        dmods.OrderByDescending(x => x.Downloads));
-                    break;
-                
-                case DmodOrderBy.AuthorAsc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(
-                        dmods.OrderBy(x => x.Author));
-                    break;
-                case DmodOrderBy.AuthorDesc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(
-                        dmods.OrderByDescending(x => x.Author));
-                    break;
-                
-                case DmodOrderBy.UpdatedAsc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(
-                        dmods.OrderBy(x => x.DmodInfo.Updated));
-                    break;
-                case DmodOrderBy.UpdatedDesc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(
-                        dmods.OrderByDescending(x => x.DmodInfo.Updated));
-                    break;
-                case DmodOrderBy.PathAsc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(
-                        dmods.OrderBy(x => x.DmodInfo.ResMain.Url));
-                    break;
-                case DmodOrderBy.PathDesc:
-                    this.DmodDefinitionsFiltered = new ObservableCollection<OnlineDmodInfoViewModel>(
-                        dmods.OrderBy(x => x.DmodInfo.ResMain.Url));
-                    break;
-            }
-            
-            this.RaisePropertyChanged(nameof(this.DmodDefinitionsFilteredHasItems));
-            this.SelectedDmodDefinition = null;
         }
 
         #endregion

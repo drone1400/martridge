@@ -1,3 +1,10 @@
+--- V0.8.0 ---
+- redesigned DMOD / Online DMOD Browsers UIs
+- DMOD Browser now groups DMODs by base path
+
+--- V0.7.2 ---
+- no longer sending "-skip" argument to YeOldeDink
+
 --- V0.7.1 ---
 - fixed dink install path issue where path wouldn't change when browsing new destination
 

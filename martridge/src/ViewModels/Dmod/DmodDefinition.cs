@@ -5,6 +5,7 @@ using Martridge.Models.Localization;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace Martridge.ViewModels.Dmod {
 
@@ -14,7 +15,8 @@ namespace Martridge.ViewModels.Dmod {
         public List<DmodLocalizationDefinition> Localizations { get; private set; } = new List<DmodLocalizationDefinition>();
         public string? Description { get; private set; }
         public string? Name { get; private set; }
-        public string? Path { get; private set; }
+        public string? DmodParentDirectory { get; private set; }
+        public string? DmodDirectory { get; private set; }
         public Bitmap? Thumbnail { get; private set; }
 
         public DmodDefinition(DmodFileDefinition fileDef) {
@@ -22,7 +24,14 @@ namespace Martridge.ViewModels.Dmod {
 
             this.Description = this.Files.GetDescription();
             this.Name = this.Files.GetName();
-            this.Path = this.Files.DmodRoot.FullName;
+            this.DmodDirectory = this.Files.DmodRoot.FullName;
+            if (this.Files.DmodRoot.Parent != null) {
+                this.DmodParentDirectory = this.Files.DmodRoot.Parent.FullName;
+            } else {
+                string dirPath = this.Files.DmodRoot.FullName;
+                string dirName = this.Files.DmodRoot.Name;
+                this.DmodParentDirectory = dirPath.Substring(0, dirPath.Length - dirName.Length);
+            }
             this.Thumbnail = this.Files.GetThumbnail();
 
             this.InitializeLocalizations();
@@ -50,41 +59,5 @@ namespace Martridge.ViewModels.Dmod {
         public override string ToString() {
             return $"{this.Name} [{this.Files.DmodRoot.FullName}]";
         }
-
-        public void CmdOpenLocation(object? parameter) {
-            if (this.Path == null) {
-                return;
-            }
-            
-            string dirPath = "";
-            
-            // if path is a file, open its directory
-            FileInfo finfo = new FileInfo(this.Path);
-            if (finfo.Exists && finfo.Directory?.Exists == true) {
-                dirPath = finfo.Directory.FullName;
-            }
-            
-            // if path is a directory, open it
-            DirectoryInfo dinfo = new DirectoryInfo(this.Path);
-            if (dinfo.Exists) {
-                dirPath = dinfo.FullName;
-            }
-
-            if (dirPath == "") {
-                return;
-            }
-            
-            ProcessStartInfo pinfo = new ProcessStartInfo(dirPath) {
-                UseShellExecute = true,
-                Verb = "open",
-            };
-            Process.Start(pinfo);
-        }
-
-        public bool CanCmdOpenLocation(object? parameter) {
-            if (Directory.Exists(this.Path)) return true;
-            return false;
-        }
-
     }
 }

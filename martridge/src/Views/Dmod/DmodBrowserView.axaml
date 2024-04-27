@@ -21,18 +21,21 @@
     
     <vw:MagicSplitPresenterView 
         Name="MagicSplit"
-        Margin="8"
+        Margin="0"
         LeftPanelMinWidth="450"
         RightPanelMinWidth="540"
         IsOnePageShowingRightContent="{Binding SelectedDmodDefinition, 
                 Converter={StaticResource ConverterIsNotNullCheck}}" >
             
         <vw:MagicSplitPresenterView.LeftPanelContent>
-            <vw:DmodBrowserDmodListView DataContext="{Binding }"/>
+            <vw:DmodBrowserDmodListView 
+                DataContext="{Binding }"
+                Margin="0,6"/>
         </vw:MagicSplitPresenterView.LeftPanelContent>
             
         <vw:MagicSplitPresenterView.RightPanelContent>
-            <Grid RowDefinitions="Auto, *">
+            <Grid RowDefinitions="Auto, *"
+                  Margin="6">
                 <Button Grid.Row="0"
                         IsVisible="{Binding IsViewOnePageMode, ElementName=MagicSplit}"
                         HorizontalAlignment="Stretch"

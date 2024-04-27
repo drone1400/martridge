@@ -213,6 +213,9 @@
   "DmodBrowser/Search" : "Search",
   "DmodBrowser/NoDmodsFound" : "No DMODs found!",
   "DmodBrowser/OrderBy" : "Order By",
+  "DmodBrowser/DataGrid/ColumnHeader/Thumbnail" : "Thumbnail",
+  "DmodBrowser/DataGrid/ColumnHeader/Name" : "DMOD Name",
+  "DmodBrowser/DataGrid/ColumnHeader/Path" : "Path",
 
   "OnlineDmodBrowser/ReloadDmod" : "Reload DMOD Info",
   "OnlineDmodBrowser/ReloadDmods" : "Reload DMOD List",

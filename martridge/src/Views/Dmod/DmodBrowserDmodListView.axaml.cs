@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 

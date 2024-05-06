@@ -15,6 +15,7 @@
     </UserControl.Styles>
     <UserControl.Resources>
         <vm:DmodScoreToSolidColorBrushConverter x:Key="DmodScoreToSolidColorBrushConverter"/>
+        <vm:GenericDateConverter x:Key="GenericDateConverter"/>
     </UserControl.Resources>
     
     <Grid RowDefinitions="Auto,Auto,*">
@@ -98,7 +99,7 @@
                                 <TextBlock Classes="Heading2I"
                                            HorizontalAlignment="Center"
                                            Foreground="Black"
-                                           Text="{Binding Score}"/>
+                                           Text="{Binding Score, Mode=OneWay}"/>
                             </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -106,22 +107,22 @@
                 <DataGridTextColumn 
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Name}"
                     Width="*"
-                    Binding="{Binding Name}"
+                    Binding="{Binding Name, Mode=OneWay}"
                     x:DataType="vm:OnlineDmodInfoViewModel"/>
                 <DataGridTextColumn 
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Author}"
                     Width="140"
-                    Binding="{Binding Author}"
+                    Binding="{Binding Author, Mode=OneWay}"
                     x:DataType="vm:OnlineDmodInfoViewModel"/>
                 <DataGridTextColumn 
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Updated}"
                     Width="100"
-                    Binding="{Binding Updated}"
+                    Binding="{Binding Updated, Converter={StaticResource GenericDateConverter}, Mode=OneWay}"
                     x:DataType="vm:OnlineDmodInfoViewModel"/>
                 <DataGridTextColumn 
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Downloads}"
                     Width="120"
-                    Binding="{Binding Downloads}"
+                    Binding="{Binding Downloads, Mode=OneWay}"
                     x:DataType="vm:OnlineDmodInfoViewModel"/>
             </DataGrid.Columns>
         </DataGrid>

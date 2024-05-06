@@ -20,8 +20,8 @@ namespace Martridge.ViewModels.Dmod {
         private string _author = "";
         public string UrlMain { get => this.DmodInfo.ResMain.Url; }
         public int Downloads { get => this.DmodInfo.Downloads; }
-        public string Updated { get => this._updated; }
-        private string _updated;
+        public DateTime Updated { get => this._updated; }
+        private DateTime _updated;
         
         public double ScoreValue { get => this.DmodInfo.Score; }
         public string Score { get => $"{this.DmodInfo.Score:0.0}"; }
@@ -58,7 +58,7 @@ namespace Martridge.ViewModels.Dmod {
             this.DmodInfo = dmodInfo;
 
             this._author = Regex.Replace(this.DmodInfo.Author, @",\s+", Environment.NewLine);
-            this._updated = this.DmodInfo.Updated.ToString("d");
+            this._updated = this.DmodInfo.Updated;
         }
 
         public void RefreshOnlineData(Dictionary<string, OnlineUserViewModel> cachedUsersViewModels) {

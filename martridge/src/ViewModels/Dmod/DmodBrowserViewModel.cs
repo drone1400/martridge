@@ -5,8 +5,10 @@ using Martridge.Models.Dmod;
 using Martridge.Trace;
 using ReactiveUI;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +16,17 @@ using System.Timers;
 using Avalonia.Collections;
 
 namespace Martridge.ViewModels.Dmod {
+    
+    public class MyDmodComparer : IComparer {
+        public int Compare(object? x, object? y) {
+            if (x is DmodDefinition x1 && y is DmodDefinition y1)
+            {
+                return String.CompareOrdinal(x1.DmodParentDirectory, y1.DmodParentDirectory);
+            }
+            return 0;
+        }
+    }
+    
     public class DmodBrowserViewModel : ViewModelBase {
 
         #region  CONSTRUCTOR / Initialization
@@ -60,6 +73,7 @@ namespace Martridge.ViewModels.Dmod {
                 if (args.PropertyName == nameof(this.DmodDefinitionsFiltered)) {
                     var collectionView = new DataGridCollectionView(this.DmodDefinitionsFiltered);
                     collectionView.GroupDescriptions.Add(new DataGridPathGroupDescription("DmodParentDirectory"));
+                    collectionView.SortDescriptions.Add(new DataGridComparerSortDescription(new MyDmodComparer(), ListSortDirection.Ascending));
                     this.DmodDefinitionsCollection = collectionView;
                 }
             };

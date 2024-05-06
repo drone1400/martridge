@@ -1,3 +1,8 @@
+--- V0.8.1 ---
+- fixed sort by date in Online DMOD Browser
+- fixed wrong color for DMOD list headers
+- fixed DMOD browser group by path order
+
 --- V0.8.0 ---
 - redesigned DMOD / Online DMOD Browsers UIs
 - DMOD Browser now groups DMODs by base path

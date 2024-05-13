@@ -1,3 +1,6 @@
+--- V0.8.2.1 ---
+- updated SharpCompress submodule
+
 --- V0.8.2 ---
 - DMODs now packed using TAR archive in USTAR format for compatibility with older DinkHD versions
 - fixed some text in DMOD packer GUI

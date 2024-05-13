@@ -15,7 +15,7 @@
 
     <PropertyGroup>
         <IsLinux Condition="'$(RuntimeIdentifier)' == 'linux-x64'">true</IsLinux>
-        <IsMacOs Condition="'$(RuntimeIdentifier)' == 'osx-x64'">true</IsMacOs>
+        <IsMacOs Condition="'$(RuntimeIdentifier)' == 'osx-x64' or '$(RuntimeIdentifier)' == 'osx-arm64' ">true</IsMacOs>
         <IsWindows Condition="'$(IsLinux)' != 'true' and '$(IsMacOs)' != 'true'">true</IsWindows>
     </PropertyGroup>
 

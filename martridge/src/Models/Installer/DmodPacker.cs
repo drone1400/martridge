@@ -220,7 +220,7 @@ namespace Martridge.Models.Installer {
             });
             
             using (FileStream fs = new FileStream(tempTarFile, FileMode.Create, FileAccess.Write))
-            using (var writer = new TarWriter(fs, new TarWriterOptions(CompressionType.None, true))) {
+            using (var writer = new TarWriter(fs, new TarWriterOptions(CompressionType.None, true, TarHeaderWriteFormat.Ustar))) {
                 for (int index = 0; index < fileList.Count; index++) {
                     if (this.CancelTokenSource.IsCancellationRequested) {
                         throw new DinkInstallerCancelledByUserException();

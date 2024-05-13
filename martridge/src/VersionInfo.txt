@@ -1,3 +1,7 @@
+--- V0.8.2 ---
+- DMODs now packed using TAR archive in USTAR format for compatibility with older DinkHD versions
+- fixed some text in DMOD packer GUI
+
 --- V0.8.1 ---
 - fixed sort by date in Online DMOD Browser
 - fixed wrong color for DMOD list headers

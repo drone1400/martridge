@@ -73,6 +73,8 @@
   "DinkInstallerView/HeadingNotSupportedDetails": "Automated Dink Installer is only available on Windows right now.\n\r Visit the link below and follow the instructions for your distribution to install FreeDink.\n\r\n\rhttps://www.gnu.org/software/freedink/get-distros",
   "DinkInstallerView/DmodInstallSettingsTitle": "Install DMOD",
   "DinkInstallerView/DmodPackSettingsTitle": "Pack DMOD",
+  "DinkInstallerView/DmodPackStart": "Pack DMOD",
+  "DinkInstallerView/DmodPackDestination": "Packed DMOD destination:",
   "DinkInstallerView/ExtractDmodMemory": "Use temporary memory buffer instead of temporary file (uses a lot of memory)",
   "DinkInstallerView/ExtractDmodMemory_Tooltip": "Temporarily extracts the dmod to memory instead of using a file. This is technically faster but can use hundreds of MB of memory!",
   "DinkInstallerView/SelectDmod": "Selected DMOD package:",

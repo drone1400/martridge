@@ -38,7 +38,7 @@
 
         <Grid Grid.Row="5" ColumnDefinitions="*,Auto">
             <TextBlock Grid.Column="0" Classes="Heading2B"
-                       Text="{dloc:Localize DinkInstallerView/SelectDmodDestination}"/>
+                       Text="{dloc:Localize DinkInstallerView/DmodPackDestination}"/>
             <Button   Grid.Row="0" Grid.Column="1"
                       Content="{dloc:Localize Generic/ButtonBrowse}"
                       Command="{Binding CmdBrowseDmodDestination}"/>

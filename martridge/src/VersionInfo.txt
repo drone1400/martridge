@@ -1,3 +1,6 @@
+--- V0.8.2.2 ---
+- fixed some text in the DMOD packer GUI that I forgot before
+
 --- V0.8.2.1 ---
 - updated SharpCompress submodule
 

@@ -33,7 +33,7 @@ namespace Martridge.Models.Installer {
                     // log start of installation
                     this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                         "",
-                        Localizer.Instance[@"DinkInstaller/StartInstalling"],
+                        Localizer.Instance[@"DinkInstaller/StartPacking"],
                         $"    \"{sourceDirectory.FullName}\"",
                         $"    \"{destinationFile.FullName}\"",
                     });
@@ -46,17 +46,17 @@ namespace Martridge.Models.Installer {
                     cancelled = true;
 
                     this.ReportProgress(InstallerReportLevel.Primary,
-                        Localizer.Instance[@"DinkInstaller/Heading/CancelledByUser"],
+                        Localizer.Instance[@"DinkInstaller/HeadingPacking/CancelledByUser"],
                         "",
                         this.ProgPhaseCurrent++ / this.ProgPhaseTotal);
                     this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                        Localizer.Instance[@"DinkInstaller/Heading/CancelledByUser"],
+                        Localizer.Instance[@"DinkInstaller/HeadingPacking/CancelledByUser"],
                     }, MyTraceLevel.Warning);
                 } catch (Exception ex) {
                     exception = ex;
 
                     this.ReportProgress(InstallerReportLevel.Primary,
-                        Localizer.Instance[@"DinkInstaller/Heading/ErrorOccured"],
+                        Localizer.Instance[@"DinkInstaller/HeadingPacking/ErrorOccured"],
                         "",
                         1.0);
 
@@ -70,19 +70,19 @@ namespace Martridge.Models.Installer {
                     if (cancelled == false && exception == null) {
                         result = DinkInstallerResult.Success;
                         this.ReportProgress(InstallerReportLevel.Primary,
-                            Localizer.Instance[@"DinkInstaller/Heading/AllDone"],
+                            Localizer.Instance[@"DinkInstaller/HeadingPacking/AllDone"],
                             "",
                             1.0);
                     } else if (cancelled) {
                         result = DinkInstallerResult.Cancelled;
                         this.ReportProgress(InstallerReportLevel.Primary,
-                            Localizer.Instance[@"DinkInstaller/Heading/CancelledByUser"],
+                            Localizer.Instance[@"DinkInstaller/HeadingPacking/CancelledByUser"],
                             "",
                             1.0);
                     } else {
                         result = DinkInstallerResult.Error;
                         this.ReportProgress(InstallerReportLevel.Primary,
-                            Localizer.Instance[@"DinkInstaller/Heading/ErrorOccured"],
+                            Localizer.Instance[@"DinkInstaller/HeadingPacking/ErrorOccured"],
                             "",
                             1.0);
                     }
@@ -168,7 +168,7 @@ namespace Martridge.Models.Installer {
             DirectoryInfo sourceDirectory) {
             
             this.ReportProgress(InstallerReportLevel.Primary,
-                Localizer.Instance[@"DinkInstaller/Heading/PackingDmod"],
+                Localizer.Instance[@"DinkInstaller/HeadingPacking/PackingDmod"],
                 destinationFile.FullName,
                 this.ProgPhaseCurrent++/this.ProgPhaseTotal);
             this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {

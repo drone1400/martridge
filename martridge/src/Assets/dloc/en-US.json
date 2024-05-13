@@ -1,5 +1,6 @@
 {
   "DinkInstaller/StartInstalling": "Starting installation...",
+  "DinkInstaller/StartPacking": "Starting to pack...",
   "DinkInstaller/NotSupportedInBuild": "Dink Installer is not supported in this build...",
 
   "DinkInstaller/Heading/Preparing": "Preparing...",
@@ -7,11 +8,15 @@
   "DinkInstaller/Heading/Installing": "Installing files",
   "DinkInstaller/Heading/Temporary": "Extracting to temporary location...",
   "DinkInstaller/Heading/InstallingDmod": "Installing DMOD",
-  "DinkInstaller/Heading/PackingDmod": "Installing DMOD",
   "DinkInstaller/Heading/Cleanup": "Cleaning up",
   "DinkInstaller/Heading/CancelledByUser": "Installation aborted by user!...",
   "DinkInstaller/Heading/ErrorOccured": "Installation interrupted by error!...",
   "DinkInstaller/Heading/AllDone": "Installation complete!",
+
+  "DinkInstaller/HeadingPacking/PackingDmod": "Packing DMOD",
+  "DinkInstaller/HeadingPacking/CancelledByUser": "Packing aborted by user!...",
+  "DinkInstaller/HeadingPacking/ErrorOccured": "Packing interrupted by error!...",
+  "DinkInstaller/HeadingPacking/AllDone": "Packing complete!",
 
   "DinkInstaller/Preparing/DestinationErrorIsRoot": "Destination can not be a root path!",
   "DinkInstaller/Preparing/DestinationErrorIsNotRooted": "Destination can not be a relative path",

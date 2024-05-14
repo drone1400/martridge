@@ -1,4 +1,4 @@
-#Martridge - The DMOD Wizard
+# Martridge - The DMOD Wizard
 ## What is this?
 Ever heard of Dink Smallwood? Well, now you have! If you have no idea what I'm talking about, just head over to [The Dink Network](https://www.dinknetwork.com/forum.cgi) for more info about Dink!
 

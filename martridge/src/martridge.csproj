@@ -77,14 +77,18 @@
     </ItemGroup>
 
     <Target Name="Copy7zipLibs" AfterTargets="Publish" Condition="'$(IsWindows)'=='true'">
-        <!-- for some reason the x86 binary from the SevenZipExtractor nuget package doesn't get included in the published exe... -->
-        <!-- copy it manually here after publishing... -->
-        <Copy Condition="'$(Platform)' == 'x86'" SourceFiles="$(ProjectDir)\lib\7zip\x86\7z.dll" DestinationFiles="$(PublishDir)\x86\7z.dll" />
+        <!-- currently it seems the 7zip libs don't get automagically included in the published single file, so we need to copy them to the published directory-->
         
-        <!-- x64 binary from nuget package seems to get included in published single file automagically.. no need to copy it.. -->
-<!--        <Copy Condition="'$(Platform)' == 'x64'"-->
-<!--              SourceFiles="$(ProjectDir)\lib\7zip\x64\7z.dll"-->
-<!--              DestinationFiles="$(PublishDir)\x64\7z.dll"/>-->
+        <!-- before, i used to not copy the x64 version because i assumed it was automagically included, but that was not the case, the 7zip wrapper was just defaulting
+            to my 7zip install in program files! not good since users might not have 7zip installed at all! -->
+        
+        <Copy Condition="'$(Platform)' == 'x86'" 
+              SourceFiles="$(ProjectDir)\lib\7zip\x86\7z.dll" 
+              DestinationFiles="$(PublishDir)\x86\7z.dll" />
+        
+        <Copy Condition="'$(Platform)' == 'x64'"
+              SourceFiles="$(ProjectDir)\lib\7zip\x64\7z.dll"
+              DestinationFiles="$(PublishDir)\x64\7z.dll"/>
         
         <!-- copy license file too.. i think i was supposed to do this before as well but didn't notice?... oops! -->
         <Copy SourceFiles="$(ProjectDir)\lib\7zip\7ZipLicense.txt" DestinationFiles="$(PublishDir)\7ZipLicense.txt" />

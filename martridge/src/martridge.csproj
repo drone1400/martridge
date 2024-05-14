@@ -90,12 +90,6 @@
         <Copy SourceFiles="$(ProjectDir)\lib\7zip\7ZipLicense.txt" DestinationFiles="$(PublishDir)\7ZipLicense.txt" />
     </Target>
 
-    <!-- old versions that are no longer included in the project...-->
-    <ItemGroup>
-        <Compile Remove="Views\Dmod\SplitListPresenterListShowConverter.cs" />
-        <Compile Remove="Views\Dmod\SplitListPresenterSelectedShowConverter.cs" />
-    </ItemGroup>
-
     <ItemGroup>
         <Folder Include="Assets\graphics" />
     </ItemGroup>

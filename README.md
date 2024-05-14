@@ -6,6 +6,8 @@ Anyway, this Dink game has a ton of community content in the form of custom stor
 
 This application is a DMOD manager/launcher for Dink Smallwood.
 
+![](doc/images/screenshot_dmodbrowser_ex01.png)
+
 ## What can it do?
 - Runs on Windows and Linux using .NET [1]
 - Automagically install a number of versions of the Dink engine and editors on Windows [2]

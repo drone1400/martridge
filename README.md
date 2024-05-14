@@ -8,23 +8,24 @@ This application is a DMOD manager/launcher for Dink Smallwood.
 
 ## What can it do?
 - Runs on Windows and Linux using .NET [1]
-- Automagically install a number of versions of the Dink engine on Windows
-- Select from multiple user configurable Dink engine versions to launch a DMOD with [2]
-- Detect DMODs already installed in multiple user configurable locations
-- Is localizable using .json files [3] 
+- Automagically install a number of versions of the Dink engine and editors on Windows [2]
+- Select from multiple user configurable Dink engine or editor versions to launch a DMOD with [3]
+- Lets you manage DMODs already installed in multiple user configurable locations
+- Is localizable using .json files [4] 
 - Supports DMOD localization, only when using FreeDink
 - Features an online DMOD browser that parses HTML data from the Dink Network, so you can browse and install dmods with just a click or two
 
 ### Notes
 1. The application uses [AvaloniaUI](https://avaloniaui.net/) for its GUI Framework
 
+2. The config file defining installable Dink engines and editors is now pulled from here: [https://github.com/drone1400/martridge-cfg-install](https://github.com/drone1400/martridge-cfg-install)
 
-2. The following versions can be installed under windows:
+3. The following versions can be installed under windows:
 - FreeDink - considered the best way to play Dink by the community
 - DinkHD - the current official release of Dink, available on multiple platforms like Android or MacOS but unfortunately not on Linux systems
 - The original Dink Smallwood V1.08 - the decade old original release, still runs under Windows, although you probably don't wnat to use this anymore...
 
-3. Application Localization is WIP - Technically works but only english is available right now, I need to add more info about how to define the localization files using a template later...
+4. Application Localization is WIP - Technically works but only english is available right now, I need to add more info about how to define the localization files using a template later...
 
 ## Building
 Assuming that you're somewhat familiar with dotnet applications...
@@ -33,14 +34,11 @@ Assuming that you're somewhat familiar with dotnet applications...
 ```git submodule update --init --recursive```
 3. Publish the project to folder using dotnet
 
-Here are my dotnet publish commandline options:
-- Windows x64 using NetCore 3.1 ```dotnet publish ./martridge/src/martridge.csproj --output ./publish/netcoreapp3.1_win-x64/martridge/ --configuration Release --framework netcoreapp3.1 --self-contained true --runtime win-x64 -p:PublishSingleFile=true```
-- Windows x86 using NetCore 3.1 ```dotnet publish ./martridge/src/martridge.csproj --output ./publish/netcoreapp3.1_win-x86/martridge/ --configuration Release --framework netcoreapp3.1 --self-contained true --runtime win-x86 -p:PublishSingleFile=true```
-- Windows x64 using Net 6.0 ```dotnet publish ./martridge/src/martridge.csproj --output ./publish/net6.0_win-x64/martridge/ --configuration Release --framework net6.0 --self-contained true --runtime win-x64 -p:PublishSingleFile=true```
-- Linux x64 using Net 6.0 ```dotnet publish ./martridge/src/martridge.csproj --output ./publish/net6.0_linux-x64/martridge/ --configuration Release --framework net6.0 --self-contained true --runtime linux-x64 -p:PublishSingleFile=true```
+NOTE: you can run the included `build-everything.ps1` file to publish to folder the following configurations: `win-x86`, `win-x64`, `linux-x64`, `osx-x64`, `osx-arm64`.
+Alternatively, you can just manually pick one of the included publish configurations to use.
+The `build-everything-readytorun.ps1` script does the same thing but publishes using the "ready to run" feature, which makes the application start up slightly faster at the expense of a bigger file size.
 
-If you are using JetBrains Rider, you should be able to use the run profiles included in the source.
-If you are using Visual Studio, you should be able to create your own publish profile based on the run profiles and the information above.
+Here is an example publish command for win-x64: ```dotnet publish ./martridge/src/martridge.csproj --output ./publish/net8.0_win-x64/martridge/ --configuration Release -p:Platform="x64" --framework net8.0 --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true```
 
 ## Overview
 
@@ -75,18 +73,24 @@ The settings interface looks like this:
 
 These can also be manually edited in "config/config.json"
 
-- Show App Log Window on startup: exactly as it says, the log window should display any errors or warnings that occur, this is mostly for debugging purposes
-- Show advanced features: (WIP) this currently doesn't do anything
+- Show App Log Window on startup: enabled by default, does exactly as it says, the log window should display any errors or warnings that occur, this is mostly for debugging purposes
+- Show DMOD developer features: enabled by default, shows DMOD dev features such as the launch editor button and pack DMOD commands, disable this if you don't care about them
 - Try to use relative paths in config files: this will store all subfolders in the config.json file as relative to the application root, helps if you want the application to be portable to another computer
 - Application Language: self explanatory, however only english is available right now (WIP)
+- Auto update existing configInstallerList.json: leftover from previous version, currently doesn't do anything
 - Default DMOD location: this is the main location where the application should install dmods (although it lets you choose others during DMOD installation too...)
 - Additional DMOD locations: the application can look in these directories for installed dmods
 - Game locations: Dink engine executables used to launch the game, you can even have different versions of the same engine if you so desire
+- Editor locations: Dink editor executables used to edit DMODs
 
 ### DMOD Browser
 The DMOD browser looks like this:
 ![](doc/images/screenshot_dmodbrowser_ex01.png)
 On the left you have a list of DMODS that were found. On the right you have the currently selected DMOD info. In the top left above the list, you can hit the refresh button to scan the directories for DMODS again or use the Search input box to filter the DMODS if you have too many.
+
+DMODs get grouped by their root install directories.
+
+You can click the "DMOD Name" header to toggle sorting DMODs by name in ascending or descending orders.
 
 In the DMOD info, you can select which Game Engine to use to launch the game (if you have more than one configured in Settings).
 You have the usual launch options as in DFArc, and below the launch button you have the FreeDink localization selection. Obviously, this only works if the selected DMOD has localization files in the first place, and you are using FreeDink.
@@ -102,12 +106,9 @@ You can view DMOD reviews, screenshots and all the released versions straight fr
 
 
 ## TODO...
-The application is mostly complete and functional, but there are still things left to do:
-- Bug hunting and fixing
-- User suggestions
-- GUI improvements?
-- Make online DMOD browser automagically refresh without spamming the Dink Network website
-- Figure out a way to automagically install FeeDink under Linux
-- Build and test how this runs under MacOS (Currently don't have a macbook to do this though)
-- Figure out commandline dotnet stuff so I can explain how you build this on linux yourself (I'm using JetBrains Rider myself right now)
-- Figure out GitHub actions and releases and see if I can automate building/publishing the application?...
+There are still some things I'd like to do before a proper V1.0 release:
+- Write a proper documentation static website for it using Material for MkDocs
+- Improve the Dink Installer feature so you can choose where to source the `configInstallerList.json` file from (currently it is hardcoded to get the latest version from https://github.com/drone1400/martridge-cfg-install)
+- Add proper SteamDeck support (currently certain controls like combo-boxes and message boxes don't render with the deck in game mode plus some other issues...)
+- Maybe add NSIS installer format support to SharpCompress so I don't have to rely on the extra 7zip wrapper anymore (this would also help make the Dink installer work on Linux for FreeDink)
+- Maybe change DMOD launch options so they can be saved separately on a per engine/editor basis

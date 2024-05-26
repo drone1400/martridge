@@ -9,7 +9,7 @@ namespace Martridge.Models.Dmod {
     public class DmodFileDefinition {
 
         private static List<string> KnownThumbnailFileNames { get; } = new List<string>() {
-          "title-01", "misc-01", "dinkl-01",
+            "preview", "title-01", "misc-01", "dinkl-01", 
         };
 
         private const string FileNameDinkIni = "dink.ini";
@@ -214,7 +214,7 @@ namespace Martridge.Models.Dmod {
                     }
                 }
 
-                Bitmap? bitmap = this.ScanDirectory(graphicsRoot);
+                Bitmap? bitmap = this.ScanDirectory(this.DmodRoot);
 
                 return bitmap;
             } catch (Exception ex) {

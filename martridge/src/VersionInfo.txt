@@ -1,3 +1,7 @@
+--- V0.8.3.1 ---
+- added "preview" to known thumbnail file names
+- slight change to project build path name 
+
 --- V0.8.3.0 ---
 - updated 7zip libs to V23.1.0.0
 - fixed 7zip.dll not being included when publishing the win-x64

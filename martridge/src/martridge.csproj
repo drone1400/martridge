@@ -7,7 +7,7 @@
         <TrimMode>copyused</TrimMode>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationIcon>Assets\martridge_new.ico</ApplicationIcon>
-        <Version>0.8.3.0</Version>
+        <Version>0.8.3.1</Version>
         <RootNamespace>Martridge</RootNamespace>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU;win-x64</Platforms>
@@ -34,8 +34,8 @@
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 
         <BaseIntermediateOutputPath>..\output.obj\</BaseIntermediateOutputPath>
-        <IntermediateOutputPath>..\output.obj\$(TargetFramework)_$(Configuration)_$(Platform)_$(OS)\Martridge\</IntermediateOutputPath>
-        <OutputPath>..\output\$(TargetFramework)_$(Configuration)_$(Platform)_$(OS)\Martridge\</OutputPath>
+        <IntermediateOutputPath>..\output.obj\$(TargetFramework)_$(Configuration)_$(Platform)\Martridge\</IntermediateOutputPath>
+        <OutputPath>..\output\$(TargetFramework)_$(Configuration)_$(Platform)\Martridge\</OutputPath>
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
 

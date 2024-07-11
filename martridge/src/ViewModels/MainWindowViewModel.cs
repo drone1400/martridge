@@ -282,6 +282,8 @@ namespace Martridge.ViewModels {
             }
 
             if (string.IsNullOrWhiteSpace(targetPath)) return;
+
+            targetPath += Path.DirectorySeparatorChar + ".";
             
             // open directory...
             ProcessStartInfo pinfo = new ProcessStartInfo(targetPath) {

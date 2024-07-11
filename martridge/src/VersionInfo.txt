@@ -1,3 +1,6 @@
+--- V0.8.3.2 ---
+- quick fix to opening base game DMOD directory for DinkHD and Dink Classic
+
 --- V0.8.3.1 ---
 - added "preview" to known thumbnail file names
 - slight change to project build path name 

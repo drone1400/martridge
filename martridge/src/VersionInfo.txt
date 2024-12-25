@@ -1,3 +1,8 @@
+--- V0.8.4.0 ---
+- updated 7zip libs to V24.9.0.0
+- fixed dmod browser listing dmods without dmod.diz data without any name
+- fixed wrong text color for selected dmods in dmod lists
+
 --- V0.8.3.2 ---
 - quick fix to opening base game DMOD directory for DinkHD and Dink Classic
 

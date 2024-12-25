@@ -132,14 +132,19 @@ namespace Martridge.Models.Dmod {
         }
 
         public string? GetName() {
-            try { 
-                if (this.IsCorrectlyDefined == false) {
-                    return null;
+            try {
+                string[] lines = null;
+                
+                if (this.IsCorrectlyDefined) {
+                    lines = File.ReadAllLines(this.DmodDiz!.FullName);
                 }
 
-                string[] lines = File.ReadAllLines(this.DmodDiz!.FullName);
-
-                return lines[0];
+                if (lines == null || lines.Length == 0 || string.IsNullOrWhiteSpace(lines[0])) {
+                    // fallback to directory name
+                    return this.DmodRoot.Name;
+                } else {
+                    return lines[0];
+                }
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex, MyTraceLevel.Warning);
                 return null;

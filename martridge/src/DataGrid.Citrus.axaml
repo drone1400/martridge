@@ -27,6 +27,7 @@
                     <SolidColorBrush x:Key="DataGridRowHoveredBackgroundColor" Color="{DynamicResource HighlightHoverColor}" />
                     <SolidColorBrush x:Key="DataGridRowInvalidBrush" Color="{DynamicResource ErrorColor}" />
 
+                    <SolidColorBrush x:Key="DataGridRowSelectedForegroundBrush" Color="{DynamicResource HighlightForegroundColor}" />
                     <SolidColorBrush x:Key="DataGridRowSelectedBackgroundBrush" Color="{DynamicResource ThemeAccentColor}" />
                     <SolidColorBrush x:Key="DataGridRowSelectedHoveredBackgroundBrush" Color="{DynamicResource HighlightHoverColor}" />
                     <SolidColorBrush x:Key="DataGridRowSelectedUnfocusedBackgroundBrush" Color="{DynamicResource ThemeAccentColor}" />
@@ -349,8 +350,14 @@
                 <Style Selector="^:pointerover /template/ Rectangle#BackgroundRectangle">
                     <Setter Property="Fill" Value="{DynamicResource DataGridRowHoveredBackgroundColor}" />
                 </Style>
-
+                
+                <Style Selector="^:pointerover">
+                    <Setter Property="Foreground" Value="{DynamicResource DataGridRowSelectedForegroundBrush}"/>
+                </Style>
+                
                 <Style Selector="^:selected">
+                    <Setter Property="Foreground" Value="{DynamicResource DataGridRowSelectedForegroundBrush}"/>
+                    
                     <Style Selector="^ /template/ Rectangle#BackgroundRectangle">
                         <Setter Property="Fill" Value="{DynamicResource DataGridRowSelectedUnfocusedBackgroundBrush}" />
                         <Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedUnfocusedBackgroundOpacity}" />
@@ -593,5 +600,10 @@
     <!-- NOTE: the default Citrus TextBlock style overrides the foreground in the DataGridColumnHeader, must do this to prevent that... -->
     <Style Selector="DataGridColumnHeader TextBlock">
         <Setter Property="Foreground" Value="{DynamicResource DataGridColumnHeaderForegroundBrush}"/>
+    </Style>
+    
+    <!-- NOTE: the default Citrus TextBlock style overrides the foreground in the DataGridRow, must do this to prevent that... -->
+    <Style Selector="DataGridRow TextBlock">
+        <Setter Property="Foreground" Value="{Binding $parent.Foreground}"/>
     </Style>
 </Styles>

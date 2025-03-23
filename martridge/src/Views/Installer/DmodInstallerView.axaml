@@ -4,51 +4,155 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 
              xmlns:dloc="using:Martridge.ViewModels.Localization"
-             xmlns:vw="using:Martridge.Views.Installer"
-             xmlns:vm="using:Martridge.ViewModels.Installer"
+             xmlns:vmi="using:Martridge.ViewModels.Installer"
+             xmlns:vm="clr-namespace:Martridge.ViewModels"
+             xmlns:installer="clr-namespace:Martridge.Models.Installer"
 
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Martridge.Views.Installer.DmodInstallerView"
              Name="DmodInstallerUserControl">
     <Design.DataContext>
-        <vm:DmodInstallerViewModel/>
+        <vmi:DmodInstallerViewModel/>
     </Design.DataContext>
     <UserControl.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
     </UserControl.Styles>
+    <UserControl.Resources>
+        <vm:GenericEqualsBoolConverter x:Key="GenericEqualsBoolConverter"/>
+        <vm:GenericNotEqualsBoolConverter x:Key="GenericNotEqualsBoolConverter"/>
+        <vm:GenericEqualsGridSizeStarConverter x:Key="GenericEqualsGridSizeStarConverter"/>
+        <vm:GenericEqualsGridSizeAutoConverter x:Key="GenericEqualsGridSizeAutoConverter"/>
+    </UserControl.Resources>
 
+    <Grid Margin="8" RowDefinitions="Auto, *, Auto">
+        
+        <!-- Header stuff... Title and progress bars -->
+        <Grid Grid.Row="0" RowDefinitions="Auto,Auto,Auto,Auto">
+            <TextBlock Grid.Row="0" Classes="HeadingTitle"
+                       Text="{Binding InstallerProgressTitle}"/>
+            
+            <Grid Grid.Row="1" RowDefinitions="Auto,Auto"
+                  IsVisible="{Binding InstallPhase,
+                                Converter={StaticResource GenericEqualsBoolConverter}, 
+                                ConverterParameter={x:Static installer:DmodInstallPhase.Inactive} }">
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                    <TextBlock Grid.Column="0" Classes="Heading2B"
+                               Text="{dloc:Localize DmodInstallerView/DmodSelect/SelectDmod}"/>
+                    <Button   Grid.Row="0" Grid.Column="1"
+                              Content="{dloc:Localize DmodInstallerView/DmodSelect/Browse}"
+                              Command="{Binding CmdBrowseDmod}"/>
+                </Grid>
 
-    <Grid Margin="8">
-        <Grid RowDefinitions="*, Auto" IsVisible="{Binding Path=!IsInstallerStarted}">
-            <vw:DmodInstallerPrepareView
-                Grid.Row="0"
-                DataContext="{Binding DataContext, ElementName=DmodInstallerUserControl}"/>
-                
-            <Grid Grid.Row="1"
-                  ColumnDefinitions="*,Auto,Auto">
-                <Button Grid.Column="1"
-                        Content="{dloc:Localize Generic/ButtonBack}"
-                        Command="{Binding CmdExit}"/>
-                <Button Grid.Column="2"
-                        Content="{dloc:Localize Generic/StartInstall}"
-                        Command="{Binding CmdStartInstall}"/>
+                <TextBox Grid.Row="1"
+                         Text="{Binding SelectedDmodSource}"
+                         IsReadOnly="{Binding InstallPhase,
+                                        Converter={StaticResource GenericNotEqualsBoolConverter},
+                                        ConverterParameter={x:Static installer:DmodInstallPhase.Inactive} }"/>
+            </Grid>
+
+            <Grid Grid.Row="2"
+                  RowDefinitions="16,16,24"
+                  IsVisible="{Binding InstallPhase,
+                                Converter={StaticResource GenericNotEqualsBoolConverter}, 
+                                ConverterParameter={x:Static installer:DmodInstallPhase.Inactive} }">
+                <TextBlock Grid.Row="0" Classes="Heading2B"
+                           Text="{Binding InstallerProgressLevel0MainTitle}"/>
+                <TextBlock Grid.Row="1" Classes="Heading2I"
+                           Text="{Binding InstallerProgressLevel0SubTitle}"/>
+                <ProgressBar Grid.Row="2"
+                             Minimum="0" Maximum="1"
+                             Value="{Binding InstallerProgressLevel0Progress}"/>
+            </Grid>
+
+            <Grid Grid.Row="3"
+                  RowDefinitions="16,16,24"
+                  IsVisible="{Binding InstallerProgressLevel1IsVisibile}">
+                <TextBlock Grid.Row="0" Classes="Heading2B"
+                           Text="{Binding InstallerProgressLevel1MainTitle}"/>
+                <TextBlock Grid.Row="1" Classes="Heading2I"
+                           Text="{Binding InstallerProgressLevel1SubTitle}"/>
+                <ProgressBar Grid.Row="2"
+                             Minimum="0" Maximum="1"
+                             Value="{Binding InstallerProgressLevel1Progress}"
+                             IsIndeterminate="{Binding InstallerProgressLevel1Indeterminate}"/>
             </Grid>
         </Grid>
+        
+        <!-- main body stuff... -->
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="{Binding InstallPhase,
+                                            Converter={StaticResource GenericEqualsGridSizeStarConverter},
+                                            ConverterParameter={x:Static installer:DmodInstallPhase.AwaitingUserInput} }"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Destination selection -->
+            <Grid Grid.Row="0" RowDefinitions="Auto,*,Auto,Auto"
+                  IsVisible="{Binding InstallPhase,
+                                Converter={StaticResource GenericEqualsBoolConverter},
+                                ConverterParameter={x:Static installer:DmodInstallPhase.AwaitingUserInput} }">
                 
-        <Grid RowDefinitions="*, Auto" IsVisible="{Binding Path=IsInstallerStarted}">
-            <vw:InstallerProgressView 
-                Grid.Row="0"
-                DataContext="{Binding DataContext, ElementName=DmodInstallerUserControl}"/>
+                <TextBlock Grid.Row="0" Classes="Heading2B"
+                           Text="{dloc:Localize DmodInstallerView/DmodSelect/SelectDestination}"/>
+
+                <ListBox Grid.Row="1"
+                         Margin="6"
+                         ItemsSource="{Binding InstallableDestinations}"
+                         SelectionMode="Single"
+                         SelectedItem="{Binding SelectedInstallableDestination}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="2">
+                                <TextBlock  Classes="Heading2"
+                                            Text="{Binding FullName}"
+                                            ToolTip.Tip="{Binding FullName}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
                 
-            <Grid Grid.Row="1"
-                  ColumnDefinitions="*,Auto,Auto">
-                <Button Grid.Column="1"
-                        Content="{dloc:Localize Generic/ButtonCancel}"
-                        Command="{Binding CmdCancel}"/>
-                <Button Grid.Column="2"
-                        Content="{dloc:Localize Generic/ButtonFinish}"
-                        Command="{Binding CmdExit}"/>
+                <TextBlock Grid.Row="2" Classes="Heading2B"
+                           Text="{dloc:Localize DmodInstallerView/DmodSelect/OverrideDmodDestination}"/>
+                <TextBox Grid.Row="3"
+                         Text="{Binding DmodDirectoryOverride}"/>
             </Grid>
+            
+            <!-- Install log... -->
+            <Border Grid.Row="1" BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
+                <TextBox Text="{Binding InstallerProgressLog}"
+                         IsReadOnly="True"
+                         CaretIndex="{Binding InstallerProgressLogCaretIndex, Mode=TwoWay}" 
+                         Margin="2" />
+            </Border>
         </Grid>
+        
+        <!-- Footer... buttons -->
+        <Grid Grid.Row="2" ColumnDefinitions="*, Auto">
+            <WrapPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="{dloc:Localize DmodInstallerView/Button/Cancel}"
+                        Command="{Binding CmdCancel}"
+                        IsVisible="{Binding InstallPhase,
+                                        Converter={StaticResource GenericNotEqualsBoolConverter},
+                                        ConverterParameter={x:Static installer:DmodInstallPhase.Finished} }"/>
+                <Button Content="{dloc:Localize DmodInstallerView/Button/InitializeDmod}"
+                        Command="{Binding CmdInitializeDmod}"
+                        CommandParameter="{Binding SelectedDmodSource}"
+                        IsVisible="{Binding InstallPhase,
+                                        Converter={StaticResource GenericEqualsBoolConverter},
+                                        ConverterParameter={x:Static installer:DmodInstallPhase.Inactive} }"/>
+                <Button Content="{dloc:Localize DmodInstallerView/Button/StartInstall}"
+                        Command="{Binding CmdStartInstall}"
+                        IsVisible="{Binding InstallPhase,
+                                        Converter={StaticResource GenericEqualsBoolConverter},
+                                        ConverterParameter={x:Static installer:DmodInstallPhase.AwaitingUserInput} }"/>
+                <Button Content="{dloc:Localize DmodInstallerView/Button/Finish}"
+                        Command="{Binding CmdFinish}"
+                        IsVisible="{Binding InstallPhase,
+                                        Converter={StaticResource GenericEqualsBoolConverter},
+                                        ConverterParameter={x:Static installer:DmodInstallPhase.Finished} }"/>
+            </WrapPanel>
+        </Grid>
+        
     </Grid>
 </UserControl>

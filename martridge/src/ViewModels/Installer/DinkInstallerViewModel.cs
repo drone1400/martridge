@@ -16,6 +16,34 @@ using System.Threading.Tasks;
 
 namespace Martridge.ViewModels.Installer {
     public class DinkInstallerViewModel : InstallerViewModelBase {
+        // ------------------------------------------------------------------------------------------
+        //      Installer State 
+        //
+        
+        public bool IsInstallerStarted {
+            get => this._isInstallerStarted;
+            protected set => this.RaiseAndSetIfChanged(ref this._isInstallerStarted, value);
+        }
+        private bool _isInstallerStarted = false;
+
+        public bool IsInstallerFinished {
+            get => this._isInstallerFinished;
+            protected set => this.RaiseAndSetIfChanged(ref this._isInstallerFinished, value);
+        }
+        private bool _isInstallerFinished = false;
+
+        public bool IsInstallerCancelled {
+            get => this._isInstallerCancelled;
+            protected set => this.RaiseAndSetIfChanged(ref this._isInstallerCancelled, value);
+        }
+        private bool _isInstallerCancelled = false;
+
+        public bool IsFileBrowserActive {
+            get => this._isFileBrowserActive;
+            protected set => this.RaiseAndSetIfChanged(ref this._isFileBrowserActive, value);
+        }
+        private bool _isFileBrowserActive = false;
+        
 
         // ------------------------------------------------------------------------------------------
         //      Installable Selection 
@@ -175,7 +203,7 @@ namespace Martridge.ViewModels.Installer {
 
         #region Commands
 
-        public override void CmdExit(object? parameter = null) {
+        public void CmdExit(object? parameter = null) {
             this._installerOnlineHelper?.CancelTokenSource.Cancel();
             
             if (this.IsInstallerStarted == false || this.DinkInstallerNotSupported) {
@@ -197,7 +225,7 @@ namespace Martridge.ViewModels.Installer {
             return true;
         }
 
-        public override void CmdCancel(object? parameter = null) {
+        public void CmdCancel(object? parameter = null) {
             if (this.CanCmdCancel() == false) return;
             
             this.IsInstallerCancelled = true;
@@ -217,7 +245,7 @@ namespace Martridge.ViewModels.Installer {
             return !this.IsInstallerCancelled;
         }
         
-        public async override void CmdStartInstall(object? parameter = null) {
+        public async void CmdStartInstall(object? parameter = null) {
             if (this.CanCmdStartInstall() == false) return;
             
             await this.StartInstallation();

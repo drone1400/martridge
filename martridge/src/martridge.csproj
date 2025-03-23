@@ -72,6 +72,7 @@
         <PackageReference Include="GetText.NET" Version="1.9.14" />
         <PackageReference Include="HtmlAgilityPack" Version="1.11.60" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="ReactiveUI.Validation" Version="4.1.1" />
         <PackageReference Condition="'$(IsWindows)'=='true'" Include="SevenZipExtractor" Version="1.0.17" />
     </ItemGroup>
 

@@ -21,6 +21,13 @@ namespace Martridge.Models.Installer {
         public DinkInstallerInvalidDmodFormatException(string? msg, Exception innerEx) : base(msg, innerEx) { }
     }
 
+    public class DinkInstallerException : Exception
+    {
+        public DinkInstallerException(string? msg) : base(msg) { }
+
+        public DinkInstallerException(string? msg, Exception innerEx) : base(msg, innerEx) { }
+    }
+
     public class DinkInstallerFileSystemException : Exception {
         
         public DinkInstallerFileSystemException(string? msg) : base(msg) { }

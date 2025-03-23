@@ -429,7 +429,7 @@ namespace Martridge.ViewModels.Dmod {
                 }
 
                 if (File.Exists(resource.Local)) {
-                    this.MainVm.VmDmodInstaller.SelectedDmodPacakge = resource.Local;
+                    this.MainVm.VmDmodInstaller.SelectedDmodSource = resource.Local;
                     this.MainVm.CmdShowPageDmodInstaller();
                 }
             }

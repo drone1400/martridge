@@ -1,9 +1,10 @@
 using Avalonia.Controls;
 using ReactiveUI;
 using System;
+using ReactiveUI.Validation.Helpers;
 
 namespace Martridge.ViewModels {
-    public class ViewModelBase : ReactiveObject {
+    public class ViewModelBase : ReactiveValidationObject {
         public Window? ParentWindow {
             get => this._parentWindow;
             private set => this.RaiseAndSetIfChanged(ref this._parentWindow, value);

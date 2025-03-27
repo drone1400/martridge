@@ -15,10 +15,6 @@
     <Design.DataContext>
         <vm:DinkyAlertWindowViewModel/>
     </Design.DataContext>
-    <Window.Styles>
-        <StyleInclude Source="avares://Citrus.Avalonia/Citrus.xaml"/>
-        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
-    </Window.Styles>
   
     <Grid RowDefinitions="*, Auto, Auto, Auto" 
           ColumnDefinitions="128, *" 

@@ -9,10 +9,7 @@
     <Design.DataContext>
         <vm:OnlineDmodBrowserViewModel/>
     </Design.DataContext>
-    <UserControl.Styles>
-        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
-        <StyleInclude Source="avares://martridge/DataGrid.Citrus.axaml"/>
-    </UserControl.Styles>
+
     <UserControl.Resources>
         <vm:DmodScoreToSolidColorBrushConverter x:Key="DmodScoreToSolidColorBrushConverter"/>
         <vm:GenericDateConverter x:Key="GenericDateConverter"/>

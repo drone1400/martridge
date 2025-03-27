@@ -24,8 +24,6 @@ namespace Martridge.Views.Log {
 #if DEBUG
             this.AttachDevTools();
 #endif
-
-            StyleManager.Instance.AddWindow(this);
         }
 
         public void OnWindowClosed(object? sender, EventArgs e) {

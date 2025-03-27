@@ -13,8 +13,6 @@ namespace Martridge.Views {
 #if DEBUG
             this.AttachDevTools();
 #endif
-            
-            StyleManager.Instance.AddWindow(this);
         }
 
         private void InitializeComponent() {
@@ -23,7 +21,8 @@ namespace Martridge.Views {
         
         public void KeyDownHandler(object? sender, Avalonia.Input.KeyEventArgs e) {
             if (e.Key == Avalonia.Input.Key.F2) {
-                StyleManager.Instance.UseNextTheme();
+                if (Application.Current is not App app) return;
+                app.SetCitrusNextPalette();
             }
             e.Handled = false;
         }

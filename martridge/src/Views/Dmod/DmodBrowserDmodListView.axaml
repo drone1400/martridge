@@ -9,10 +9,7 @@
     <Design.DataContext>
         <vm:DmodBrowserViewModel/>
     </Design.DataContext>
-    <UserControl.Styles>
-        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
-        <StyleInclude Source="avares://martridge/DataGrid.Citrus.axaml"/>
-    </UserControl.Styles>
+
     <UserControl.Resources>
         <x:String x:Key="DataNotAvailable">N/A</x:String>
     </UserControl.Resources>

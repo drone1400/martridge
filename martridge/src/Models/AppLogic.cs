@@ -5,6 +5,7 @@ using Martridge.Models.OnlineDmods;
 using Martridge.Trace;
 using System;
 using System.IO;
+using Avalonia;
 
 namespace Martridge.Models {
     public class AppLogic {
@@ -24,8 +25,9 @@ namespace Martridge.Models {
 
             // try to set loaded theme...
             string themeName = this.Config.General.ThemeName;
-            if (Enum.TryParse(themeName, out ApplicationTheme themeValue)) {
-                StyleManager.Instance.UseTheme(themeValue);
+            if (Enum.TryParse(themeName, out ApplicationTheme themeValue) &&
+                Application.Current is App app) {
+                app.SetCitrusThemePalette(themeName);
             }
 
             #if PLATF_LINUX

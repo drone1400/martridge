@@ -10,8 +10,6 @@ namespace Martridge.Views.About {
 #if DEBUG
             this.AttachDevTools();
 #endif
-
-            StyleManager.Instance.AddWindow(this);
         }
 
         private void InitializeComponent() {

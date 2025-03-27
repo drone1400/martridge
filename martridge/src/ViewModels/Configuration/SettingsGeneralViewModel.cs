@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using Avalonia;
 
 namespace Martridge.ViewModels.Configuration {
     public class SettingsGeneralViewModel : ViewModelBase {
@@ -138,8 +139,14 @@ namespace Martridge.ViewModels.Configuration {
 
         public SettingsGeneralViewModel() {
             // set current theme...
-            this._themeName = StyleManager.Instance.CurrentApplicationTheme;
-            StyleManager.Instance.ThemeChanged += InstanceOnThemeChanged;
+            if (Application.Current is App app) {
+                string themeName = app.GetCitrusPalette();
+                if (Enum.TryParse(themeName, out ApplicationTheme themeValue)) {
+                    this._themeName = themeValue;
+                }
+                app.OnThemePaletteChange += this.AppOnThemePaletteChanged;
+            }
+            
             
             try {
                 this._localizations.Clear();
@@ -162,9 +169,13 @@ namespace Martridge.ViewModels.Configuration {
 
             
         }
-        private void InstanceOnThemeChanged(object? sender, EventArgs e) {
-            if (sender is not StyleManager styleMan) return;
-            this.ThemeName = styleMan.CurrentApplicationTheme;
+        private void AppOnThemePaletteChanged(object? sender, EventArgs e) {
+            if (sender is not App app) return;
+            string themeName = app.GetCitrusPalette();
+            if (Enum.TryParse(themeName, out ApplicationTheme themeValue)) {
+                this.ThemeName = themeValue;
+            }
+            
         }
 
         private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
@@ -178,8 +189,8 @@ namespace Martridge.ViewModels.Configuration {
                 this.Configuration?.UpdateProperties(new Dictionary<string, object?>() {
                     [nameof(ConfigGeneral.ThemeName)] = this.ThemeName.ToString(),
                 });
-                // update in style manager...
-                StyleManager.Instance.UseTheme(this.ThemeName);
+                if (Application.Current is not App app) return;
+                app.SetCitrusThemePalette(this.ThemeName.ToString());
             }
         }
 

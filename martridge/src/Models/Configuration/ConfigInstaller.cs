@@ -1,5 +1,6 @@
 ﻿using Martridge.Models.Configuration.Save;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using SharpCompress;
 
 namespace Martridge.Models.Configuration {
@@ -47,7 +48,7 @@ namespace Martridge.Models.Configuration {
             
             for (int i = 0; i < this._installerComponents.Count; i++) {
                 ConfigInstallerComponent comp = this._installerComponents[i];
-                cfg.InstallerComponents.Add(comp.Clone());
+                cfg._installerComponents.Add(comp.Clone());
             }
 
             return cfg;

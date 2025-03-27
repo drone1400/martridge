@@ -2,3 +2,6 @@
 	path = sharpcompress
 	url = https://github.com/drone1400/sharpcompress
 	branch = drone-modifications-2024
+[submodule "citrus"]
+	path = citrus
+	url = https://github.com/drone1400/Citrus.Avalonia

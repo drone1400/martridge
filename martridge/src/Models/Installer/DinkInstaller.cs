@@ -391,7 +391,7 @@ namespace Martridge.Models.Installer {
                 } else {
                     if (logMissingFiles) {
                         this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                            Localizer.Instance[@"DinkInstaller/DinkInstaller/InstallingDink/MovingFiles/Not"],
+                            Localizer.Instance[@"DinkInstaller/DinkInstaller/InstallingDink/MovingFiles/NotFound"],
                             $"    Path        = {fullwhite}",
                         }, MyTraceLevel.Warning);
                         //TODO... maybe give the user a confirmation warning or something?....

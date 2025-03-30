@@ -645,12 +645,6 @@ namespace Martridge.Models.Installer {
                 string relativePath = Path.Combine(split);
                         
                 string fullPath = Path.Combine(this._installationDestination.FullName, relativePath);
-
-                // NOTE: reporting progress here slows down extraction greatly! there's no point in doing it...
-                // this.ReportProgress(InstallerReportLevel.Indeterminate,
-                //     Localizer.Instance[@"DinkInstaller/InstallingDmod/FinalUnzip/Detail"],
-                //     relativePath,
-                //     0.0);
                         
                 if (reader.Entry.IsDirectory == false) {
                     DirectoryInfo? parent = Directory.GetParent(fullPath);

@@ -6,8 +6,6 @@
   "DinkInstaller/Heading/Preparing": "Preparing...",
   "DinkInstaller/Heading/Downloading": "Downloading Resources",
   "DinkInstaller/Heading/Installing": "Installing files",
-  "DinkInstaller/Heading/Temporary": "Extracting to temporary location...",
-  "DinkInstaller/Heading/InstallingDmod": "Installing DMOD",
   "DinkInstaller/Heading/Cleanup": "Cleaning up",
   "DinkInstaller/Heading/CancelledByUser": "Installation aborted by user!...",
   "DinkInstaller/Heading/ErrorOccured": "Installation interrupted by error!...",
@@ -17,10 +15,7 @@
   "DinkInstaller/HeadingPacking/CancelledByUser": "Packing aborted by user!...",
   "DinkInstaller/HeadingPacking/ErrorOccured": "Packing interrupted by error!...",
   "DinkInstaller/HeadingPacking/AllDone": "Packing complete!",
-
-  "DinkInstaller/GenericError/CanNotCreateTempFile": "Can not create temporary file... ",
-          
-  "DinkInstaller/Preparing/FileNotFoundError": "File not found!",
+  
   "DinkInstaller/Preparing/DestinationErrorIsRoot": "Destination can not be a root path!",
   "DinkInstaller/Preparing/DestinationErrorIsNotRooted": "Destination can not be a relative path",
   "DinkInstaller/Preparing/CreatingDirectory": "Creating Directory!",
@@ -47,36 +42,23 @@
   "DinkInstaller/InstallingDink/InstallingResourceUnzipping/ErrorParsing7ZipFormat": "Error parsing 7zip format name...",
   "DinkInstaller/InstallingDink/InstallingResourceUnzipping/Success": "Done unzipping resource...",
   "DinkInstaller/InstallingDink/InstallingResourceUnzipping/Failure": "Could not unzip resource...",
-  "DinkInstaller/InstallingDink/InstallingResourceCopying": "Copying resource files...",
   "DinkInstaller/InstallingDink/MovingFiles/Start": "Preparing to move files...",
   "DinkInstaller/InstallingDink/MovingFiles/Indexing": "Indexing files...",
   "DinkInstaller/InstallingDink/MovingFiles/ActuallyMoving": "Moving files...",
   "DinkInstaller/InstallingDink/MovingFiles/FilesWord": "files",
-  "DinkInstaller/InstallingDink/MovingFiles/Not found": "WARNING! Files not found!...",
+  "DinkInstaller/InstallingDink/MovingFiles/NotFound": "WARNING! Files not found!...",
   "DinkInstaller/InstallingDink/MovingFiles/Done": "Done moving files!...",
 
   "DinkInstaller/CleaningUp/Start": "Starting cleanup...",
   "DinkInstaller/CleaningUp/Remove": "Removing...",
   "DinkInstaller/CleaningUp/Done": "Done with cleanup!...",
-  
-  "DinkInstaller/InstallingDmod/InvalidFormatTooManyFiles": "Invalid DMOD pack format! Expect .dmod file to be an archive that contains only one file!",
-  "DinkInstaller/InstallingDmod/TemporaryUnzip/Start": "Unzipping DMOD pack to a temporary location...",
-  "DinkInstaller/InstallingDmod/TemporaryUnzip/Done": "Done unzipping DMOD pack to a temporary location!",
-  "DinkInstaller/InstallingDmod/TemporaryUnzip/Error": "ERROR unzipping DMOD pack to a temporary location!",
-  "DinkInstaller/InstallingDmod/TemporaryUnzip/PaddingFile": "Padding temporary TAR archive with 0x00 bytes...",
-  "DinkInstaller/InstallingDmod/FinalUnzip/Start": "Installing DMOD to destination: ",
-  "DinkInstaller/InstallingDmod/FinalUnzip/Detail": "Extracting dmod...",
-  "DinkInstaller/InstallingDmod/FinalUnzip/Done": "Done installing DMOD to destination!",
-  
+
   "DinkInstaller/PackingDmod/Start": "Packing DMOD",
   "DinkInstaller/PackingDmod/FoundFiles": "Done indexing files...",
   "DinkInstaller/PackingDmod/CreatingTemporaryTar": "Creating TAR archive",
   "DinkInstaller/PackingDmod/CreatingBzip2Archive": "Creating BZIP2 DMOD file",
   "DinkInstaller/PackingDmod/Detail": "Compressing files...",
   "DinkInstaller/PackingDmod/Done": "Done packing DMOD!",
-  
-  
-
 
   "DinkInstallerView/Title": "Martridge - Dink Installer",
   "DinkInstallerView/HeadingNotSupported": "Dink Installer Not Supported",
@@ -170,8 +152,6 @@
   "DmodInstaller/MessageBox_Cancel_Title": "DMOD Installation cancelled by user",
   "DmodInstaller/MessageBox_Cancel_Body": "DMOD Installation was cancelled!",
   "DmodInstaller/MessageBox_Extra_ManualCleanup": "Already extracted DMOD files will not be cleaned up! Please check the install destination and remove any leftover files manually if necessary: ",
-  
-
 
   "DinkyAlertWindow/ButtonOk": "Ok",
   "DinkyAlertWindow/ButtonYes": "Yes",

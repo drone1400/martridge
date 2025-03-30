@@ -211,8 +211,7 @@
         
                 <!-- Reviews -->
                 <TabItem  Classes="Medium"
-                          Header="{dloc:Localize OnlineDmodBrowser/Reviews}"
-                          VerticalContentAlignment="Stretch">
+                          Header="{dloc:Localize OnlineDmodBrowser/Reviews}">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" 
                                   VerticalScrollBarVisibility="Visible"
                                   VerticalAlignment="Stretch"

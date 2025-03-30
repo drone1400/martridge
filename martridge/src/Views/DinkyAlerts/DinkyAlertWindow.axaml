@@ -10,8 +10,8 @@
         
         Title="{Binding Title }"
         Name="Alert"
-        MinWidth="560" MinHeight="340"
-        Width="560" Height="340">
+        MinWidth="640" MinHeight="340"
+        Width="640" Height="340">
     <Design.DataContext>
         <vm:DinkyAlertWindowViewModel/>
     </Design.DataContext>

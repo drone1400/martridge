@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using SharpCompress.Common;
 using SharpCompress.Compressors.PBZip2;
 
 namespace Martridge.Models.Installer {
@@ -46,24 +47,22 @@ namespace Martridge.Models.Installer {
     
     public class DmodInstallerProgressEventArgs {
         public DateTime Timestamp { get; }
-        public InstallerReportLevel ProgressLevel { get; }
         public DmodInstallPhase Phase { get; }
-        public string HeadingMain { get; }
-        public string HeadingSecondary { get; }
+        public DinkInstallerResult Result { get; }
         public double ProgressPercent { get; }
 
-        public DmodInstallerProgressEventArgs(DmodInstallPhase phase, InstallerReportLevel level, string headingMain, string headingSecondary, double progressPercent) {
+        public DmodInstallerProgressEventArgs(DmodInstallPhase phase, DinkInstallerResult result, double progressPercent) {
             this.Timestamp = DateTime.Now;
             this.Phase = phase;
-            this.ProgressLevel = level;
-            this.HeadingMain = headingMain;
-            this.HeadingSecondary = headingSecondary;
+            this.Result = result;
             this.ProgressPercent = progressPercent;
         }
     }
     
     public class DmodInstaller {
         public event EventHandler<DmodInstallerProgressEventArgs>? ProgressReport;
+        public event EventHandler? DmodInstallerActivityStarted; 
+        public event EventHandler? DmodInstallerActivityEnded; 
         
         public DmodInstallPhase InstallPhase => this._installPhase;
         
@@ -106,46 +105,29 @@ namespace Martridge.Models.Installer {
         private void ReportProgressPrimary() {
             try
             {
-                string heading = this._installPhase switch {
-                    DmodInstallPhase.Inactive => Localizer.Instance["DmodInstaller/ReportPhase/Inactive"],
-                    DmodInstallPhase.Initializing => Localizer.Instance["DmodInstaller/ReportPhase/Initializing"],
-                    DmodInstallPhase.AwaitingUserInput => Localizer.Instance["DmodInstaller/ReportPhase/AwaitingUserInput"],
-                    DmodInstallPhase.Installing => Localizer.Instance["DmodInstaller/ReportPhase/Installing"],
-                    DmodInstallPhase.Cleanup => Localizer.Instance["DmodInstaller/ReportPhase/Cleanup"],
-                    DmodInstallPhase.Finished => this._installResult switch {
-                        DinkInstallerResult.Success => Localizer.Instance["DmodInstaller/ReportPhase/Finished_Success"],
-                        DinkInstallerResult.Error => Localizer.Instance["DmodInstaller/ReportPhase/Finished_Error"],
-                        DinkInstallerResult.Cancelled => Localizer.Instance["DmodInstaller/ReportPhase/Finished_Cancelled"],
-                        _ => "?????"
-                    },
-                    _ => "???",
-                };
-                
+               
                 // NOTE: the primary progress is the phase itself
                 // there are a total of 5 phases to go through...
-                this.ProgressReport?.Invoke(this, new DmodInstallerProgressEventArgs(this._installPhase,
-                    InstallerReportLevel.Primary, heading, this._sourceFile?.FullName ?? "", (int)this._installPhase / 5.0));
+                this.ProgressReport?.Invoke(this, new DmodInstallerProgressEventArgs(this._installPhase,  this._installResult, (int)this._installPhase / 5.0));
             } catch (Exception ex)
             {
                 MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
             }
         }
-        private void ReportProgressIndeterminateStart(string heading) {
+        private void ReportActivityStart() {
             try
             {
-                this.ProgressReport?.Invoke(this, new DmodInstallerProgressEventArgs(this._installPhase,
-                    InstallerReportLevel.Indeterminate, heading, "", 0.0));
+                this.DmodInstallerActivityStarted?.Invoke(this, EventArgs.Empty);
             } catch (Exception ex)
             {
                 MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
             }
         }
         
-        private void ReportProgressIndeterminateEnd(string heading) {
+        private void ReportActivityEnd() {
             try
             {
-                this.ProgressReport?.Invoke(this, new DmodInstallerProgressEventArgs(this._installPhase,
-                    InstallerReportLevel.Indeterminate, heading, "", 1.0));
+                this.DmodInstallerActivityEnded?.Invoke(this, EventArgs.Empty);
             } catch (Exception ex)
             {
                 MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
@@ -244,9 +226,9 @@ namespace Martridge.Models.Installer {
                     {
                         this.LogMessage(Localizer.Instance[@"DmodInstaller/InitializingQuickPeek"]);
                         
-                        this.ReportProgressIndeterminateStart(Localizer.Instance[@"DmodInstaller/InitializingQuickPeek"]);
+                        this.ReportActivityStart();
                         bool result = this.TryInitializeQuickPeek();
-                        this.ReportProgressIndeterminateEnd(Localizer.Instance[@"DmodInstaller/InitializingQuickPeek"]);
+                        this.ReportActivityEnd();
 
                         if (result)
                         {
@@ -268,7 +250,7 @@ namespace Martridge.Models.Installer {
                     case DmodInstallPreprocessingMode.PeekAll:
                     {
                         this.LogMessage(Localizer.Instance[@"DmodInstaller/InitializingPeekAll"]);
-                        this.ReportProgressIndeterminateStart(Localizer.Instance[@"DmodInstaller/InitializingPeekAll"]);
+                        this.ReportActivityStart();
                         // try to initialize the DMOD top entries info from the standard bzip2/tar dmod format
                         // if that fails, maybe this is a different archive type like 7z, so try that instead?
                         bool result = this.TryInitializeEntriesFromStandardDmod();
@@ -276,7 +258,7 @@ namespace Martridge.Models.Installer {
                         {
                             result = this.TryInitializeEntriesFromUnknownDmod();
                         }
-                        this.ReportProgressIndeterminateEnd(Localizer.Instance[@"DmodInstaller/InitializingPeekAll"]);
+                        this.ReportActivityEnd();
 
                         if (result)
                         {
@@ -496,7 +478,7 @@ namespace Martridge.Models.Installer {
             return string.IsNullOrWhiteSpace(this._dmodRootDirName) == false;
         }
 
-        public void InstallDmod(DirectoryInfo destinationDirectory, string destinationOverride = "") {
+        public void InstallDmod(DirectoryInfo destinationDirectory, string destinationOverride, bool allowOverwrite) {
             lock (this._syncRoot)
             {
                 if (this._installPhase != DmodInstallPhase.AwaitingUserInput) return;
@@ -533,9 +515,9 @@ namespace Martridge.Models.Installer {
                 
                 // extracting DMOD
                 this.LogMessage(Localizer.Instance[@"DmodInstaller/DmodExtractStart"], $"    \"{this._sourceFile.FullName}\"", $"    \"{destinationDirectory.FullName}\"");
-                this.ReportProgressIndeterminateStart(Localizer.Instance[@"DmodInstaller/DmodExtracting"]);
-                this.ExtractDmod();
-                this.ReportProgressIndeterminateEnd(Localizer.Instance[@"DmodInstaller/DmodExtracting"]);
+                this.ReportActivityStart();
+                this.ExtractDmod(allowOverwrite);
+                this.ReportActivityEnd();
                 this.LogMessage(Localizer.Instance[@"DmodInstaller/DmodExtractEnd"]);
             } catch (DinkInstallerCancelledByUserException) {
                 cancelled = true;
@@ -545,6 +527,8 @@ namespace Martridge.Models.Installer {
                 this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, this._installException);
                 MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, this._installException);
             } finally {
+                this.ReportActivityEnd();
+                
                 this.CleanUp();
 
                 this.CustomTrace.Flush();
@@ -569,7 +553,7 @@ namespace Martridge.Models.Installer {
             }
             this.ReportProgressPrimary();
             
-            this.ReportProgressIndeterminateStart(Localizer.Instance[@"DmodInstaller/CleaningUpStart"]);
+            this.ReportActivityStart();
             this.LogMessage(Localizer.Instance[@"DmodInstaller/CleaningUpStart"]);
             foreach (FileInfo tempFile in this._temp.TempFileList) {
                 try
@@ -582,11 +566,11 @@ namespace Martridge.Models.Installer {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                 }
             }
-            this.ReportProgressIndeterminateEnd(Localizer.Instance[@"DmodInstaller/CleaningUpEnd"]);
+            this.ReportActivityEnd();
             this.LogMessage(Localizer.Instance[@"DmodInstaller/CleaningUpEnd"]);
         }
         
-        private void ExtractDmod() {
+        private void ExtractDmod(bool allowOverwrite) {
             if (this._sourceFile == null) return;
             if (this._installationDestination == null) return;
             
@@ -610,7 +594,7 @@ namespace Martridge.Models.Installer {
                 // check if folder already exists...
                 string path =  Path.Combine(this._installationDestination.FullName, topLevelOverride);
 
-                if (Directory.Exists(path))
+                if (Directory.Exists(path) && allowOverwrite == false)
                 {
                     string msg = Localizer.Instance[@"DmodInstaller/DestinationErrorAlreadyExists"];
                     this.LogMessage(msg);
@@ -673,7 +657,7 @@ namespace Martridge.Models.Installer {
                     if (parent != null && parent.Exists == false) {
                         parent.Create();
                     }
-                    reader.WriteEntryToFile(fullPath);
+                    reader.WriteEntryToFile(fullPath, new ExtractionOptions() { Overwrite = allowOverwrite, });
                 }
             }
         }

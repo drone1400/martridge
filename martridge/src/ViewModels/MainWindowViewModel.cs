@@ -114,7 +114,7 @@ namespace Martridge.ViewModels {
                     FileInfo finfo = new FileInfo(file);
                     if (finfo.Exists && finfo.Extension.ToLowerInvariant() == ".dmod") {
                         this.CmdShowPageDmodInstaller();
-                        this.VmDmodInstaller.SelectedDmodSource = finfo.FullName;
+                        this.VmDmodInstaller.TemporaryDmodSource = finfo.FullName;
                     }
                 }
             }
@@ -137,7 +137,7 @@ namespace Martridge.ViewModels {
                     if (finfo.Exists && finfo.Extension.ToLowerInvariant() == ".dmod") {
                         // try to open dmod file?...
                         this.CmdShowPageDmodInstaller();
-                        this.VmDmodInstaller.SelectedDmodSource = finfo.FullName;
+                        this.VmDmodInstaller.TemporaryDmodSource = finfo.FullName;
                     }
                 }
             } catch (Exception ex) {
@@ -244,7 +244,7 @@ namespace Martridge.ViewModels {
             if (this.ActiveUserPage == MainViewPage.MainView) {
                 if (parameter is string path &&
                     File.Exists(path)) {
-                    this.VmDmodInstaller.SelectedDmodSource = path;
+                    this.VmDmodInstaller.TemporaryDmodSource = path;
                 }
                 this.ActiveUserPage = MainViewPage.DmodInstaller;
             }

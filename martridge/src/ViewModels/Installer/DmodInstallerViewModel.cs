@@ -13,37 +13,145 @@ using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Martridge.ViewModels.DinkyAlerts;
+using ReactiveUI.Validation.Extensions;
 
 namespace Martridge.ViewModels.Installer {
     
-    public class DmodInstallerViewModel : InstallerViewModelBase {
+    public class DmodInstallerViewModel : ViewModelBase {
 
-        public string SelectedDmodSource {
-            get => this._selectedDmodSource;
-            set => this.RaiseAndSetIfChanged( ref this._selectedDmodSource, value);
+        /// <summary>
+        /// A nice title to show at the top of the UI
+        /// </summary>
+        public string DmodInstallerTitle {
+            get => this._dmodInstallerTitle;
+            private set => this.RaiseAndSetIfChanged(ref this._dmodInstallerTitle, value);
         }
-        private string _selectedDmodSource = "";
+        private string _dmodInstallerTitle = "";
 
-        public ObservableCollection<DirectoryInfo> InstallableDestinations { get; } = new ObservableCollection<DirectoryInfo>();
-
-        public DirectoryInfo? SelectedInstallableDestination {
-            get => this._selectedInstallableDestination;
-            set => this.RaiseAndSetIfChanged(ref this._selectedInstallableDestination, value);
+        /// <summary>
+        /// Indicates overall install phase
+        /// </summary>
+        public double DmodInstallerPhaseProgressPercent {
+            get => this._dmodInstallerPhaseProgressPercent;
+            private set => this.RaiseAndSetIfChanged(ref this._dmodInstallerPhaseProgressPercent, value);
         }
-        private DirectoryInfo? _selectedInstallableDestination = null;
+        private double _dmodInstallerPhaseProgressPercent = 0;
 
-        public string DmodDirectoryOverride {
-            get => this._dmodDirectoryOverride;
-            set => this.RaiseAndSetIfChanged(ref this._dmodDirectoryOverride, value);
+        /// <summary>
+        /// Shows various DMOD installer log info
+        /// </summary>
+        public string InstallerProgressLog {
+            get => this._installerTraceListener?.Text ?? "";
         }
-        private string _dmodDirectoryOverride = "";
+        private MyTraceListenerGui? _installerTraceListener = null;
 
+        /// <summary>
+        /// For keeping the DMOD isntaller log textbox scrolled down
+        /// </summary>
+        public int InstallerProgressLogCaretIndex {
+            get => this._installerProgressLogCaretIndex;
+            private set => this.RaiseAndSetIfChanged(ref this._installerProgressLogCaretIndex, value);
+        }
+        private int _installerProgressLogCaretIndex = 0;
+
+        /// <summary>
+        /// If true, the DMOD is actively being installed
+        /// </summary>
+        public bool DmodInstallerInProgress {
+            get => this._dmodInstallerInProgress;
+            private set => this.RaiseAndSetIfChanged(ref this._dmodInstallerInProgress, value);
+        }
+        private bool _dmodInstallerInProgress = false;
+
+        /// <summary>
+        /// Final DMOD source, this is what is actually used to install the DMOD
+        /// </summary>
+        public string FinalDmodSource {
+            get => this._finalDmodSource;
+            private set => this.RaiseAndSetIfChanged(ref this._finalDmodSource, value);
+        }
+        private string _finalDmodSource = "";
+        
+        /// <summary>
+        /// Temporary DMOD source value holder
+        /// </summary>
+        public string TemporaryDmodSource {
+            get => this._temporaryDmodSource;
+            set => this.RaiseAndSetIfChanged( ref this._temporaryDmodSource, value);
+        }
+        private string _temporaryDmodSource = "";
+
+        /// <summary>
+        /// Known DMOD base destination locations
+        /// </summary>
+        public ObservableCollection<DirectoryInfo> BaseDestinations { get; } = new ObservableCollection<DirectoryInfo>();
+
+        
+        /// <summary>
+        /// Selected DMOD base destination
+        /// </summary>
+        public DirectoryInfo? SelectedBaseDestination {
+            get => this._selectedBaseDestination;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this._selectedBaseDestination, value);
+                this.RefreshFinalDmodDestination();
+            }
+        }
+        private DirectoryInfo? _selectedBaseDestination = null;
+
+        /// <summary>
+        /// The final DMOD folder, overrides whatever the top level DMOD folder in the .dmod archive is
+        /// </summary>
+        public string DesiredDmodDirectory {
+            get => this._desiredDmodDirectory;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this._desiredDmodDirectory, value);
+                this.RefreshFinalDmodDestination();
+            }
+        }
+        private string _desiredDmodDirectory = "";
+
+        /// <summary>
+        /// Final DMOD destination path...
+        /// </summary>
+        public string FinalDmodDestination {
+            get => this._finalDmodDestination;
+            private set => this.RaiseAndSetIfChanged(ref this._finalDmodDestination, value);
+        }
+        private string _finalDmodDestination = "";
+
+        /// <summary>
+        /// Show the option to overwrite existing DMODs
+        /// </summary>
+        public bool ShowDesiredDmodDirectoryOverwrite {
+            get => this._showDesiredDmodDirectoryOverwrite;
+            set => this.RaiseAndSetIfChanged(ref this._showDesiredDmodDirectoryOverwrite, value);
+        }
+        private bool _showDesiredDmodDirectoryOverwrite = false;
+
+        /// <summary>
+        /// Enable overwriting existing DMODs
+        /// </summary>
+        public bool IsEnabledDesiredDmodDirectoryOverwrite {
+            get => this._isEnabledDesiredDmodDirectoryOverwrite;
+            set => this.RaiseAndSetIfChanged(ref this._isEnabledDesiredDmodDirectoryOverwrite, value);
+        }
+        private bool _isEnabledDesiredDmodDirectoryOverwrite = false;
+
+        /// <summary>
+        /// Current DMOD install phase...
+        /// </summary>
         public DmodInstallPhase InstallPhase {
             get => this._installPhase;
             private set => this.RaiseAndSetIfChanged( ref this._installPhase, value);
         }
         private DmodInstallPhase _installPhase = DmodInstallPhase.Inactive;
 
+        /// <summary>
+        /// Indicates if the file browser was opened and not yet closed
+        /// </summary>
         public bool IsFileBrowserActive {
             get => this._isFileBrowserActive;
             private set => this.RaiseAndSetIfChanged(ref this._isFileBrowserActive, value);
@@ -55,10 +163,12 @@ namespace Martridge.ViewModels.Installer {
         //
         
         public event EventHandler<DmodInstallerDoneEventArgs>? InstallerDone;
+        
         private DmodInstallerDoneEventArgs _installerDoneEventArgs = new DmodInstallerDoneEventArgs(DinkInstallerResult.Cancelled);
         
         private ConfigGeneral? _configGeneral = null;
         private DmodInstaller? _installerLogic = null;
+        private readonly object _syncRoot_DesiredDmodDirectory = new object();
 
 
         // ------------------------------------------------------------------------------------------
@@ -67,6 +177,49 @@ namespace Martridge.ViewModels.Installer {
         
         public DmodInstallerViewModel() {
             this.ResetInstallerStateAndFireDoneEvent(false);
+            
+            // validate source DMOD
+            this.ValidationRule(x => x.TemporaryDmodSource,
+                dmodSource => {
+                    try
+                    {
+                        return (string.IsNullOrWhiteSpace(dmodSource) == false && File.Exists(dmodSource));
+                    } catch (Exception)
+                    {
+                        return false;
+                    }
+                },
+                Localizer.Instance["DmodInstaller/Validation/MissingSourceDmod"]);
+            
+            // validate final destination directory...
+            this.ValidationRule(x => x.FinalDmodDestination,
+                finalDestination => string.IsNullOrWhiteSpace(finalDestination) == false,
+                Localizer.Instance["DmodInstaller/Validation/DestinationEmpty"]);
+            this.ValidationRule(x => x.FinalDmodDestination,
+                finalDestination => {
+                    this.SelectedBaseDestination?.Refresh();
+                    return this.SelectedBaseDestination?.Exists == true;
+                },
+                Localizer.Instance["DmodInstaller/Validation/DestinationBaseDoesNotExist"]);
+            this.ValidationRule(x => x.FinalDmodDestination,
+                finalDestination => {
+                    try
+                    {
+                        // reset the show overwrite checkbox every time we validate...
+                        // the user must explicitly confirm the *final* location if they want to overwrite it
+                        this.ShowDesiredDmodDirectoryOverwrite = false;
+                        this.IsEnabledDesiredDmodDirectoryOverwrite = false;
+                        
+                        bool exists = Directory.Exists(finalDestination);
+                        if (exists) this.ShowDesiredDmodDirectoryOverwrite = true;
+                        return exists == false;
+                    } catch (Exception)
+                    {
+                        // if we get an exception, technically the directory does not exist so don't show this validation message..
+                        return true;
+                    }
+                },
+                Localizer.Instance["DmodInstaller/Validation/DestinationAlreadyExists"]);
         }
 
         public void InitializeConfiguration(ConfigGeneral cfg) {
@@ -87,14 +240,14 @@ namespace Martridge.ViewModels.Installer {
 
         private void InitializeDmodLocations() {
             if (this._configGeneral == null) return;
-            this.InstallableDestinations.Clear();
+            this.BaseDestinations.Clear();
             List<DirectoryInfo> dmodPlaces = this._configGeneral.GetRealDmodDirectories();
 
             foreach (DirectoryInfo dirInfo in dmodPlaces) {
-                this.InstallableDestinations.Add(dirInfo);
+                this.BaseDestinations.Add(dirInfo);
             }
             
-            this.SelectedInstallableDestination = dmodPlaces.First();
+            this.SelectedBaseDestination = dmodPlaces.First();
         }
 
         // ------------------------------------------------------------------------------------------
@@ -108,11 +261,10 @@ namespace Martridge.ViewModels.Installer {
             if (this.InstallPhase != DmodInstallPhase.Inactive) return;
             if (parameter is not string dmodPath) return;
             
-            FileInfo fileInfo = new FileInfo(dmodPath);
-            if (fileInfo.Exists == false) return;
-            
-            this.SelectedDmodSource = fileInfo.FullName;
-            await this.StartInitializingDmod(fileInfo);
+            if (File.Exists(dmodPath) == false) return;
+
+            this.FinalDmodDestination = dmodPath;
+            await this.StartInitializingDmod();
         }
         [DependsOn(nameof(InstallPhase))]
         public bool CanCmdInitializeDmod(object? parameter = null)
@@ -164,13 +316,21 @@ namespace Martridge.ViewModels.Installer {
         }
         [DependsOn(nameof(InstallPhase))]
         [DependsOn(nameof(ParentWindow))]
-        [DependsOn(nameof(SelectedInstallableDestination))]
+        [DependsOn(nameof(SelectedBaseDestination))]
+        [DependsOn(nameof(DesiredDmodDirectory))]
+        [DependsOn(nameof(FinalDmodDestination))]
+        [DependsOn(nameof(IsEnabledDesiredDmodDirectoryOverwrite))]
         public bool CanCmdStartInstall(object? parameter = null)
         {
             if (this.InstallPhase != DmodInstallPhase.AwaitingUserInput) return false;
             if (this.ParentWindow == null) return false;
-            if (this.SelectedInstallableDestination == null) return false;
-            return true;
+            if (this.SelectedBaseDestination == null) return false;
+            if (string.IsNullOrWhiteSpace(this.DesiredDmodDirectory)) return false;
+            
+            // base destination must exist, final destination must not or overwrite must be enabled...
+            return
+                Directory.Exists(this.SelectedBaseDestination.FullName) &&
+                (Directory.Exists(this.FinalDmodDestination) == false || this.IsEnabledDesiredDmodDirectoryOverwrite);
         }
 
         public void CmdBrowseDmod(object? parameter = null) {
@@ -189,6 +349,18 @@ namespace Martridge.ViewModels.Installer {
         // ------------------------------------------------------------------------------------------
         //      Command logic
         //
+
+        private void RefreshFinalDmodDestination()
+        {
+            if (this._selectedBaseDestination != null)
+            {
+                this.FinalDmodDestination = Path.Combine(this._selectedBaseDestination.FullName, this.DesiredDmodDirectory);
+            }
+            else
+            {
+                this.FinalDmodDestination = "";
+            }
+        }
         
         private Task BrowseDmod_Internal() {
             if (this.ParentWindow?.StorageProvider.CanOpen != true || this.IsFileBrowserActive) return Task.CompletedTask;
@@ -216,7 +388,7 @@ namespace Martridge.ViewModels.Installer {
 
                     if (results.Count > 0)
                     {
-                        this.SelectedDmodSource = results[0].Path.AbsolutePath;
+                        this.TemporaryDmodSource = results[0].Path.AbsolutePath;
                     }
 
                 } catch (Exception ex)
@@ -230,22 +402,22 @@ namespace Martridge.ViewModels.Installer {
             });
         }
 
-        private Task StartInitializingDmod(FileInfo dmodPath)
+        private Task StartInitializingDmod()
         {
-            dmodPath.Refresh();
-            if (dmodPath.Exists == false) return Task.CompletedTask;
-
             return Task.Run(() => {
                 try
                 {
+                    FileInfo fileInfo = new FileInfo(this.FinalDmodSource);
+                    if (fileInfo.Exists == false) return;
+                    
                     // preemptively update phase...
                     this.InstallPhase = DmodInstallPhase.Initializing;
                     
                     // create installer trace listener
-                    this.InstallerTraceListener = new MyTraceListenerGui("Installer Trace Listener");
-                    this.InstallerTraceListener.ShowLevels = false;
-                    this.InstallerTraceListener.Levels = MyTraceLevel.Critical | MyTraceLevel.Error | MyTraceLevel.Warning | MyTraceLevel.Information;
-                    this.InstallerTraceListener.PropertyChanged += ( sender,  args) => {
+                    this._installerTraceListener = new MyTraceListenerGui("Installer Trace Listener");
+                    this._installerTraceListener.ShowLevels = false;
+                    this._installerTraceListener.Levels = MyTraceLevel.Critical | MyTraceLevel.Error | MyTraceLevel.Warning | MyTraceLevel.Information;
+                    this._installerTraceListener.PropertyChanged += ( sender,  args) => {
                         this.RaisePropertyChanged(nameof(this.InstallerProgressLog));
                         this.InstallerProgressLogCaretIndex = int.MaxValue;
                     };
@@ -253,9 +425,11 @@ namespace Martridge.ViewModels.Installer {
 
                     // create installer logic
                     this._installerLogic = new DmodInstaller();
-                    this._installerLogic.CustomTrace.Listeners.Add(this.InstallerTraceListener);
+                    this._installerLogic.CustomTrace.Listeners.Add(this._installerTraceListener);
                     this._installerLogic.ProgressReport += this.InstallerOnProgressReport;
-                    this._installerLogic.Initialize(dmodPath, DmodInstallPreprocessingMode.QuickPeek);
+                    this._installerLogic.DmodInstallerActivityStarted += this.InstallerLogicOnDmodInstallerActivityStarted;
+                    this._installerLogic.DmodInstallerActivityEnded += this.InstallerLogicOnDmodInstallerActivityEnded;
+                    this._installerLogic.Initialize(fileInfo, DmodInstallPreprocessingMode.QuickPeek);
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                 }
@@ -267,10 +441,10 @@ namespace Martridge.ViewModels.Installer {
 
             return Task.Run(() => {
                 try {
-                    if (this.SelectedInstallableDestination == null) return;
+                    if (this.SelectedBaseDestination == null) return;
                     if (this._installerLogic == null) return;
                     
-                    this._installerLogic.InstallDmod(this.SelectedInstallableDestination, this.DmodDirectoryOverride);
+                    this._installerLogic.InstallDmod(this.SelectedBaseDestination, this.DesiredDmodDirectory, this.IsEnabledDesiredDmodDirectoryOverwrite);
                     
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
@@ -288,25 +462,35 @@ namespace Martridge.ViewModels.Installer {
                 this._installerLogic = null;
             }
 
-            this.InstallerTraceListener?.Close();
-            this.InstallerTraceListener = null;
+            this._installerTraceListener?.Close();
+            this._installerTraceListener = null;
             
             this.RaisePropertyChanged(nameof(this.InstallerProgressLog));
             this.RaisePropertyChanged(nameof(this.InstallerProgressLogCaretIndex));
+            
             this.InstallPhase = DmodInstallPhase.Inactive;
-            this.SelectedInstallableDestination = null;
-            this.SelectedDmodSource = "";
-            this.DmodDirectoryOverride = "";
+            
+            this.SelectedBaseDestination = null;
+            this.TemporaryDmodSource = "";
+            this.DesiredDmodDirectory = "";
 
-            this.InstallerProgressTitle = Localizer.Instance[@"DmodInstallerView/Title"];
-
-            this.InstallerProgressLevel0IsVisibile = false;
-            this.InstallerProgressLevel1IsVisibile = false;
+            this.DmodInstallerTitle = Localizer.Instance[@"DmodInstallerView/Title"];
+            this.DmodInstallerPhaseProgressPercent = 0.0;
+            this.DmodInstallerInProgress = false;
 
             if (fireDone)
             {
                 this.InstallerDone?.Invoke(this, this._installerDoneEventArgs);
             }
+        }
+        
+        private void InstallerLogicOnDmodInstallerActivityEnded(object? sender, EventArgs e)
+        {
+            this.DmodInstallerInProgress = false;
+        }
+        private void InstallerLogicOnDmodInstallerActivityStarted(object? sender, EventArgs e)
+        {
+            this.DmodInstallerInProgress = true;
         }
 
         private void InstallerOnProgressReport(object? sender, DmodInstallerProgressEventArgs args) {
@@ -322,38 +506,14 @@ namespace Martridge.ViewModels.Installer {
                 {
                     title += " - " + installer.DmodSourceNameNoExt;
                 }
-                this.InstallerProgressTitle = title;
+                this.DmodInstallerTitle = title;
                 
-                if (args.ProgressLevel == InstallerReportLevel.Primary) {
-                    this.InstallerProgressLevel0IsVisibile = true;
-                    this.InstallerProgressLevel0MainTitle = args.HeadingMain;
-                    this.InstallerProgressLevel0SubTitle = args.HeadingSecondary;
-                    this.InstallerProgressLevel0Progress = args.ProgressPercent;
-                }
+                this.DmodInstallerPhaseProgressPercent = args.ProgressPercent;
                 
-                if (args.ProgressLevel == InstallerReportLevel.Secondary) {
-                    if (Math.Abs(args.ProgressPercent - 1.0) < 0.00001) {
-                        this.InstallerProgressLevel1IsVisibile = false;
-                    } else {
-                        this.InstallerProgressLevel1IsVisibile = true;
-                    }
-
-                    this.InstallerProgressLevel1Indeterminate = false;
-                    this.InstallerProgressLevel1MainTitle = args.HeadingMain;
-                    this.InstallerProgressLevel1SubTitle = args.HeadingSecondary;
-                    this.InstallerProgressLevel1Progress = args.ProgressPercent;
-                }
-                
-                if (args.ProgressLevel == InstallerReportLevel.Indeterminate) {
-                    if (Math.Abs(args.ProgressPercent - 1.0) < 0.00001) {
-                        this.InstallerProgressLevel1IsVisibile = false;
-                    } else {
-                        this.InstallerProgressLevel1IsVisibile = true;
-                    }
-                    this.InstallerProgressLevel1Indeterminate = true;
-                    this.InstallerProgressLevel1MainTitle = args.HeadingMain;
-                    this.InstallerProgressLevel1SubTitle = args.HeadingSecondary;
-                    this.InstallerProgressLevel1Progress = args.ProgressPercent;
+                // just in case this wasn't cleared?...
+                if (args.Phase == DmodInstallPhase.Finished)
+                {
+                    this.DmodInstallerInProgress = false;
                 }
 
                 switch (args.Phase)
@@ -361,7 +521,10 @@ namespace Martridge.ViewModels.Installer {
                     case DmodInstallPhase.AwaitingUserInput:
                     {
                         // just finished Initializing...
-                        this.DmodDirectoryOverride = installer.DmodRootName ?? "";
+                        lock (this._syncRoot_DesiredDmodDirectory)
+                        {
+                            this.DesiredDmodDirectory = installer.DmodRootName ?? "";
+                        }
                         break;
                     }
                     case DmodInstallPhase.Finished:
@@ -378,7 +541,53 @@ namespace Martridge.ViewModels.Installer {
             }
         }
 
-        
+        // ------------------------------------------------------------------------------------------
+        //      Message box stuff
+        //
+
+        private void ShowInstallerCancelledMessageBox() {
+            Dispatcher.UIThread.InvokeAsync(async () => {
+                try {
+                    if (this.ParentWindow == null) return;
+                    
+                    string title = Localizer.Instance["DmodInstaller/MessageBox_Cancel_Title"];
+                    string body = Localizer.Instance["DmodInstaller/MessageBox_Cancel_Body"];
+                    if (Directory.Exists(this.FinalDmodDestination))
+                    {
+                        body += Environment.NewLine;
+                        body += Environment.NewLine;
+                        body += Localizer.Instance["DmodInstaller/MessageBox_Extra_ManualCleanup"];
+                        body += Environment.NewLine;
+                        body += this.FinalDmodDestination;
+                    }
+                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Info, this.ParentWindow);
+                } catch (Exception ex) {
+                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                }
+            });
+        }
+
+        private void ShowInstallerErrorMessageBox(Exception? exception) {
+            Dispatcher.UIThread.InvokeAsync(async () => {
+                try {
+                    if (this.ParentWindow == null) return;
+                    
+                    string title = Localizer.Instance["DmodInstaller/MessageBox_Error_Title"];
+                    string body = Localizer.Instance["DmodInstaller/MessageBox_Error_Body"] + Environment.NewLine + MyTrace.GetExceptionMessages(exception);
+                    if (Directory.Exists(this.FinalDmodDestination))
+                    {
+                        body += Environment.NewLine;
+                        body += Environment.NewLine;
+                        body += Localizer.Instance["DmodInstaller/MessageBox_Extra_ManualCleanup"];
+                        body += Environment.NewLine;
+                        body += this.FinalDmodDestination;
+                    }
+                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Error, this.ParentWindow);
+                } catch (Exception ex) {
+                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                }
+            });
+        }
     }
 }
 

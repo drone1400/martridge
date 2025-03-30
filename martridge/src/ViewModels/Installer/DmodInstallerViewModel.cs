@@ -263,7 +263,7 @@ namespace Martridge.ViewModels.Installer {
             
             if (File.Exists(dmodPath) == false) return;
 
-            this.FinalDmodDestination = dmodPath;
+            this.FinalDmodSource = dmodPath;
             await this.StartInitializingDmod();
         }
         [DependsOn(nameof(InstallPhase))]

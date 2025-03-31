@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Martridge.Models.DmodInstaller;
+using Martridge.Models.DmodPacker;
 
 namespace Martridge.ViewModels {
     public class MainWindowViewModel : ViewModelBase {

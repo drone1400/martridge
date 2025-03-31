@@ -1,14 +1,14 @@
-﻿using Martridge.Models.Localization;
-using Martridge.Trace;
-using SharpCompress.Common;
-using SharpCompress.Writers.Tar;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Martridge.Models.Installer;
+using Martridge.Models.Localization;
+using Martridge.Trace;
+using SharpCompress.Common;
 using SharpCompress.Compressors.PBZip2;
-
-namespace Martridge.Models.Installer {
+using SharpCompress.Writers.Tar;
+namespace Martridge.Models.DmodPacker {
     public class DmodPacker : InstallerBase {
         public event EventHandler<DmodPackerDoneEventArgs>? InstallerDone;
 

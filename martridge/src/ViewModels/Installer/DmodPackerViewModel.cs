@@ -10,6 +10,7 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Martridge.Models.DmodPacker;
 
 namespace Martridge.ViewModels.Installer {
     public class DmodPackerViewModel : InstallerViewModelBase {

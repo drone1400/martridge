@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using Martridge.Trace;
-
-namespace Martridge.Models.Installer {
+namespace Martridge.Models {
     public class DinkTempFileHelper : IDisposable {
         
         public IReadOnlyList<FileInfo> TempFileList;

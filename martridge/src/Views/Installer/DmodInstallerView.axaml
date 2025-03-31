@@ -7,6 +7,7 @@
              xmlns:vmi="using:Martridge.ViewModels.Installer"
              xmlns:vm="clr-namespace:Martridge.ViewModels"
              xmlns:installer="clr-namespace:Martridge.Models.Installer"
+             xmlns:dmodInstaller="clr-namespace:Martridge.Models.DmodInstaller"
 
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Martridge.Views.Installer.DmodInstallerView"
@@ -32,7 +33,7 @@
 
                 <StackPanel IsVisible="{Binding InstallPhase,
                                 Converter={StaticResource GenericEqualsBoolConverter}, 
-                                ConverterParameter={x:Static installer:DmodInstallPhase.Inactive} }">
+                                ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Inactive} }">
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Grid.Column="0" Classes="Heading2B"
                                Content="{dloc:Localize DmodInstallerView/DmodSelect/SelectDmod}" />
@@ -44,12 +45,12 @@
                     <TextBox Text="{Binding TemporaryDmodSource}"
                              IsReadOnly="{Binding InstallPhase,
                                         Converter={StaticResource GenericNotEqualsBoolConverter},
-                                        ConverterParameter={x:Static installer:DmodInstallPhase.Inactive} }" />
+                                        ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Inactive} }" />
                 </StackPanel>
 
                 <StackPanel IsVisible="{Binding InstallPhase,
                                 Converter={StaticResource GenericNotEqualsBoolConverter}, 
-                                ConverterParameter={x:Static installer:DmodInstallPhase.Inactive} }">
+                                ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Inactive} }">
 
                     <Label Classes="Heading2I"
                            Content="{Binding FinalDmodDestination}" />
@@ -69,7 +70,7 @@
                 <StackPanel Grid.Row="0"
                             IsVisible="{Binding InstallPhase,
                                 Converter={StaticResource GenericEqualsBoolConverter},
-                                ConverterParameter={x:Static installer:DmodInstallPhase.AwaitingUserInput} }">
+                                ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.AwaitingUserInput} }">
 
                     <Label Classes="Heading2B"
                            Content="{dloc:Localize DmodInstallerView/DmodSelect/SelectDestination}" />
@@ -118,23 +119,23 @@
                             Command="{Binding CmdCancel}"
                             IsVisible="{Binding InstallPhase,
                                         Converter={StaticResource GenericNotEqualsBoolConverter},
-                                        ConverterParameter={x:Static installer:DmodInstallPhase.Finished} }" />
+                                        ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Finished} }" />
                     <Button Content="{dloc:Localize DmodInstallerView/Button/InitializeDmod}"
                             Command="{Binding CmdInitializeDmod}"
                             CommandParameter="{Binding TemporaryDmodSource}"
                             IsVisible="{Binding InstallPhase,
                                         Converter={StaticResource GenericEqualsBoolConverter},
-                                        ConverterParameter={x:Static installer:DmodInstallPhase.Inactive} }" />
+                                        ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Inactive} }" />
                     <Button Content="{dloc:Localize DmodInstallerView/Button/StartInstall}"
                             Command="{Binding CmdStartInstall}"
                             IsVisible="{Binding InstallPhase,
                                         Converter={StaticResource GenericEqualsBoolConverter},
-                                        ConverterParameter={x:Static installer:DmodInstallPhase.AwaitingUserInput} }" />
+                                        ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.AwaitingUserInput} }" />
                     <Button Content="{dloc:Localize DmodInstallerView/Button/Finish}"
                             Command="{Binding CmdFinish}"
                             IsVisible="{Binding InstallPhase,
                                         Converter={StaticResource GenericEqualsBoolConverter},
-                                        ConverterParameter={x:Static installer:DmodInstallPhase.Finished} }" />
+                                        ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Finished} }" />
                 </WrapPanel>
             </Grid>
 

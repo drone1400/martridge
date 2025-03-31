@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Martridge.Models.DmodInstaller;
 using Martridge.ViewModels.DinkyAlerts;
 using ReactiveUI.Validation.Extensions;
 

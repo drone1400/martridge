@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-
-namespace Martridge.Models.Installer {
+using Martridge.Models.Installer;
+namespace Martridge.Models.DmodInstaller {
     public class DmodInstallerDoneEventArgs : EventArgs {
         public DinkInstallerResult Result { get; }
 

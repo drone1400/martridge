@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using Martridge.Trace;
 
 namespace Martridge.Models.Installer {
     public class DinkTempFileHelper : IDisposable {
@@ -59,18 +60,18 @@ namespace Martridge.Models.Installer {
                     try {
                         x.Delete();
                     } catch (Exception ex) {
-                        // TODO ...
+                        MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                     }
                 }
                 foreach (var x in this._tempDirectories) {
                     try {
                         x.Delete();
                     } catch (Exception ex) {
-                        // TODO ...
+                        MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                     }
                 }
             } catch (Exception ex) {
-                // TODO ...
+                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
             }
 
             this._disposed = true;

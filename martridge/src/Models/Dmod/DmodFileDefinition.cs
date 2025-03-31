@@ -107,10 +107,9 @@ namespace Martridge.Models.Dmod {
                 }
             }
 
+            // NOTE: DMOD can be missing dink.ini and hard.dat, in which case the default ones from the core install will be used...
             if (this.DinkDat != null &&
-                this.DinkIni != null &&
                 this.DmodDiz != null &&
-                this.HardDat != null &&
                 this.MapDat != null) {
                 this.IsCorrectlyDefined = true;
             }

@@ -12,13 +12,13 @@ namespace Martridge.Models.Dmod {
             "preview", "title-01", "misc-01", "dinkl-01", 
         };
 
-        private const string FileNameDinkIni = "dink.ini";
-        private const string FileNameDmodDiz = "dmod.diz";
-        private const string FileNameDinkDat = "dink.dat";
-        private const string FileNameHardDat = "hard.dat";
-        private const string FileNameMapDat = "map.dat";
-        private const string FileNameDirff = "dir.ff";
-        private const string DirNameGraphics = "graphics";
+        private const string FILE_NAME_DINK_INI = "dink.ini";
+        private const string FILE_NAME_DMOD_DIZ = "dmod.diz";
+        private const string FILE_NAME_DINK_DAT = "dink.dat";
+        private const string FILE_NAME_HARD_DAT = "hard.dat";
+        private const string FILE_NAME_MAP_DAT = "map.dat";
+        private const string FILE_NAME_DIRFF = "dir.ff";
+        private const string DIR_NAME_GRAPHICS = "graphics";
 
 
         public bool IsCorrectlyDefined { get; private set; } = false;
@@ -89,19 +89,19 @@ namespace Martridge.Models.Dmod {
                 string fileLower = file.Name.ToLowerInvariant();
 
                 switch (fileLower) {
-                    case FileNameDinkDat:
+                    case FILE_NAME_DINK_DAT:
                         this.DinkDat = file;
                         break;
-                    case FileNameDinkIni:
+                    case FILE_NAME_DINK_INI:
                         this.DinkIni = file;
                         break;
-                    case FileNameDmodDiz:
+                    case FILE_NAME_DMOD_DIZ:
                         this.DmodDiz = file;
                         break;
-                    case FileNameHardDat:
+                    case FILE_NAME_HARD_DAT:
                         this.HardDat = file;
                         break;
-                    case FileNameMapDat:
+                    case FILE_NAME_MAP_DAT:
                         this.MapDat = file;
                         break;
                 }
@@ -187,7 +187,7 @@ namespace Martridge.Models.Dmod {
                 }
 
                 // scan dir.ff
-                if (fileLower == FileNameDirff) {
+                if (fileLower == FILE_NAME_DIRFF) {
                     Bitmap? bmp = this.ScanDirFf(file);
                     if (bmp != null) {
                         return bmp;
@@ -212,7 +212,7 @@ namespace Martridge.Models.Dmod {
                 DirectoryInfo? graphicsRoot = null;
                 DirectoryInfo[] lvl1dirs = this.DmodRoot.GetDirectories();
                 foreach (DirectoryInfo dirInfo in lvl1dirs) {
-                    if (dirInfo.Name.ToLowerInvariant() == DirNameGraphics) {
+                    if (dirInfo.Name.ToLowerInvariant() == DIR_NAME_GRAPHICS) {
                         graphicsRoot = dirInfo;
                         break;
                     }

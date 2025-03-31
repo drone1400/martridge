@@ -555,17 +555,7 @@ namespace Martridge.Models.Installer {
             
             this.ReportActivityStart();
             this.LogMessage(Localizer.Instance[@"DmodInstaller/CleaningUpStart"]);
-            foreach (FileInfo tempFile in this._temp.TempFileList) {
-                try
-                {
-                    tempFile.Refresh();
-                    this.LogMessage($"    {tempFile.FullName}");
-                    tempFile.Delete();
-                } catch (Exception ex)
-                {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
-                }
-            }
+            this._temp.Dispose();
             this.ReportActivityEnd();
             this.LogMessage(Localizer.Instance[@"DmodInstaller/CleaningUpEnd"]);
         }

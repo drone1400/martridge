@@ -10,12 +10,7 @@
   "DinkInstaller/Heading/CancelledByUser": "Installation aborted by user!...",
   "DinkInstaller/Heading/ErrorOccured": "Installation interrupted by error!...",
   "DinkInstaller/Heading/AllDone": "Installation complete!",
-  
-  "DinkInstaller/HeadingPacking/PackingDmod": "Packing DMOD",
-  "DinkInstaller/HeadingPacking/CancelledByUser": "Packing aborted by user!...",
-  "DinkInstaller/HeadingPacking/ErrorOccured": "Packing interrupted by error!...",
-  "DinkInstaller/HeadingPacking/AllDone": "Packing complete!",
-  
+
   "DinkInstaller/Preparing/DestinationErrorIsRoot": "Destination can not be a root path!",
   "DinkInstaller/Preparing/DestinationErrorIsNotRooted": "Destination can not be a relative path",
   "DinkInstaller/Preparing/CreatingDirectory": "Creating Directory!",
@@ -52,14 +47,7 @@
   "DinkInstaller/CleaningUp/Start": "Starting cleanup...",
   "DinkInstaller/CleaningUp/Remove": "Removing...",
   "DinkInstaller/CleaningUp/Done": "Done with cleanup!...",
-
-  "DinkInstaller/PackingDmod/Start": "Packing DMOD",
-  "DinkInstaller/PackingDmod/FoundFiles": "Done indexing files...",
-  "DinkInstaller/PackingDmod/CreatingTemporaryTar": "Creating TAR archive",
-  "DinkInstaller/PackingDmod/CreatingBzip2Archive": "Creating BZIP2 DMOD file",
-  "DinkInstaller/PackingDmod/Detail": "Compressing files...",
-  "DinkInstaller/PackingDmod/Done": "Done packing DMOD!",
-
+  
   "DinkInstallerView/Title": "Martridge - Dink Installer",
   "DinkInstallerView/HeadingNotSupported": "Dink Installer Not Supported",
   "DinkInstallerView/HeadingNotSupportedDetails": "Automated Dink Installer is only available on Windows right now.\n\r Visit the link below and follow the instructions for your distribution to install FreeDink.\n\r\n\rhttps://www.gnu.org/software/freedink/get-distros",
@@ -99,7 +87,6 @@
   "DinkInstallerView/MessageBox_CleanInstallConfirm_Body": "Existing files detected in installation destination!\n\rDo you want to DELETE all existing files before installing?\n\r\n\r    Yes = Delete everything, clean install\n\r    No = Install over existing files\n\r    Cancel = Cancels the installation",
   "DinkInstallerView/MessageBox_DmodOverwriteInstallConfirm_Title": "DMOD installation issue!...",
   "DinkInstallerView/MessageBox_DmodOverwriteInstallConfirm_Body": "Existing files detected in DMOD destination!\n\rDo you want to install over the existing files?\n\r\n\r    Yes = Install over existing files\n\r    Cancel = Cancels the installation",
-
   "DinkInstallerView/MessageBox_CleanInstallConfirm_DeleteDoubleConfirm_Title": "Installation issue!...",
   "DinkInstallerView/MessageBox_CleanInstallConfirm_DeleteDoubleConfirm_Body": "You have chosen to DELETE ALL FILES in the Installation path! Are you REALLY sure this is what you want?! Clicking YES here will delete all files in the destination path!",
   
@@ -193,8 +180,6 @@
   "DmodPacker/ViewModel/MessageBox_Cancel_Body": "DMOD Packing was cancelled!",  
   "DmodPacker/ViewModel/MessageBox_Error_Title": "DMOD Packing error!",
   "DmodPacker/ViewModel/MessageBox_Error_Body": "DMOD Packing was interrupted by an error!",
-  
-  
 
   "DinkyAlertWindow/ButtonOk": "Ok",
   "DinkyAlertWindow/ButtonYes": "Yes",

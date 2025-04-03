@@ -73,7 +73,7 @@ namespace Martridge.ViewModels {
             this.VmDmodInstaller.InstallerDone += this.VmDmodInstallerOnInstallerDone;
             this.VmDmodInstaller.InitializeConfiguration(this._logic.Config.General);
             
-            this.VmDmodPacker.InstallerDone += this.VmDmodPackerOnInstallerDone;
+            this.VmDmodPacker.PackerDone += this.VmDmodPackerOnInstallerDone;
             
             this.VmDmodBrowser.Configuration = this._logic.Config;
             this.VmDmodBrowser.DmodManager = this._logic.DmodManager;
@@ -307,7 +307,7 @@ namespace Martridge.ViewModels {
             if (this.ActiveUserPage != MainViewPage.MainView) return;
             
             if (new DmodFileDefinition(path).IsCorrectlyDefined) {
-                this.VmDmodPacker.SelectedDmodSourceDirectory = path;
+                this.VmDmodPacker.TemporaryDmodSourceDirectory = path;
                 this.ActiveUserPage = MainViewPage.DmodPacker;
             }
         }

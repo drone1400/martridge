@@ -2,9 +2,15 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using DynamicData;
+using Martridge.Models.Localization;
 using Martridge.Trace;
 namespace Martridge.Models {
-    public class DinkTempFileHelper : IDisposable {
+    public class DinkTempFileHelper : IDisposable
+    {
+
+        public delegate void LogCallback(string message);
+        
         
         public IReadOnlyList<FileInfo> TempFileList;
         public IReadOnlyList<DirectoryInfo> TempDirectories;
@@ -14,6 +20,8 @@ namespace Martridge.Models {
         private DirectoryInfo _tempBaseFolder;
         
         private bool _disposed = false;
+
+        private LogCallback? _logCallback = null;
 
         public DinkTempFileHelper() {
             this.TempFileList = new ReadOnlyCollection<FileInfo>(this._tempFiles);
@@ -28,16 +36,49 @@ namespace Martridge.Models {
             this._tempDirectories.Add(this._tempBaseFolder);
         }
 
+        public void SetLogCallback(LogCallback callback)
+        {
+            this._logCallback = callback;
+        }
+        public void ClearLogCallback() 
+        {
+            this._logCallback = null;
+        }
+
         public FileInfo? TryCreateTempFile() {
             try {
                 string filename = Path.GetRandomFileName();
-                FileInfo temp = new FileInfo(Path.Combine(this._tempBaseFolder.FullName, filename));
+                string fullPath = Path.Combine(this._tempBaseFolder.FullName, filename);
+                this._logCallback?.Invoke(Localizer.Instance["DinkTempFileHelper/Log/CreatingTemporaryFile"] + fullPath);
+                FileInfo temp = new FileInfo(fullPath);
                 using FileStream tempFs = temp.Create();
                 this._tempFiles.Add(temp);
                 return temp;
             } catch (Exception) {
                 return null;
             }
+        }
+
+        public DirectoryInfo? TryCreateTempDirectory()
+        {
+            try
+            {
+                string dirName = Path.GetRandomFileName();
+                string fullPath = Path.Combine(this._tempBaseFolder.FullName, dirName);
+                this._logCallback?.Invoke(Localizer.Instance["DinkTempFileHelper/Log/CreatingTemporaryDirectory"] + fullPath);
+                DirectoryInfo temp = new DirectoryInfo(fullPath);
+                temp.Create();
+                this._tempDirectories.Add(temp);
+                return temp;
+            } catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public void RegisterTempFile(FileInfo tempFile)
+        {
+            this._tempFiles.Add(tempFile);
         }
 
         public void Dispose() {
@@ -54,9 +95,14 @@ namespace Martridge.Models {
                 // no managed objects...
             }
 
+            string deleteFileMsg = Localizer.Instance["DinkTempFileHelper/Log/DeletingTemporaryFile"];
+            string deleteDirectoryMsg = Localizer.Instance["DinkTempFileHelper/Log/DeletingTemporaryDirectory"];
+            
+
             try {
                 foreach (var x in this._tempFiles) {
                     try {
+                        this._logCallback?.Invoke(deleteFileMsg + x.FullName);
                         x.Delete();
                     } catch (Exception ex) {
                         MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
@@ -64,6 +110,7 @@ namespace Martridge.Models {
                 }
                 foreach (var x in this._tempDirectories) {
                     try {
+                        this._logCallback?.Invoke(deleteDirectoryMsg + x.FullName);
                         x.Delete();
                     } catch (Exception ex) {
                         MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);

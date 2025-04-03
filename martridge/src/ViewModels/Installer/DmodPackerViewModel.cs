@@ -1,7 +1,4 @@
-﻿using Avalonia.Controls;
-using Avalonia.Metadata;
-using Martridge.Models;
-using Martridge.Models.Dmod;
+﻿using Avalonia.Metadata;
 using Martridge.Models.Installer;
 using Martridge.Models.Localization;
 using Martridge.Trace;
@@ -9,78 +6,190 @@ using Martridge.ViewModels.DinkyAlerts;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Avalonia.Platform.Storage;
+using Avalonia.Threading;
+using Martridge.Models.Configuration;
+using Martridge.Models.Dmod;
+using Martridge.Models.DmodInstaller;
 using Martridge.Models.DmodPacker;
+using ReactiveUI.Validation.Extensions;
 
 namespace Martridge.ViewModels.Installer {
-    public class DmodPackerViewModel : InstallerViewModelBase {
-         
-        // ------------------------------------------------------------------------------------------
-        //      Installer State 
-        //
+    public class DmodPackerViewModel : ViewModelBase {
+
+        /// <summary>
+        /// A nice title to show at the top of the UI
+        /// </summary>
+        public string DmodPackerTitle {
+            get => this._dmodPackerTitle;
+            private set => this.RaiseAndSetIfChanged(ref this._dmodPackerTitle, value);
+        }
+        private string _dmodPackerTitle = "";
+
+        /// <summary>
+        /// Indicates overall packing phase
+        /// </summary>
+        public double DmodPackerPhaseProgressPercent {
+            get => this._dmodPackerPhaseProgressPercent;
+            private set => this.RaiseAndSetIfChanged(ref this._dmodPackerPhaseProgressPercent, value);
+        }
+        private double _dmodPackerPhaseProgressPercent = 0;
+
+        /// <summary>
+        /// Shows various DMOD packer log info
+        /// </summary>
+        public string DmodPackerProgressLog {
+            get => this._packerTraceListener?.Text ?? "";
+        }
+        private MyTraceListenerGui? _packerTraceListener = null;
+
+        /// <summary>
+        /// For keeping the DMOD packer log textbox scrolled down
+        /// </summary>
+        public int DmodPackerProgressLogCaretIndex {
+            get => this._dmodPackerProgressLogCaretIndex;
+            private set => this.RaiseAndSetIfChanged(ref this._dmodPackerProgressLogCaretIndex, value);
+        }
+        private int _dmodPackerProgressLogCaretIndex = 0;
+
+        /// <summary>
+        /// If true, the DMOD is actively being packed or scanned
+        /// </summary>
+        public bool DmodPackingInProgress {
+            get => this._dmodPackingInProgress;
+            private set => this.RaiseAndSetIfChanged(ref this._dmodPackingInProgress, value);
+        }
+        private bool _dmodPackingInProgress = false;
+
+        /// <summary>
+        /// Temporary DMOD destination value holder
+        /// </summary>
+        public string TemporaryDmodDestination {
+            get => this._temporaryDmodDestination;
+            private set => this.RaiseAndSetIfChanged(ref this._temporaryDmodDestination, value);
+        }
+        private string _temporaryDmodDestination = "";
         
-        public bool IsInstallerStarted {
-            get => this._isInstallerStarted;
-            protected set => this.RaiseAndSetIfChanged(ref this._isInstallerStarted, value);
+        /// <summary>
+        /// Final DMOD destination, this is what is actually used to pack the DMOD
+        /// </summary>
+        public string FinalDmodDestination {
+            get => this._finalDmodDestination;
+            private set => this.RaiseAndSetIfChanged(ref this._finalDmodDestination, value);
         }
-        private bool _isInstallerStarted = false;
-
-        public bool IsInstallerFinished {
-            get => this._isInstallerFinished;
-            protected set => this.RaiseAndSetIfChanged(ref this._isInstallerFinished, value);
+        private string _finalDmodDestination = "";
+        
+        /// <summary>
+        /// Temporary DMOD source value holder
+        /// </summary>
+        public string TemporaryDmodSourceDirectory {
+            get => this._temporaryDmodSourceDirectory;
+            set => this.RaiseAndSetIfChanged( ref this._temporaryDmodSourceDirectory, value);
         }
-        private bool _isInstallerFinished = false;
+        private string _temporaryDmodSourceDirectory = "";
 
-        public bool IsInstallerCancelled {
-            get => this._isInstallerCancelled;
-            protected set => this.RaiseAndSetIfChanged(ref this._isInstallerCancelled, value);
+        /// <summary>
+        /// Final DMOD source directory
+        /// </summary>
+        public string FinalDmodSourceDirectory {
+            get => this._finalDmodSourceDirectory;
+            private set => this.RaiseAndSetIfChanged(ref this._finalDmodSourceDirectory, value);
         }
-        private bool _isInstallerCancelled = false;
+        private string _finalDmodSourceDirectory = "";
 
+        /// <summary>
+        /// Current DMOD install phase...
+        /// </summary>
+        public DmodPackerPhase PackerPhase {
+            get => this._packerPhase;
+            private set => this.RaiseAndSetIfChanged( ref this._packerPhase, value);
+        }
+        private DmodPackerPhase _packerPhase = DmodPackerPhase.Inactive;
+
+        /// <summary>
+        /// Indicates if the file browser was opened and not yet closed
+        /// </summary>
         public bool IsFileBrowserActive {
             get => this._isFileBrowserActive;
-            protected set => this.RaiseAndSetIfChanged(ref this._isFileBrowserActive, value);
+            private set => this.RaiseAndSetIfChanged(ref this._isFileBrowserActive, value);
         }
         private bool _isFileBrowserActive = false;
-
-        // ------------------------------------------------------------------------------------------
-        //      Source and Destination Selection 
-        //
-
-        public string? SelectedDmodSourceDirectory {
-            get => this._selectedDmodSourceDirectory;
-            set => this.RaiseAndSetIfChanged(ref this._selectedDmodSourceDirectory, value);
-        }
-        private string? _selectedDmodSourceDirectory = "";
-
-        public string? SelectedDmodDestination {
-            get => this._selectedDmodDestination;
-            set => this.RaiseAndSetIfChanged(ref this._selectedDmodDestination, value);
-        }
-        private string? _selectedDmodDestination = "";
-
 
         // ------------------------------------------------------------------------------------------
         //      Installer logic 
         //
         
-        public event EventHandler<DmodPackerDoneEventArgs>? InstallerDone;
-        private DmodPackerDoneEventArgs _lastInstallerDoneEventArgs = new DmodPackerDoneEventArgs(DinkInstallerResult.Cancelled);
+        public event EventHandler<DmodPackerDoneEventArgs>? PackerDone;
         
-        private DmodPacker? _installerLogic = null;
+        private DmodPackerDoneEventArgs _packerDoneEventArgs = new DmodPackerDoneEventArgs(DinkInstallerResult.Cancelled);
+        
+        private ConfigGeneral? _configGeneral = null;
+        private DmodPacker? _packerLogic = null;
+
 
         // ------------------------------------------------------------------------------------------
         //      Constructor
         //
-
-        public DmodPackerViewModel() {
-            this.PropertyChanged += this.DmodPackerViewModel_PropertyChanged;
-        }
-
-        private void DmodPackerViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
-            // TODO hmmm, did i need to do something here?...
-        }
         
+        public DmodPackerViewModel() {
+            this.ResetPackerState();
+            
+            // validate source DMOD directory
+            this.ValidationRule(x => x.TemporaryDmodSourceDirectory,
+                dmodSource => string.IsNullOrWhiteSpace(dmodSource) == false,
+                Localizer.Instance["DmodPacker/ViewModel/Validation/SourceDmodEmpty"]);
+            this.ValidationRule(x => x.TemporaryDmodSourceDirectory,
+                dmodSource => {
+                    try
+                    {
+                        if (string.IsNullOrWhiteSpace(dmodSource)) return true; // validated elsewhere...
+                        DmodFileDefinition dfd = new DmodFileDefinition(new DirectoryInfo(dmodSource));
+                        return dfd.IsCorrectlyDefined;
+                    } catch (Exception)
+                    {
+                        return false;
+                    }
+                },
+                Localizer.Instance["DmodPacker/ViewModel/Validation/NotAValidDmodDirectory"]);
+            
+            
+            // validate final destination DMOD file...
+            this.ValidationRule(x => x.TemporaryDmodDestination,
+                finalDestination => string.IsNullOrWhiteSpace(finalDestination) == false,
+                Localizer.Instance["DmodPacker/ViewModel/Validation/DestinationDmodEmpty"]);
+            this.ValidationRule(x => x.TemporaryDmodDestination,
+                dmodDestination => {
+                    try
+                    {
+                        if (string.IsNullOrWhiteSpace(dmodDestination)) return true; // validated elsewhere...
+                        FileInfo fileInfo = new FileInfo(dmodDestination);
+                        return fileInfo.Exists == false;
+                    } catch (Exception)
+                    {
+                        return false;
+                    }
+                },
+                Localizer.Instance["DmodPacker/ViewModel/Validation/DestinationDmodAlreadyExists"]);
+        }
+
+        public void InitializeConfiguration(ConfigGeneral cfg) {
+            if (this._configGeneral != null) {
+                this._configGeneral.Updated -= this.GeneralUpdated;
+            }
+
+            this._configGeneral = cfg;
+            if (this._configGeneral != null) {
+                this._configGeneral.Updated += this.GeneralUpdated;
+            }
+        }
+
+        private void GeneralUpdated(object? sender, EventArgs e) {
+            // TODO?...
+        }
 
         // ------------------------------------------------------------------------------------------
         //      Commands
@@ -88,64 +197,95 @@ namespace Martridge.ViewModels.Installer {
 
         #region Commands
 
-        public void CmdExit(object? parameter = null) {
-            if (this.IsInstallerStarted == false) {
-                this._lastInstallerDoneEventArgs = new DmodPackerDoneEventArgs(DinkInstallerResult.Cancelled);
-                this.ResetInstallerStateAndFireDoneEvent();
+        public async void CmdInitializeDmod(object? parameter = null)
+        {
+            if (this.PackerPhase != DmodPackerPhase.Inactive) return;
+            if (parameter is not string dmodPath) return;
+
+            try
+            {
+                DmodFileDefinition dfd = new DmodFileDefinition(dmodPath);
+                if (dfd.IsCorrectlyDefined == false) return;
+            } catch (Exception)
+            {
+                return;
             }
-            if (this.IsInstallerFinished) {
-                this.ResetInstallerStateAndFireDoneEvent();
-            }
+
+            this.FinalDmodSourceDirectory = dmodPath;
+            await this.StartInitializingDmod();
         }
-        
-        [DependsOn(nameof(IsInstallerStarted))]
-        [DependsOn(nameof(IsInstallerCancelled))]
-        [DependsOn(nameof(IsInstallerFinished))]
-        public bool CanCmdExit(object? parameter = null) {
-            if (this.IsInstallerCancelled) return false;
-            if (this.IsInstallerStarted == false) return true;
-            if (this.IsInstallerFinished) return true;
-            return false;
+        [DependsOn(nameof(PackerPhase))]
+        public bool CanCmdInitializeDmod(object? parameter = null)
+        {
+            if (this.PackerPhase != DmodPackerPhase.Inactive) return false;
+            if (parameter is not string dmodPath) return false;
+
+            try
+            {
+                DmodFileDefinition dfd = new DmodFileDefinition(dmodPath);
+                if (dfd.IsCorrectlyDefined == false) return false;
+            } catch (Exception)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public void CmdFinish(object? parameter = null)
+        {
+            if (this.PackerPhase != DmodPackerPhase.Finished)
+                return;
+            
+            this.ResetPackerState();
+            this.FirePackerDone();
+        }
+        [DependsOn(nameof(PackerPhase))]
+        public bool CanCmdFinish(object? parameter = null)
+        {
+            return this.PackerPhase == DmodPackerPhase.Finished;
         }
 
         public void CmdCancel(object? parameter = null) {
             if (this.CanCmdCancel() == false) return;
-            
-            this.IsInstallerCancelled = true;
-            // null check done in CanCmdCancel
-            this._installerLogic!.CancelTokenSource.Cancel();
-        }
-        
-        [DependsOn(nameof(IsInstallerStarted))]
-        [DependsOn(nameof(IsInstallerCancelled))]
-        [DependsOn(nameof(IsInstallerFinished))]
-        public bool CanCmdCancel(object? parameter = null) {
-            if (this._installerLogic == null) return false;
-            // can't cancel if the installer is not started
-            if (this.IsInstallerStarted == false) return false;
-            // can't cancel if already done
-            if (this.IsInstallerFinished) return false;
-            // can only cancel once
-            return !this.IsInstallerCancelled;
-        }
-        
-        public void CmdStartInstall(object? parameter = null) {
-            if (this.CanCmdStartInstall() == false) return;
 
-            this.StartInstallation();
+            if (this._packerLogic == null)
+            {
+                this._packerDoneEventArgs = new DmodPackerDoneEventArgs(DinkInstallerResult.Cancelled);
+                this.ResetPackerState();
+                this.FirePackerDone();
+            }
+            else
+            {
+                this._packerLogic.Cancel();
+            }
+        }
+        [DependsOn(nameof(PackerPhase))]
+        public bool CanCmdCancel(object? parameter = null)
+        {
+            if (this.PackerPhase == DmodPackerPhase.Inactive) return true;
+            if (this.PackerPhase == DmodPackerPhase.Initializing) return true;
+            if (this.PackerPhase == DmodPackerPhase.AwaitingUserInput) return true;
+            if (this.PackerPhase == DmodPackerPhase.Packing) return true;
+
+            return false;
         }
         
-        [DependsOn(nameof(IsInstallerStarted))]
+        public async void CmdStartPacking(object? parameter = null)
+        {
+            if (this.CanCmdStartPacking(parameter) == false) return;
+            this.FinalDmodDestination = (parameter as string)!; // already validated above...
+            await this.StartPacking();
+        }
+        [DependsOn(nameof(PackerPhase))]
         [DependsOn(nameof(ParentWindow))]
-        [DependsOn(nameof(SelectedDmodDestination))]
-        [DependsOn(nameof(SelectedDmodSourceDirectory))]
-        public bool CanCmdStartInstall(object? parameter = null) {
-            if (this.IsInstallerStarted) return false;
+        public bool CanCmdStartPacking(object? parameter = null)
+        {
+            if (parameter is not string path) return false;
+            if (string.IsNullOrWhiteSpace(path)) return false;
+            if (File.Exists(path)) return false;
+            if (this.PackerPhase != DmodPackerPhase.AwaitingUserInput) return false;
             if (this.ParentWindow == null) return false;
-            if (string.IsNullOrWhiteSpace(this.SelectedDmodSourceDirectory)) return false;
-            if (string.IsNullOrWhiteSpace(this.SelectedDmodDestination)) return false;
-            if (Directory.Exists(this.SelectedDmodSourceDirectory) == false) return false;
-            
             return true;
         }
 
@@ -156,7 +296,7 @@ namespace Martridge.ViewModels.Installer {
         [DependsOn(nameof(IsFileBrowserActive))]
         [DependsOn(nameof(ParentWindow))]
         public bool CanCmdBrowseDmodSource(object? parameter = null) {
-            return !this.IsFileBrowserActive && this.ParentWindow != null;
+            return !this.IsFileBrowserActive && this.ParentWindow?.StorageProvider.CanOpen == true;
         }
         
         public void CmdBrowseDmodDestination(object? parameter = null) {
@@ -166,162 +306,264 @@ namespace Martridge.ViewModels.Installer {
         [DependsOn(nameof(IsFileBrowserActive))]
         [DependsOn(nameof(ParentWindow))]
         public bool CanCmdBrowseDmodDestination(object? parameter = null) {
-            return !this.IsFileBrowserActive && this.ParentWindow != null;
+            return !this.IsFileBrowserActive && this.ParentWindow?.StorageProvider.CanOpen == true;
         }
-
+        
         #endregion
+        
+        
+        // ------------------------------------------------------------------------------------------
+        //      Command logic
+        //
 
+        private Task BrowseDmodSource_Internal() {
+            if (this.ParentWindow?.StorageProvider.CanOpen != true || this.IsFileBrowserActive) return Task.CompletedTask;
 
-        private async void BrowseDmodSource_Internal() {
-            if (this.ParentWindow == null || this.IsFileBrowserActive) return;
+            return Task.Run(() => {
+                try
+                {
+                    if (this.IsFileBrowserActive) return;
 
-            try {
-                this.IsFileBrowserActive = true;
+                    this.IsFileBrowserActive = true;
 
-                OpenFolderDialog ofd = new OpenFolderDialog();
-                ofd.Directory = LocationHelper.AppBaseDirectory;
+                    FolderPickerOpenOptions fpo = new FolderPickerOpenOptions() {
+                        Title = Localizer.Instance["Generic/FileTypeDmod"],
+                        AllowMultiple = false, 
+                    };
 
-                string? result = await ofd.ShowAsync(this.ParentWindow);
-                if (result != null) {
-                    // check if this is a valid DMOD directory
-                    DmodFileDefinition dfd = new DmodFileDefinition(result);
-                    if (dfd.IsCorrectlyDefined) {
-                        this.SelectedDmodSourceDirectory = result;
-                    } else {
-                        string title = Localizer.Instance[@"DinkInstallerView/MessageBox_DmodPackerError_BadFolder_Title"];
-                        string message = Localizer.Instance[@"DinkInstallerView/MessageBox_DmodPackerError_BadFolder_Body"];
-                        await DinkyAlert.ShowDialog(title, message, AlertResults.Ok, AlertType.Error, this.ParentWindow);
+                    Task<IReadOnlyList<IStorageFolder>> fpoTask = this.ParentWindow.StorageProvider.OpenFolderPickerAsync(fpo);
+                    fpoTask.Wait();
+                    IReadOnlyList<IStorageFolder> results = fpoTask.Result;
+
+                    if (results.Count > 0)
+                    {
+                        this.TemporaryDmodSourceDirectory = results[0].Path.AbsolutePath;
                     }
-                }
 
-            } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
-            } finally {
-                this.IsFileBrowserActive = false;                
-            }
+                } catch (Exception ex)
+                {
+                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                }
+                finally
+                {
+                    this.IsFileBrowserActive = false;
+                }
+            });
         }
         
-        private async void BrowseDmodDestination_Internal() {
-            if (this.ParentWindow == null) return;
+        private Task BrowseDmodDestination_Internal() {
+            if (this.ParentWindow?.StorageProvider.CanOpen != true || this.IsFileBrowserActive) return Task.CompletedTask;
 
-            try {
-                this.IsFileBrowserActive = true;
+            return Task.Run(() => {
+                try
+                {
+                    if (this.IsFileBrowserActive) return;
 
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.Directory = LocationHelper.AppBaseDirectory;
-                sfd.Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() {
-                        Name = Localizer.Instance[@"Generic/FileTypeDmod"],
-                        Extensions = new List<string>() {
-                            "dmod",
-                        },
-                    },
-                };
+                    this.IsFileBrowserActive = true;
 
-                string? result = await sfd.ShowAsync(this.ParentWindow);
-                if (result != null) {
-                    this.SelectedDmodDestination = result;
+                    FilePickerSaveOptions fpo = new FilePickerSaveOptions() {
+                        Title = Localizer.Instance["Generic/FileTypeDmod"],
+                        FileTypeChoices = new [] {
+                            new FilePickerFileType("DMOD") {
+                                Patterns = new [] { "*.dmod" },
+                            }
+                        } 
+                    };
+
+                    Task<IStorageFile?> fpoTask = this.ParentWindow.StorageProvider.SaveFilePickerAsync(fpo);
+                    fpoTask.Wait();
+                    IStorageFile? result = fpoTask.Result;
+
+                    if (result != null)
+                    {
+                        this.TemporaryDmodDestination = result.Path.AbsolutePath;
+                    }
+
+                } catch (Exception ex)
+                {
+                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                 }
+                finally
+                {
+                    this.IsFileBrowserActive = false;
+                }
+            });
+        }
 
-            } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
-            } finally
+        private Task StartInitializingDmod()
+        {
+            return Task.Run(() => {
+                try
+                {
+                    DirectoryInfo dirInfo = new DirectoryInfo(this.FinalDmodSourceDirectory);
+                    if (dirInfo.Exists == false) return;
+                    
+                    // preemptively update phase...
+                    this.PackerPhase = DmodPackerPhase.Initializing;
+                    
+                    // create installer trace listener
+                    this._packerTraceListener = new MyTraceListenerGui("Installer Trace Listener");
+                    this._packerTraceListener.ShowLevels = false;
+                    this._packerTraceListener.Levels = MyTraceLevel.Critical | MyTraceLevel.Error | MyTraceLevel.Warning | MyTraceLevel.Information;
+                    this._packerTraceListener.PropertyChanged += ( sender,  args) => {
+                        this.RaisePropertyChanged(nameof(this.DmodPackerProgressLog));
+                        this.DmodPackerProgressLogCaretIndex = int.MaxValue;
+                    };
+                    this.RaisePropertyChanged(nameof(this.DmodPackerProgressLog));
+
+                    // create installer logic
+                    this._packerLogic = new DmodPacker();
+                    this._packerLogic.CustomTrace.Listeners.Add(this._packerTraceListener);
+                    this._packerLogic.ProgressReport += this.PackerOnProgressReport;
+                    this._packerLogic.ActivityStarted += this.PackerOnActivityStarted;
+                    this._packerLogic.ActivityEnded += this.PackerOnActivityEnded;
+                    this._packerLogic.Initialize(dirInfo);
+                } catch (Exception ex) {
+                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                }
+            });
+        }
+
+        private Task StartPacking() {
+            return Task.Run(() => {
+                try
+                {
+                    if (this._packerLogic == null) return;
+                    if (string.IsNullOrWhiteSpace(this.FinalDmodDestination)) return;
+                    
+                    FileInfo fileInfo = new FileInfo(this.FinalDmodDestination);
+                    if (fileInfo.Exists) return;
+                    
+                    this._packerLogic.PackDmod(fileInfo);
+                    
+                } catch (Exception ex) {
+                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                }
+            });
+
+        }
+
+        private void ResetPackerState() {
+            if (this._packerLogic != null)
             {
-                this.IsFileBrowserActive = false;
+                this._packerLogic.CustomTrace.Flush();
+                this._packerLogic.CustomTrace.Close();
+                this._packerLogic.ProgressReport -= this.PackerOnProgressReport;
+                this._packerLogic = null;
             }
-        }
 
-        private void StartInstallation() {
-            if (this.CanCmdStartInstall() == false) return;
-
-            try {
-                this.IsInstallerStarted = true;
-                
-                DirectoryInfo source = new DirectoryInfo(this.SelectedDmodSourceDirectory);
-                FileInfo destination = new FileInfo(this.SelectedDmodDestination);
-
-                // create installer trace listener
-                this.InstallerTraceListener = new MyTraceListenerGui("Installer Trace Listener");
-                this.InstallerTraceListener.ShowLevels = false;
-                this.InstallerTraceListener.Levels = MyTraceLevel.Critical | MyTraceLevel.Error | MyTraceLevel.Warning | MyTraceLevel.Information;
-                this.InstallerTraceListener.PropertyChanged += ( sender,  args) =>  {
-                    this.RaisePropertyChanged(nameof(this.InstallerProgressLog));
-                    this.InstallerProgressLogCaretIndex = int.MaxValue;
-                };
-
-                // create installer logic
-                this._installerLogic = new DmodPacker();
-                this._installerLogic.CustomTrace.Listeners.Add(this.InstallerTraceListener);
-                this._installerLogic.ProgressReport += this.InstallerOnProgressReport;
-                this._installerLogic.InstallerDone += this.InstallerOnDone;
-
-                this.InstallerProgressTitle = source.Name;
-
-                //this._InstallerLogic.IsDebugMode = true;
-                this._installerLogic.StartPackingDmod(destination, source);
-            } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
-            }
-        }
-
-        private void ResetInstallerStateAndFireDoneEvent() {
-            this._installerLogic?.CustomTrace.Flush();
-            this._installerLogic?.CustomTrace.Close();
-            this._installerLogic = null;
-
-            this.InstallerTraceListener?.Close();
-            this.InstallerTraceListener = null;
+            this._packerTraceListener?.Close();
+            this._packerTraceListener = null;
             
-            this.IsInstallerStarted = false;
-            this.IsInstallerFinished = false;
-            this.IsInstallerCancelled = false;
+            this.RaisePropertyChanged(nameof(this.DmodPackerProgressLog));
+            this.RaisePropertyChanged(nameof(this.DmodPackerProgressLogCaretIndex));
+            
+            this.PackerPhase = DmodPackerPhase.Inactive;
+            
+            this.FinalDmodSourceDirectory = "";
+            this.FinalDmodDestination = "";
 
-            this.InstallerDone?.Invoke(this, this._lastInstallerDoneEventArgs);
+            this.DmodPackerTitle = Localizer.Instance["DmodPacker/ViewModel/Title"];
+            this.DmodPackerPhaseProgressPercent = 0.0;
+            this.DmodPackingInProgress = false;
+        }
+
+        private void FirePackerDone()
+        {
+            try
+            {
+                this.PackerDone?.Invoke(this, this._packerDoneEventArgs);
+            } catch (Exception ex)
+            {
+                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+            }
         }
         
-        private void InstallerOnDone(object? sender, DmodPackerDoneEventArgs args) {
-            this.IsInstallerFinished = true;
-            this._lastInstallerDoneEventArgs = args;
-            if (args.Result == DinkInstallerResult.Cancelled) this.ShowInstallerCancelledMessageBox();
-            if (args.Result == DinkInstallerResult.Error) this.ShowInstallerErrorMessageBox(args.Exception);
+        private void PackerOnActivityEnded(object? sender, EventArgs e)
+        {
+            this.DmodPackingInProgress = false;
+        }
+        private void PackerOnActivityStarted(object? sender, EventArgs e)
+        {
+            this.DmodPackingInProgress = true;
         }
 
-        private void InstallerOnProgressReport(object? sender, InstallerProgressEventArgs args) {
-            try {
-                if (args.ProgressLevel == InstallerReportLevel.Primary) {
-                    this.InstallerProgressLevel0MainTitle = args.HeadingMain;
-                    this.InstallerProgressLevel0SubTitle = args.HeadingSecondary;
-                    this.InstallerProgressLevel0Progress = args.ProgressPercent;
+        private void PackerOnProgressReport(object? sender, DmodPackerProgressEventArgs args) {
+            try
+            {
+                if (sender is not DmodPacker packer) return;
+                
+                // set current install phase
+                this.PackerPhase = args.Phase;
+                
+                string title = Localizer.Instance["DmodPacker/ViewModel/Title"];
+                if (string.IsNullOrWhiteSpace(packer.SourceDirectory?.Name) == false)
+                {
+                    title += " - " + packer.SourceDirectory.Name;
                 }
-                if (args.ProgressLevel == InstallerReportLevel.Secondary) {
-                    if (Math.Abs(args.ProgressPercent - 1.0) < 0.00001) {
-                        this.InstallerProgressLevel1IsVisibile = false;
-                    } else {
-                        this.InstallerProgressLevel1IsVisibile = true;
-                    }
+                this.DmodPackerTitle = title;
+                
+                this.DmodPackerPhaseProgressPercent = args.ProgressPercent;
+                
+                // just in case this wasn't cleared?...
+                if (args.Phase == DmodPackerPhase.Finished)
+                {
+                    this.DmodPackingInProgress = false;
+                }
 
-                    this.InstallerProgressLevel1Indeterminate = false;
-                    this.InstallerProgressLevel1MainTitle = args.HeadingMain;
-                    this.InstallerProgressLevel1SubTitle = args.HeadingSecondary;
-                    this.InstallerProgressLevel1Progress = args.ProgressPercent;
-                }
-                if (args.ProgressLevel == InstallerReportLevel.Indeterminate) {
-                    if (Math.Abs(args.ProgressPercent - 1.0) < 0.00001) {
-                        this.InstallerProgressLevel1IsVisibile = false;
-                    } else {
-                        this.InstallerProgressLevel1IsVisibile = true;
+                switch (args.Phase)
+                {
+                    case DmodPackerPhase.AwaitingUserInput:
+                    {
+                        // just finished Initializing...
+                        // TODO... populate directory trees...
+                        break;
                     }
-                    this.InstallerProgressLevel1Indeterminate = true;
-                    this.InstallerProgressLevel1MainTitle = args.HeadingMain;
-                    this.InstallerProgressLevel1SubTitle = args.HeadingSecondary;
-                    this.InstallerProgressLevel1Progress = args.ProgressPercent;
+                    case DmodPackerPhase.Finished:
+                    {
+                        // just finished overall...
+                        this._packerDoneEventArgs = new DmodPackerDoneEventArgs(args.Result, packer.DestinationFile, packer.SourceDirectory);
+                        if (args.Result == DinkInstallerResult.Cancelled) this.ShowInstallerCancelledMessageBox();
+                        if (args.Result == DinkInstallerResult.Error) this.ShowInstallerErrorMessageBox(packer.PackException);
+                        break;
+                    }
                 }
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
             }
         }
 
-        
+        // ------------------------------------------------------------------------------------------
+        //      Message box stuff
+        //
+
+        private void ShowInstallerCancelledMessageBox() {
+            Dispatcher.UIThread.InvokeAsync(async () => {
+                try {
+                    if (this.ParentWindow == null) return;
+                    
+                    string title = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Cancel_Title"];
+                    string body = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Cancel_Body"];
+                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Info, this.ParentWindow);
+                } catch (Exception ex) {
+                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                }
+            });
+        }
+
+        private void ShowInstallerErrorMessageBox(Exception? exception) {
+            Dispatcher.UIThread.InvokeAsync(async () => {
+                try {
+                    if (this.ParentWindow == null) return;
+                    
+                    string title = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Error_Title"];
+                    string body = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Error_Body"] + Environment.NewLine + MyTrace.GetExceptionMessages(exception);
+                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Error, this.ParentWindow);
+                } catch (Exception ex) {
+                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                }
+            });
+        }
     }
 }
 

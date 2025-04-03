@@ -2,12 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-
              xmlns:dloc="using:Martridge.ViewModels.Localization"
-             xmlns:vw="using:Martridge.Views.Installer"
              xmlns:vm="using:Martridge.ViewModels.Installer"
-
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:dmodPacker="clr-namespace:Martridge.Models.DmodPacker"
+             xmlns:converters="clr-namespace:Martridge.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignWidth="800" 
+             d:DesignHeight="450"
              x:Class="Martridge.Views.Installer.DmodPackerView"
              Name="DmodInstallerUserControl">
     <Design.DataContext>
@@ -16,39 +17,109 @@
     <UserControl.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
     </UserControl.Styles>
+    <UserControl.Resources>
+        <converters:GenericEqualsBoolConverter x:Key="GenericEqualsBoolConverter" />
+        <converters:GenericNotEqualsBoolConverter x:Key="GenericNotEqualsBoolConverter" />
+    </UserControl.Resources>
 
 
-    <Grid Margin="8">
-        <Grid RowDefinitions="*, Auto" IsVisible="{Binding Path=!IsInstallerStarted}">
-            <vw:DmodPackerPrepareView
-                Grid.Row="0"
-                DataContext="{Binding DataContext, ElementName=DmodInstallerUserControl}"/>
-                
-            <Grid Grid.Row="1"
-                  ColumnDefinitions="*,Auto,Auto">
-                <Button Grid.Column="1"
-                        Content="{dloc:Localize Generic/ButtonBack}"
-                        Command="{Binding CmdExit}"/>
-                <Button Grid.Column="2"
-                        Content="{dloc:Localize DinkInstallerView/DmodPackStart}"
-                        Command="{Binding CmdStartInstall}"/>
+    <Border Classes="MartridgeCard">
+        <Grid RowDefinitions="Auto, *, Auto">
+
+            <!-- Header stuff... Title and progress bars -->
+            <StackPanel Grid.Row="0">
+                <Label Classes="HeadingTitle"
+                       Content="{Binding DmodPackerTitle}" />
+
+                <StackPanel IsVisible="{Binding PackerPhase,
+                                Converter={StaticResource GenericEqualsBoolConverter}, 
+                                ConverterParameter={x:Static dmodPacker:DmodPackerPhase.Inactive} }">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Classes="Heading2B"
+                               Content="{dloc:Localize DmodPacker/View/DmodSelectSource}" />
+                        <Button Grid.Row="0" Grid.Column="1"
+                                Content="{dloc:Localize DmodInstallerView/DmodSelect/Browse}"
+                                Command="{Binding CmdBrowseDmodSource}" />
+                    </Grid>
+
+                    <TextBox Text="{Binding TemporaryDmodSourceDirectory}"
+                             IsReadOnly="{Binding PackerPhase,
+                                        Converter={StaticResource GenericNotEqualsBoolConverter},
+                                        ConverterParameter={x:Static dmodPacker:DmodPackerPhase.Inactive} }" />
+                </StackPanel>
+
+                <StackPanel IsVisible="{Binding PackerPhase,
+                                Converter={StaticResource GenericNotEqualsBoolConverter}, 
+                                ConverterParameter={x:Static dmodPacker:DmodPackerPhase.Inactive} }">
+
+                    <Label Classes="Heading2I"
+                           Content="{Binding FinalDmodSourceDirectory}" />
+                    <ProgressBar Minimum="0" Maximum="1"
+                                 IsVisible="{Binding !DmodPackingInProgress}"
+                                 Value="{Binding DmodPackerPhaseProgressPercent}" />
+                </StackPanel>
+
+                <ProgressBar IsIndeterminate="True"  
+                             IsVisible="{Binding DmodPackingInProgress}"/>
+            </StackPanel>
+
+            <!-- main body stuff... -->
+            <Grid Grid.Row="1" RowDefinitions="Auto,*">
+
+                <!-- Destination selection -->
+                <StackPanel Grid.Row="0"
+                            IsVisible="{Binding PackerPhase,
+                                Converter={StaticResource GenericEqualsBoolConverter},
+                                ConverterParameter={x:Static dmodPacker:DmodPackerPhase.AwaitingUserInput} }">
+                    
+                    
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Row="0" Grid.Column="0" 
+                               Classes="Heading2B"
+                               Content="{dloc:Localize DmodPacker/View/DmodDestination}" />
+                        <Button Grid.Row="0" Grid.Column="1"
+                                Content="{dloc:Localize DmodInstallerView/DmodSelect/Browse}"
+                                Command="{Binding CmdBrowseDmodDestination}" />
+                    </Grid>
+                    <TextBox Text="{Binding TemporaryDmodDestination}" />
+                </StackPanel>
+
+                <!-- Install log... -->
+                <TextBox Grid.Row="1"
+                         Classes="BigTextBox"
+                         Text="{Binding DmodPackerProgressLog}"
+                         IsReadOnly="True"
+                         CaretIndex="{Binding DmodPackerProgressLogCaretIndex, Mode=TwoWay}" />
             </Grid>
-        </Grid>
-                
-        <Grid RowDefinitions="*, Auto" IsVisible="{Binding Path=IsInstallerStarted}">
-            <vw:InstallerProgressView 
-                Grid.Row="0"
-                DataContext="{Binding DataContext, ElementName=DmodInstallerUserControl}"/>
-                
-            <Grid Grid.Row="1"
-                  ColumnDefinitions="*,Auto,Auto">
-                <Button Grid.Column="1"
-                        Content="{dloc:Localize Generic/ButtonCancel}"
-                        Command="{Binding CmdCancel}"/>
-                <Button Grid.Column="2"
-                        Content="{dloc:Localize Generic/ButtonFinish}"
-                        Command="{Binding CmdExit}"/>
+
+            <!-- Footer... buttons -->
+            <Grid Grid.Row="2" ColumnDefinitions="*, Auto">
+                <WrapPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="{dloc:Localize DmodPacker/View/Button/Cancel}"
+                            Command="{Binding CmdCancel}"
+                            IsVisible="{Binding PackerPhase,
+                                        Converter={StaticResource GenericNotEqualsBoolConverter},
+                                        ConverterParameter={x:Static dmodPacker:DmodPackerPhase.Finished} }" />
+                    <Button Content="{dloc:Localize DmodPacker/View/Button/InitializeDmod}"
+                            Command="{Binding CmdInitializeDmod}"
+                            CommandParameter="{Binding TemporaryDmodSourceDirectory}"
+                            IsVisible="{Binding PackerPhase,
+                                        Converter={StaticResource GenericEqualsBoolConverter},
+                                        ConverterParameter={x:Static dmodPacker:DmodPackerPhase.Inactive} }" />
+                    <Button Content="{dloc:Localize DmodPacker/View/Button/StartPacking}"
+                            Command="{Binding CmdStartPacking}"
+                            CommandParameter="{Binding TemporaryDmodDestination}"
+                            IsVisible="{Binding PackerPhase,
+                                        Converter={StaticResource GenericEqualsBoolConverter},
+                                        ConverterParameter={x:Static dmodPacker:DmodPackerPhase.AwaitingUserInput} }" />
+                    <Button Content="{dloc:Localize DmodPacker/View/Button/Finish}"
+                            Command="{Binding CmdFinish}"
+                            IsVisible="{Binding PackerPhase,
+                                        Converter={StaticResource GenericEqualsBoolConverter},
+                                        ConverterParameter={x:Static dmodPacker:DmodPackerPhase.Finished} }" />
+                </WrapPanel>
             </Grid>
+
         </Grid>
-    </Grid>
+    </Border>
 </UserControl>

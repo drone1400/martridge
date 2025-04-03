@@ -103,6 +103,8 @@ namespace Martridge.Models.DmodInstaller {
         public DmodInstaller() {
             this.CustomTrace = new MyTrace(this.GetType().ToString());
             
+            this._temp.SetLogCallback(this.LogMessage);
+            
             this.ArchiveEntries = new ReadOnlyCollection<string>(this._archiveEntries);
             this.ArchiveTopLevelEntries = new ReadOnlyCollection<string>(this._archiveTopLevelEntries);
         }

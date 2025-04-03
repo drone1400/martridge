@@ -36,9 +36,9 @@
                                 ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Inactive} }">
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Grid.Column="0" Classes="Heading2B"
-                               Content="{dloc:Localize DmodInstallerView/DmodSelect/SelectDmod}" />
+                               Content="{dloc:Localize DmodInstaller/View/DmodSelect/SelectDmod}" />
                         <Button Grid.Row="0" Grid.Column="1"
-                                Content="{dloc:Localize DmodInstallerView/DmodSelect/Browse}"
+                                Content="{dloc:Localize DmodInstaller/View/DmodSelect/Browse}"
                                 Command="{Binding CmdBrowseDmod}" />
                     </Grid>
 
@@ -73,7 +73,7 @@
                                 ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.AwaitingUserInput} }">
 
                     <Label Classes="Heading2B"
-                           Content="{dloc:Localize DmodInstallerView/DmodSelect/SelectDestination}" />
+                           Content="{dloc:Localize DmodInstaller/View/DmodSelect/SelectDestination}" />
 
                     <ListBox Height="200"
                              ItemsSource="{Binding BaseDestinations}"
@@ -91,15 +91,15 @@
                     </ListBox>
 
                     <Label Classes="Heading2B"
-                           Content="{dloc:Localize DmodInstallerView/DmodSelect/DesiredDmodDestination}" />
+                           Content="{dloc:Localize DmodInstaller/View/DmodSelect/DesiredDmodDestination}" />
                     <TextBox Text="{Binding DesiredDmodDirectory}" />
 
                     <Label Classes="Heading2B"
-                           Content="{dloc:Localize DmodInstallerView/DmodSelect/FinalDmodDestination}" />
+                           Content="{dloc:Localize DmodInstaller/View/DmodSelect/FinalDmodDestination}" />
                     <TextBox IsReadOnly="True"
                              Text="{Binding FinalDmodDestination}" />
                     <CheckBox Classes="Heading2B"
-                              Content="{dloc:Localize DmodInstallerView/DmodSelect/AllowDmodDestinationOverwrite}"
+                              Content="{dloc:Localize DmodInstaller/View/DmodSelect/AllowDmodDestinationOverwrite}"
                               IsVisible="{Binding ShowDesiredDmodDirectoryOverwrite}"
                               IsChecked="{Binding IsEnabledDesiredDmodDirectoryOverwrite}" />
                 </StackPanel>
@@ -115,23 +115,23 @@
             <!-- Footer... buttons -->
             <Grid Grid.Row="2" ColumnDefinitions="*, Auto">
                 <WrapPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Content="{dloc:Localize DmodInstallerView/Button/Cancel}"
+                    <Button Content="{dloc:Localize DmodInstaller/View/Button/Cancel}"
                             Command="{Binding CmdCancel}"
                             IsVisible="{Binding InstallPhase,
                                         Converter={StaticResource GenericNotEqualsBoolConverter},
                                         ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Finished} }" />
-                    <Button Content="{dloc:Localize DmodInstallerView/Button/InitializeDmod}"
+                    <Button Content="{dloc:Localize DmodInstaller/View/Button/InitializeDmod}"
                             Command="{Binding CmdInitializeDmod}"
                             CommandParameter="{Binding TemporaryDmodSource}"
                             IsVisible="{Binding InstallPhase,
                                         Converter={StaticResource GenericEqualsBoolConverter},
                                         ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Inactive} }" />
-                    <Button Content="{dloc:Localize DmodInstallerView/Button/StartInstall}"
+                    <Button Content="{dloc:Localize DmodInstaller/View/Button/StartInstall}"
                             Command="{Binding CmdStartInstall}"
                             IsVisible="{Binding InstallPhase,
                                         Converter={StaticResource GenericEqualsBoolConverter},
                                         ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.AwaitingUserInput} }" />
-                    <Button Content="{dloc:Localize DmodInstallerView/Button/Finish}"
+                    <Button Content="{dloc:Localize DmodInstaller/View/Button/Finish}"
                             Command="{Binding CmdFinish}"
                             IsVisible="{Binding InstallPhase,
                                         Converter={StaticResource GenericEqualsBoolConverter},

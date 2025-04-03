@@ -190,18 +190,18 @@ namespace Martridge.ViewModels.Installer {
                         return false;
                     }
                 },
-                Localizer.Instance["DmodInstaller/Validation/MissingSourceDmod"]);
+                Localizer.Instance["DmodInstaller/ViewModel/Validation/MissingSourceDmod"]);
             
             // validate final destination directory...
             this.ValidationRule(x => x.FinalDmodDestination,
                 finalDestination => string.IsNullOrWhiteSpace(finalDestination) == false,
-                Localizer.Instance["DmodInstaller/Validation/DestinationEmpty"]);
+                Localizer.Instance["DmodInstaller/ViewModel/Validation/DestinationEmpty"]);
             this.ValidationRule(x => x.FinalDmodDestination,
                 finalDestination => {
                     this.SelectedBaseDestination?.Refresh();
                     return this.SelectedBaseDestination?.Exists == true;
                 },
-                Localizer.Instance["DmodInstaller/Validation/DestinationBaseDoesNotExist"]);
+                Localizer.Instance["DmodInstaller/ViewModel/Validation/DestinationBaseDoesNotExist"]);
             this.ValidationRule(x => x.FinalDmodDestination,
                 finalDestination => {
                     try
@@ -220,7 +220,7 @@ namespace Martridge.ViewModels.Installer {
                         return true;
                     }
                 },
-                Localizer.Instance["DmodInstaller/Validation/DestinationAlreadyExists"]);
+                Localizer.Instance["DmodInstaller/ViewModel/Validation/DestinationAlreadyExists"]);
         }
 
         public void InitializeConfiguration(ConfigGeneral cfg) {
@@ -475,7 +475,7 @@ namespace Martridge.ViewModels.Installer {
             this.TemporaryDmodSource = "";
             this.DesiredDmodDirectory = "";
 
-            this.DmodInstallerTitle = Localizer.Instance[@"DmodInstallerView/Title"];
+            this.DmodInstallerTitle = Localizer.Instance[@"DmodInstaller/ViewModel/Title"];
             this.DmodInstallerPhaseProgressPercent = 0.0;
             this.DmodInstallerInProgress = false;
 
@@ -502,7 +502,7 @@ namespace Martridge.ViewModels.Installer {
                 // set current install phase
                 this.InstallPhase = args.Phase;
                 
-                string title = Localizer.Instance[@"DmodInstallerView/Title"];
+                string title = Localizer.Instance[@"DmodInstaller/ViewModel/Title"];
                 if (string.IsNullOrWhiteSpace(installer.DmodSourceNameNoExt) == false)
                 {
                     title += " - " + installer.DmodSourceNameNoExt;
@@ -551,13 +551,13 @@ namespace Martridge.ViewModels.Installer {
                 try {
                     if (this.ParentWindow == null) return;
                     
-                    string title = Localizer.Instance["DmodInstaller/MessageBox_Cancel_Title"];
-                    string body = Localizer.Instance["DmodInstaller/MessageBox_Cancel_Body"];
+                    string title = Localizer.Instance["DmodInstaller/ViewModel/MessageBox_Cancel_Title"];
+                    string body = Localizer.Instance["DmodInstaller/ViewModel/MessageBox_Cancel_Body"];
                     if (Directory.Exists(this.FinalDmodDestination))
                     {
                         body += Environment.NewLine;
                         body += Environment.NewLine;
-                        body += Localizer.Instance["DmodInstaller/MessageBox_Extra_ManualCleanup"];
+                        body += Localizer.Instance["DmodInstaller/ViewModel/MessageBox_Extra_ManualCleanup"];
                         body += Environment.NewLine;
                         body += this.FinalDmodDestination;
                     }
@@ -573,13 +573,13 @@ namespace Martridge.ViewModels.Installer {
                 try {
                     if (this.ParentWindow == null) return;
                     
-                    string title = Localizer.Instance["DmodInstaller/MessageBox_Error_Title"];
-                    string body = Localizer.Instance["DmodInstaller/MessageBox_Error_Body"] + Environment.NewLine + MyTrace.GetExceptionMessages(exception);
+                    string title = Localizer.Instance["DmodInstaller/ViewModel/MessageBox_Error_Title"];
+                    string body = Localizer.Instance["DmodInstaller/ViewModel/MessageBox_Error_Body"] + Environment.NewLine + MyTrace.GetExceptionMessages(exception);
                     if (Directory.Exists(this.FinalDmodDestination))
                     {
                         body += Environment.NewLine;
                         body += Environment.NewLine;
-                        body += Localizer.Instance["DmodInstaller/MessageBox_Extra_ManualCleanup"];
+                        body += Localizer.Instance["DmodInstaller/ViewModel/MessageBox_Extra_ManualCleanup"];
                         body += Environment.NewLine;
                         body += this.FinalDmodDestination;
                     }

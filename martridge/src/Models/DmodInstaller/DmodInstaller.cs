@@ -120,7 +120,7 @@ namespace Martridge.Models.DmodInstaller {
                 this._installPhase = DmodInstallPhase.Cleanup;
             }
             
-            this.LogMessage(Localizer.Instance[@"DmodInstaller/CancelledByUser"]);
+            this.LogMessage(Localizer.Instance["DmodInstaller/Log/CancelledByUser"]);
                 
             this.CleanUp();
                 
@@ -156,18 +156,18 @@ namespace Martridge.Models.DmodInstaller {
                 this._sourceFile.Refresh();
                 if (this._sourceFile.Exists == false)
                 {
-                    this.LogMessage(Localizer.Instance[@"DmodInstaller/DmodFileNotFound"], $"    \"{this._sourceFile.FullName}\"");
+                    this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodFileNotFound"], $"    \"{this._sourceFile.FullName}\"");
                     throw new DinkInstallerFileSystemException(this._sourceFile.FullName);
                 }
                 
                 // begin initializing DMOD file...
-                this.LogMessage(Localizer.Instance[@"DmodInstaller/InitializingDmodFileStart"], $"    \"{this._sourceFile.FullName}\"");
+                this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializingDmodFileStart"], $"    \"{this._sourceFile.FullName}\"");
 
                 switch (installPreprocessingMode)
                 {
                     case DmodInstallPreprocessingMode.None:
                     {
-                        this.LogMessage(Localizer.Instance[@"DmodInstaller/InitializedNone"]);
+                        this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializedNone"]);
                         lock (this._syncRoot)
                         {
                             this._installPhase = DmodInstallPhase.AwaitingUserInput;
@@ -177,7 +177,7 @@ namespace Martridge.Models.DmodInstaller {
                     }
                     case DmodInstallPreprocessingMode.QuickPeek:
                     {
-                        this.LogMessage(Localizer.Instance[@"DmodInstaller/InitializingQuickPeek"]);
+                        this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializingQuickPeek"]);
                         
                         this.ReportActivityStart();
                         bool result = this.TryInitializeQuickPeek();
@@ -185,7 +185,7 @@ namespace Martridge.Models.DmodInstaller {
 
                         if (result)
                         {
-                            this.LogMessage(Localizer.Instance[@"DmodInstaller/InitializedQuickPeek"], this.DmodRootName);
+                            this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializedQuickPeek"], this.DmodRootName);
 
                             lock (this._syncRoot)
                             {
@@ -195,14 +195,14 @@ namespace Martridge.Models.DmodInstaller {
                         }
                         else
                         {
-                            this.LogMessage(Localizer.Instance[@"DmodInstaller/InitializeFailedQuickPeek"]);
+                            this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializeFailedQuickPeek"]);
                             throw new Exception();
                         }
                         break;
                     }
                     case DmodInstallPreprocessingMode.PeekAll:
                     {
-                        this.LogMessage(Localizer.Instance[@"DmodInstaller/InitializingPeekAll"]);
+                        this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializingPeekAll"]);
                         this.ReportActivityStart();
                         // try to initialize the DMOD top entries info from the standard bzip2/tar dmod format
                         // if that fails, maybe this is a different archive type like 7z, so try that instead?
@@ -215,11 +215,11 @@ namespace Martridge.Models.DmodInstaller {
 
                         if (result)
                         {
-                            this.LogMessage(Localizer.Instance[@"DmodInstaller/InitializedPeekAll"]);
+                            this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializedPeekAll"]);
 
                             if (this._archiveTopLevelEntries.Count > 1)
                             {
-                                this.LogMessage(Localizer.Instance[@"DmodInstaller/WarningMultipleTopLevelItems"]);
+                                this.LogMessage(Localizer.Instance["DmodInstaller/Log/WarningMultipleTopLevelItems"]);
                             }
 
                             lock (this._syncRoot)
@@ -230,7 +230,7 @@ namespace Martridge.Models.DmodInstaller {
                         }
                         else
                         {
-                            this.LogMessage(Localizer.Instance[@"DmodInstaller/InitializeFailedPeekAll"]);
+                            this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializeFailedPeekAll"]);
 
                             throw new DinkInstallerException("");
                         }
@@ -239,10 +239,10 @@ namespace Martridge.Models.DmodInstaller {
                 }
                 
                 // finished initializing DMOD file
-                this.LogMessage(Localizer.Instance[@"DmodInstaller/InitializingDmodFileEnd"]);
+                this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializingDmodFileEnd"]);
             } catch (DinkInstallerCancelledByUserException)
             {
-                this.LogMessage(Localizer.Instance[@"DmodInstaller/CancelledByUser"]);
+                this.LogMessage(Localizer.Instance["DmodInstaller/Log/CancelledByUser"]);
                 
                 this.CleanUp();
                 
@@ -454,27 +454,27 @@ namespace Martridge.Models.DmodInstaller {
                 this._sourceFile?.Refresh();
                 if (this._sourceFile?.Exists != true)
                 {
-                    this.LogMessage(Localizer.Instance[@"DmodInstaller/DmodFileNotFound"], $"    \"{this._sourceFile?.FullName}\"");
+                    this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodFileNotFound"], $"    \"{this._sourceFile?.FullName}\"");
                     throw new DinkInstallerFileSystemException(this._sourceFile?.FullName ?? "");
                 }
                 
                 // sanity checks for destination
                 if (this._installationDestination.Parent == null) {
-                    throw new DinkInstallerFileSystemException(Localizer.Instance[@"DmodInstaller/DestinationErrorIsRoot"] + $" \"{destinationDirectory.FullName}\"");
+                    throw new DinkInstallerFileSystemException(Localizer.Instance["DmodInstaller/Log/DestinationErrorIsRoot"] + $" \"{destinationDirectory.FullName}\"");
                 }
                 if (Path.IsPathRooted(destinationDirectory.FullName) == false) {
-                    throw new DinkInstallerFileSystemException(Localizer.Instance[@"DmodInstaller/DestinationErrorIsNotRooted"] + $" \"{destinationDirectory.FullName}\"");
+                    throw new DinkInstallerFileSystemException(Localizer.Instance["DmodInstaller/Log/DestinationErrorIsNotRooted"] + $" \"{destinationDirectory.FullName}\"");
                 }
                 
                 // extracting DMOD
-                this.LogMessage(Localizer.Instance[@"DmodInstaller/DmodExtractStart"], $"    \"{this._sourceFile.FullName}\"", $"    \"{destinationDirectory.FullName}\"");
+                this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodExtractStart"], $"    \"{this._sourceFile.FullName}\"", $"    \"{destinationDirectory.FullName}\"");
                 this.ReportActivityStart();
                 this.ExtractDmod(allowOverwrite);
                 this.ReportActivityEnd();
-                this.LogMessage(Localizer.Instance[@"DmodInstaller/DmodExtractEnd"]);
+                this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodExtractEnd"]);
             } catch (DinkInstallerCancelledByUserException) {
                 cancelled = true;
-                this.LogMessage(Localizer.Instance[@"DmodInstaller/CancelledByUser"]);
+                this.LogMessage(Localizer.Instance["DmodInstaller/Log/CancelledByUser"]);
             } catch (Exception ex) {
                 this._installException = ex;
                 this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, this._installException);
@@ -507,10 +507,10 @@ namespace Martridge.Models.DmodInstaller {
             this.ReportProgressPrimary();
             
             this.ReportActivityStart();
-            this.LogMessage(Localizer.Instance[@"DmodInstaller/CleaningUpStart"]);
+            this.LogMessage(Localizer.Instance["DmodInstaller/Log/CleaningUpStart"]);
             this._temp.Dispose();
             this.ReportActivityEnd();
-            this.LogMessage(Localizer.Instance[@"DmodInstaller/CleaningUpEnd"]);
+            this.LogMessage(Localizer.Instance["DmodInstaller/Log/CleaningUpEnd"]);
         }
         
         private void ExtractDmod(bool allowOverwrite) {
@@ -539,7 +539,7 @@ namespace Martridge.Models.DmodInstaller {
 
                 if (Directory.Exists(path) && allowOverwrite == false)
                 {
-                    string msg = Localizer.Instance[@"DmodInstaller/DestinationErrorAlreadyExists"];
+                    string msg = Localizer.Instance["DmodInstaller/Log/DestinationErrorAlreadyExists"];
                     this.LogMessage(msg);
                     throw new DinkInstallerFileSystemException(msg);
                 }
@@ -564,7 +564,7 @@ namespace Martridge.Models.DmodInstaller {
                 if (stopwatch.ElapsedMilliseconds > 2000)
                 {
                     stopwatch.Restart();
-                    this.LogMessage(Localizer.Instance[@"DmodInstaller/DmodExtractingProgress"] + $" {fileCount}...");
+                    this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodExtractingProgress"] + $" {fileCount}...");
                 }
                 
                 if (string.IsNullOrEmpty(reader.Entry.Key))

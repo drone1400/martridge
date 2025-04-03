@@ -38,7 +38,7 @@
                         <Label Grid.Column="0" Classes="Heading2B"
                                Content="{dloc:Localize DmodPacker/View/DmodSelectSource}" />
                         <Button Grid.Row="0" Grid.Column="1"
-                                Content="{dloc:Localize DmodInstallerView/DmodSelect/Browse}"
+                                Content="{dloc:Localize DmodPacker/View/DmodSelectBrowse}"
                                 Command="{Binding CmdBrowseDmodSource}" />
                     </Grid>
 
@@ -78,7 +78,7 @@
                                Classes="Heading2B"
                                Content="{dloc:Localize DmodPacker/View/DmodDestination}" />
                         <Button Grid.Row="0" Grid.Column="1"
-                                Content="{dloc:Localize DmodInstallerView/DmodSelect/Browse}"
+                                Content="{dloc:Localize DmodPacker/View/DmodSelectBrowse}"
                                 Command="{Binding CmdBrowseDmodDestination}" />
                     </Grid>
                     <TextBox Text="{Binding TemporaryDmodDestination}" />

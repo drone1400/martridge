@@ -6,27 +6,17 @@ namespace Martridge.Models.Installer {
         Cancelled,
         Error,
     }
-    
 
-    public class DinkInstallerExceptionEventArgs : EventArgs{
-        public Exception Exception { get; }
-
-        public DinkInstallerExceptionEventArgs(Exception ex) {
-            this.Exception = ex;
-        }
-    }
-
-    public class DinkInstallerInvalidDmodFormatException : Exception {
-        public DinkInstallerInvalidDmodFormatException(string? msg) : base(msg) { }
-        public DinkInstallerInvalidDmodFormatException(string? msg, Exception innerEx) : base(msg, innerEx) { }
-    }
-
-    public class DinkInstallerException : Exception
+    public enum DinkInstallPhase
     {
-        public DinkInstallerException(string? msg) : base(msg) { }
-
-        public DinkInstallerException(string? msg, Exception innerEx) : base(msg, innerEx) { }
+        Inactive = 0,                   // has not started installing yet
+        Preparing = 1,                  // various preparations...
+        DownloadingResources = 2,       // downloading resources
+        Installing = 3,                 // actually installing
+        Cleanup = 4,                    // cleaning up temporary files
+        Finished = 5,                   // all done!
     }
+    
 
     public class DinkInstallerFileSystemException : Exception {
         

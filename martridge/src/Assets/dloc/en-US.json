@@ -18,6 +18,7 @@
   "DinkInstaller/Preparing/CreatingDirectoryErrorDirectoryRoot": "One of the specified directories is a root drive! Can not continue...",
   "DinkInstaller/Preparing/PreparingDirectoriesStart": "Preparing directories...",
   "DinkInstaller/Preparing/PreparingDirectoriesDone": "Done preparing directories!...",
+  "DinkInstaller/Preparing/CreatingTempDirectoryError": "Error creating temporary directory...",
 
   "DinkInstaller/DownloadingResources/Start": "Starting downloading resources...",
   "DinkInstaller/DownloadingResources/Done": "Done downloading resources...",

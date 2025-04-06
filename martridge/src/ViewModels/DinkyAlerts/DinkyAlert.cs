@@ -5,6 +5,7 @@ using Martridge.ViewModels.DinkyGraphics;
 using Martridge.Views.DinkyAlerts;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 
 namespace Martridge.ViewModels.DinkyAlerts {
     public static class DinkyAlert {
@@ -198,16 +199,21 @@ namespace Martridge.ViewModels.DinkyAlerts {
         public async static Task<AlertResults> ShowDialog(string title, string message, AlertResults resultButtons, AlertType type, Window parentWindow, Dictionary<AlertResults, string>? customButtonText = null, string? specialMessage = null) {
             
             DinkyAlertWindowViewModel vm = new DinkyAlertWindowViewModel(title, message, resultButtons, type, customButtonText, specialMessage);
-            DinkyAlertWindow win = new DinkyAlertWindow { DataContext = vm, };
+
+            await Dispatcher.UIThread.InvokeAsync(async () => {
+                DinkyAlertWindow win = new DinkyAlertWindow { DataContext = vm, };
             
-            // cancel closing if result is not set yet
-            win.Closing += ( sender,  args) => { if (vm.Result == AlertResults.None) args.Cancel = true; };
+                // cancel closing if result is not set yet
+                win.Closing += ( sender,  args) => { if (vm.Result == AlertResults.None) args.Cancel = true; };
             
-            // try to center on parent window
-            CenterOnParentWindow(win, parentWindow);
+                // try to center on parent window
+                CenterOnParentWindow(win, parentWindow);
             
-            // show dialog and get result when done
-            await win.ShowDialog(parentWindow);
+                // show dialog and get result when done
+                await win.ShowDialog(parentWindow);
+            });
+            
+            
             return vm.Result;
         }
     }

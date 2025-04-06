@@ -197,8 +197,9 @@ namespace Martridge.Models.DmodInstaller {
                         }
                         else
                         {
-                            this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializeFailedQuickPeek"]);
-                            throw new Exception();
+                            string message = Localizer.Instance["DmodInstaller/Log/InitializeFailedQuickPeek"];
+                            this.LogMessage(message);
+                            throw new Exception(message);
                         }
                         break;
                     }
@@ -232,9 +233,9 @@ namespace Martridge.Models.DmodInstaller {
                         }
                         else
                         {
-                            this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializeFailedPeekAll"]);
-
-                            throw new DinkInstallerException("");
+                            string message = Localizer.Instance["DmodInstaller/Log/InitializeFailedPeekAll"];
+                            this.LogMessage(message);
+                            throw new Exception(message);
                         }
                         break;
                     }

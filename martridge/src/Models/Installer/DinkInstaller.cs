@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 #if PLATF_WINDOWS
@@ -12,247 +13,285 @@ using SevenZipExtractor;
 #endif
 
 namespace Martridge.Models.Installer {
-    public class DinkInstaller : InstallerBase {
+    public class DinkInstaller {
 
+        public event EventHandler<DinkInstallerProgressEventArgs>? ProgressReport;
+        public event EventHandler<DinkInstallerProgressEventArgs>? SecondaryProgressReport;
         public event EventHandler<DinkInstallerDoneEventArgs>? InstallerDone;
 
-        // download config parameters, maybe make them not be hardcoded in the future?...
+        public MyTrace CustomTrace { get; }
+        
+        private double _progPhaseCurrent = 0;
+        private double _progPhaseTotal = 0;
+
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        
+
+        private DinkInstallPhase _installPhase = DinkInstallPhase.Inactive;
+        private readonly object _syncRoot = new object();
+        
         private readonly TimeSpan _timeoutHttpClient = new TimeSpan(0,0,10);
         private readonly TimeSpan _downloadProgressReportInterval = new TimeSpan(0,0,0,0,500);
 
-        private readonly List<DirectoryInfo> _tempDirs = new List<DirectoryInfo>();
-        private readonly List<FileInfo> _tempFiles = new List<FileInfo>();
+        private DinkTempFileHelper _temp = new DinkTempFileHelper();
+
+        public DinkInstaller() {
+            this.CustomTrace = new MyTrace(this.GetType().ToString());
+
+            // add text logger listener to trace...
+            MyTraceListenerLogger traceLogger = new MyTraceListenerLogger(this.GetType().ToString());
+            this.CustomTrace.Listeners.Add(traceLogger);
+            
+            this._temp.SetLogCallback(this.LogMessage);
+        }
+        
+        private void ReportPrimaryProgress(string heading, string detail = "")
+        {
+            this.ProgressReport?.Invoke(this, new DinkInstallerProgressEventArgs(heading, detail, this._progPhaseCurrent++ / this._progPhaseTotal));
+        }
+        
+        private void ReportSecondaryProgress(string heading, string detail = "", double progressPercent = double.NaN)
+        {
+            // NOTE: NaN progress means indeterminate...
+            this.SecondaryProgressReport?.Invoke(this, new DinkInstallerProgressEventArgs(heading, detail, progressPercent));
+        }
+        
+        private void LogMessage(string line1)
+        {
+            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, line1);
+        }
+        private void LogMessage(string line1, string line2)
+        {
+            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, [line1, line2]);
+        }
+        private void LogMessage(string line1, string line2, string line3)
+        {
+            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, [line1, line2, line3]);
+        }
+        private void LogMessage(string line1, string line2, string line3, string line4)
+        {
+            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, [line1, line2, line3, line4]);
+        }
+        
+        public void Cancel()
+        {
+            this._cancellationTokenSource.Cancel();
+
+            lock (this._syncRoot)
+            {
+                if (this._installPhase != DinkInstallPhase.Inactive) return;
+                
+                // jump to cleanup state to prevent starting initialization or installation...
+                this._installPhase = DinkInstallPhase.Cleanup;
+            }
+            
+            this.LogMessage(Localizer.Instance["DmodInstaller/Log/CancelledByUser"]);
+                
+            this.CleanUp();
+                
+            this.CustomTrace.Flush();
+            this.CustomTrace.Close();
+                
+            lock (this._syncRoot)
+            {
+                this._installPhase = DinkInstallPhase.Finished;
+            }
+            
+            this.InstallerDone?.Invoke(this, new DinkInstallerDoneEventArgs(DinkInstallerResult.Cancelled, null, null));
+        }
 
         #if PLATF_WINDOWS
 
-        public void StartInstallingDink(DirectoryInfo destinationDirectory, bool overrideDestination, ConfigInstaller config, bool cleanupDownloadsWhenDone = false) {
-            // only allow installer to run once
-            if (this.IsBusy || this.IsDone) return;
-            
-            this.IsBusy = true;
+        public void InstallDink(DirectoryInfo destinationDirectory, bool overrideDestination, ConfigInstaller config) {
+            lock (this._syncRoot)
+            {
+                if (this._installPhase != DinkInstallPhase.Inactive)
+                    return;
 
-            Task task = new Task( async () => {
-                bool cancelled = false;
-                Exception? exception = null;
+                this._installPhase = DinkInstallPhase.Preparing;
+            }
+
+            bool cancelled = false;
+            Exception? exception = null;
                 
-                try {
-                    // starting...
-                    this.StartTime = DateTime.Now;
-                    this.ProgPhaseCurrent = 0;
-                    this.ProgPhaseTotal = 2 + 2 * (config.InstallerComponents.Count + 1);
-                    DirectoryInfo webCacheDir = new DirectoryInfo(LocationHelper.WebCache);
-                    // log start of installation
-                    this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                        "",
-                        Localizer.Instance[@"DinkInstaller/StartInstalling"],
-                        $"    {config.Name}",
-                    });
-                    // prepare directories
-                    this.PrepareLocations(config, webCacheDir, destinationDirectory, overrideDestination);
-                    // download resources if needed
-                    await this.DownloadResources(config, webCacheDir);
-                    // install dink
-                    this.InstallDink(config, webCacheDir, destinationDirectory);
-                    // All done!
-                }catch (DinkInstallerCancelledByUserException) {
-                    cancelled = true;
-
-                    this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                        Localizer.Instance[@"DinkInstaller/Heading/CancelledByUser"],
-                    }, MyTraceLevel.Warning);
-                } catch (Exception ex) {
-                    exception = ex;
-
-                    this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, exception);
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, exception);
-                } finally {
-                    DinkInstallerResult result;
-                    
-                    this.CleanUp(cleanupDownloadsWhenDone);
-
-                    if (cancelled == false && exception == null) {
-                        result = DinkInstallerResult.Success;
-                        this.ReportProgress(InstallerReportLevel.Primary,
-                            Localizer.Instance[@"DinkInstaller/Heading/AllDone"],
-                            "",
-                            1.0);
-                    } else if (cancelled) {
-                        result = DinkInstallerResult.Cancelled;
-                        this.ReportProgress(InstallerReportLevel.Primary,
-                            Localizer.Instance[@"DinkInstaller/Heading/CancelledByUser"],
-                            "",
-                            1.0);
-                    } else {
-                        result = DinkInstallerResult.Error;
-                        this.ReportProgress(InstallerReportLevel.Primary,
-                            Localizer.Instance[@"DinkInstaller/Heading/ErrorOccured"],
-                            "",
-                            1.0);
-                    }
-
-                    this.CustomTrace.Flush();
-                    this.CustomTrace.Close(); // closes all trace listeners...
-
-                    this.IsDone = true;
-                    this.IsBusy = false;
-                    this.EndTime = DateTime.Now;
-
-                    this.InstallerDone?.Invoke(this, exception == null
-                        ? new DinkInstallerDoneEventArgs(result, config, destinationDirectory) 
-                        : new DinkInstallerDoneEventArgs(exception, config, destinationDirectory));
+            try {
+                // starting...
+                this._progPhaseCurrent = 0;
+                this._progPhaseTotal = 2 + 2 * (config.InstallerComponents.Count + 1);
+                DirectoryInfo webCacheDir = new DirectoryInfo(LocationHelper.WebCache);
+                // log start of installation
+                this.LogMessage(
+                    Localizer.Instance["DinkInstaller/StartInstalling"],
+                    $"    {config.Name}");
+                
+                // prepare directories
+                this.PrepareLocations(config, webCacheDir, destinationDirectory, overrideDestination);
+                
+                // download resources if needed
+                lock (this._syncRoot)
+                {
+                    this._installPhase = DinkInstallPhase.DownloadingResources;
                 }
-            });
+                this.DownloadResources(config, webCacheDir);
+                
+                // install dink
+                lock (this._syncRoot)
+                {
+                    this._installPhase = DinkInstallPhase.Installing;
+                }
+                this.InstallDink(config, webCacheDir, destinationDirectory);
+                // All done!
+            }catch (DinkInstallerCancelledByUserException) {
+                cancelled = true;
+                this.LogMessage(Localizer.Instance["DinkInstaller/Heading/CancelledByUser"]);
+            } catch (Exception ex) {
+                exception = ex;
+                this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, exception);
+                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, exception);
+            } finally {
+                DinkInstallerResult result;
 
-            task.Start();
+                this.CleanUp();
+
+                this._progPhaseCurrent = this._progPhaseTotal;
+                if (cancelled == false && exception == null) {
+                    result = DinkInstallerResult.Success;
+                    this.ReportPrimaryProgress(Localizer.Instance["DinkInstaller/Heading/AllDone"]);
+                } else if (cancelled) {
+                    result = DinkInstallerResult.Cancelled;
+                    this.ReportPrimaryProgress(Localizer.Instance["DinkInstaller/Heading/CancelledByUser"]);
+                } else {
+                    result = DinkInstallerResult.Error;
+                    this.ReportPrimaryProgress(Localizer.Instance["DinkInstaller/Heading/ErrorOccured"]);
+                }
+                
+                this.CustomTrace.Flush();
+                this.CustomTrace.Close(); // closes all trace listeners...
+
+                lock (this._syncRoot)
+                {
+                    this._installPhase = DinkInstallPhase.Finished;
+                }
+                
+                this.InstallerDone?.Invoke(this, exception == null
+                    ? new DinkInstallerDoneEventArgs(result, config, destinationDirectory) 
+                    : new DinkInstallerDoneEventArgs(exception, config, destinationDirectory));
+            }
         }
 
         private void PrepareLocations(ConfigInstaller config, DirectoryInfo webCacheDir, DirectoryInfo destinationDirectory, bool overrideDestination) {
             // start of phase 1
-            this.ReportProgress(InstallerReportLevel.Primary,
-                Localizer.Instance[@"DinkInstaller/Heading/Preparing"],
-                Localizer.Instance[@"DinkInstaller/Preparing/PreparingDirectoriesStart"],
-                this.ProgPhaseCurrent / this.ProgPhaseTotal);
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                "",
-                Localizer.Instance[@"DinkInstaller/Preparing/PreparingDirectoriesStart"]
-            });
+            this.ReportPrimaryProgress(
+                Localizer.Instance["DinkInstaller/Heading/Preparing"],
+                Localizer.Instance["DinkInstaller/Preparing/PreparingDirectoriesStart"]);
+            // do not increment yet...
+            this._progPhaseCurrent--;
+            this.LogMessage(Localizer.Instance["DinkInstaller/Preparing/PreparingDirectoriesStart"]);
 
             // safety checks for destination...
             if (destinationDirectory.Parent == null) {
                 throw new DinkInstallerFileSystemException(
-                    Localizer.Instance[@"DinkInstaller/Preparing/DestinationErrorIsRoot"] + $" \"{destinationDirectory.FullName}\"");
+                    Localizer.Instance["DinkInstaller/Preparing/DestinationErrorIsRoot"] + $" \"{destinationDirectory.FullName}\"");
             }
             if (Path.IsPathRooted(destinationDirectory.FullName) == false) {
                 throw new DinkInstallerFileSystemException(
-                    Localizer.Instance[@"DinkInstaller/Preparing/DestinationErrorIsNotRooted"] + $" \"{destinationDirectory.FullName}\"");
+                    Localizer.Instance["DinkInstaller/Preparing/DestinationErrorIsNotRooted"] + $" \"{destinationDirectory.FullName}\"");
             }
 
             // prepare web cache directory
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                "    " + webCacheDir.FullName
-            });
+            this.LogMessage("    " + webCacheDir.FullName);
             this.PrepareDirectories_CreateIfNotExists(webCacheDir);
 
             // prepare destination directory
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                "    " + destinationDirectory.FullName
-            });
+            this.LogMessage("    " + destinationDirectory.FullName);
             if (overrideDestination) {
                 this.PrepareDirectories_CreateNew(destinationDirectory);
             } else {
                 this.PrepareDirectories_CreateIfNotExists(destinationDirectory);
             }
 
-            // prepare temp dirs for all the resources...
-            DirectoryInfo theTempDir = new DirectoryInfo(Path.GetTempPath());
-            foreach (ConfigInstallerComponent comp in config.InstallerComponents) {
-                if (this.CancelToken.IsCancellationRequested) {
-                    throw new DinkInstallerCancelledByUserException();
-                }
-
-                // create a temporary subdirectory for the resource unzipping process
-                DirectoryInfo tempDirInfo = theTempDir.CreateSubdirectory(Path.Combine("dink_temp", Path.GetRandomFileName()));
-                this._tempDirs.Add(tempDirInfo);
-            }
-
             // end of phase 1
-            this.ReportProgress(InstallerReportLevel.Primary,
-                Localizer.Instance[@"DinkInstaller/Heading/Preparing"],
-                Localizer.Instance[@"DinkInstaller/Preparing/PreparingDirectoriesDone"],
-                this.ProgPhaseCurrent++ / this.ProgPhaseTotal);
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                Localizer.Instance[@"DinkInstaller/Preparing/PreparingDirectoriesDone"],
-                "",
-            });
+            this.ReportPrimaryProgress(
+                Localizer.Instance["DinkInstaller/Heading/Preparing"],
+                Localizer.Instance["DinkInstaller/Preparing/PreparingDirectoriesDone"]);
+            this.LogMessage(Localizer.Instance["DinkInstaller/Preparing/PreparingDirectoriesDone"]);
         }
 
-        private async Task DownloadResources(ConfigInstaller config, DirectoryInfo webCacheDir) {
+        private void DownloadResources(ConfigInstaller config, DirectoryInfo webCacheDir) {
             // start of phase 2
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                Localizer.Instance[@"DinkInstaller/DownloadingResources/Start"],
-            });
+            this.LogMessage(Localizer.Instance["DinkInstaller/DownloadingResources/Start"]);
 
             foreach (ConfigInstallerComponent comp in config.InstallerComponents) {
-                if (this.CancelToken.IsCancellationRequested) {
+                if (this._cancellationTokenSource.IsCancellationRequested)
                     throw new DinkInstallerCancelledByUserException();
-                }
-
-                this.ReportProgress(InstallerReportLevel.Primary,
-                    Localizer.Instance[@"DinkInstaller/Heading/Downloading"],
-                    comp.WebResource.Uri,
-                    this.ProgPhaseCurrent++ / this.ProgPhaseTotal);
+                
+                this.ReportPrimaryProgress(
+                    Localizer.Instance["DinkInstaller/Heading/Downloading"],
+                    comp.WebResource.Uri);
 
                 FileInfo finfo = new FileInfo(Path.Combine(webCacheDir.FullName, comp.WebResource.Name));
-                this._tempFiles.Add(finfo);
+                // NOTE: I think the cached file should not be cleaned up in this case.. right?...
+                //this._temp.RegisterTempFile(finfo);
 
-                await this.DownloadFile(finfo, comp.WebResource);
+                this.DownloadFile(finfo, comp.WebResource);
             }
 
             // end of phase 2
-            this.ReportProgress(InstallerReportLevel.Primary,
-                Localizer.Instance[@"DinkInstaller/Heading/Downloading"],
-                Localizer.Instance[@"DinkInstaller/DownloadingResources/Done"],
-                this.ProgPhaseCurrent++ / this.ProgPhaseTotal);
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                "",
-                Localizer.Instance[@"DinkInstaller/DownloadingResources/Done"],
-                "",
-            });
+            this.ReportPrimaryProgress(
+                Localizer.Instance["DinkInstaller/Heading/Downloading"],
+                Localizer.Instance["DinkInstaller/DownloadingResources/Done"]);
+            this.LogMessage(Localizer.Instance["DinkInstaller/DownloadingResources/Done"]);
         }
 
         private void InstallDink(ConfigInstaller config, DirectoryInfo webCacheDir, DirectoryInfo destinationDirectory) {
             // start of phase 3
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResource/Start"],
-                "",
-            });
+            this.LogMessage(Localizer.Instance["DinkInstaller/InstallingDink/InstallingResource/Start"]);
 
             foreach (ConfigInstallerComponent comp in config.InstallerComponents) {
-                if (this.CancelToken.IsCancellationRequested) {
+                if (this._cancellationTokenSource.IsCancellationRequested)
                     throw new DinkInstallerCancelledByUserException();
-                }
-
-                string tempName = Path.GetFileNameWithoutExtension(comp.WebResource.Name) + "_tmp";
-                DirectoryInfo tempDirInfo = new DirectoryInfo(Path.Combine(webCacheDir.FullName,tempName));
+                
+                // create a temporary directory to extract the component to
+                DirectoryInfo? tmpDirInfo = this._temp.TryCreateTempDirectory();
+                if (tmpDirInfo == null)
+                    throw new DinkInstallerFileSystemException(Localizer.Instance["DinkInstaller/Preparing/CreatingTempDirectoryError"]);
+                
                 FileInfo finfo = new FileInfo(Path.Combine(webCacheDir.FullName, comp.WebResource.Name));
+                
+                this.ReportPrimaryProgress(
+                    Localizer.Instance["DinkInstaller/Heading/Installing"],
+                    comp.WebResource.Name);
 
-                this.ReportProgress(InstallerReportLevel.Primary,
-                    Localizer.Instance[@"DinkInstaller/Heading/Installing"],
-                    comp.WebResource.Name,
-                    this.ProgPhaseCurrent++ / this.ProgPhaseTotal);
-
-                this.ReportProgress(InstallerReportLevel.Indeterminate,
+                this.ReportSecondaryProgress(
                     finfo.FullName,
-                    Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResourceUnzipping/Attempt"],
-                    0.0);
+                    Localizer.Instance["DinkInstaller/InstallingDink/InstallingResourceUnzipping/Attempt"],
+                    double.NaN);
 
-                bool success = this.TryUnzipFile(finfo, tempDirInfo, comp.WebResource.ResourceArchiveFormat);
+                bool success = this.TryUnzipFile(finfo, tmpDirInfo, comp.WebResource.ResourceArchiveFormat);
 
-                this.ReportProgress(InstallerReportLevel.Indeterminate,
+                this.ReportSecondaryProgress(
                     finfo.FullName,
-                    Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResourceUnzipping/Attempt"],
+                    Localizer.Instance["DinkInstaller/InstallingDink/InstallingResourceUnzipping/Attempt"],
                     1.0);
 
                 if (!success) {
                     throw new DinkInstallerUnzipException(finfo.FullName);
                 }
 
-                DirectoryInfo sourceDirectory = tempDirInfo;
+                DirectoryInfo sourceDirectory = tmpDirInfo;
 
                 if (!string.IsNullOrWhiteSpace(comp.SourceSubFolder)) {
-                    sourceDirectory = new DirectoryInfo(Path.Combine(tempDirInfo.FullName, comp.SourceSubFolder));
+                    sourceDirectory = new DirectoryInfo(Path.Combine(tmpDirInfo.FullName, comp.SourceSubFolder));
                 } 
                 
                 this.MoveDirectoryContents(sourceDirectory, destinationDirectory, comp.FileFilterMode, comp.FileFilterList);
             }
             
-            this.ReportProgress(InstallerReportLevel.Primary,
-                Localizer.Instance[@"DinkInstaller/Heading/Installing"],
-                Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResource/Done"],
-                this.ProgPhaseCurrent++ / this.ProgPhaseTotal);
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResource/Done"],
-            });
+            this.ReportPrimaryProgress(
+                Localizer.Instance["DinkInstaller/Heading/Installing"],
+                Localizer.Instance["DinkInstaller/InstallingDink/InstallingResource/Done"]);
+            this._progPhaseCurrent++;
+            this.LogMessage(Localizer.Instance["DinkInstaller/InstallingDink/InstallingResource/Done"]);
         }
 
         private void PrepareDirectories_CreateIfNotExists(DirectoryInfo dirInfo) {
@@ -260,18 +299,17 @@ namespace Martridge.Models.Installer {
                 dirInfo.Refresh();
 
                 if (dirInfo.Parent == null) {
-                    throw new DinkInstallerFileSystemException(Localizer.Instance[@"DinkInstaller/Preparing/CreatingDirectoryErrorDirectoryRoot"]);
+                    throw new DinkInstallerFileSystemException(Localizer.Instance["DinkInstaller/Preparing/CreatingDirectoryErrorDirectoryRoot"]);
                 }
 
                 if (dirInfo.Exists == false) {
-                    this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                        Localizer.Instance[@"DinkInstaller/Preparing/CreatingDirectory"],
-                        $"    \"{dirInfo.FullName}\""
-                    });
+                    this.LogMessage(
+                        Localizer.Instance["DinkInstaller/Preparing/CreatingDirectory"],
+                        $"    \"{dirInfo.FullName}\"");
                     dirInfo.Create();
                 }
             } catch (Exception ex) {
-                throw new DinkInstallerFileSystemException(Localizer.Instance[@"DinkInstaller/Preparing/CreatingDirectoryError"], ex);
+                throw new DinkInstallerFileSystemException(Localizer.Instance["DinkInstaller/Preparing/CreatingDirectoryError"], ex);
             }
         }
 
@@ -280,69 +318,33 @@ namespace Martridge.Models.Installer {
                 dirInfo.Refresh();
 
                 if (dirInfo.Parent == null) {
-                    throw new DinkInstallerFileSystemException(Localizer.Instance[@"DinkInstaller/Preparing/CreatingDirectoryErrorDirectoryRoot"]);
+                    throw new DinkInstallerFileSystemException(Localizer.Instance["DinkInstaller/Preparing/CreatingDirectoryErrorDirectoryRoot"]);
                 }
 
                 if (dirInfo.Exists) {
                     dirInfo.Delete(true);
                 }
 
-                this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                    Localizer.Instance[@"DinkInstaller/Preparing/CreatingDirectory"],
-                    $"    \"{dirInfo.FullName}\""
-                });
+                this.LogMessage(
+                    Localizer.Instance["DinkInstaller/Preparing/CreatingDirectory"],
+                    $"    \"{dirInfo.FullName}\"");
                 dirInfo.Create();
 
             } catch (Exception ex) {
-                throw new DinkInstallerFileSystemException(Localizer.Instance[@"DinkInstaller/Preparing/CreatingDirectoryError"], ex);
+                throw new DinkInstallerFileSystemException(Localizer.Instance["DinkInstaller/Preparing/CreatingDirectoryError"], ex);
             }
         }
 
-        private void CleanUp(bool removeFiles) {
-            this.ReportProgress(InstallerReportLevel.Primary,
-                Localizer.Instance[@"DinkInstaller/Heading/Cleanup"],
-                "",
-                this.ProgPhaseCurrent / this.ProgPhaseTotal);
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                "",
-                Localizer.Instance[@"DinkInstaller/CleaningUp/Start"],
-            });
-
-            foreach (DirectoryInfo dir in this._tempDirs) {
-                try {
-                    dir.Refresh();
-                    if (dir.Exists) {
-                        this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                        $"    {dir.FullName}",
-                    });
-                        dir.Delete(true);
-                    }
-                } catch (Exception ex) {
-                    this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, ex);
-                }
+        private void CleanUp() {
+            lock (this._syncRoot)
+            {
+                this._installPhase = DinkInstallPhase.Cleanup;
             }
-
-            if (removeFiles) {
-
-                foreach (FileInfo file in this._tempFiles) {
-                    try {
-                        file.Refresh();
-                        if (file.Exists) {
-                            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                            $"    {file.FullName}",
-                        });
-                            file.Delete();
-                        }
-                    } catch (Exception ex) {
-                        this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, ex);
-                    }
-                }
-            }
-
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                "",
-                Localizer.Instance[@"DinkInstaller/CleaningUp/Done"],
-            });
+            this.ReportPrimaryProgress(Localizer.Instance["DinkInstaller/Heading/Cleanup"]);
+            this._progPhaseCurrent++;
+            this.LogMessage(Localizer.Instance["DinkInstaller/CleaningUp/Start"]);
+            this._temp.Dispose();
+            this.LogMessage(Localizer.Instance["DinkInstaller/CleaningUp/Done"]);
         }
 
         private void IndexAllFilesInDirectory(DirectoryInfo sourceDir, List<FileInfo> outputList) {
@@ -351,9 +353,8 @@ namespace Martridge.Models.Installer {
 
             // searching remaining directories...
             do {
-                if (this.CancelToken.IsCancellationRequested) {
+                if (this._cancellationTokenSource.IsCancellationRequested)
                     throw new DinkInstallerCancelledByUserException();
-                }
 
                 DirectoryInfo currentDir = dirsToIndex.Pop();
 
@@ -390,10 +391,9 @@ namespace Martridge.Models.Installer {
                     this.IndexAllFilesInDirectory(theDir, outputList);
                 } else {
                     if (logMissingFiles) {
-                        this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                            Localizer.Instance[@"DinkInstaller/DinkInstaller/InstallingDink/MovingFiles/NotFound"],
-                            $"    Path        = {fullwhite}",
-                        }, MyTraceLevel.Warning);
+                        this.LogMessage(
+                            Localizer.Instance["DinkInstaller/DinkInstaller/InstallingDink/MovingFiles/NotFound"],
+                            $"    Path        = {fullwhite}");
                         //TODO... maybe give the user a confirmation warning or something?....
                     }
 
@@ -406,13 +406,11 @@ namespace Martridge.Models.Installer {
             List<FileInfo> bannedFiles = new List<FileInfo>();
             Dictionary<string, bool>? bannedDict = null;
 
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                "",
-                Localizer.Instance[@"DinkInstaller/InstallingDink/MovingFiles/Start"],
+            this.LogMessage(
+                Localizer.Instance["DinkInstaller/InstallingDink/MovingFiles/Start"],
                 $"    Source      = {source.FullName}",
                 $"    Destination = {destination.FullName}",
-                Localizer.Instance[@"DinkInstaller/InstallingDink/MovingFiles/Indexing"],
-            });                
+                Localizer.Instance["DinkInstaller/InstallingDink/MovingFiles/Indexing"]);
             
             switch(filterMode) {
                 case InstallerFiltering.NoFiltering:
@@ -443,15 +441,13 @@ namespace Martridge.Models.Installer {
             double progressCount = 0;
             double progressTotal = filesToMove.Count;
 
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                Localizer.Instance[@"DinkInstaller/InstallingDink/MovingFiles/ActuallyMoving"]
-                        + $"({filesToMove.Count} {Localizer.Instance[@"DinkInstaller/InstallingDink/MovingFiles/FilesWord"]})",
-            });
+            this.LogMessage(
+                Localizer.Instance["DinkInstaller/InstallingDink/MovingFiles/ActuallyMoving"]
+                    + $"({filesToMove.Count} {Localizer.Instance["DinkInstaller/InstallingDink/MovingFiles/FilesWord"]})");
 
             foreach (FileInfo file in filesToMove) {
-                if (this.CancelToken.IsCancellationRequested) {
+                if (this._cancellationTokenSource.IsCancellationRequested)
                     throw new DinkInstallerCancelledByUserException();
-                }
 
                 string relativePath = Path.GetRelativePath(source.FullName, file.FullName);
                 string newPath = Path.Combine(destination.FullName, relativePath);
@@ -466,8 +462,8 @@ namespace Martridge.Models.Installer {
                     }
                 }
 
-                this.ReportProgress(InstallerReportLevel.Secondary,
-                    Localizer.Instance[@"DinkInstaller/InstallingDink/MovingFiles/ActuallyMoving"],
+                this.ReportSecondaryProgress(
+                    Localizer.Instance["DinkInstaller/InstallingDink/MovingFiles/ActuallyMoving"],
                     relativePath,
                     progressCount++ / progressTotal);
                 
@@ -484,74 +480,60 @@ namespace Martridge.Models.Installer {
 
                     file.MoveTo(newPath, true);
                 } else {
-                    this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller,
-                        new List<string>() { $"{indentStr}\"{relativePath}\" (blacklisted!)" },
-                        MyTraceLevel.Verbose);
+                    this.LogMessage($"{indentStr}\"{relativePath}\" (blacklisted!)");
                 }
             }
 
-            this.ReportProgress(InstallerReportLevel.Secondary,
-                Localizer.Instance[@"DinkInstaller/InstallingDink/MovingFiles/Done"],
+            this.ReportSecondaryProgress(
+                Localizer.Instance["DinkInstaller/InstallingDink/MovingFiles/Done"],
                 "",
                 1.0);
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                Localizer.Instance[@"DinkInstaller/InstallingDink/MovingFiles/Done"],
-                "",
-            });
+            this.LogMessage(Localizer.Instance["DinkInstaller/InstallingDink/MovingFiles/Done"]);
         }
 
         private bool TryUnzipFile(FileInfo file, DirectoryInfo destination, string expectedFormatName) {
             
             if (!Enum.TryParse( expectedFormatName, out SevenZipFormat expectedFormat))
             {
-                this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                    Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResourceUnzipping/ErrorParsing7ZipFormat"],
-                    $"    FormatName  = \"{ expectedFormatName }\"",
-                });
+                this.LogMessage(
+                    Localizer.Instance["DinkInstaller/InstallingDink/InstallingResourceUnzipping/ErrorParsing7ZipFormat"],
+                    $"    FormatName  = \"{ expectedFormatName }\"");
             }
             
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResourceUnzipping/Attempt"],
+            this.LogMessage(
+                Localizer.Instance["DinkInstaller/InstallingDink/InstallingResourceUnzipping/Attempt"],
                 $"    Archive  = \"{ expectedFormat }\"",
                 $"    Source   = \"{ file.FullName }\"",
-                $"    Dest     = \"{ destination.FullName }\"",
-            });
+                $"    Dest     = \"{ destination.FullName }\"");
 
             bool success = this.TryUnzipFile_SingleFormat(file, destination, expectedFormat);
             if (!success) {
                 // failed to extract archive with expected format... attempt all known formats?..
                 Array enumVals = Enum.GetValues(typeof(SevenZipFormat));
                 foreach (SevenZipFormat format in enumVals) {
-                    if (this.CancelToken.IsCancellationRequested) {
+                    if (this._cancellationTokenSource.IsCancellationRequested) {
                         throw new DinkInstallerCancelledByUserException();
                     }
 
                     if (format != expectedFormat) {
-                        this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                            Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResourceUnzipping/Error"],
-                            $"    Archive  = \"{ format }\"",
-                        });
+                        this.LogMessage(
+                            Localizer.Instance["DinkInstaller/InstallingDink/InstallingResourceUnzipping/Error"],
+                            $"    Archive  = \"{ format }\"");
 
                         success = this.TryUnzipFile_SingleFormat(file, destination, format);
 
                         if (success) {
-                            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                                Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResourceUnzipping/Success"]
-                            });
+                            this.LogMessage(Localizer.Instance["DinkInstaller/InstallingDink/InstallingResourceUnzipping/Success"]);
                             return true;
                         }
                     }
                 }
             } else {
-                this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                    Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResourceUnzipping/Success"]
-                });
+                this.LogMessage(Localizer.Instance["DinkInstaller/InstallingDink/InstallingResourceUnzipping/Success"]);
                 return true;
             }
 
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                Localizer.Instance[@"DinkInstaller/InstallingDink/InstallingResourceUnzipping/Failure"]
-            });
+            this.LogMessage(Localizer.Instance["DinkInstaller/InstallingDink/InstallingResourceUnzipping/Failure"]);
             return false;
         }
 
@@ -571,7 +553,7 @@ namespace Martridge.Models.Installer {
             }
         }
         
-        private async Task DownloadFile(FileInfo dest, ConfigWebResource res) {
+        private void DownloadFile(FileInfo dest, ConfigWebResource res) {
             HttpClient client = new HttpClient();
             client.Timeout = this._timeoutHttpClient;
 
@@ -579,8 +561,7 @@ namespace Martridge.Models.Installer {
                 string sha256;
 
                 this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                    "",
-                    Localizer.Instance[@"DinkInstaller/DownloadingResources/Prepare"],
+                    Localizer.Instance["DinkInstaller/DownloadingResources/Prepare"],
                     $"    Name         = \"{res.Name}\"",
                     $"    Source       = \"{res.Uri}\"",
                     $"    Destination  = \"{dest.FullName}\"",
@@ -590,46 +571,52 @@ namespace Martridge.Models.Installer {
 
                 dest.Refresh();
                 if (dest.Exists) {
-                    this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                        Localizer.Instance[@"DinkInstaller/DownloadingResources/FileAlreadyFound"]
-                    });
+                    this.LogMessage(Localizer.Instance["DinkInstaller/DownloadingResources/FileAlreadyFound"]);
 
                     if (res.CheckSha256) {
                         sha256 = HashHelper.ComputeFileSha256Hash(dest.FullName);
                         if (sha256 == res.Sha256) {
-                            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                                Localizer.Instance[@"DinkInstaller/DownloadingResources/FileHashMatch"],
-                                Localizer.Instance[@"DinkInstaller/DownloadingResources/UseExistingFile"],
-                            });
+                            this.LogMessage(
+                                Localizer.Instance["DinkInstaller/DownloadingResources/FileHashMatch"],
+                                Localizer.Instance["DinkInstaller/DownloadingResources/UseExistingFile"]);
                             return;
                         } else {
-                            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                                Localizer.Instance[@"DinkInstaller/DownloadingResources/FileHashMismatch"],
+                            this.LogMessage(
+                                Localizer.Instance["DinkInstaller/DownloadingResources/FileHashMismatch"],
                                 $"    File     SHA256 = \"{sha256}\"",
-                                $"    Expected SHA256 = \"{res.Sha256}\"",
-                            });
+                                $"    Expected SHA256 = \"{res.Sha256}\"");
                             // proceed to download new file...
                         }
-                    } else {
-                        // TODO maybe check file length against web resource?...
-                        this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                            Localizer.Instance[@"DinkInstaller/DownloadingResources/UseExistingFile"],
-                        });
-                        return;
+                    } else
+                    {
+                        // NOTE: only use local file if it's younger than 3 days... otherwise redownload to make sure we have latest version...
+                        TimeSpan age = DateTime.Now - dest.LastWriteTime;
+                        if (Math.Floor(age.TotalDays) <= 3.0)
+                        {
+                            // TODO maybe check file length against web resource?...
+                            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
+                                Localizer.Instance["DinkInstaller/DownloadingResources/UseExistingFile"],
+                            });
+                            return;
+                        }
                     }
                 }
 
-                this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                    Localizer.Instance[@"DinkInstaller/DownloadingResources/DownloadingFile"],
-                    res.Uri
-                });
+                this.LogMessage(
+                    Localizer.Instance["DinkInstaller/DownloadingResources/DownloadingFile"],
+                    res.Uri);
 
                 long downloaded;
 
-                using (HttpResponseMessage response = await client.GetAsync(res.Uri, HttpCompletionOption.ResponseHeadersRead))
-                using (FileStream fstream = new FileStream(dest.FullName, FileMode.Create, FileAccess.Write, FileShare.Read)) {
-
-                    Stream webstream = await response.Content.ReadAsStreamAsync();
+                Task<HttpResponseMessage> httpTask = client.GetAsync(res.Uri, HttpCompletionOption.ResponseHeadersRead);
+                httpTask.Wait();
+                using (HttpResponseMessage response = httpTask.Result)
+                using (FileStream fstream = new FileStream(dest.FullName, FileMode.Create, FileAccess.Write, FileShare.Read))
+                {
+                    Task<Stream> readTask = response.Content.ReadAsStreamAsync();
+                    readTask.Wait();
+                    
+                    Stream webstream = readTask.Result;
 
                     byte[] buffer = new byte[65536];
                     downloaded = 0;
@@ -638,11 +625,10 @@ namespace Martridge.Models.Installer {
 
                     while (true) {
                         // check if user is cancelling operation...
-                        if (this.CancelToken.IsCancellationRequested) {
-                            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                                    Localizer.Instance[@"DinkInstaller/DownloadingResources/DownloadingCancelled"],
-                                    res.Uri
-                                });
+                        if (this._cancellationTokenSource.IsCancellationRequested) {
+                            this.LogMessage(
+                                    Localizer.Instance["DinkInstaller/DownloadingResources/DownloadingCancelled"],
+                                    res.Uri);
 
                             throw new DinkInstallerCancelledByUserException();
                         }
@@ -662,10 +648,7 @@ namespace Martridge.Models.Installer {
 
                             // check if need to report progress...
                             if (DateTime.Now > nextReport) {
-                                this.ReportProgress(InstallerReportLevel.Secondary,
-                                    res.Name,
-                                    res.Uri,
-                                    progress);
+                                this.ReportSecondaryProgress(res.Name, res.Uri, progress);
                                 this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                                         $"    ({(int)Math.Ceiling((double)downloaded/1024)}kB/{(int)Math.Ceiling(totalsize/1024.0)}kB)"
                                     });
@@ -680,10 +663,7 @@ namespace Martridge.Models.Installer {
 
 
                 // send a final progress report 
-                this.ReportProgress(InstallerReportLevel.Secondary,
-                    res.Name,
-                    res.Uri,
-                    1.0);
+                this.ReportSecondaryProgress(res.Name, res.Uri, 1.0);
                 this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
                     $"    ({(int)Math.Ceiling((double)downloaded/1024)}kB/{(int)Math.Ceiling((double)downloaded/1024)}kB)"
                 });
@@ -692,17 +672,14 @@ namespace Martridge.Models.Installer {
                 if (res.CheckSha256) {
                     sha256 = HashHelper.ComputeFileSha256Hash(dest.FullName);
                     if (sha256 == res.Sha256) {
-                        this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                            Localizer.Instance[@"DinkInstaller/DownloadingResources/FileHashMatch"],
-                        });
+                        this.LogMessage(Localizer.Instance["DinkInstaller/DownloadingResources/FileHashMatch"]);
                         // all done
                         return;
                     } else {
-                        this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
+                        this.LogMessage(
                             Localizer.Instance[@"DinkInstaller/DownloadingResources/FileHashMismatch"],
                             $"    File     SHA256 = \"{sha256}\"",
-                            $"    Expected SHA256 = \"{res.Sha256}\"",
-                        });
+                            $"    Expected SHA256 = \"{res.Sha256}\"");
                         throw new DinkInstallerDownloadException("Checksum mismatch...");
                     }
                 } else {
@@ -712,9 +689,9 @@ namespace Martridge.Models.Installer {
 
                 // this should be unreachable...
                 // return false;
-            } catch (DinkInstallerCancelledByUserException ex) {
+            } catch (DinkInstallerCancelledByUserException) {
                 // just forward exception?
-                throw ex;
+                throw;
             } catch (Exception ex) {
                 throw new DinkInstallerDownloadException(null, ex);
             } finally {
@@ -722,7 +699,7 @@ namespace Martridge.Models.Installer {
                 client.Dispose();
 
                 dest.Refresh();
-                if (this.CancelToken.IsCancellationRequested && dest.Exists) {
+                if (this._cancellationTokenSource.IsCancellationRequested && dest.Exists) {
                     dest.Delete();
                 }
             }
@@ -735,11 +712,14 @@ namespace Martridge.Models.Installer {
         // this is here just so that I don't have to modify the DinkInstallerViewModel for different platforms
         //
         
-        public void StartInstallingDink(DirectoryInfo destinationDirectory, bool overrideDestination, ConfigInstaller config, bool cleanupDownloadsWhenDone = false) {
-            
-            if (this.IsBusy || this.IsDone) return;
+        public void StartInstallingDink(DirectoryInfo destinationDirectory, bool overrideDestination, ConfigInstaller config) {
+            lock (this._syncRoot)
+            {
+                if (this._installPhase != DinkInstallPhase.Inactive)
+                    return;
 
-            this.IsBusy = true;
+                this._installPhase = DinkInstallPhase.Preparing;
+            }
             
             
 
@@ -748,16 +728,11 @@ namespace Martridge.Models.Installer {
                 Exception? exception = null;
 
                 try {
-                    // starting...
-                    this.StartTime = DateTime.Now;
-
-                    this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
-                        "",
-                        Localizer.Instance[@"DinkInstaller/NotSupportedInBuild"],
-                        $"    {config.Name}",
-                    });
+                    this.LogMessage(
+                        Localizer.Instance["DinkInstaller/NotSupportedInBuild"],
+                        $"    {config.Name}");
                     
-                    exception = new NotSupportedException(Localizer.Instance[@"DinkInstaller/NotSupportedInBuild"]);;
+                    exception = new NotSupportedException(Localizer.Instance["DinkInstaller/NotSupportedInBuild"]);;
                 } catch (Exception ex) {
                     exception = ex;
 
@@ -765,11 +740,12 @@ namespace Martridge.Models.Installer {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, exception);
                 } finally {
                     this.CustomTrace.Flush();
-                    this.CustomTrace.Close(); // closes all trace listeners...
-
-                    this.IsDone = true;
-                    this.IsBusy = false;
-                    this.EndTime = DateTime.Now;
+                    this.CustomTrace.Close();
+                    
+                    lock (this._syncRoot)
+                    {
+                        this._installPhase = DinkInstallPhase.Finished;
+                    }
 
                     this.InstallerDone?.Invoke(this,new DinkInstallerDoneEventArgs(exception, config, destinationDirectory));
                 }

@@ -17,13 +17,24 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Avalonia;
+using Martridge.Models.Configuration;
 using Martridge.Models.DmodInstaller;
 using Martridge.Models.DmodPacker;
+using Martridge.Models.OnlineDmods;
 
 namespace Martridge.ViewModels {
-    public class MainWindowViewModel : ViewModelBase {
+    public class MainWindowViewModel : ViewModelBase
+    {
 
-        private readonly AppLogic _logic;
+        private Config? _config = null;
+        private DmodManager? _dmodManager = null;
+        private DmodCrawler? _dmodCrawler = null;
+        
+        public MainWindowViewModel()
+        {
+            
+        }
 
         public AnimatedDinkGraphicViewModel AnimatedDuckWizardLeft {
             get => DinkyAlert.AnimatedDuckWizardLeft;
@@ -57,35 +68,42 @@ namespace Martridge.ViewModels {
         public DmodPackerViewModel VmDmodPacker { get; } = new DmodPackerViewModel();
 
         public AboutWindowViewModel VmAboutWindow { get; } = new AboutWindowViewModel();
-    
-        public MainWindowViewModel() {
-            this._logic = new AppLogic();
 
-            if (this._logic.Config.General.ShowLogWindowOnStartup) {
-                WindowManager.Instance.ShowLogWindow();
-            }
+        public void Initialize(Config appConfig)
+        {
+            // sanity check if already initialized.. should never happen...
+            if (this._config != null)
+                return;
+            
+            this._config = appConfig;
+            
+            this._dmodManager = new DmodManager();
+            this._dmodManager.Initialize(this._config.General);
+            
+            this._dmodCrawler = new DmodCrawler();
+            this._dmodCrawler.InitializeDmodLists(false); // no await
 
-            this.VmGeneralSettings.Configuration = this._logic.Config.General;
+            this.VmGeneralSettings.Configuration = this._config.General;
             this.VmGeneralSettings.SettingsDone += this.VmGeneralSettingsOnSettingsDone;
             
             this.VmDinkInstaller.InstallerDone += this.VmDinkInstallerOnInstallerDone;
 
             this.VmDmodInstaller.InstallerDone += this.VmDmodInstallerOnInstallerDone;
-            this.VmDmodInstaller.InitializeConfiguration(this._logic.Config.General);
+            this.VmDmodInstaller.InitializeConfiguration(this._config.General);
             
             this.VmDmodPacker.PackerDone += this.VmDmodPackerOnInstallerDone;
             
-            this.VmDmodBrowser.Configuration = this._logic.Config;
-            this.VmDmodBrowser.DmodManager = this._logic.DmodManager;
+            this.VmDmodBrowser.Configuration = this._config;
+            this.VmDmodBrowser.DmodManager = this._dmodManager;
             
-            this.VmOnlineDmodBrowser.DmodCrawler = this._logic.DmodCrawler;
+            this.VmOnlineDmodBrowser.DmodCrawler = this._dmodCrawler;
             this.VmOnlineDmodBrowser.MainVm = this;
 
-            this.VmAboutWindow.Configuration = this._logic.Config.General;
+            this.VmAboutWindow.Configuration = this._config.General;
 
             MyTrace.Global.WriteMessage(MyTraceCategory.General, $"App Path = \"{LocationHelper.AppBaseDirectory}\"");
 
-            this._logic.DmodCrawler.InitializeDmodLists(false);
+            
         }
 
 
@@ -167,7 +185,7 @@ namespace Martridge.ViewModels {
             try {
                 if (e.Result == DinkInstallerResult.Success) {
                     // refresh dmods...
-                    this._logic.DmodManager.Initialize(this._logic.Config.General);
+                    this._dmodManager.Initialize(this._config.General);
                 }
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);
@@ -185,13 +203,13 @@ namespace Martridge.ViewModels {
                     if (string.IsNullOrWhiteSpace(e.UsedInstaller.GameFileName) == false) {
                         string pathGame = Path.Combine(e.Destination.FullName, e.UsedInstaller.GameFileName);
                         if (File.Exists(pathGame)) {
-                            this._logic.Config.General.AddGameExePath(pathGame);
+                            this._config.General.AddGameExePath(pathGame);
                         }
                     }
                     if (string.IsNullOrWhiteSpace(e.UsedInstaller.EditorFileName) == false) {
                         string pathGame = Path.Combine(e.Destination.FullName, e.UsedInstaller.EditorFileName);
                         if (File.Exists(pathGame)) {
-                            this._logic.Config.General.AddEditorExePath(pathGame);
+                            this._config.General.AddEditorExePath(pathGame);
                         }
                     }
                 }
@@ -222,7 +240,7 @@ namespace Martridge.ViewModels {
         public void CmdShowPageDinkInstaller(object? parameter = null) {
             if (this.ActiveUserPage == MainViewPage.MainView) {
                 this.ActiveUserPage = MainViewPage.DinkInstaller;
-                this.VmDinkInstaller.InitializeInstallerList(this._logic.Config.General.AutoUpdateInstallerList);
+                this.VmDinkInstaller.InitializeInstallerList(this._config.General.AutoUpdateInstallerList);
             }
         }
 
@@ -319,7 +337,7 @@ namespace Martridge.ViewModels {
         }
 
         public void CmdShowLogWindow(object? parameter = null) {
-            WindowManager.Instance.ShowLogWindow();
+            App.Instance?.ShowLogWindow();
         }
 
     }

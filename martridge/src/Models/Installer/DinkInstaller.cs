@@ -608,10 +608,14 @@ namespace Martridge.Models.Installer {
 
                 long downloaded;
 
+                FileInfo? tempDownloadFile = this._temp.TryCreateTempFile();
+                if (tempDownloadFile == null)
+                    throw new DinkInstallerFileSystemException(Localizer.Instance["DinkInstaller/Preparing/CreatingTempFileError"]);
+
                 Task<HttpResponseMessage> httpTask = client.GetAsync(res.Uri, HttpCompletionOption.ResponseHeadersRead);
                 httpTask.Wait();
                 using (HttpResponseMessage response = httpTask.Result)
-                using (FileStream fstream = new FileStream(dest.FullName, FileMode.Create, FileAccess.Write, FileShare.Read))
+                using (FileStream fstream = new FileStream(tempDownloadFile.FullName, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
                     Task<Stream> readTask = response.Content.ReadAsStreamAsync();
                     readTask.Wait();
@@ -629,7 +633,6 @@ namespace Martridge.Models.Installer {
                             this.LogMessage(
                                     Localizer.Instance["DinkInstaller/DownloadingResources/DownloadingCancelled"],
                                     res.Uri);
-
                             throw new DinkInstallerCancelledByUserException();
                         }
 
@@ -660,8 +663,7 @@ namespace Martridge.Models.Installer {
                         }
                     }
                 }
-
-
+                
                 // send a final progress report 
                 this.ReportSecondaryProgress(res.Name, res.Uri, 1.0);
                 this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
@@ -670,11 +672,9 @@ namespace Martridge.Models.Installer {
 
                 // check SHA256 if necessary
                 if (res.CheckSha256) {
-                    sha256 = HashHelper.ComputeFileSha256Hash(dest.FullName);
+                    sha256 = HashHelper.ComputeFileSha256Hash(tempDownloadFile.FullName);
                     if (sha256 == res.Sha256) {
                         this.LogMessage(Localizer.Instance["DinkInstaller/DownloadingResources/FileHashMatch"]);
-                        // all done
-                        return;
                     } else {
                         this.LogMessage(
                             Localizer.Instance[@"DinkInstaller/DownloadingResources/FileHashMismatch"],
@@ -682,13 +682,10 @@ namespace Martridge.Models.Installer {
                             $"    Expected SHA256 = \"{res.Sha256}\"");
                         throw new DinkInstallerDownloadException("Checksum mismatch...");
                     }
-                } else {
-                    // all done
-                    return;
                 }
-
-                // this should be unreachable...
-                // return false;
+                
+                // file seems to have been downloaded correctly...
+                tempDownloadFile.MoveTo(dest.FullName, true);
             } catch (DinkInstallerCancelledByUserException) {
                 // just forward exception?
                 throw;
@@ -697,11 +694,6 @@ namespace Martridge.Models.Installer {
             } finally {
                 client.CancelPendingRequests();
                 client.Dispose();
-
-                dest.Refresh();
-                if (this._cancellationTokenSource.IsCancellationRequested && dest.Exists) {
-                    dest.Delete();
-                }
             }
         }
         

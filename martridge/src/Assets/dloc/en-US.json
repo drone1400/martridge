@@ -19,6 +19,7 @@
   "DinkInstaller/Preparing/PreparingDirectoriesStart": "Preparing directories...",
   "DinkInstaller/Preparing/PreparingDirectoriesDone": "Done preparing directories!...",
   "DinkInstaller/Preparing/CreatingTempDirectoryError": "Error creating temporary directory...",
+  "DinkInstaller/Preparing/CreatingTempFileError": "Error creating temporary file...",
 
   "DinkInstaller/DownloadingResources/Start": "Starting downloading resources...",
   "DinkInstaller/DownloadingResources/Done": "Done downloading resources...",

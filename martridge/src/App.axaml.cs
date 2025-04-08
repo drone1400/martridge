@@ -1,9 +1,11 @@
 using System;
 using System.IO;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Platform.Storage;
 using Avalonia.Styling;
 using Citrus.Avalonia;
 using Martridge.Models;
@@ -23,6 +25,10 @@ namespace Martridge {
     
     public partial class App : Application {
         public static App? Instance => Application.Current as App;
+
+        public Window? MainWindow => this._mainWindow;
+
+        public IStorageProvider? StorageProvider => this.MainWindow?.StorageProvider;
 
         public event EventHandler? OnThemePaletteChange;
 
@@ -177,12 +183,6 @@ namespace Martridge {
                 this._mainWindow = new MainWindow {
                     DataContext = this._mainWindowViewModel,
                 };
-
-                this._mainWindowViewModel.VmDinkInstaller.AssignParentWindow(this._mainWindow);
-                this._mainWindowViewModel.VmDmodInstaller.AssignParentWindow(this._mainWindow);
-                this._mainWindowViewModel.VmDmodPacker.AssignParentWindow(this._mainWindow);
-                this._mainWindowViewModel.VmDmodBrowser.AssignParentWindow(this._mainWindow);
-                this._mainWindowViewModel.VmGeneralSettings.AssignParentWindow(this._mainWindow);
                 
                 this._mainWindow.Closed += this.MainWindow_Closed;
                 this._mainWindow.Closing += this.MainWindow_Closing;

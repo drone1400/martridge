@@ -387,109 +387,102 @@ namespace Martridge.ViewModels.Installer
 
         [DependsOn(nameof(DinkInstallerNotSupported))]
         [DependsOn(nameof(IsInstallerStarted))]
-        [DependsOn(nameof(ParentWindow))]
         [DependsOn(nameof(SelectedInstallable))]
         public bool CanCmdStartInstall(object? parameter = null)
         {
             if (this.DinkInstallerNotSupported) return false;
             if (this.IsInstallerStarted) return false;
-            if (this.ParentWindow == null) return false;
             if (this.SelectedInstallable == null) return false;
             if (this._installerLogic != null) return false;
 
             return true;
         }
 
-        public void CmdBrowseDestination(object? parameter = null)
+        public async void CmdBrowseDestination(object? parameter = null)
         {
-            this.BrowseDestination_Internal();
+            await this.BrowseDestination();
         }
 
         [DependsOn(nameof(IsFileBrowserActive))]
-        [DependsOn(nameof(ParentWindow))]
+        [DependsOn(nameof(SelectedInstallable))]
         public bool CanCmdBrowseDestination(object? parameter = null)
         {
-            return !this.IsFileBrowserActive && this.ParentWindow != null;
+            return !this.IsFileBrowserActive && this.SelectedInstallable != null;
         }
 
-        private async void BrowseDestination_Internal()
+        private Task BrowseDestination()
         {
-            if (this.ParentWindow == null || this.SelectedInstallable == null || this.IsFileBrowserActive) return;
+            if (this.SelectedInstallable == null || this.IsFileBrowserActive)
+                return Task.CompletedTask;
+            
+            this.IsFileBrowserActive = true;
 
-            try
-            {
-                if (this.IsFileBrowserActive) return;
+            return Task.Run( () => {
 
-                this.IsFileBrowserActive = true;
-                
-                string baseDirectory = LocationHelper.AppBaseDirectory;
-                if (this._installerDestinationAuto == this._installerDestination)
+                try
                 {
-                    DirectoryInfo dirInfo = new DirectoryInfo(this._installerDestination);
-                    if (dirInfo.Parent?.Exists == true)
+                    string baseDirectory = LocationHelper.AppBaseDirectory;
+                    if (this._installerDestinationAuto == this._installerDestination)
                     {
-                        baseDirectory = dirInfo.Parent.FullName;
+                        DirectoryInfo dirInfo = new DirectoryInfo(this._installerDestination);
+                        if (dirInfo.Parent?.Exists == true)
+                        {
+                            baseDirectory = dirInfo.Parent.FullName;
+                        }
                     }
-                }
-                else
-                {
-                    DirectoryInfo dirInfo = new DirectoryInfo(this._installerDestination);
-                    if (dirInfo.Exists)
+                    else
                     {
-                        baseDirectory = dirInfo.FullName;
+                        DirectoryInfo dirInfo = new DirectoryInfo(this._installerDestination);
+                        if (dirInfo.Exists)
+                        {
+                            baseDirectory = dirInfo.FullName;
+                        }
                     }
-                }
-
-                IStorageFolder? baseStorageFolder = this.ParentWindow.StorageProvider.TryGetFolderFromPathAsync(baseDirectory).Result;
-                
-
-                FolderPickerOpenOptions fpo = new FolderPickerOpenOptions() {
-                    Title = Localizer.Instance["Generic/FileTypeDmod"],
-                    AllowMultiple = false, 
-                    SuggestedStartLocation = baseStorageFolder, 
-                };
-                
-                IReadOnlyList<IStorageFolder> results = this.ParentWindow.StorageProvider.OpenFolderPickerAsync(fpo).Result;
-
-                if (results.Count > 0)
-                {
-                    DirectoryInfo dirInfo = new DirectoryInfo(results[0].Path.AbsolutePath);
                     
-                    if (dirInfo.Exists && dirInfo.Parent != null)
+                    IStorageFolder? storageFolder = LocationHelper.BrowseFolderPicker(
+                        Localizer.Instance["DinkInstaller/BrowseDinkDestination"],
+                        baseDirectory);
+                    
+                    if (storageFolder != null)
                     {
-                        string name = !string.IsNullOrWhiteSpace(this.SelectedInstallable.InstallerData.DestinationName)
-                            ?   this.SelectedInstallable.InstallerData.DestinationName
-                            :   this.SelectedInstallable.InstallerData.Name;
+                        DirectoryInfo dirInfo = new DirectoryInfo(storageFolder.Path.LocalPath);
 
-                        if (
-                            // name sameness check depends on platform...
+                        if (dirInfo.Exists && dirInfo.Parent != null)
+                        {
+                            string name = !string.IsNullOrWhiteSpace(this.SelectedInstallable.InstallerData.DestinationName)
+                                ?   this.SelectedInstallable.InstallerData.DestinationName
+                                :   this.SelectedInstallable.InstallerData.Name;
+
+                            if (
+                                // name sameness check depends on platform...
                         #if PLATF_WINDOWS
-                            dirInfo.Name.ToLowerInvariant() == name.ToLowerInvariant()
+                                dirInfo.Name.ToLowerInvariant() == name.ToLowerInvariant()
                         #else
-                        dirInfo.Name == name
+                                dirInfo.Name == name
                         #endif
-                        )
-                        {
-                            string basePath = dirInfo.FullName.Substring(0, dirInfo.FullName.Length - name.Length);
-                            this._installerDestinationAuto = Path.Combine(basePath, name);
-                        }
-                        else
-                        {
-                            this._installerDestinationAuto = Path.Combine(dirInfo.FullName, name);
-                        }
+                            )
+                            {
+                                string basePath = dirInfo.FullName.Substring(0, dirInfo.FullName.Length - name.Length);
+                                this._installerDestinationAuto = Path.Combine(basePath, name);
+                            }
+                            else
+                            {
+                                this._installerDestinationAuto = Path.Combine(dirInfo.FullName, name);
+                            }
 
-                        this._installerDestinationAutoPreviousName = name;
-                        this.InstallerDestination = this._installerDestinationAuto;
+                            this._installerDestinationAutoPreviousName = name;
+                            this.InstallerDestination = this._installerDestinationAuto;
+                        }
                     }
+                } catch (Exception ex)
+                {
+                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                 }
-            } catch (Exception ex)
-            {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
-            }
-            finally
-            {
-                this.IsFileBrowserActive = false;
-            }
+                finally
+                {
+                    this.IsFileBrowserActive = false;
+                }
+            });
         }
 
         #endregion
@@ -532,7 +525,7 @@ namespace Martridge.ViewModels.Installer
                         // make sure the correct new line characters are used
                         body = body.Replace("\n\r", Environment.NewLine);
 
-                        Task<AlertResults> taskDialog = DinkyAlert.ShowDialog(title, body, AlertResults.Yes | AlertResults.No | AlertResults.Cancel, AlertType.Warning, this.ParentWindow);
+                        Task<AlertResults> taskDialog = DinkyAlert.ShowDialog(title, body, AlertResults.Yes | AlertResults.No | AlertResults.Cancel, AlertType.Warning);
                         taskDialog.Wait();
                         
                         if (taskDialog.Result == AlertResults.Cancel)
@@ -547,7 +540,7 @@ namespace Martridge.ViewModels.Installer
                             body += Environment.NewLine;
                             body += destination.FullName;
 
-                            Task<AlertResults> taskDialog2 = DinkyAlert.ShowDialog(title, body, AlertResults.Yes | AlertResults.Cancel, AlertType.Warning, this.ParentWindow);
+                            Task<AlertResults> taskDialog2 = DinkyAlert.ShowDialog(title, body, AlertResults.Yes | AlertResults.Cancel, AlertType.Warning);
                             taskDialog2.Wait();
                             
                             if (taskDialog2.Result == AlertResults.Yes)
@@ -646,11 +639,9 @@ namespace Martridge.ViewModels.Installer
             Dispatcher.UIThread.InvokeAsync(async () => {
                 try
                 {
-                    if (this.ParentWindow == null) return;
-
                     string title = Localizer.Instance[@"DinkInstallerView/MessageBox_Cancel_Title"];
                     string body = Localizer.Instance[@"DinkInstallerView/MessageBox_Cancel_Body"];
-                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Info, this.ParentWindow);
+                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Info);
                 } catch (Exception ex)
                 {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
@@ -663,11 +654,9 @@ namespace Martridge.ViewModels.Installer
             Dispatcher.UIThread.InvokeAsync(async () => {
                 try
                 {
-                    if (this.ParentWindow == null) return;
-
                     string title = Localizer.Instance[@"DinkInstallerView/MessageBox_Error_Title"];
                     string body = Localizer.Instance[@"DinkInstallerView/MessageBox_Error_Body"] + Environment.NewLine + MyTrace.GetExceptionMessages(exception);
-                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Error, this.ParentWindow);
+                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Error);
                 } catch (Exception ex)
                 {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);

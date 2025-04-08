@@ -10,7 +10,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Platform.Storage;
 
 namespace Martridge.ViewModels.Configuration {
     public class SettingsGeneralViewModel : ViewModelBase {
@@ -331,34 +333,39 @@ namespace Martridge.ViewModels.Configuration {
         
         public async void CmdDefaultDmodsSet(object? parameter = null) {
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return;
+            
+            this.IsBusy = true;
 
-            try {
-                this.IsBusy = true;
-                
-                OpenFolderDialog ofd = new OpenFolderDialog {
-                    Directory = LocationHelper.AppBaseDirectory,
-                };
-
-                string? result = await ofd.ShowAsync(this.ParentWindow);
-                if (result != null) {
-                    this.DefaultDmodLocation = result;
+            await Task.Run(() => {
+                try
+                {
+                    IStorageFolder? storageFolder = LocationHelper.BrowseFolderPicker(
+                        Localizer.Instance["SettingsGeneral/BrowseDefaultDmodDirectory"],
+                        string.IsNullOrWhiteSpace(this.DefaultDmodLocation) 
+                            ? LocationHelper.AppBaseDirectory
+                            : this.DefaultDmodLocation );
+                    
+                    if (storageFolder != null)
+                    {
+                        this.DefaultDmodLocation = storageFolder.Path.LocalPath;
+                    }
+                } catch (Exception ex)
+                {
+                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
                 }
-            } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
-            } finally {
-                this.IsBusy = false;
-            }
+                finally
+                {
+                    this.IsBusy = false;
+                }
+            });
         }
 
         [DependsOn(nameof(Configuration))]
-        [DependsOn(nameof(ParentWindow))]
         [DependsOn(nameof(IsBusy))]
         public bool CanCmdDefaultDmodsSet(object? parameter = null) {
             // general conditions
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return true;
@@ -371,7 +378,6 @@ namespace Martridge.ViewModels.Configuration {
 
         public void CmdAdditionalDmodsRemoveSelected(object? parameter = null) {
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return;
 
             if (this.AdditionalDmodLocationsIndex >= 0 && this.AdditionalDmodLocationsIndex < this.AdditionalDmodLocations.Count) {
@@ -380,14 +386,12 @@ namespace Martridge.ViewModels.Configuration {
         }
 
         [DependsOn(nameof(Configuration))]
-        [DependsOn(nameof(ParentWindow))]
         [DependsOn(nameof(IsBusy))]
         [DependsOn(nameof(AdditionalDmodLocationsIndex))]
         [DependsOn(nameof(AdditionalDmodLocations))]
         public bool CanCmdAdditionalDmodsRemoveSelected(object? parameter = null) {
             // general conditions
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return this.AdditionalDmodLocationsIndex >= 0 && this.AdditionalDmodLocationsIndex < this.AdditionalDmodLocations.Count;
@@ -395,34 +399,39 @@ namespace Martridge.ViewModels.Configuration {
 
         public async void CmdAdditionalDmodsAddNew(object? parameter = null) {
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return;
 
-            try {
-                this.IsBusy = true;
-                
-                OpenFolderDialog ofd = new OpenFolderDialog {
-                    Directory = LocationHelper.AppBaseDirectory,
-                };
+            this.IsBusy = true;
+            
+            await Task.Run(() => {
+                try
+                {
+                    IStorageFolder? storageFolder = LocationHelper.BrowseFolderPicker(
+                        Localizer.Instance["SettingsGeneral/BrowseAddDmodDirectory"],
+                        string.IsNullOrWhiteSpace(this.DefaultDmodLocation) 
+                            ? LocationHelper.AppBaseDirectory
+                            : this.DefaultDmodLocation );
 
-                string? result = await ofd.ShowAsync(this.ParentWindow);
-                if (result != null) {
-                    this.Configuration.AddAdditionalDmodPath(result);
+                    if (storageFolder != null)
+                    {
+                        this.Configuration.AddAdditionalDmodPath(storageFolder.Path.LocalPath);
+                    }
+                } catch (Exception ex)
+                {
+                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
                 }
-            } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
-            } finally {
-                this.IsBusy = false;
-            }
+                finally
+                {
+                    this.IsBusy = false;
+                }
+            });
         }
 
         [DependsOn(nameof(Configuration))]
-        [DependsOn(nameof(ParentWindow))]
         [DependsOn(nameof(IsBusy))]
         public bool CanCmdAdditionalDmodsAddNew(object? parameter = null) {
             // general conditions
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return true;
@@ -462,7 +471,6 @@ namespace Martridge.ViewModels.Configuration {
         //
         public void CmdGameExeRemoveSelected(object? parameter = null) {
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return;
 
             if (this.ActiveGameExeIndex >= 0 && this.ActiveGameExeIndex < this.GameExePaths.Count) {
@@ -471,14 +479,12 @@ namespace Martridge.ViewModels.Configuration {
         }
         
         [DependsOn(nameof(Configuration))]
-        [DependsOn(nameof(ParentWindow))]
         [DependsOn(nameof(IsBusy))]
         [DependsOn(nameof(ActiveGameExeIndex))]
         [DependsOn(nameof(GameExePaths))]
         public bool CanCmdGameExeRemoveSelected(object? parameter = null) {
             // general conditions
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return this.ActiveGameExeIndex >= 0 && this.ActiveGameExeIndex < this.GameExePaths.Count;
@@ -487,46 +493,48 @@ namespace Martridge.ViewModels.Configuration {
 
         public async void CmdGameExeAddNew(object? parameter = null) {
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return;
 
-            try {
-                this.IsBusy = true;
+            this.IsBusy = true;
 
-                OpenFileDialog ofd = new OpenFileDialog();
-                ofd.Directory = LocationHelper.AppBaseDirectory;
-                ofd.AllowMultiple = false;
-
+            await Task.Run(() => {
+                try
+                {
+                    IStorageFile? storageFile = LocationHelper.BrowseFileOpen(
+                        Localizer.Instance["SettingsGeneral/BrowseAddGameExe"],
 #if PLATF_WINDOWS
-                // on windows, Dink executables need to have .exe extension...
-                ofd.Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() {
-                        Name = Localizer.Instance[@"Generic/FileTypeExecutable"],
-                        Extensions = new List<string>() { "exe" },
-                    },
-                };
+                        // on windows, browse for exe files
+                        new [] {
+                            new FilePickerFileType(Localizer.Instance["SettingsGeneral/BrowseFileTypeExe"]) {
+                                Patterns = new [] { "*.exe" },
+                            },
+                        },
+#else   
+                        // on other platforms, browse for everything?
+                        null,
 #endif
+                        LocationHelper.AppBaseDirectory);
 
-                string[]? result = await ofd.ShowAsync(this.ParentWindow);
-                if (result == null) return;
-                
-                // result is ok, add it
-                string file = result[0];
-                this.Configuration.AddGameExePath(file);
-            } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
-            } finally {
-                this.IsBusy = false;
-            }
+                    if (storageFile != null)
+                    {
+                        this.Configuration.AddGameExePath(storageFile.Path.LocalPath);
+                    }
+                } catch (Exception ex)
+                {
+                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                }
+                finally
+                {
+                    this.IsBusy = false;
+                }
+            });
         }
 
         [DependsOn(nameof(Configuration))]
-        [DependsOn(nameof(ParentWindow))]
         [DependsOn(nameof(IsBusy))]
         public bool CanCmdGameExeAddNew(object? parameter = null) {
             // general conditions
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return true;
@@ -541,7 +549,6 @@ namespace Martridge.ViewModels.Configuration {
         //
         public void CmdEditorExeRemoveSelected(object? parameter = null) {
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return;
 
             if (this.ActiveEditorExeIndex >= 0 && this.ActiveEditorExeIndex < this.EditorExePaths.Count) {
@@ -550,14 +557,12 @@ namespace Martridge.ViewModels.Configuration {
         }
         
         [DependsOn(nameof(Configuration))]
-        [DependsOn(nameof(ParentWindow))]
         [DependsOn(nameof(IsBusy))]
         [DependsOn(nameof(ActiveEditorExeIndex))]
         [DependsOn(nameof(EditorExePaths))]
         public bool CanCmdEditorExeRemoveSelected(object? parameter = null) {
             // general conditions
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return this.ActiveEditorExeIndex >= 0 && this.ActiveEditorExeIndex < this.EditorExePaths.Count;
@@ -566,46 +571,49 @@ namespace Martridge.ViewModels.Configuration {
 
         public async void CmdEditorExeAddNew(object? parameter = null) {
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return;
 
-            try {
-                this.IsBusy = true;
+            this.IsBusy = true;
 
-                OpenFileDialog ofd = new OpenFileDialog();
-                ofd.Directory = LocationHelper.AppBaseDirectory;
-                ofd.AllowMultiple = false;
+            await Task.Run(() => {
 
+                try
+                {
+                    IStorageFile? storageFile = LocationHelper.BrowseFileOpen(
+                        Localizer.Instance["SettingsGeneral/BrowseAddEditorExe"],
 #if PLATF_WINDOWS
-                // on windows, Dink executables need to have .exe extension...
-                ofd.Filters = new List<FileDialogFilter>() {
-                    new FileDialogFilter() {
-                        Name = Localizer.Instance[@"Generic/FileTypeExecutable"],
-                        Extensions = new List<string>() { "exe" },
-                    },
-                };
+                        // on windows, browse for exe files
+                        new [] {
+                            new FilePickerFileType(Localizer.Instance["SettingsGeneral/BrowseFileTypeExe"]) {
+                                Patterns = new [] { "*.exe" },
+                            },
+                        },
+#else   
+                        // on other platforms, browse for everything?
+                        null,
 #endif
+                        LocationHelper.AppBaseDirectory);
 
-                string[]? result = await ofd.ShowAsync(this.ParentWindow);
-                if (result == null) return;
-                
-                // result is ok, add it
-                string file = result[0];
-                this.Configuration.AddEditorExePath(file);
-            } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
-            } finally {
-                this.IsBusy = false;
-            }
+                    if (storageFile != null)
+                    {
+                        this.Configuration.AddEditorExePath(storageFile.Path.LocalPath);
+                    }
+                } catch (Exception ex)
+                {
+                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                }
+                finally
+                {
+                    this.IsBusy = false;
+                }
+            });
         }
 
         [DependsOn(nameof(Configuration))]
-        [DependsOn(nameof(ParentWindow))]
         [DependsOn(nameof(IsBusy))]
         public bool CanCmdEditorExeAddNew(object? parameter = null) {
             // general conditions
             if (this.Configuration == null ||
-                this.ParentWindow == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return true;

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Martridge.Models;
 using Martridge.Models.Configuration;
 using Martridge.Models.Dmod;
 using Martridge.Models.DmodInstaller;
@@ -278,35 +279,31 @@ namespace Martridge.ViewModels.Installer {
             await this.StartPacking();
         }
         [DependsOn(nameof(PackerPhase))]
-        [DependsOn(nameof(ParentWindow))]
         public bool CanCmdStartPacking(object? parameter = null)
         {
             if (parameter is not string path) return false;
             if (string.IsNullOrWhiteSpace(path)) return false;
             if (File.Exists(path)) return false;
             if (this.PackerPhase != DmodPackerPhase.AwaitingUserInput) return false;
-            if (this.ParentWindow == null) return false;
             return true;
         }
 
-        public void CmdBrowseDmodSource(object? parameter = null) {
-            this.BrowseDmodSource_Internal();
+        public async void CmdBrowseDmodSource(object? parameter = null) {
+            await this.BrowseDmodSource();
         }
 
         [DependsOn(nameof(IsFileBrowserActive))]
-        [DependsOn(nameof(ParentWindow))]
         public bool CanCmdBrowseDmodSource(object? parameter = null) {
-            return !this.IsFileBrowserActive && this.ParentWindow?.StorageProvider.CanOpen == true;
+            return !this.IsFileBrowserActive;
         }
         
-        public void CmdBrowseDmodDestination(object? parameter = null) {
-            this.BrowseDmodDestination_Internal();
+        public async void CmdBrowseDmodDestination(object? parameter = null) {
+            await this.BrowseDmodDestination();
         }
 
         [DependsOn(nameof(IsFileBrowserActive))]
-        [DependsOn(nameof(ParentWindow))]
         public bool CanCmdBrowseDmodDestination(object? parameter = null) {
-            return !this.IsFileBrowserActive && this.ParentWindow?.StorageProvider.CanOpen == true;
+            return !this.IsFileBrowserActive;
         }
         
         #endregion
@@ -316,28 +313,21 @@ namespace Martridge.ViewModels.Installer {
         //      Command logic
         //
 
-        private Task BrowseDmodSource_Internal() {
-            if (this.ParentWindow?.StorageProvider.CanOpen != true || this.IsFileBrowserActive) return Task.CompletedTask;
+        private Task BrowseDmodSource() {
+            if (this.IsFileBrowserActive)
+                return Task.CompletedTask;
+            
+            this.IsFileBrowserActive = true;
 
             return Task.Run(() => {
                 try
                 {
-                    if (this.IsFileBrowserActive) return;
+                    IStorageFolder? storageFolder = LocationHelper.BrowseFolderPicker(
+                        Localizer.Instance["DmodPacker/ViewModel/BrowseDmodSource"]);
 
-                    this.IsFileBrowserActive = true;
-
-                    FolderPickerOpenOptions fpo = new FolderPickerOpenOptions() {
-                        Title = Localizer.Instance["Generic/FileTypeDmod"],
-                        AllowMultiple = false, 
-                    };
-
-                    Task<IReadOnlyList<IStorageFolder>> fpoTask = this.ParentWindow.StorageProvider.OpenFolderPickerAsync(fpo);
-                    fpoTask.Wait();
-                    IReadOnlyList<IStorageFolder> results = fpoTask.Result;
-
-                    if (results.Count > 0)
+                    if (storageFolder != null)
                     {
-                        this.TemporaryDmodSourceDirectory = results[0].Path.AbsolutePath;
+                        this.TemporaryDmodSourceDirectory = storageFolder.Path.LocalPath;
                     }
 
                 } catch (Exception ex)
@@ -351,32 +341,26 @@ namespace Martridge.ViewModels.Installer {
             });
         }
         
-        private Task BrowseDmodDestination_Internal() {
-            if (this.ParentWindow?.StorageProvider.CanOpen != true || this.IsFileBrowserActive) return Task.CompletedTask;
+        private Task BrowseDmodDestination() {
+            if (this.IsFileBrowserActive)
+                return Task.CompletedTask;
+            
+            this.IsFileBrowserActive = true;
 
             return Task.Run(() => {
                 try
                 {
-                    if (this.IsFileBrowserActive) return;
-
-                    this.IsFileBrowserActive = true;
-
-                    FilePickerSaveOptions fpo = new FilePickerSaveOptions() {
-                        Title = Localizer.Instance["Generic/FileTypeDmod"],
-                        FileTypeChoices = new [] {
+                    IStorageFile? storageFile = LocationHelper.BrowseFileSave(
+                        Localizer.Instance["DmodPacker/ViewModel/BrowseDmodDestination"],
+                        new [] {
                             new FilePickerFileType("DMOD") {
                                 Patterns = new [] { "*.dmod" },
-                            }
-                        } 
-                    };
+                            },
+                        });
 
-                    Task<IStorageFile?> fpoTask = this.ParentWindow.StorageProvider.SaveFilePickerAsync(fpo);
-                    fpoTask.Wait();
-                    IStorageFile? result = fpoTask.Result;
-
-                    if (result != null)
+                    if (storageFile != null)
                     {
-                        this.TemporaryDmodDestination = result.Path.AbsolutePath;
+                        this.TemporaryDmodDestination = storageFile.Path.LocalPath;
                     }
 
                 } catch (Exception ex)
@@ -540,11 +524,9 @@ namespace Martridge.ViewModels.Installer {
         private void ShowInstallerCancelledMessageBox() {
             Dispatcher.UIThread.InvokeAsync(async () => {
                 try {
-                    if (this.ParentWindow == null) return;
-                    
                     string title = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Cancel_Title"];
                     string body = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Cancel_Body"];
-                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Info, this.ParentWindow);
+                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Info);
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                 }
@@ -554,11 +536,9 @@ namespace Martridge.ViewModels.Installer {
         private void ShowInstallerErrorMessageBox(Exception? exception) {
             Dispatcher.UIThread.InvokeAsync(async () => {
                 try {
-                    if (this.ParentWindow == null) return;
-                    
                     string title = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Error_Title"];
                     string body = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Error_Body"] + Environment.NewLine + MyTrace.GetExceptionMessages(exception);
-                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Error, this.ParentWindow);
+                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Error);
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                 }

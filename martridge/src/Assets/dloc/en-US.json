@@ -50,6 +50,8 @@
   "DinkInstaller/CleaningUp/Remove": "Removing...",
   "DinkInstaller/CleaningUp/Done": "Done with cleanup!...",
   
+  "DinkInstaller/BrowseDinkDestination": "Select dink installer destination",
+  
   "DinkInstallerView/Title": "Martridge - Dink Installer",
   "DinkInstallerView/HeadingNotSupported": "Dink Installer Not Supported",
   "DinkInstallerView/HeadingNotSupportedDetails": "Automated Dink Installer is only available on Windows right now.\n\r Visit the link below and follow the instructions for your distribution to install FreeDink.\n\r\n\rhttps://www.gnu.org/software/freedink/get-distros",
@@ -146,6 +148,7 @@
   "DmodInstaller/ViewModel/MessageBox_Cancel_Title": "DMOD Installation cancelled by user",
   "DmodInstaller/ViewModel/MessageBox_Cancel_Body": "DMOD Installation was cancelled!",
   "DmodInstaller/ViewModel/MessageBox_Extra_ManualCleanup": "Already extracted DMOD files will not be cleaned up! Please check the install destination and remove any leftover files manually if necessary: ",
+  "DmodInstaller/ViewModel/BrowseDmodSource": "Martridge - Select a DMOD to install",
 
   "DmodPacker/Log/CancelledByUser": "DMOD packing cancelled by user!",
   "DmodPacker/Log/DmodDirectoryNotFound": "DMOD directory could not be accessed!",
@@ -182,6 +185,8 @@
   "DmodPacker/ViewModel/MessageBox_Cancel_Body": "DMOD Packing was cancelled!",  
   "DmodPacker/ViewModel/MessageBox_Error_Title": "DMOD Packing error!",
   "DmodPacker/ViewModel/MessageBox_Error_Body": "DMOD Packing was interrupted by an error!",
+  "DmodPacker/ViewModel/BrowseDmodSource": "Martridge - Select a DMOD to pack",
+  "DmodPacker/ViewModel/BrowseDmodDestination": "Martridge - Save packed DMOD file as",
 
   "DinkyAlertWindow/ButtonOk": "Ok",
   "DinkyAlertWindow/ButtonYes": "Yes",
@@ -244,6 +249,11 @@
   "SettingsGeneral/EditorExePaths_Remove": "Remove",
   "SettingsGeneral/EditorExePaths_Add": "Add New",  
   "SettingsGeneral/Localization": "Application Language:",
+  "SettingsGeneral/BrowseDefaultDmodDirectory": "Martridge - Select default location to look for DMODs in",
+  "SettingsGeneral/BrowseAddDmodDirectory": "Martridge - Select a location to look for DMODs in",
+  "SettingsGeneral/BrowseFileTypeExe": "Executable",
+  "SettingsGeneral/BrowseAddGameExe": "Martridge - Select a Dink game executable",
+  "SettingsGeneral/BrowseAddEditorExe": "Martridge - Select a Dink editor executable",
 
   "DmodBrowser/BackToList" : "Go back to DMOD List",
   "DmodBrowser/ContextMenu/OpenDmodLocation" : "Open Location In Explorer",

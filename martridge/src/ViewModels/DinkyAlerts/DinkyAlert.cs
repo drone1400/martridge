@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Martridge.Models.Configuration;
@@ -126,7 +127,7 @@ namespace Martridge.ViewModels.DinkyAlerts {
             }
         );
 
-        public static void CenterOnParentWindow(Window window, Window parent) {
+        private static void CenterOnParentWindow(Window window, Window parent) {
             Size? frameSize = parent.FrameSize;
             int posX = parent.Position.X;
             int posY = parent.Position.Y;
@@ -161,7 +162,7 @@ namespace Martridge.ViewModels.DinkyAlerts {
                 return result;
             }
             
-            DinkyAlertWindowViewModel vm = new DinkyAlertWindowViewModel(title, message, resultButtons, type, customButtonText, specialMessage);
+            DinkyAlertWindowViewModel vm = new DinkyAlertWindowViewModel(title, message, resultButtons, type, customButtonText);
             DinkyAlertWindow win = new DinkyAlertWindow { DataContext = vm, };
             
             // cancel closing if result is not set yet
@@ -196,9 +197,18 @@ namespace Martridge.ViewModels.DinkyAlerts {
         }
         
 
-        public async static Task<AlertResults> ShowDialog(string title, string message, AlertResults resultButtons, AlertType type, Window parentWindow, Dictionary<AlertResults, string>? customButtonText = null, string? specialMessage = null) {
+        public async static Task<AlertResults> ShowDialog(string title, string message, AlertResults resultButtons, AlertType type, Dictionary<AlertResults, string>? customButtonText = null, Window? parentWindow = null) {
             
-            DinkyAlertWindowViewModel vm = new DinkyAlertWindowViewModel(title, message, resultButtons, type, customButtonText, specialMessage);
+            DinkyAlertWindowViewModel vm = new DinkyAlertWindowViewModel(title, message, resultButtons, type, customButtonText);
+
+            if (parentWindow == null) parentWindow = App.Instance?.MainWindow;
+            
+            if (parentWindow == null)
+            {
+                // TODO maybe localize this...
+                throw new NullReferenceException("Can not resolve parent window...");
+            }
+
 
             await Dispatcher.UIThread.InvokeAsync(async () => {
                 DinkyAlertWindow win = new DinkyAlertWindow { DataContext = vm, };

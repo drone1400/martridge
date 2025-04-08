@@ -18,21 +18,6 @@ namespace Martridge.ViewModels.DinkyAlerts {
             set => this.RaiseAndSetIfChanged(ref this._message, value);
         }
         private string _message;
-
-        public string? SpecialMessage {
-            get => this._specialMessage;
-            set {
-                this.RaiseAndSetIfChanged(ref this._specialMessage, value);
-                this.RaisePropertyChanged(nameof(this.ShowSpecialMessage));
-            }
-        }
-        private string? _specialMessage = null;
-
-        private bool ShowSpecialMessage {
-            get => this._specialMessage != null;
-        }
-
-        
         public AlertResults Result {
             get => this._result;
             set => this.RaiseAndSetIfChanged(ref this._result, value);
@@ -119,13 +104,11 @@ namespace Martridge.ViewModels.DinkyAlerts {
             return DinkyAlert.AnimatedPillbug;
         }
         
-        public DinkyAlertWindowViewModel(string title, string message, AlertResults resultButtons, AlertType type, Dictionary<AlertResults,string>? customButtonText = null, string? specialMessage = null) {
+        public DinkyAlertWindowViewModel(string title, string message, AlertResults resultButtons, AlertType type, Dictionary<AlertResults,string>? customButtonText = null) {
             this._title = title;
             this._message = message;
             this._resultButtons = resultButtons;
             this._type = type;
-
-            this._specialMessage = specialMessage;
 
             this._buttonTextOk = Localizer.Instance[@"DinkyAlertWindow/ButtonOk"];
             this._buttonTextYes = Localizer.Instance[@"DinkyAlertWindow/ButtonYes"];

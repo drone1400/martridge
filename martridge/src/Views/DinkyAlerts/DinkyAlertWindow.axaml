@@ -16,7 +16,7 @@
         <vm:DinkyAlertWindowViewModel/>
     </Design.DataContext>
   
-    <Grid RowDefinitions="*, Auto, Auto, Auto" 
+    <Grid RowDefinitions="*, Auto, Auto" 
           ColumnDefinitions="128, *" 
           Margin="10">
     
@@ -25,23 +25,15 @@
     
         <TextBlock Grid.Row="0" Grid.Column="1" 
                    Text="{Binding Message}"
-                   Classes="Heading2I"
                    TextWrapping="Wrap"/>
         
-        <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                 Text="{Binding SpecialMessage}"
-                 IsReadOnly="True"
-                 Margin="6"
-                 IsVisible="{Binding ShowSpecialMessage}"
-                 />
-        
-        <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" 
+        <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
                   Content="{dloc:Localize DinkyAlertWindow/CheckBoxRememberResult}"
                   IsChecked="{Binding IsResultRemembered}"
                   IsVisible="{Binding ShowRememberResultCheckbox}"
                   />
     
-        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+        <Grid Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
               ColumnDefinitions="*, Auto, Auto, Auto, Auto, *">
             <Button Grid.Column="1"
                     Content="{Binding ButtonTextOk}"

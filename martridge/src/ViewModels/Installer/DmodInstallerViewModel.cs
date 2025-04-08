@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Martridge.Models;
 using Martridge.Models.DmodInstaller;
 using Martridge.ViewModels.DinkyAlerts;
 using ReactiveUI.Validation.Extensions;
@@ -316,7 +317,6 @@ namespace Martridge.ViewModels.Installer {
             await this.StartInstallation();
         }
         [DependsOn(nameof(InstallPhase))]
-        [DependsOn(nameof(ParentWindow))]
         [DependsOn(nameof(SelectedBaseDestination))]
         [DependsOn(nameof(DesiredDmodDirectory))]
         [DependsOn(nameof(FinalDmodDestination))]
@@ -324,7 +324,6 @@ namespace Martridge.ViewModels.Installer {
         public bool CanCmdStartInstall(object? parameter = null)
         {
             if (this.InstallPhase != DmodInstallPhase.AwaitingUserInput) return false;
-            if (this.ParentWindow == null) return false;
             if (this.SelectedBaseDestination == null) return false;
             if (string.IsNullOrWhiteSpace(this.DesiredDmodDirectory)) return false;
             
@@ -334,14 +333,13 @@ namespace Martridge.ViewModels.Installer {
                 (Directory.Exists(this.FinalDmodDestination) == false || this.IsEnabledDesiredDmodDirectoryOverwrite);
         }
 
-        public void CmdBrowseDmod(object? parameter = null) {
-            this.BrowseDmod_Internal();
+        public async void CmdBrowseDmod(object? parameter = null) {
+            await this.BrowseDmod();
         }
 
         [DependsOn(nameof(IsFileBrowserActive))]
-        [DependsOn(nameof(ParentWindow))]
         public bool CanCmdBrowseDmod(object? parameter = null) {
-            return !this.IsFileBrowserActive && this.ParentWindow?.StorageProvider.CanOpen == true;
+            return !this.IsFileBrowserActive;
         }
         
         #endregion
@@ -363,33 +361,26 @@ namespace Martridge.ViewModels.Installer {
             }
         }
         
-        private Task BrowseDmod_Internal() {
-            if (this.ParentWindow?.StorageProvider.CanOpen != true || this.IsFileBrowserActive) return Task.CompletedTask;
+        private Task BrowseDmod() {
+            if (this.IsFileBrowserActive)
+                return Task.CompletedTask;
+            
+            this.IsFileBrowserActive = true;
 
             return Task.Run(() => {
                 try
                 {
-                    if (this.IsFileBrowserActive) return;
-
-                    this.IsFileBrowserActive = true;
-
-                    FilePickerOpenOptions fpo = new FilePickerOpenOptions() {
-                        Title = Localizer.Instance[@"Generic/FileTypeDmod"],
-                        AllowMultiple = false,
-                        FileTypeFilter = new [] {
+                    IStorageFile? storageFile = LocationHelper.BrowseFileOpen(
+                        Localizer.Instance["DmodInstaller/ViewModel/BrowseDmodSource"],
+                        new [] {
                             new FilePickerFileType("DMOD") {
                                 Patterns = new [] { "*.dmod" },
-                            }
-                        }
-                    };
+                            },
+                        });
 
-                    Task<IReadOnlyList<IStorageFile>> fpoTask = this.ParentWindow.StorageProvider.OpenFilePickerAsync(fpo);
-                    fpoTask.Wait();
-                    IReadOnlyList<IStorageFile> results = fpoTask.Result;
-
-                    if (results.Count > 0)
+                    if (storageFile != null)
                     {
-                        this.TemporaryDmodSource = results[0].Path.AbsolutePath;
+                        this.TemporaryDmodSource = storageFile.Path.LocalPath;
                     }
 
                 } catch (Exception ex)
@@ -549,8 +540,6 @@ namespace Martridge.ViewModels.Installer {
         private void ShowInstallerCancelledMessageBox() {
             Dispatcher.UIThread.InvokeAsync(async () => {
                 try {
-                    if (this.ParentWindow == null) return;
-                    
                     string title = Localizer.Instance["DmodInstaller/ViewModel/MessageBox_Cancel_Title"];
                     string body = Localizer.Instance["DmodInstaller/ViewModel/MessageBox_Cancel_Body"];
                     if (Directory.Exists(this.FinalDmodDestination))
@@ -561,7 +550,7 @@ namespace Martridge.ViewModels.Installer {
                         body += Environment.NewLine;
                         body += this.FinalDmodDestination;
                     }
-                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Info, this.ParentWindow);
+                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Info);
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                 }
@@ -571,8 +560,6 @@ namespace Martridge.ViewModels.Installer {
         private void ShowInstallerErrorMessageBox(Exception? exception) {
             Dispatcher.UIThread.InvokeAsync(async () => {
                 try {
-                    if (this.ParentWindow == null) return;
-                    
                     string title = Localizer.Instance["DmodInstaller/ViewModel/MessageBox_Error_Title"];
                     string body = Localizer.Instance["DmodInstaller/ViewModel/MessageBox_Error_Body"] + Environment.NewLine + MyTrace.GetExceptionMessages(exception);
                     if (Directory.Exists(this.FinalDmodDestination))
@@ -583,7 +570,7 @@ namespace Martridge.ViewModels.Installer {
                         body += Environment.NewLine;
                         body += this.FinalDmodDestination;
                     }
-                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Error, this.ParentWindow);
+                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Error);
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                 }

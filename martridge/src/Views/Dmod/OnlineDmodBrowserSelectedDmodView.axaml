@@ -264,32 +264,74 @@
                 </TabItem>
                 <TabItem  Classes="Medium"
                           Header="{dloc:Localize OnlineDmodBrowser/Screenshots}">
-                    <Grid ColumnDefinitions="Auto, * "
+                    <Grid RowDefinitions="*,Auto"
                           Margin="4">
-                        <Border Grid.Column="0" Classes="PfpFrame"
+                        <Border Grid.Row="1" Classes="PfpFrame"
+                                BorderThickness="1,0,1,1"
                                 Margin="2,0"
-                                VerticalAlignment="Stretch">
+                                HorizontalAlignment="Stretch">
                             <ListBox ItemsSource="{Binding SelectedDmodDefinition.Screenshots}"
                                      SelectedItem="{Binding SelectedDmodScreenshotVm}"
-                                     ScrollViewer.VerticalScrollBarVisibility="Visible"
-                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                     >
+                                     SelectedIndex="{Binding SelectedDmodScreenshotIndex}"
+                                     ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Visible">
+                                <ListBox.Styles>
+                                    <Style Selector="ListBoxItem">
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="Margin" Value="3,0"/>
+                                    </Style>
+                                </ListBox.Styles>
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
                                 <ListBox.ItemTemplate>
                                     <DataTemplate DataType="vm:OnlineDmodScreenshotViewModel">
                                         <Image Source="{Binding ScreenshotPreview }"
-                                               Width="175"/>
+                                               Height="100"/>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
                         </Border>
-                        <Border Grid.Column="1" Classes="PfpFrame"
+                        <Border Grid.Row="0" Classes="PfpFrame"
+                                BorderThickness="1,1,1,0"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch"
                                 Margin="2,0">
-                            <Image HorizontalAlignment="Center" 
-                                   VerticalAlignment="Center" 
-                                   Width="NaN" Height="NaN"
-                                   Source="{Binding SelectedDmodScreenshot}"/>
+                            <Grid ColumnDefinitions="*,*">
+                                <Image
+                                    Grid.Column="0" Grid.ColumnSpan="2"
+                                    HorizontalAlignment="Center" 
+                                       VerticalAlignment="Center" 
+                                       Width="NaN" Height="NaN"
+                                       Source="{Binding SelectedDmodScreenshot}"/>
+                                
+                                <Button Grid.Column="0" 
+                                        Width="NaN"
+                                        Height="NaN"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        Foreground="Transparent"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Padding="0"
+                                        Margin="5"
+                                        Command="{Binding CmdGoScreenshotPrevious}"/>
+                                <Button Grid.Column="1" 
+                                        Width="NaN"
+                                        Height="NaN"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        Foreground="Transparent"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Padding="0"
+                                        Margin="5"
+                                        Command="{Binding CmdGoScreenshotNext}"/>
+                            </Grid>
+                            
                         </Border>
             
                     </Grid>

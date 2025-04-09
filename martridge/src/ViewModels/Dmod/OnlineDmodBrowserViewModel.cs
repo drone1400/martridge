@@ -250,6 +250,12 @@ namespace Martridge.ViewModels.Dmod {
         }
         private OnlineDmodScreenshotViewModel? _selectedDmodScreenshotVm;
 
+        public int SelectedDmodScreenshotIndex {
+            get => this._selectedDmodScreenshotIndex;
+            set => this.RaiseAndSetIfChanged(ref this._selectedDmodScreenshotIndex, value);
+        }
+        private int _selectedDmodScreenshotIndex = -1;
+
         public Bitmap? SelectedDmodScreenshot {
             get => this._selectedDmodScreenshot;
             set => this.RaiseAndSetIfChanged(ref this._selectedDmodScreenshot, value);
@@ -446,6 +452,22 @@ namespace Martridge.ViewModels.Dmod {
             if (this.DmodCrawler == null) { return false;}
             if (parameter is OnlineDmodVersionViewModel) { return true; }
             return false;
+        }
+
+        public void CmdGoScreenshotPrevious() {
+            if (this.SelectedDmodDefinition == null) return;
+            if (this.SelectedDmodScreenshotIndex > 0) {
+                if (this.SelectedDmodScreenshotIndex >= this.SelectedDmodDefinition.Screenshots.Count) this.SelectedDmodScreenshotIndex = this.SelectedDmodDefinition.Screenshots.Count - 1;
+                else this.SelectedDmodScreenshotIndex--;
+            }
+        }
+        
+        public void CmdGoScreenshotNext() {
+            if (this.SelectedDmodDefinition == null) return;
+            if (this.SelectedDmodScreenshotIndex < this.SelectedDmodDefinition.Screenshots.Count - 1) {
+                if (this.SelectedDmodScreenshotIndex < 0) this.SelectedDmodScreenshotIndex = 0;
+                else this.SelectedDmodScreenshotIndex++;
+            }
         }
 
         #endregion

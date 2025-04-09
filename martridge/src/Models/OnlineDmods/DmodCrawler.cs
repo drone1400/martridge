@@ -278,7 +278,7 @@ namespace Martridge.Models.OnlineDmods {
                     }
                 }
 
-                return reviews;
+                return reviews.OrderByDescending(x => x.ReviewDate).ThenByDescending(x => x.User.Name).ToList();
             } catch (Exception ex) {
                 MyTrace.Global.WriteMessage(MyTraceCategory.Online, "Error parsing Online Dmod Reviews", MyTraceLevel.Error);
                 MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
@@ -328,7 +328,7 @@ namespace Martridge.Models.OnlineDmods {
                     }
                 }
 
-                return versions;
+                return versions.OrderByDescending(x => x.Released).ThenByDescending(x => x.Name).ToList();
             } catch (Exception ex) {
                 MyTrace.Global.WriteMessage(MyTraceCategory.Online, "Error parsing Online Dmod Versions", MyTraceLevel.Error);
                 MyTrace.Global.WriteException(MyTraceCategory.Online, ex);

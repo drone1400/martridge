@@ -5,14 +5,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:dloc="using:Martridge.ViewModels.Localization"
-             xmlns:vm="using:Martridge.ViewModels.Dmod">
+             xmlns:vm="using:Martridge.ViewModels.Dmod"
+             xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters">
     <Design.DataContext>
         <vm:OnlineDmodBrowserViewModel/>
     </Design.DataContext>
 
     <UserControl.Resources>
-        <vm:DmodScoreToSolidColorBrushConverter x:Key="DmodScoreToSolidColorBrushConverter"/>
-        <vm:GenericDateConverter x:Key="GenericDateConverter"/>
+        <valueConverters:DmodScoreToSolidColorBrushConverter x:Key="DmodScoreToSolidColorBrushConverter"/>
+        <valueConverters:GenericDateConverter x:Key="GenericDateConverter"/>
     </UserControl.Resources>
     
     <Grid RowDefinitions="Auto,Auto,*">

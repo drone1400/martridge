@@ -1,8 +1,7 @@
-using Avalonia.Data.Converters;
 using System;
 using System.Globalization;
-
-namespace Martridge.ViewModels {
+using Avalonia.Data.Converters;
+namespace Martridge.ViewModels.ValueConverters {
     public class IsNullCheckBoolConverter : IValueConverter {
 
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) {

@@ -7,6 +7,7 @@
              xmlns:dloc="using:Martridge.ViewModels.Localization"
              xmlns:vm="using:Martridge.ViewModels.Dmod"
              xmlns:vv="using:Martridge.Views.Dmod"
+             xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
              Name="SelectedDmodView">
     <Design.DataContext>
         <vm:OnlineDmodBrowserViewModel/>
@@ -16,7 +17,7 @@
     </UserControl.Styles>
     <UserControl.Resources>
         <x:String x:Key="DataNotAvailable">N/A</x:String>
-        <vm:DmodScoreToSolidColorBrushConverter x:Key="DmodScoreToSolidColorBrushConverter"/>
+        <valueConverters:DmodScoreToSolidColorBrushConverter x:Key="DmodScoreToSolidColorBrushConverter"/>
     </UserControl.Resources>
     <Grid>
         <!-- this is needed to trigger the context menu when right clicking empty spaces... -->

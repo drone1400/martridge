@@ -103,4 +103,11 @@
         <ProjectReference Include="..\..\citrus\src\Citrus.Avalonia\Citrus.Avalonia.csproj" />
         <ProjectReference Include="..\..\citrus\src\Citrus.Avalonia.DataGrid\Citrus.Avalonia.DataGrid.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <Compile Update="Views\Dmod\NoDinkyLinuxView.axaml.cs">
+        <DependentUpon>NoDinkyLinuxView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

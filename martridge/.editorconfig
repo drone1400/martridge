@@ -5,7 +5,7 @@
 csharp_indent_braces = false
 csharp_new_line_before_else = true
 csharp_new_line_before_finally = true
-csharp_new_line_before_open_brace = accessors,control_blocks,local_functions,methods,types
+csharp_new_line_before_open_brace = none
 csharp_preferred_modifier_order = protected, public, private, new, internal, async, static, volatile, virtual, abstract, override, readonly, unsafe, sealed, extern, file, required:suggestion
 csharp_style_var_elsewhere = false:suggestion
 csharp_style_var_for_built_in_types = false:suggestion

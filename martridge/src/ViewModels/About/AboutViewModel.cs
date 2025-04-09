@@ -6,9 +6,12 @@ using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Martridge.Trace;
 
 namespace Martridge.ViewModels.About {
-    public class AboutWindowViewModel : ViewModelBase {
+    public class AboutViewModel : ViewModelBase
+    {
+        public event EventHandler? GoBackRequested;
 
         public List<AboutUsedPackageViewModel> UsedPackages {
             get => this._usedPackages;
@@ -52,13 +55,13 @@ namespace Martridge.ViewModels.About {
         
         public string Version { get; }
 
-        public AboutWindowViewModel() {
+        public AboutViewModel() {
             Version? version = Assembly.GetExecutingAssembly().GetName().Version;
             // note, this should be impossible i think?...
             this.Version = version != null ? version.ToString() : "VersionError!!?!";
         }
 
-        public void InitializeLocalizedPackageInfo() {
+        private void InitializeLocalizedPackageInfo() {
             this._lastInitializedLanguage = this._cfg?.LocalizationName;
             
             this.UsedPackages = new List<AboutUsedPackageViewModel>() {
@@ -93,6 +96,17 @@ namespace Martridge.ViewModels.About {
                     name: Localizer.Instance[@"AboutWindow/Package/HtmlAgilityPack/Name"],
                     info: Localizer.Instance[@"AboutWindow/Package/HtmlAgilityPack/Description"]),
             };
+        }
+
+        public void CmdGoBack()
+        {
+            try
+            {
+                this.GoBackRequested?.Invoke(this, EventArgs.Empty);
+            } catch (Exception ex)
+            {
+                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+            }
         }
     }
 }

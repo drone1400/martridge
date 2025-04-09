@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Martridge.ViewModels.DinkyGraphics {
-    public class AnimatedDinkGraphicViewModel : ViewModelBase, IDisposable {
+    public class AnimatedDinkGraphicViewModel : ViewModelBase {
 
         private static DispatcherTimer _frameTimer;
         
@@ -71,8 +71,13 @@ namespace Martridge.ViewModels.DinkyGraphics {
             _frameTimer.Tick += this.FrameTimerOnTick;
         }
 
-        public void Dispose() {
-            _frameTimer.Tick -= this.FrameTimerOnTick;
+        protected override void Dispose(bool disposing) {
+            try {
+                _frameTimer.Tick -= this.FrameTimerOnTick;
+            } catch (Exception) {
+                // just in case so we don't break something?...
+            }
+            base.Dispose(disposing);
         }
         private void FrameTimerOnTick(object? sender, EventArgs e) {
             if (this._frames.Count <= 1) {

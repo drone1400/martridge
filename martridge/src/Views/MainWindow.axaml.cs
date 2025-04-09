@@ -30,13 +30,5 @@ namespace Martridge.Views {
         public void CloseWindow(object? sender, RoutedEventArgs e) {
             this.Close();
         }
-
-
-        public void ShowAboutWindow(object? sender, RoutedEventArgs e) {
-            AboutWindow aboutWindow = new AboutWindow() {
-                DataContext = (this.DataContext as MainWindowViewModel)?.VmAboutWindow,
-            };
-            aboutWindow.ShowDialog(this);
-        }
     }
 }

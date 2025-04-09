@@ -62,6 +62,12 @@ namespace Martridge.ViewModels.Configuration {
             set => this.RaiseAndSetIfChanged(ref this._ShowDmodDevFeatures, value);
         }
         private bool _ShowDmodDevFeatures = false;
+        
+        public bool EnableOnlineFeatures {
+            get => this._EnableOnlineFeatures;
+            set => this.RaiseAndSetIfChanged(ref this._EnableOnlineFeatures, value);
+        }
+        private bool _EnableOnlineFeatures = false;
 
         public bool ShowLogWindowOnStartup {
             get => this._showLogWindowOnStartup;
@@ -223,6 +229,7 @@ namespace Martridge.ViewModels.Configuration {
             
             this.ShowLogWindowOnStartup = this._cfg.ShowLogWindowOnStartup;
             this.ShowDmodDevFeatures = this._cfg.ShowDmodDevFeatures;
+            this.EnableOnlineFeatures = this._cfg.EnableOnlineFeatures;
             this.UseRelativePathForSubfolders = this._cfg.UseRelativePathForSubfolders;
             this.AutoUpdateInstallerList = this._cfg.AutoUpdateInstallerList;
             this.AdditionalDmodLocationsIndex = -1;
@@ -279,6 +286,7 @@ namespace Martridge.ViewModels.Configuration {
                 [nameof(ConfigGeneral.LocalizationName)] = this._savedLocalization ?? "en-US",
                 [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
                 [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
+                [nameof(ConfigGeneral.EnableOnlineFeatures)] = this.EnableOnlineFeatures,
                 [nameof(ConfigGeneral.ShowLogWindowOnStartup)] = this.ShowLogWindowOnStartup,
                 [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,
                 [nameof(ConfigGeneral.ActiveGameExeIndex)] = this.ActiveGameExeIndex,

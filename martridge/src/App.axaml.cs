@@ -47,6 +47,8 @@ namespace Martridge {
                 if (this._config.General.ShowLogWindowOnStartup) {
                     this.ShowLogWindow();
                 }
+                
+                MyTrace.Global.WriteMessage(MyTraceCategory.General, $"App Path = \"{LocationHelper.AppBaseDirectory}\"");
             }
 
             base.OnFrameworkInitializationCompleted();

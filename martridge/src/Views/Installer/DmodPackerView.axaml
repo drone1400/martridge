@@ -6,6 +6,7 @@
              xmlns:vm="using:Martridge.ViewModels.Installer"
              xmlns:dmodPacker="clr-namespace:Martridge.Models.DmodPacker"
              xmlns:converters="clr-namespace:Martridge.ViewModels"
+             xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
              mc:Ignorable="d" 
              d:DesignWidth="800" 
              d:DesignHeight="450"
@@ -18,8 +19,8 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
     </UserControl.Styles>
     <UserControl.Resources>
-        <converters:GenericEqualsBoolConverter x:Key="GenericEqualsBoolConverter" />
-        <converters:GenericNotEqualsBoolConverter x:Key="GenericNotEqualsBoolConverter" />
+        <valueConverters:GenericEqualsBoolConverter x:Key="GenericEqualsBoolConverter" />
+        <valueConverters:GenericNotEqualsBoolConverter x:Key="GenericNotEqualsBoolConverter" />
     </UserControl.Resources>
 
 

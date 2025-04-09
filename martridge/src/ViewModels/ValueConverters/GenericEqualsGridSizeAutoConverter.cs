@@ -2,7 +2,7 @@
 using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Data.Converters;
-namespace Martridge.ViewModels {
+namespace Martridge.ViewModels.ValueConverters {
     public class GenericEqualsGridSizeAutoConverter : IValueConverter{
 
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) {

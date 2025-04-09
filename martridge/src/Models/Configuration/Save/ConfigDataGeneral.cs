@@ -31,6 +31,11 @@ namespace Martridge.Models.Configuration.Save {
         public bool? ShowDmodDevFeatures { get; set; }
         
         /// <summary>
+        /// Indicates if the application should enable online features...
+        /// </summary>
+        public bool? EnableOnlineFeatures { get; set; }
+        
+        /// <summary>
         /// Indicates if the application should show the info/error log window when starting
         /// </summary>
         public bool? ShowLogWindowOnStartup { get; set; }
@@ -77,6 +82,7 @@ namespace Martridge.Models.Configuration.Save {
                 [nameof(ConfigGeneral.LocalizationName)] = this.LocalizationName,
                 [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
                 [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
+                [nameof(ConfigGeneral.EnableOnlineFeatures)] = this.EnableOnlineFeatures,
                 [nameof(ConfigGeneral.ShowLogWindowOnStartup)] = this.ShowLogWindowOnStartup,
                 [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,
                 [nameof(ConfigGeneral.ActiveGameExeIndex)] = this.ActiveGameExeIndex,

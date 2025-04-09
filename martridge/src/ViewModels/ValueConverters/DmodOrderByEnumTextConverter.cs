@@ -1,9 +1,9 @@
-﻿using Avalonia.Data.Converters;
-using Martridge.Models.Localization;
-using System;
+﻿using System;
 using System.Globalization;
-
-namespace Martridge.ViewModels.Dmod {
+using Avalonia.Data.Converters;
+using Martridge.Models.Localization;
+using Martridge.ViewModels.Dmod;
+namespace Martridge.ViewModels.ValueConverters {
     public class DmodOrderByEnumTextConverter : IValueConverter {
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) {
             if (value?.GetType() == typeof(DmodOrderBy)) {

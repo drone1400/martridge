@@ -8,6 +8,7 @@
              xmlns:vmm="using:Martridge.ViewModels"
              xmlns:vm="using:Martridge.ViewModels.Dmod"
              xmlns:vw="using:Martridge.Views.Dmod"
+             xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
              Name="DmodBrowser">
     <Design.DataContext>
         <vm:OnlineDmodBrowserViewModel/>
@@ -16,7 +17,7 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
     </UserControl.Styles>
     <UserControl.Resources>
-        <vmm:IsNotNullCheckBoolConverter x:Key="ConverterIsNotNullCheck"/>
+        <valueConverters:IsNotNullCheckBoolConverter x:Key="ConverterIsNotNullCheck"/>
     </UserControl.Resources>
     
     <vw:MagicSplitPresenterView 

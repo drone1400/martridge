@@ -4,9 +4,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dloc="using:Martridge.ViewModels.Localization"
         xmlns:vm="using:Martridge.ViewModels"
-        xmlns:vw="using:Martridge.Views"
-        xmlns:vwi="using:Martridge.Views.Installer"
-        xmlns:vwc="using:Martridge.Views.Configuration"
         xmlns:martridge="clr-namespace:Martridge"
 
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
@@ -30,20 +27,19 @@
     </Window.Styles>
 
     <Grid RowDefinitions="Auto,*">
-        <Grid.Resources>
-            <vm:MainViewPageEnumConverter x:Key="ViewPageEnumConverter"/>
-            <vm:GenericEqualsBoolConverter x:Key="GenericEqualsBoolConverter"/>
-        </Grid.Resources>
-
+        
         <Menu Grid.Row="0">
             <MenuItem Header="{dloc:Localize MainWindow/MenuFile}">
                 <MenuItem Header="{dloc:Localize MainWindow/MenuDmodInstaller}"
                           Command="{Binding CmdShowPageDmodInstallerAndBrowse}"/>
                 <MenuItem Header="{dloc:Localize MainWindow/MenuDmodPacker}"
                           Command="{Binding CmdShowPageDmodPackerAndBrowse}"
-                          IsVisible="{Binding VmGeneralSettings.ShowDmodDevFeatures}"/>
+                          IsVisible="{Binding EnableDmodDeveloperFeatures}"
+                          IsEnabled="{Binding EnableDmodDeveloperFeatures}"/>
                 <MenuItem Header="{dloc:Localize MainWindow/MenuDinkInstaller}"
-                          Command="{Binding CmdShowPageDinkInstaller}"/>
+                          Command="{Binding CmdShowPageDinkInstaller}"
+                          IsVisible="{Binding EnableOnlineFeatures}"
+                          IsEnabled="{Binding EnableOnlineFeatures}"/>
                 <MenuItem Header="{dloc:Localize MainWindow/MenuLogWindow}"
                           Command="{Binding CmdShowLogWindow}"/>
                 <MenuItem Header="{dloc:Localize MainWindow/MenuExit}"
@@ -55,66 +51,37 @@
             
             <MenuItem Header="{dloc:Localize MainWindow/MenuTheme}">
                 <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Citrus}"
-                          Command="{Binding VmGeneralSettings.CmdSetApplicationTheme}"
+                          Command="{Binding CmdChangeTheme}"
                           CommandParameter="{x:Static martridge:ApplicationTheme.Citrus}"/>
                 
                 <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Sea}"
-                          Command="{Binding VmGeneralSettings.CmdSetApplicationTheme}"
+                          Command="{Binding CmdChangeTheme}"
                           CommandParameter="{x:Static martridge:ApplicationTheme.Sea}"/>
                 
                 <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Rust}"
-                          Command="{Binding VmGeneralSettings.CmdSetApplicationTheme}"
+                          Command="{Binding CmdChangeTheme}"
                           CommandParameter="{x:Static martridge:ApplicationTheme.Rust}"/>
                 
                 <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Candy}"
-                          Command="{Binding VmGeneralSettings.CmdSetApplicationTheme}"
+                          Command="{Binding CmdChangeTheme}"
                           CommandParameter="{x:Static martridge:ApplicationTheme.Candy}"/>
                 
                 <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Magma}"
-                          Command="{Binding VmGeneralSettings.CmdSetApplicationTheme}"
+                          Command="{Binding CmdChangeTheme}"
                           CommandParameter="{x:Static martridge:ApplicationTheme.Magma}"/>
             </MenuItem>
 
             <MenuItem Header="{dloc:Localize MainWindow/MenuAbout}"
-                      Click="ShowAboutWindow"/>
+                      Command="{Binding CmdShowPageAbout}"/>
 
         </Menu>
-
-        <Grid Grid.Row="1"
-              IsVisible="{Binding Path=ActiveUserPage,
-              Converter={StaticResource ViewPageEnumConverter},
-              ConverterParameter={x:Static vm:MainViewPage.MainView }}">
-            <vw:MainView DataContext="{Binding }"/>
+        
+        <Grid Grid.Row="1">
+            <ContentControl Content="{Binding CurrentViewModel}">
+                <ContentControl.DataTemplates>
+                    <vm:MainViewLocator/>
+                </ContentControl.DataTemplates>
+            </ContentControl>
         </Grid>
-
-        <Grid Grid.Row="1"
-              IsVisible="{Binding Path=ActiveUserPage,
-              Converter={StaticResource ViewPageEnumConverter},
-              ConverterParameter={x:Static vm:MainViewPage.Settings }}">
-            <vwc:SettingsGeneralView DataContext="{Binding VmGeneralSettings}"/>
-        </Grid>
-
-        <Grid Grid.Row="1"
-              IsVisible="{Binding Path=ActiveUserPage,
-              Converter={StaticResource ViewPageEnumConverter},
-              ConverterParameter={x:Static vm:MainViewPage.DinkInstaller }}">
-            <vwi:DinkInstallerView DataContext="{Binding VmDinkInstaller}"/>
-        </Grid>
-
-        <Grid Grid.Row="1"
-              IsVisible="{Binding Path=ActiveUserPage,
-              Converter={StaticResource ViewPageEnumConverter},
-              ConverterParameter={x:Static vm:MainViewPage.DmodInstaller }}">
-            <vwi:DmodInstallerView DataContext="{Binding VmDmodInstaller}"/>
-        </Grid>
-    
-        <Grid Grid.Row="1"
-              IsVisible="{Binding Path=ActiveUserPage,
-              Converter={StaticResource ViewPageEnumConverter},
-              ConverterParameter={x:Static vm:MainViewPage.DmodPacker }}">
-            <vwi:DmodPackerView DataContext="{Binding VmDmodPacker}"/>
-        </Grid>
-
-
     </Grid>
 </Window>

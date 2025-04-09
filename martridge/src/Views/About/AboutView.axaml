@@ -1,23 +1,18 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-
-        xmlns:dloc="using:Martridge.ViewModels.Localization"
-        xmlns:vm="using:Martridge.ViewModels.About"
-        
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="540"
-        MinWidth="600" MinHeight="540"
-        Width="800" Height="600"
-        
-        x:Class="Martridge.Views.About.AboutWindow"
-        Icon="/Assets/martridge_new.ico"
-        Title="{dloc:Localize AboutWindow/Title}">
-
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:aboutVm="clr-namespace:Martridge.ViewModels.About"
+             xmlns:dloc="clr-namespace:Martridge.ViewModels.Localization"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Martridge.Views.About.AboutView">
     <Design.DataContext>
-        <vm:AboutWindowViewModel/>
+        <aboutVm:AboutViewModel />
     </Design.DataContext>
-  
+    <Design.DesignStyle>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </Design.DesignStyle>
+    
     <Grid RowDefinitions="Auto,*,Auto">
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*">
             <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto">
@@ -81,7 +76,7 @@
                         <StackLayout Spacing="4" Orientation="Vertical"/>
                     </ItemsRepeater.Layout>
                     <ItemsRepeater.ItemTemplate>
-                        <DataTemplate DataType="vm:AboutUsedPackageViewModel">
+                        <DataTemplate DataType="aboutVm:AboutUsedPackageViewModel">
                             <Border BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
                                 <Grid Margin="2"
                                       RowDefinitions="Auto,Auto">
@@ -104,6 +99,6 @@
                 Content="{dloc:Localize Generic/ButtonOk}"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
-                Click="ButtonOkClickHandler"/>
+                Command="{Binding CmdGoBack}"/>
     </Grid>
-</Window>
+</UserControl>

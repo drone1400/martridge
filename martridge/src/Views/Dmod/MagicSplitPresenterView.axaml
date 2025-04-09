@@ -4,14 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vw="using:Martridge.Views.Dmod"
              xmlns:vm="clr-namespace:Martridge.ViewModels"
-             
+             xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
+
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Martridge.Views.Dmod.MagicSplitPresenterView"
              
              Name="Myself">
     
     <UserControl.Resources>
-        <vm:MultiBoolOrConverter x:Key="ConverterMultiBoolOr"/>
+        <valueConverters:MultiBoolOrConverter x:Key="ConverterMultiBoolOr"/>
     </UserControl.Resources>
     
     <Grid>

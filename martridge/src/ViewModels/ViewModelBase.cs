@@ -4,7 +4,7 @@ using System;
 using ReactiveUI.Validation.Helpers;
 
 namespace Martridge.ViewModels {
-    public class ViewModelBase : ReactiveValidationObject {
+    public abstract class ViewModelBase : ReactiveValidationObject{
         // hmmm
     }
 }

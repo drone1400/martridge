@@ -8,6 +8,7 @@
              xmlns:vm="clr-namespace:Martridge.ViewModels"
              xmlns:installer="clr-namespace:Martridge.Models.Installer"
              xmlns:dmodInstaller="clr-namespace:Martridge.Models.DmodInstaller"
+             xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
 
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Martridge.Views.Installer.DmodInstallerView"
@@ -19,8 +20,8 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </UserControl.Styles>
     <UserControl.Resources>
-        <vm:GenericEqualsBoolConverter x:Key="GenericEqualsBoolConverter" />
-        <vm:GenericNotEqualsBoolConverter x:Key="GenericNotEqualsBoolConverter" />
+        <valueConverters:GenericEqualsBoolConverter x:Key="GenericEqualsBoolConverter" />
+        <valueConverters:GenericNotEqualsBoolConverter x:Key="GenericNotEqualsBoolConverter" />
     </UserControl.Resources>
 
     <Border Classes="MartridgeCard">

@@ -1,9 +1,8 @@
-using Avalonia.Data.Converters;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-
-namespace Martridge.ViewModels {
+using Avalonia.Data.Converters;
+namespace Martridge.ViewModels.ValueConverters {
     public class MultiBoolOrConverter : IMultiValueConverter {
 
         public object Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture) {

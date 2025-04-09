@@ -6,6 +6,7 @@
              xmlns:dloc="using:Martridge.ViewModels.Localization"
              xmlns:vm="using:Martridge.ViewModels.Installer"
              xmlns:cfg="clr-namespace:Martridge.Models.Configuration"
+             xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
 
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Martridge.Views.Installer.DinkInstallerVersionInfoView">
@@ -21,7 +22,7 @@
         <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto">
 
             <Grid.Resources>
-                <vm:InstallerFileFilterConverter x:Key="ListStringConverter" />
+                <valueConverters:InstallerFileFilterConverter x:Key="ListStringConverter" />
             </Grid.Resources>
 
             <TextBlock Grid.Row="0" Classes="HeadingTitle"

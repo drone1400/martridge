@@ -15,14 +15,17 @@ using System.Threading.Tasks;
 using System.Timers;
 
 namespace Martridge.ViewModels.Dmod {
+
+    public class InstallOnlineDmodEventArgs : EventArgs {
+        public string Path { get; }
+        public InstallOnlineDmodEventArgs(string path) {
+            this.Path = path;
+        }
+    }
+    
     public class OnlineDmodBrowserViewModel : ViewModelBase {
 
-        public MainWindowViewModel? MainVm {
-            get => this._mainVm;
-            set => this.RaiseAndSetIfChanged(ref this._mainVm, value);
-        }
-        private MainWindowViewModel? _mainVm;
-
+        public event EventHandler<InstallOnlineDmodEventArgs>? InstallDmodRequested; 
 
         private readonly Timer _dmodSearchTimer;
         
@@ -409,7 +412,6 @@ namespace Martridge.ViewModels.Dmod {
         /// <param name="parameter"><see cref="OnlineDmodVersionViewModel"/></param>
         public async void CmdInstallDmod(object? parameter = null) {
             if (this.ProgressIsVisible) return;
-            if (this.MainVm == null) return;
             if (this.DmodCrawler == null) return;
             if (!(parameter is OnlineDmodVersionViewModel def)) return;
 
@@ -429,17 +431,18 @@ namespace Martridge.ViewModels.Dmod {
                 }
 
                 if (File.Exists(resource.Local)) {
-                    this.MainVm.VmDmodInstaller.TemporaryDmodSource = resource.Local;
-                    this.MainVm.CmdShowPageDmodInstaller();
+                    try {
+                        this.InstallDmodRequested?.Invoke(this, new InstallOnlineDmodEventArgs(resource.Local));
+                    } catch (Exception ex) {
+                        MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                    }
                 }
             }
         }
         [DependsOn(nameof(ProgressIsVisible))]
-        [DependsOn(nameof(MainVm))]
         [DependsOn(nameof(DmodCrawler))]
         public bool CanCmdInstallDmod(object? parameter = null) {
             if (this.ProgressIsVisible) { return false;}
-            if (this.MainVm == null) { return false;}
             if (this.DmodCrawler == null) { return false;}
             if (parameter is OnlineDmodVersionViewModel) { return true; }
             return false;

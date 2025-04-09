@@ -1,9 +1,8 @@
-using Avalonia.Data.Converters;
-using Avalonia.Media;
 using System;
 using System.Globalization;
-
-namespace Martridge.ViewModels.Dmod {
+using Avalonia.Data.Converters;
+using Avalonia.Media;
+namespace Martridge.ViewModels.ValueConverters {
     
     public class DmodScoreToSolidColorBrushConverter : IValueConverter {
         public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) {

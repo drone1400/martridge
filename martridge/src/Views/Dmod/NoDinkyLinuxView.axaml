@@ -1,0 +1,48 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dmodVm="clr-namespace:Martridge.ViewModels.Dmod"
+             xmlns:dloc="clr-namespace:Martridge.ViewModels.Localization"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Martridge.Views.Dmod.NoDinkyLinuxView">
+    
+    <Design.DataContext>
+        <dmodVm:NoDinkyViewModel />
+    </Design.DataContext>
+    <Design.DesignStyle>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+    </Design.DesignStyle>
+    
+    <Grid ColumnDefinitions="*,Auto,*">
+        <Image Grid.Column="0" 
+               Source="{Binding AnimatedDuckWizardRight.Frame}"
+               Width="99"
+               VerticalAlignment="Center"/>
+      
+        <Image Grid.Column="2" 
+               Source="{Binding AnimatedDuckWizardLeft.Frame}"
+               Width="99"
+               VerticalAlignment="Center" />
+      
+        <Grid Grid.Column="1"  
+              VerticalAlignment="Center"
+              HorizontalAlignment="Center"
+              RowDefinitions="Auto,Auto,Auto">
+
+            <TextBlock Grid.Row="0" Classes="HeadingTitle"
+                       HorizontalAlignment="Center"
+                       Text="{dloc:Localize MainWindow/NoDmodsLinux_Title}"/>
+
+            <TextBlock Grid.Row="1" Classes="Heading2I"
+                       HorizontalAlignment="Center"
+                       MaxWidth="400"
+                       TextWrapping="Wrap"
+                       Text="{dloc:Localize MainWindow/NoDmodsLinux_Body}"/>
+        
+            <Button Grid.Row="2"
+                    Content="{dloc:Localize MainWindow/MenuSettings}"
+                    Command="{Binding CmdShowConfigurationPage}"/>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
-namespace Martridge.ViewModels.Dmod {
+namespace Martridge.ViewModels.ValueConverters {
     public class GenericDateConverter : IValueConverter{
         
         

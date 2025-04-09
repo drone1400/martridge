@@ -1,19 +1,23 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+﻿<UserControl x:Class="Martridge.Views.Dmod.DualDmodBrowserView"
+             xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             
              xmlns:dloc="clr-namespace:Martridge.ViewModels.Localization"
              xmlns:dmod="clr-namespace:Martridge.Views.Dmod"
              xmlns:dmodVm="clr-namespace:Martridge.ViewModels.Dmod"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Martridge.Views.Dmod.DualDmodBrowserView">
+             
+             mc:Ignorable="d" 
+             d:DesignWidth="800" 
+             d:DesignHeight="450">
     
     <Design.DataContext>
         <dmodVm:DualDmodBrowserViewModel />
     </Design.DataContext>
-    <Design.DesignStyle>
-        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
-    </Design.DesignStyle>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml" />
+    </UserControl.Styles>
     
     <TabControl>
         <TabItem  Classes="Big"

@@ -1,6 +1,5 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:sys="clr-namespace:System;assembly=netstandard">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Design.PreviewWith>
         <Border Padding="20">
             <!-- Add Controls for Previewer Here -->
@@ -79,6 +78,20 @@
     </Style>
     <Style Selector="Label.Heading2">
         <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMargin}"/>
+    </Style>
+    <Style Selector="Label.Heading2BWrapping">
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMargin}"/>
+        <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="Label.Heading2IWrapping">
+        <Setter Property="FontStyle" Value="Italic"/>
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMargin}"/>
+        <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="Label.Heading2Wrapping">
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMargin}"/>
+        <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
     </Style>
     
     <!-- CheckBox -->
@@ -161,5 +174,18 @@
         <Setter Property="TextDecorations" Value="Underline"/>
         <Setter Property="Foreground" Value="Blue" />
     </Style> 
+    <Style Selector="Label.Hyperlink">
+        <Setter Property="FontStyle" Value="Italic"/>
+        <Setter Property="Margin" Value="10,3"/>
+        <Setter Property="Foreground" Value="Blue" />
+        <Setter Property="TextBlock.TextDecorations" Value="Underline" />
+    </Style>
+    <Style Selector="Label.HyperlinkWrapping">
+        <Setter Property="FontStyle" Value="Italic"/>
+        <Setter Property="Margin" Value="10,3"/>
+        <Setter Property="Foreground" Value="Blue" />
+        <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
+        <Setter Property="TextBlock.TextDecorations" Value="Underline" />
+    </Style>
   
 </Styles>

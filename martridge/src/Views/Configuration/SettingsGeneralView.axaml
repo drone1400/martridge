@@ -16,7 +16,7 @@
         <vm:SettingsGeneralViewModel/>
     </Design.DataContext>
     <UserControl.Styles>
-        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </UserControl.Styles>
   
     <Grid RowDefinitions="Auto,Auto,Auto,*,*,*,Auto"
@@ -25,16 +25,16 @@
         <StackPanel Grid.Row="0">
             <Grid ColumnDefinitions="Auto,*" 
                   RowDefinitions="Auto,Auto">
-                <TextBlock Grid.Row="0" Grid.Column="0 " Classes="Heading2B"
-                           Text="{dloc:Localize SettingsGeneral/Localization}"/>
+                <Label Grid.Row="0" Grid.Column="0 " Classes="Heading2B"
+                       Content="{dloc:Localize SettingsGeneral/Localization}"/>
                 <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Localizations}"
                           HorizontalAlignment="Left"
                           SelectedItem="{Binding SelectedLocalization}"
                           Width="360">
                     <ComboBox.DataTemplates>
                         <DataTemplate DataType="globalization:CultureInfo">
-                            <TextBlock  Classes="Heading2I"
-                                        Text="{Binding NativeName}"/>
+                            <Label Classes="Heading2I"
+                                   Content="{Binding NativeName}"/>
                         </DataTemplate>
                     </ComboBox.DataTemplates>
                 </ComboBox>
@@ -55,8 +55,8 @@
                 BorderBrush="{DynamicResource ThemeBorderHighBrush}" 
                 Margin="6">
             <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,*">
-                <TextBlock  Grid.Row="1" Grid.Column="0" Classes="Heading2B"
-                            Text="{dloc:Localize SettingsGeneral/DefaultDmodLocation}"/>
+                <Label   Grid.Row="1" Grid.Column="0" Classes="Heading2B"
+                         Content="{dloc:Localize SettingsGeneral/DefaultDmodLocation}"/>
                 <Button  Grid.Row="1" Grid.Column="1"
                          Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
                          Command="{Binding CmdDefaultDmodsSet}"/>
@@ -71,8 +71,8 @@
                 BorderBrush="{DynamicResource ThemeBorderHighBrush}" 
                 Margin="6,3">
             <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,*">
-                <TextBlock  Grid.Row="1" Grid.Column="0" Classes="Heading2B"
-                            Text="{dloc:Localize SettingsGeneral/AdditionalDmodLocations}"/>
+                <Label   Grid.Row="1" Grid.Column="0" Classes="Heading2B"
+                         Content="{dloc:Localize SettingsGeneral/AdditionalDmodLocations}"/>
                 <Button  Grid.Row="1" Grid.Column="1"
                          Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
                          Command="{Binding CmdAdditionalDmodsAddNew}"/>
@@ -90,8 +90,8 @@
                 BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}"
                 Margin="6,3">
             <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,*">
-                <TextBlock  Grid.Row="1" Grid.Column="0"  Classes="Heading2B"
-                            Text="{dloc:Localize SettingsGeneral/GameExePaths}"/>
+                <Label   Grid.Row="1" Grid.Column="0"  Classes="Heading2B"
+                         Content="{dloc:Localize SettingsGeneral/GameExePaths}"/>
 
                 <Button  Grid.Row="1" Grid.Column="1" 
                          Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
@@ -110,8 +110,8 @@
                 BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}"
                 Margin="6,3">
             <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,*">
-                <TextBlock  Grid.Row="1" Grid.Column="0"  Classes="Heading2B"
-                            Text="{dloc:Localize SettingsGeneral/EditorExePaths}"/>
+                <Label   Grid.Row="1" Grid.Column="0"  Classes="Heading2B"
+                         Content="{dloc:Localize SettingsGeneral/EditorExePaths}"/>
 
                 <Button  Grid.Row="1" Grid.Column="1" 
                          Content="{dloc:Localize SettingsGeneral/EditorExePaths_Add}"

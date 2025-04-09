@@ -9,21 +9,21 @@
     <Design.DataContext>
         <aboutVm:AboutViewModel />
     </Design.DataContext>
-    <Design.DesignStyle>
-        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
-    </Design.DesignStyle>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml" />
+    </UserControl.Styles>
     
     <Grid RowDefinitions="Auto,*,Auto">
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*">
             <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto">
-                <TextBlock Grid.Row="0"
-                           Classes="HeadingTitle"
-                           Text="{dloc:Localize AboutWindow/AppName}"
-                           HorizontalAlignment="Center"/>
+                <Label Grid.Row="0"
+                       Classes="HeadingTitle"
+                       Content="{dloc:Localize AboutWindow/AppName}"
+                       HorizontalAlignment="Center"/>
 
-                <TextBlock Grid.Row="1"
+                <Label Grid.Row="1"
                            Classes="Heading2"
-                           Text="{dloc:Localize AboutWindow/Version2}"
+                           Content="{dloc:Localize AboutWindow/Version2}"
                            HorizontalAlignment="Center"/>
 
                 <StackPanel 
@@ -32,23 +32,23 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Center">
 
-                    <TextBlock  
-                        Text="{dloc:Localize AboutWindow/Version}"
+                    <Label  
+                        Content="{dloc:Localize AboutWindow/Version}"
                         HorizontalAlignment="Center"/>
-                    <TextBlock  
-                        Text=" - "
+                    <Label  
+                        Content=" - "
                         HorizontalAlignment="Center"/>
-                    <TextBlock  
-                        Text="{Binding Version}"
+                    <Label  
+                        Content="{Binding Version}"
                         HorizontalAlignment="Center"/>
                 </StackPanel>
       
-                <TextBlock 
+                <Label 
                     Grid.Row="3"
                     Margin="20,10"
-                    Text="{dloc:Localize AboutWindow/Description}"
-                    TextWrapping="Wrap"
-                />
+                    Content="{dloc:Localize AboutWindow/Description}"
+                    TextBlock.TextWrapping="Wrap"/>
+                
       
             </Grid>
             
@@ -62,10 +62,10 @@
       
 
         <Grid Grid.Row="1" RowDefinitions="Auto,*">
-            <TextBlock
+            <Label
                 Grid.Row="0"
                 Margin="20,5"
-                Text="{dloc:Localize AboutWindow/ResourceCredits}"
+                Content="{dloc:Localize AboutWindow/ResourceCredits}"
             />
 
             <ScrollViewer Grid.Row="1">
@@ -80,8 +80,8 @@
                             <Border BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
                                 <Grid Margin="2"
                                       RowDefinitions="Auto,Auto">
-                                    <TextBlock Grid.Row="0" Classes="Heading2B"
-                                               Text="{Binding PackageName}"/>
+                                    <Label Grid.Row="0" Classes="Heading2B"
+                                           Content="{Binding PackageName}"/>
                                     <TextBox Grid.Row="1" 
                                              Text="{Binding PackageInfo}" 
                                              TextWrapping="Wrap"

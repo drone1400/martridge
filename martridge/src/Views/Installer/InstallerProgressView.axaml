@@ -1,10 +1,14 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl x:Class="Martridge.Views.Installer.InstallerProgressView"
+             xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             
              xmlns:vm="using:Martridge.ViewModels.Installer"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Martridge.Views.Installer.InstallerProgressView">
+             
+             mc:Ignorable="d" 
+             d:DesignWidth="800" 
+             d:DesignHeight="450">
 
     <Design.DataContext>
         <vm:DinkInstallerViewModel />
@@ -16,21 +20,21 @@
     <Border Classes="MartridgeCard">
         <Grid RowDefinitions="Auto,*">
             <StackPanel Grid.Row="0">
-                <TextBlock Classes="HeadingTitle"
-                           Text="{Binding DinkInstallerTitle}" />
+                <Label Classes="HeadingTitle"
+                       Content="{Binding DinkInstallerTitle}" />
 
-                <TextBlock Classes="Heading2B"
-                           Text="{Binding ProgressPrimaryHeading}" />
-                <TextBlock Classes="Heading2I"
-                           Text="{Binding ProgressPrimarySubheading}" />
+                <Label Classes="Heading2B"
+                       Content="{Binding ProgressPrimaryHeading}" />
+                <Label Classes="Heading2I"
+                       Content="{Binding ProgressPrimarySubheading}" />
                 <ProgressBar Minimum="0" Maximum="1"
                              Value="{Binding ProgressPrimaryPercent}" />
 
                 <StackPanel IsVisible="{Binding ProgressSecondaryIsVisible}">
-                    <TextBlock Classes="Heading2B"
-                               Text="{Binding ProgressSecondaryHeading}" />
-                    <TextBlock Classes="Heading2I"
-                               Text="{Binding ProgressSecondarySubtitle}" />
+                    <Label Classes="Heading2B"
+                           Content="{Binding ProgressSecondaryHeading}" />
+                    <Label Classes="Heading2I"
+                           Content="{Binding ProgressSecondarySubtitle}" />
                     <ProgressBar Minimum="0" Maximum="1"
                                  Value="{Binding ProgressSecondaryPercent}"
                                  IsIndeterminate="{Binding ProgressSecondaryIsIndeterminate}" />

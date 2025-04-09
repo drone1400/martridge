@@ -1,15 +1,18 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl x:Class="Martridge.Views.Installer.DinkInstallerVersionInfoView"
+             xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-
+             
              xmlns:dloc="using:Martridge.ViewModels.Localization"
              xmlns:vm="using:Martridge.ViewModels.Installer"
              xmlns:cfg="clr-namespace:Martridge.Models.Configuration"
              xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
-
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Martridge.Views.Installer.DinkInstallerVersionInfoView">
+             
+             mc:Ignorable="d" 
+             d:DesignWidth="800" 
+             d:DesignHeight="450"
+>
 
     <Design.DataContext>
         <vm:DinkInstallerViewModel />
@@ -25,12 +28,12 @@
                 <valueConverters:InstallerFileFilterConverter x:Key="ListStringConverter" />
             </Grid.Resources>
 
-            <TextBlock Grid.Row="0" Classes="HeadingTitle"
-                       Text="{Binding DinkInstallerTitle}" />
+            <Label Grid.Row="0" Classes="HeadingTitle"
+                       Content="{Binding DinkInstallerTitle}" />
 
             <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
-                <TextBlock Grid.Column="0" Classes="Heading2B"
-                           Text="{dloc:Localize DinkInstallerView/SelectDestination}" />
+                <Label Grid.Column="0" Classes="Heading2B"
+                       Content="{dloc:Localize DinkInstallerView/SelectDestination}" />
                 <Button Grid.Row="0" Grid.Column="1"
                         Content="{dloc:Localize Generic/ButtonBrowse}"
                         Command="{Binding CmdBrowseDestination}" />
@@ -39,15 +42,15 @@
             <TextBox Grid.Row="2"
                      Text="{Binding InstallerDestination}" />
 
-            <TextBlock Grid.Row="3" Classes="Heading2B"
-                       Text="{dloc:Localize DinkInstallerView/GameExeName}" />
+            <Label Grid.Row="3" Classes="Heading2B"
+                   Content="{dloc:Localize DinkInstallerView/GameExeName}" />
 
             <TextBox Grid.Row="4"
                      Text="{Binding SelectedInstallable.InstallerData.GameFileName}"
                      IsReadOnly="True" />
 
-            <TextBlock Grid.Row="5" Classes="Heading2B"
-                       Text="{dloc:Localize DinkInstallerView/EditorExeName}" />
+            <Label Grid.Row="5" Classes="Heading2B"
+                   Content="{dloc:Localize DinkInstallerView/EditorExeName}" />
 
             <TextBox Grid.Row="6"
                      Text="{Binding SelectedInstallable.InstallerData.EditorFileName}"
@@ -66,19 +69,18 @@
                                 <Grid Margin="2"
                                       RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
                                       ColumnDefinitions="Auto,*">
-                                    <TextBlock Grid.Column="0" Grid.Row="1" Classes="Heading2"
-                                               Text="{dloc:Localize DinkInstallerView/WebResourceName}" />
-                                    <TextBlock Grid.Column="0" Grid.Row="2" Classes="Heading2"
-                                               Text="{dloc:Localize DinkInstallerView/WebResourceUri}" />
-                                    <TextBlock Grid.Column="0" Grid.Row="3" Classes="Heading2"
-                                               IsEnabled="False"
-                                               Text="{dloc:Localize DinkInstallerView/WebResourceSha256}" />
-                                    <TextBlock Grid.Column="0" Grid.Row="4" Classes="Heading2"
-                                               Text="{dloc:Localize DinkInstallerView/WebResourceType}" />
-                                    <TextBlock Grid.Column="0" Grid.Row="5" Classes="Heading2"
-                                               Text="{dloc:Localize DinkInstallerView/WebResourceSourceSubFolder}" />
-                                    <TextBlock Grid.Column="0" Grid.Row="6" Classes="Heading2"
-                                               Text="{dloc:Localize DinkInstallerView/WebResourceFilterType}" />
+                                    <Label Grid.Column="0" Grid.Row="1" Classes="Heading2"
+                                           Content="{dloc:Localize DinkInstallerView/WebResourceName}" />
+                                    <Label Grid.Column="0" Grid.Row="2" Classes="Heading2"
+                                           Content="{dloc:Localize DinkInstallerView/WebResourceUri}" />
+                                    <Label Grid.Column="0" Grid.Row="3" Classes="Heading2"
+                                           Content="{dloc:Localize DinkInstallerView/WebResourceSha256}" />
+                                    <Label Grid.Column="0" Grid.Row="4" Classes="Heading2"
+                                           Content="{dloc:Localize DinkInstallerView/WebResourceType}" />
+                                    <Label Grid.Column="0" Grid.Row="5" Classes="Heading2"
+                                           Content="{dloc:Localize DinkInstallerView/WebResourceSourceSubFolder}" />
+                                    <Label Grid.Column="0" Grid.Row="6" Classes="Heading2"
+                                           Content="{dloc:Localize DinkInstallerView/WebResourceFilterType}" />
 
                                     <TextBox Grid.Column="1" Grid.Row="1"
                                              Text="{Binding WebResource.Name}"

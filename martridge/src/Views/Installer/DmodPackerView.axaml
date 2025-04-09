@@ -1,22 +1,23 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl x:Class="Martridge.Views.Installer.DmodPackerView"
+             xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             
              xmlns:dloc="using:Martridge.ViewModels.Localization"
              xmlns:vm="using:Martridge.ViewModels.Installer"
              xmlns:dmodPacker="clr-namespace:Martridge.Models.DmodPacker"
-             xmlns:converters="clr-namespace:Martridge.ViewModels"
              xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
+             
              mc:Ignorable="d" 
              d:DesignWidth="800" 
-             d:DesignHeight="450"
-             x:Class="Martridge.Views.Installer.DmodPackerView"
-             Name="DmodInstallerUserControl">
+             d:DesignHeight="450">
+    
     <Design.DataContext>
         <vm:DmodPackerViewModel/>
     </Design.DataContext>
     <UserControl.Styles>
-        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </UserControl.Styles>
     <UserControl.Resources>
         <valueConverters:GenericEqualsBoolConverter x:Key="GenericEqualsBoolConverter" />

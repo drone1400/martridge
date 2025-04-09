@@ -3,14 +3,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             
              xmlns:dloc="using:Martridge.ViewModels.Localization"
              xmlns:vm="using:Martridge.ViewModels.Dmod"
-             xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters">
+             xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
+             
+             mc:Ignorable="d" 
+             d:DesignWidth="800" 
+             d:DesignHeight="450">
+    
     <Design.DataContext>
         <vm:OnlineDmodBrowserViewModel/>
     </Design.DataContext>
-
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml" />
+    </UserControl.Styles>
     <UserControl.Resources>
         <valueConverters:DmodScoreToSolidColorBrushConverter x:Key="DmodScoreToSolidColorBrushConverter"/>
         <valueConverters:GenericDateConverter x:Key="GenericDateConverter"/>
@@ -21,12 +28,12 @@
               ColumnDefinitions="Auto,Auto,*,200"
               RowDefinitions="Auto,Auto,Auto">
             
-            <TextBlock Grid.Row="0" Grid.Column="0"
-                       Classes="Heading2B"
-                       Text="{dloc:Localize OnlineDmodBrowser/ReloadLastRefreshed}" />
-            <TextBlock Grid.Row="0" Grid.Column="1"
-                       Classes="Heading2I"
-                       Text="{Binding LastRefreshedString }" />
+            <Label Grid.Row="0" Grid.Column="0"
+                   Classes="Heading2B"
+                   Content="{dloc:Localize OnlineDmodBrowser/ReloadLastRefreshed}" />
+            <Label Grid.Row="0" Grid.Column="1"
+                   Classes="Heading2I"
+                   Content="{Binding LastRefreshedString }" />
             <Button Grid.Row="0" Grid.Column="3" 
                     Command="{Binding CmdRefreshDmods}"
                     HorizontalAlignment="Stretch"
@@ -37,21 +44,21 @@
         <Grid Grid.Row="1"
               ColumnDefinitions="Auto,*"
               RowDefinitions="Auto,Auto,Auto">
-            <TextBlock Grid.Row="0" Grid.Column="0"
-                       Classes="Heading2B"
-                       Text="{dloc:Localize OnlineDmodBrowser/Search}" />
+            <Label Grid.Row="0" Grid.Column="0"
+                   Classes="Heading2B"
+                   Content="{dloc:Localize OnlineDmodBrowser/Search}" />
             <TextBox Grid.Row="0" Grid.Column="1" 
                      HorizontalAlignment="Stretch"
                      VerticalContentAlignment="Center"
                      Text="{Binding DmodSearchString}"/>
         </Grid>
         
-        <TextBlock Grid.Row="2" 
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   IsVisible="{Binding !DmodDefinitionsFilteredHasItems}"
-                   Classes="HeadingTitle"
-                   Text="{dloc:Localize DmodBrowser/NoDmodsFound}"
+        <Label Grid.Row="2" 
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               IsVisible="{Binding !DmodDefinitionsFilteredHasItems}"
+               Classes="HeadingTitle"
+               Content="{dloc:Localize DmodBrowser/NoDmodsFound}"
         />
         
         <DataGrid Grid.Row="2"
@@ -94,10 +101,10 @@
                                 VerticalAlignment="Stretch"
                                 Background="{Binding ScoreValue, 
                                         Converter={StaticResource DmodScoreToSolidColorBrushConverter}}">
-                                <TextBlock Classes="Heading2I"
-                                           HorizontalAlignment="Center"
-                                           Foreground="Black"
-                                           Text="{Binding Score, Mode=OneWay}"/>
+                                <Label Classes="Heading2I"
+                                       HorizontalAlignment="Center"
+                                       Foreground="Black"
+                                       Content="{Binding Score, Mode=OneWay}"/>
                             </Border>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

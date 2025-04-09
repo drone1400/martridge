@@ -1,14 +1,17 @@
-<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl x:Class="Martridge.Views.Installer.DinkInstallerPrepareView"
+             xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-
+             
              xmlns:dloc="using:Martridge.ViewModels.Localization"
              xmlns:vw="using:Martridge.Views.Installer"
              xmlns:vm="using:Martridge.ViewModels.Installer"
-
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Martridge.Views.Installer.DinkInstallerPrepareView">
+             
+             mc:Ignorable="d" 
+             d:DesignWidth="800" 
+             d:DesignHeight="450"
+>
 
     <Design.DataContext>
         <vm:DinkInstallerViewModel />
@@ -23,15 +26,14 @@
                   HorizontalAlignment="Center"
                   RowDefinitions="Auto,Auto">
 
-                <TextBlock Grid.Row="0" Grid.Column="0"  Classes="HeadingTitle"
+                <Label Grid.Row="0" Grid.Column="0"  Classes="HeadingTitle"
                            HorizontalAlignment="Center"
-                           Text="{dloc:Localize DinkInstallerView/InstallableInitializing_Title}"/>
+                           Content="{dloc:Localize DinkInstallerView/InstallableInitializing_Title}"/>
 
-                <TextBlock Grid.Row="1" Grid.Column="0"  Classes="Heading2I"
+                <Label Grid.Row="1" Grid.Column="0"  Classes="Heading2IWrapping"
                            HorizontalAlignment="Center"
                            MaxWidth="400"
-                           TextWrapping="Wrap"
-                           Text="{dloc:Localize DinkInstallerView/InstallableInitializing_Body}"/>
+                           Content="{dloc:Localize DinkInstallerView/InstallableInitializing_Body}"/>
             </Grid>
         </Grid>
         <Grid IsVisible="{Binding !IsInstallableInitializing}">
@@ -40,23 +42,22 @@
                   RowDefinitions="Auto,Auto"
                   IsVisible="{Binding !IsInstallableInitialized}">
 
-                <TextBlock Grid.Row="0" Grid.Column="0" Classes="HeadingTitle"
+                <Label Grid.Row="0" Grid.Column="0" Classes="HeadingTitle"
                            HorizontalAlignment="Center"
-                           Text="{dloc:Localize DinkInstallerView/InstallableNotInitialized_Title}"/>
+                           Content="{dloc:Localize DinkInstallerView/InstallableNotInitialized_Title}"/>
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Classes="Heading2I"
+                <Label Grid.Row="1" Grid.Column="0" Classes="Heading2IWrapping"
                            HorizontalAlignment="Center"
                            MaxWidth="400"
-                           TextWrapping="Wrap"
-                           Text="{dloc:Localize DinkInstallerView/InstallableNotInitialized_Body}"/>
+                           Content="{dloc:Localize DinkInstallerView/InstallableNotInitialized_Body}"/>
             </Grid>
             <Grid Name="GridInstaller_Versions"
                   IsVisible="{Binding IsInstallableInitialized}"
                   RowDefinitions="*,Auto">
                 
                 <Grid Grid.Row="0" RowDefinitions="Auto,Auto,*" ColumnDefinitions="Auto,*">
-                    <TextBlock Grid.Row="0" Grid.Column="0" Classes="Heading2B"
-                               Text="{dloc:Localize DinkInstallerView/SelectVersion}" />
+                    <Label Grid.Row="0" Grid.Column="0" Classes="Heading2B"
+                           Content="{dloc:Localize DinkInstallerView/SelectVersion}" />
 
                     <ComboBox Grid.Row="1" Grid.Column="0"
                               ItemsSource="{Binding InstallableCategories}"
@@ -64,8 +65,8 @@
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="2">
-                                    <TextBlock Classes="Heading2"
-                                               Text="{Binding CategoryName}" />
+                                    <Label Classes="Heading2"
+                                           Content="{Binding CategoryName}" />
                                 </Grid>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
@@ -78,8 +79,8 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="2">
-                                    <TextBlock Classes="Heading2"
-                                               Text="{Binding DisplayName }" />
+                                    <Label Classes="Heading2"
+                                           Content="{Binding DisplayName }" />
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -96,14 +97,13 @@
                         IsVisible="{Binding SelectedInstallable,
                             Converter={x:Static ObjectConverters.IsNull}}">
 
-                        <TextBlock Grid.Row="0" Grid.Column="0" Classes="HeadingTitle"
+                        <Label Grid.Row="0" Grid.Column="0" Classes="HeadingTitle"
                                    HorizontalAlignment="Left"
-                                   Text="{dloc:Localize DinkInstallerView/InstallableNotSelected_Title}"/>
+                                   Content="{dloc:Localize DinkInstallerView/InstallableNotSelected_Title}"/>
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Classes="Heading2B"
+                        <Label Grid.Row="1" Grid.Column="0" Classes="Heading2BWrapping"
                                    HorizontalAlignment="Left"
-                                   TextWrapping="Wrap"
-                                   Text="{dloc:Localize DinkInstallerView/InstallableNotSelected_Body}"/>
+                                   Content="{dloc:Localize DinkInstallerView/InstallableNotSelected_Body}"/>
                     </Grid>
                 </Grid>
             </Grid>

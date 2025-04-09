@@ -1,20 +1,27 @@
-<Window xmlns="https://github.com/avaloniaui"
+<Window x:Class="Martridge.Views.DinkyAlerts.DinkyAlertWindow"
+        xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="Martridge.Views.DinkyAlerts.DinkyAlertWindow"
         
         xmlns:vm="using:Martridge.ViewModels.DinkyAlerts"
         xmlns:dloc="using:Martridge.ViewModels.Localization"
         
+        mc:Ignorable="d" 
+        d:DesignWidth="800" 
+        d:DesignHeight="450"
+        
         Title="{Binding Title }"
-        Name="Alert"
         MinWidth="640" MinHeight="340"
-        Width="640" Height="340">
+        Width="640" Height="340"
+        Name="Alert">
+    
     <Design.DataContext>
         <vm:DinkyAlertWindowViewModel/>
     </Design.DataContext>
+    <Window.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml" />
+    </Window.Styles>
   
     <Grid RowDefinitions="*, Auto, Auto" 
           ColumnDefinitions="128, *" 
@@ -23,9 +30,9 @@
         <Image Grid.Row="0" Grid.Column="0"
                Source="{Binding AnimatedImage.Frame}"/>
     
-        <TextBlock Grid.Row="0" Grid.Column="1" 
-                   Text="{Binding Message}"
-                   TextWrapping="Wrap"/>
+        <Label Grid.Row="0" Grid.Column="1" 
+               Content="{Binding Message}"
+               TextBlock.TextWrapping="Wrap"/>
         
         <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
                   Content="{dloc:Localize DinkyAlertWindow/CheckBoxRememberResult}"

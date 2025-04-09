@@ -172,7 +172,7 @@
                                             BorderBrush="{DynamicResource ThemeBorderHighBrush}">
                     
                                         <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="150, *">
-                                            <Label Grid.Row="0" Grid.Column="0" Classes="Heading2B" 
+                                            <Label Grid.Row="0" Grid.Column="0" Classes="Heading2BWrapping" 
                                                    Content="{Binding Name}"/>
                                             <Button Grid.Row="0" Grid.Column="1"
                                                     HorizontalAlignment="Left"

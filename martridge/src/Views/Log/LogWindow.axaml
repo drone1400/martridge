@@ -17,10 +17,14 @@
     <Design.DataContext>
         <vm:LogConsoleViewModel/>
     </Design.DataContext>
+    <Window.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml" />
+    </Window.Styles>
   
     <Grid>
         <Border>
             <TextBox Text="{Binding Text}" IsReadOnly="True"
+                     Classes="BigTextBox"
                      FontFamily="Consolas"/>
         </Border>
     </Grid>

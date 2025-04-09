@@ -42,6 +42,7 @@
             </StackPanel>
 
             <TextBox Grid.Row="1"
+                     Classes="BigTextBox"
                      Text="{Binding InstallerLogText}"
                      CaretIndex="{Binding InstallerLogCaretIndex, Mode=TwoWay}" />
         </Grid>

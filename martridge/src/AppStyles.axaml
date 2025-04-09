@@ -172,18 +172,18 @@
         <Setter Property="FontStyle" Value="Italic"/>
         <Setter Property="Margin" Value="10,3"/>
         <Setter Property="TextDecorations" Value="Underline"/>
-        <Setter Property="Foreground" Value="Blue" />
+        <Setter Property="Foreground" Value="{DynamicResource HighlightColor}" />
     </Style> 
     <Style Selector="Label.Hyperlink">
         <Setter Property="FontStyle" Value="Italic"/>
         <Setter Property="Margin" Value="10,3"/>
-        <Setter Property="Foreground" Value="Blue" />
+        <Setter Property="Foreground" Value="{DynamicResource HighlightColor}" />
         <Setter Property="TextBlock.TextDecorations" Value="Underline" />
     </Style>
     <Style Selector="Label.HyperlinkWrapping">
         <Setter Property="FontStyle" Value="Italic"/>
         <Setter Property="Margin" Value="10,3"/>
-        <Setter Property="Foreground" Value="Blue" />
+        <Setter Property="Foreground" Value="{DynamicResource HighlightColor}" />
         <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
         <Setter Property="TextBlock.TextDecorations" Value="Underline" />
     </Style>

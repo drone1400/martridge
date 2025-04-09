@@ -72,6 +72,12 @@
                   IsVisible="{Binding DmodDefinitionsFilteredHasItems}"
                   ItemsSource="{Binding DmodDefinitionsFiltered}" 
                   SelectedItem="{Binding SelectedDmodDefinition, Mode=TwoWay}">
+            <DataGrid.Styles>
+                <Style Selector="TextBlock">
+                    <Setter Property="TextWrapping" Value="Wrap"/>
+                    <Setter Property="Margin" Value="1"/>
+                </Style>
+            </DataGrid.Styles>
             <DataGrid.RowTheme>
                 <ControlTheme TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
                     <ControlTheme.Children>

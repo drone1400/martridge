@@ -187,7 +187,7 @@ namespace Martridge.Models.DmodInstaller {
 
                         if (result)
                         {
-                            this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializedQuickPeek"], this.DmodRootName);
+                            this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializedQuickPeek"], this.DmodRootName ?? string.Empty);
 
                             lock (this._syncRoot)
                             {

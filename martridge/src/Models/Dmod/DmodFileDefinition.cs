@@ -132,7 +132,7 @@ namespace Martridge.Models.Dmod {
 
         public string? GetName() {
             try {
-                string[] lines = null;
+                string[]? lines = null;
                 
                 if (this.IsCorrectlyDefined) {
                     lines = File.ReadAllLines(this.DmodDiz!.FullName);
@@ -161,7 +161,9 @@ namespace Martridge.Models.Dmod {
                 string fileLowerNoExt = Path.GetFileNameWithoutExtension(fileLower);
                 foreach (string str in KnownThumbnailFileNames) {
                     if (str == fileLowerNoExt) {
-                        return new Bitmap(DirFf.LoadImageStream(file,fileLower)); 
+                        MemoryStream? stream = DirFf.LoadImageStream(file, fileLower);
+                        if (stream == null) return null;
+                        return new Bitmap(stream); 
                     }
                 }
             }

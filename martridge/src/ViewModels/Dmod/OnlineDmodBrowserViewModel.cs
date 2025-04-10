@@ -56,7 +56,7 @@ namespace Martridge.ViewModels.Dmod {
                 }
 
                 if (args.PropertyName == nameof(this.SelectedDmodDefinition)) {
-                    this.SelectedDmodDefinitionInitialize(false);
+                    _ = this.SelectedDmodDefinitionInitialize(false); // no await
                 }
 
                 if (args.PropertyName == nameof(this.SelectedDmodScreenshotVm)) {

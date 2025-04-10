@@ -76,7 +76,7 @@ namespace Martridge.ViewModels {
 
             if (this.EnableOnlineFeatures) {
                 this._dmodCrawler = new DmodCrawler();
-                this._dmodCrawler.InitializeDmodLists(false); // no await
+                _ = this._dmodCrawler.InitializeDmodLists(false); // no await
             }
 
             this.InitializeMainViewModel();
@@ -115,7 +115,7 @@ namespace Martridge.ViewModels {
 
                     if (this._dmodCrawler == null) {
                         this._dmodCrawler = new DmodCrawler();
-                        this._dmodCrawler.InitializeDmodLists(false); // no await
+                        _ = this._dmodCrawler.InitializeDmodLists(false); // no await
                     }
                 }
                 
@@ -340,8 +340,9 @@ namespace Martridge.ViewModels {
         public bool CanCmdShowPageDinkInstaller(object? parameter = null) {
             #if PLATF_WINDOWS
             return this.CanSwitchViewModel() && this.EnableOnlineFeatures;
-            #endif
+            #else
             return false;
+            #endif
         }
         public void CmdShowPageDinkInstaller(object? parameter = null) {
             if (this.CanCmdShowPageDinkInstaller() == false) return;

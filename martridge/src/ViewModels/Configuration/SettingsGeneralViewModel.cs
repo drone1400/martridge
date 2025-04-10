@@ -1,5 +1,4 @@
-﻿using Avalonia.Controls;
-using Avalonia.Metadata;
+﻿using Avalonia.Metadata;
 using Martridge.Models;
 using Martridge.Models.Configuration;
 using Martridge.Models.Localization;
@@ -15,31 +14,9 @@ using Avalonia;
 using Avalonia.Platform.Storage;
 
 namespace Martridge.ViewModels.Configuration {
-    public class SettingsGeneralViewModel : ViewModelBase {
+    public class SettingsGeneralViewModel : ViewModelAppPageWithCfg {
 
         public event EventHandler? SettingsDone;
-
-        //
-        // General Configuration object...
-        //
-        public ConfigGeneral? Configuration { 
-            get => this._cfg;
-            set {
-                if (this._cfg != null) {
-                    this._cfg.Updated -= this.CfgOnUpdated;
-                }
-                this.RaiseAndSetIfChanged(ref this._cfg, value);
-                
-                if (this._cfg != null) {
-                    this._cfg.Updated += this.CfgOnUpdated;
-                    this.LoadFromConfig();
-                }
-            }
-        }
-        private ConfigGeneral? _cfg = null;
-        private void CfgOnUpdated(object? sender, EventArgs e) {
-            this.LoadFromConfig();
-        }
         
         //
         // General Configuration properties
@@ -58,16 +35,16 @@ namespace Martridge.ViewModels.Configuration {
         private bool _autoUpdateInstallerList = false;
         
         public bool ShowDmodDevFeatures {
-            get => this._ShowDmodDevFeatures;
-            set => this.RaiseAndSetIfChanged(ref this._ShowDmodDevFeatures, value);
+            get => this._showDmodDevFeatures;
+            set => this.RaiseAndSetIfChanged(ref this._showDmodDevFeatures, value);
         }
-        private bool _ShowDmodDevFeatures = false;
+        private bool _showDmodDevFeatures = false;
         
         public bool EnableOnlineFeatures {
-            get => this._EnableOnlineFeatures;
-            set => this.RaiseAndSetIfChanged(ref this._EnableOnlineFeatures, value);
+            get => this._enableOnlineFeatures;
+            set => this.RaiseAndSetIfChanged(ref this._enableOnlineFeatures, value);
         }
-        private bool _EnableOnlineFeatures = false;
+        private bool _enableOnlineFeatures = false;
 
         public bool ShowLogWindowOnStartup {
             get => this._showLogWindowOnStartup;
@@ -145,6 +122,11 @@ namespace Martridge.ViewModels.Configuration {
         private bool _isBusy = false;
         private readonly object _isBusyLock = new object();
 
+        
+        //
+        // CONSTRUCTOR
+        //
+        
         public SettingsGeneralViewModel() {
             // set current theme...
             if (Application.Current is App app) {
@@ -194,58 +176,66 @@ namespace Martridge.ViewModels.Configuration {
                 }
             } else if (e.PropertyName == nameof(this.ThemeName)) {
                 // update in configuration...
-                this.Configuration?.UpdateProperties(new Dictionary<string, object?>() {
-                    [nameof(ConfigGeneral.ThemeName)] = this.ThemeName.ToString(),
+                this.CfgGeneral?.UpdateProperties(new Dictionary<string, object?>() {
+                    [nameof(this.CfgGeneral.ThemeName)] = this.ThemeName.ToString(),
                 });
                 if (Application.Current is not App app) return;
                 app.SetCitrusThemePalette(this.ThemeName.ToString());
             }
         }
 
+        protected override void OnConfigGeneralChanged() {
+            this.LoadFromConfig();
+        }
+
+        protected override void OnCfgGeneralUpdated(object? sender, ConfigUpdateEventArgs e) {
+            this.LoadFromConfig();
+        }
+
         #region LOAD / SAVE Config
 
         private void LoadFromConfig() {
-            if (this._cfg == null) { return; }
+            if (this.CfgGeneral == null) { return; }
 
 
             ObservableCollection<string> listGameExe = new ObservableCollection<string>();
-            foreach (string str in this._cfg.GameExePaths) {
+            foreach (string str in this.CfgGeneral.GameExePaths) {
                 listGameExe.Add(str);
             }
             
             ObservableCollection<string> listEditorExe = new ObservableCollection<string>();
-            foreach (string str in this._cfg.EditorExePaths) {
+            foreach (string str in this.CfgGeneral.EditorExePaths) {
                 listEditorExe.Add(str);
             }
 
             ObservableCollection<string> listDmod = new ObservableCollection<string>();
-            foreach (string str in this._cfg.AdditionalDmodLocations) {
+            foreach (string str in this.CfgGeneral.AdditionalDmodLocations) {
                 listDmod.Add(str);
             }
 
-            if (Enum.TryParse(this._cfg.ThemeName, out ApplicationTheme theme )) {
+            if (Enum.TryParse(this.CfgGeneral.ThemeName, out ApplicationTheme theme )) {
                 this.ThemeName = theme;
             }
             
-            this.ShowLogWindowOnStartup = this._cfg.ShowLogWindowOnStartup;
-            this.ShowDmodDevFeatures = this._cfg.ShowDmodDevFeatures;
-            this.EnableOnlineFeatures = this._cfg.EnableOnlineFeatures;
-            this.UseRelativePathForSubfolders = this._cfg.UseRelativePathForSubfolders;
-            this.AutoUpdateInstallerList = this._cfg.AutoUpdateInstallerList;
+            this.ShowLogWindowOnStartup = this.CfgGeneral.ShowLogWindowOnStartup;
+            this.ShowDmodDevFeatures = this.CfgGeneral.ShowDmodDevFeatures;
+            this.EnableOnlineFeatures = this.CfgGeneral.EnableOnlineFeatures;
+            this.UseRelativePathForSubfolders = this.CfgGeneral.UseRelativePathForSubfolders;
+            this.AutoUpdateInstallerList = this.CfgGeneral.AutoUpdateInstallerList;
             this.AdditionalDmodLocationsIndex = -1;
             this.AdditionalDmodLocations = listDmod;
             this.AdditionalDmodLocationsIndex = 0;
-            this.DefaultDmodLocation = this._cfg.DefaultDmodLocation;
+            this.DefaultDmodLocation = this.CfgGeneral.DefaultDmodLocation;
             this.ActiveGameExeIndex = -1;
             this.GameExePaths = listGameExe;
-            this.ActiveGameExeIndex = this._cfg.ActiveGameExeIndex;
+            this.ActiveGameExeIndex = this.CfgGeneral.ActiveGameExeIndex;
             this.ActiveEditorExeIndex = -1;
             this.EditorExePaths = listEditorExe;
-            this.ActiveEditorExeIndex = this._cfg.ActiveEditorExeIndex;
+            this.ActiveEditorExeIndex = this.CfgGeneral.ActiveEditorExeIndex;
             
             // find and select the right localization
             foreach (CultureInfo ci in this._localizations) {
-                if (ci.Name == this._cfg.LocalizationName) {
+                if (ci.Name == this.CfgGeneral.LocalizationName) {
                     this.SelectedLocalization = ci;
                 }
             }
@@ -254,7 +244,7 @@ namespace Martridge.ViewModels.Configuration {
         }
 
         private void SaveToConfig() {
-            if (this.Configuration == null) { return; }
+            if (this.CfgGeneral == null) { return; }
 
             List<string> listGameExe = new List<string>();
             foreach (string str in this.GameExePaths) {
@@ -281,7 +271,7 @@ namespace Martridge.ViewModels.Configuration {
                 this.ActiveEditorExeIndex = 0;
             }
 
-            this.Configuration.UpdateProperties(new Dictionary<string, object?>() {
+            this.CfgGeneral.UpdateProperties(new Dictionary<string, object?>() {
                 [nameof(ConfigGeneral.ThemeName)] = this.ThemeName.ToString(),
                 [nameof(ConfigGeneral.LocalizationName)] = this._savedLocalization ?? "en-US",
                 [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
@@ -310,7 +300,7 @@ namespace Martridge.ViewModels.Configuration {
 
         [DependsOn(nameof(Configuration))]
         public bool CanCmdSettingsOk(object? parameter = null) {
-            if (this.Configuration == null) { return false; }
+            if (this.CfgGeneral == null) { return false; }
             return true;
         }
 
@@ -340,7 +330,7 @@ namespace Martridge.ViewModels.Configuration {
         //
         
         public async void CmdDefaultDmodsSet(object? parameter = null) {
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return;
             
             this.IsBusy = true;
@@ -373,7 +363,7 @@ namespace Martridge.ViewModels.Configuration {
         [DependsOn(nameof(IsBusy))]
         public bool CanCmdDefaultDmodsSet(object? parameter = null) {
             // general conditions
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return true;
@@ -385,7 +375,7 @@ namespace Martridge.ViewModels.Configuration {
         //
 
         public void CmdAdditionalDmodsRemoveSelected(object? parameter = null) {
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return;
 
             if (this.AdditionalDmodLocationsIndex >= 0 && this.AdditionalDmodLocationsIndex < this.AdditionalDmodLocations.Count) {
@@ -399,14 +389,14 @@ namespace Martridge.ViewModels.Configuration {
         [DependsOn(nameof(AdditionalDmodLocations))]
         public bool CanCmdAdditionalDmodsRemoveSelected(object? parameter = null) {
             // general conditions
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return this.AdditionalDmodLocationsIndex >= 0 && this.AdditionalDmodLocationsIndex < this.AdditionalDmodLocations.Count;
         }
 
         public async void CmdAdditionalDmodsAddNew(object? parameter = null) {
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return;
 
             this.IsBusy = true;
@@ -422,7 +412,7 @@ namespace Martridge.ViewModels.Configuration {
 
                     if (storageFolder != null)
                     {
-                        this.Configuration.AddAdditionalDmodPath(storageFolder.Path.LocalPath);
+                        this.CfgGeneral.AddAdditionalDmodPath(storageFolder.Path.LocalPath);
                     }
                 } catch (Exception ex)
                 {
@@ -439,7 +429,7 @@ namespace Martridge.ViewModels.Configuration {
         [DependsOn(nameof(IsBusy))]
         public bool CanCmdAdditionalDmodsAddNew(object? parameter = null) {
             // general conditions
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return true;
@@ -461,7 +451,7 @@ namespace Martridge.ViewModels.Configuration {
         
         public bool CanCmdSetApplicationTheme(object? parameter = null) {
             if (parameter is string themeName) {
-                if (Enum.TryParse(themeName, out ApplicationTheme themeValue )) {
+                if (Enum.TryParse(themeName, out ApplicationTheme _ )) {
                     return true;
                 }
             } else if (parameter is ApplicationTheme) {
@@ -478,7 +468,7 @@ namespace Martridge.ViewModels.Configuration {
         // Game exe paths
         //
         public void CmdGameExeRemoveSelected(object? parameter = null) {
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return;
 
             if (this.ActiveGameExeIndex >= 0 && this.ActiveGameExeIndex < this.GameExePaths.Count) {
@@ -492,7 +482,7 @@ namespace Martridge.ViewModels.Configuration {
         [DependsOn(nameof(GameExePaths))]
         public bool CanCmdGameExeRemoveSelected(object? parameter = null) {
             // general conditions
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return this.ActiveGameExeIndex >= 0 && this.ActiveGameExeIndex < this.GameExePaths.Count;
@@ -500,7 +490,7 @@ namespace Martridge.ViewModels.Configuration {
 
 
         public async void CmdGameExeAddNew(object? parameter = null) {
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return;
 
             this.IsBusy = true;
@@ -525,7 +515,7 @@ namespace Martridge.ViewModels.Configuration {
 
                     if (storageFile != null)
                     {
-                        this.Configuration.AddGameExePath(storageFile.Path.LocalPath);
+                        this.CfgGeneral.AddGameExePath(storageFile.Path.LocalPath);
                     }
                 } catch (Exception ex)
                 {
@@ -542,7 +532,7 @@ namespace Martridge.ViewModels.Configuration {
         [DependsOn(nameof(IsBusy))]
         public bool CanCmdGameExeAddNew(object? parameter = null) {
             // general conditions
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return true;
@@ -556,7 +546,7 @@ namespace Martridge.ViewModels.Configuration {
         // Editor exe paths
         //
         public void CmdEditorExeRemoveSelected(object? parameter = null) {
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return;
 
             if (this.ActiveEditorExeIndex >= 0 && this.ActiveEditorExeIndex < this.EditorExePaths.Count) {
@@ -570,7 +560,7 @@ namespace Martridge.ViewModels.Configuration {
         [DependsOn(nameof(EditorExePaths))]
         public bool CanCmdEditorExeRemoveSelected(object? parameter = null) {
             // general conditions
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return this.ActiveEditorExeIndex >= 0 && this.ActiveEditorExeIndex < this.EditorExePaths.Count;
@@ -578,7 +568,7 @@ namespace Martridge.ViewModels.Configuration {
 
 
         public async void CmdEditorExeAddNew(object? parameter = null) {
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return;
 
             this.IsBusy = true;
@@ -604,7 +594,7 @@ namespace Martridge.ViewModels.Configuration {
 
                     if (storageFile != null)
                     {
-                        this.Configuration.AddEditorExePath(storageFile.Path.LocalPath);
+                        this.CfgGeneral.AddEditorExePath(storageFile.Path.LocalPath);
                     }
                 } catch (Exception ex)
                 {
@@ -621,7 +611,7 @@ namespace Martridge.ViewModels.Configuration {
         [DependsOn(nameof(IsBusy))]
         public bool CanCmdEditorExeAddNew(object? parameter = null) {
             // general conditions
-            if (this.Configuration == null ||
+            if (this.CfgGeneral == null ||
                 this.IsBusy ) return false;
             // specific conditions
             return true;

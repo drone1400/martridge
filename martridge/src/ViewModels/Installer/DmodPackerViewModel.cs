@@ -6,21 +6,18 @@ using Martridge.ViewModels.DinkyAlerts;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Martridge.Models;
 using Martridge.Models.Configuration;
 using Martridge.Models.Dmod;
-using Martridge.Models.DmodInstaller;
 using Martridge.Models.DmodPacker;
 using ReactiveUI.Validation.Extensions;
 
 namespace Martridge.ViewModels.Installer {
-    public class DmodPackerViewModel : ViewModelBase {
+    public class DmodPackerViewModel : ViewModelAppPageWithCfg {
 
         /// <summary>
         /// A nice title to show at the top of the UI
@@ -128,7 +125,6 @@ namespace Martridge.ViewModels.Installer {
         
         private DmodPackerDoneEventArgs _packerDoneEventArgs = new DmodPackerDoneEventArgs(DinkInstallerResult.Cancelled);
         
-        private ConfigGeneral? _configGeneral = null;
         private DmodPacker? _packerLogic = null;
 
 
@@ -176,20 +172,21 @@ namespace Martridge.ViewModels.Installer {
                 },
                 Localizer.Instance["DmodPacker/ViewModel/Validation/DestinationDmodAlreadyExists"]);
         }
-
-        public void InitializeConfiguration(ConfigGeneral cfg) {
-            if (this._configGeneral != null) {
-                this._configGeneral.Updated -= this.GeneralUpdated;
-            }
-
-            this._configGeneral = cfg;
-            if (this._configGeneral != null) {
-                this._configGeneral.Updated += this.GeneralUpdated;
-            }
+        
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+            
+            if (this._packerLogic != null && this._packerLogic.PackPhase != DmodPackerPhase.Finished)
+                this._packerLogic.Cancel();
         }
 
-        private void GeneralUpdated(object? sender, EventArgs e) {
-            // TODO?...
+        protected override void OnConfigRememberChanged() {
+            if (this.CfgRemember == null) return;
+            
+            if (this._packerLogic == null || this._packerLogic.PackPhase != DmodPackerPhase.Inactive) {
+                this.TemporaryDmodSourceDirectory = this.CfgRemember.PackDmodSourcePath;
+                this.TemporaryDmodDestination = this.CfgRemember.PackDmodDestinationPath;
+            }
         }
 
         // ------------------------------------------------------------------------------------------
@@ -237,7 +234,8 @@ namespace Martridge.ViewModels.Installer {
         {
             if (this.PackerPhase != DmodPackerPhase.Finished)
                 return;
-            
+
+            this.RememberSelections();
             this.ResetPackerState();
             this.FirePackerDone();
         }
@@ -253,6 +251,7 @@ namespace Martridge.ViewModels.Installer {
             if (this._packerLogic == null)
             {
                 this._packerDoneEventArgs = new DmodPackerDoneEventArgs(DinkInstallerResult.Cancelled);
+                this.RememberSelections();
                 this.ResetPackerState();
                 this.FirePackerDone();
             }
@@ -323,7 +322,8 @@ namespace Martridge.ViewModels.Installer {
                 try
                 {
                     IStorageFolder? storageFolder = LocationHelper.BrowseFolderPicker(
-                        Localizer.Instance["DmodPacker/ViewModel/BrowseDmodSource"]);
+                        Localizer.Instance["DmodPacker/ViewModel/BrowseDmodSource"],
+                        this.TemporaryDmodSourceDirectory);
 
                     if (storageFolder != null)
                     {
@@ -356,7 +356,8 @@ namespace Martridge.ViewModels.Installer {
                             new FilePickerFileType("DMOD") {
                                 Patterns = new [] { "*.dmod" },
                             },
-                        });
+                        },
+                        this.TemporaryDmodDestination);
 
                     if (storageFile != null)
                     {
@@ -450,6 +451,21 @@ namespace Martridge.ViewModels.Installer {
             this.DmodPackerTitle = Localizer.Instance["DmodPacker/ViewModel/Title"];
             this.DmodPackerPhaseProgressPercent = 0.0;
             this.DmodPackingInProgress = false;
+        }
+
+        private void RememberSelections() {
+            try {
+                if (this.CfgRemember != null) {
+                    Dictionary<string, object?> values = new Dictionary<string, object?>() {
+                        [nameof(ConfigRemember.PackDmodSourcePath)] = this.TemporaryDmodSourceDirectory,
+                        [nameof(ConfigRemember.PackDmodDestinationPath)] = this.TemporaryDmodDestination
+                    };
+                    this.CfgRemember.UpdateProperties(values);
+                }
+            } catch (Exception ex)
+            {
+                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+            }
         }
 
         private void FirePackerDone()

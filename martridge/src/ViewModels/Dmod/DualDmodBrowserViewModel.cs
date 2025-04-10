@@ -1,7 +1,7 @@
 ﻿using ReactiveUI;
 namespace Martridge.ViewModels.Dmod
 {
-    public class DualDmodBrowserViewModel : ViewModelBase
+    public class DualDmodBrowserViewModel : ViewModelAppPage
     {
         public DmodBrowserViewModel? DmodBrowserVm {
             get => this._dmodBrowserVm;

@@ -46,13 +46,13 @@ namespace Martridge.ViewModels {
         }
         private bool _isInitialized = false;
 
-        public ViewModelBase? CurrentViewModel {
+        public ViewModelAppPage? CurrentViewModel {
             get => this._currentViewModel;
             private set => this.RaiseAndSetIfChanged(ref this._currentViewModel, value);
         }
-        private ViewModelBase? _currentViewModel = null;
+        private ViewModelAppPage? _currentViewModel = null;
 
-        private ViewModelBase? _previousViewModel = null;
+        private ViewModelAppPage? _previousViewModel = null;
 
         // ------------------------------------------------------------------------------------------
         //      Internal logic 
@@ -236,8 +236,10 @@ namespace Martridge.ViewModels {
             
             if (this._enableOnlineFeatures) {
                 DmodBrowserViewModel dbVm = new DmodBrowserViewModel();
-                dbVm.Configuration = this._config;
-                dbVm.DmodManager = this._dmodManager;
+                dbVm.DmodManager = this._dmodManager; // NOTE: initialize this first or the remembered selected DMOD won't be restored
+                dbVm.CfgGeneral = this._config?.General;
+                dbVm.CfgLaunch = this._config?.Launch;
+                dbVm.CfgRemember = this._config?.Remember;
 
                 OnlineDmodBrowserViewModel odbVm = new OnlineDmodBrowserViewModel();
                 odbVm.DmodCrawler = this._dmodCrawler;
@@ -253,8 +255,10 @@ namespace Martridge.ViewModels {
             }
             else {
                 DmodBrowserViewModel dbVm = new DmodBrowserViewModel();
-                dbVm.Configuration = this._config;
-                dbVm.DmodManager = this._dmodManager;
+                dbVm.DmodManager = this._dmodManager; // NOTE: initialize this first or the remembered selected DMOD won't be restored
+                dbVm.CfgGeneral = this._config?.General;
+                dbVm.CfgLaunch = this._config?.Launch;
+                dbVm.CfgRemember = this._config?.Remember;
                     
                 this.CurrentViewModel = dbVm;
             }
@@ -317,7 +321,7 @@ namespace Martridge.ViewModels {
                 this.SaveCurrentViewModel();
                 
                 SettingsGeneralViewModel vm = new SettingsGeneralViewModel();
-                vm.Configuration = this._config!.General;
+                vm.CfgGeneral = this._config?.General;
                 vm.SettingsDone += (_, _) => {
                     // return to previous view model...
                     // NOTE: this should also clean up the current view model...
@@ -402,7 +406,8 @@ namespace Martridge.ViewModels {
                 this.SaveCurrentViewModel();
 
                 DmodInstallerViewModel vm = new DmodInstallerViewModel();
-                vm.InitializeConfiguration(this._config!.General);
+                vm.CfgGeneral = this._config?.General;
+                vm.CfgRemember = this._config?.Remember;
                 if (parameter is string path && string.IsNullOrWhiteSpace(path) == false) {
                     vm.TemporaryDmodSource = path;
                 }
@@ -420,6 +425,7 @@ namespace Martridge.ViewModels {
 
                 this.CurrentViewModel = vm;
 
+                // only browse for DMOD if the DMOD source has not been initialized by CfgRemember ...
                 if (browseDmodImmediately) {
                     vm.CmdBrowseDmod();
                 }
@@ -450,7 +456,8 @@ namespace Martridge.ViewModels {
                 this.SaveCurrentViewModel();
 
                 DmodPackerViewModel vm = new DmodPackerViewModel();
-                vm.InitializeConfiguration(this._config!.General);
+                vm.CfgGeneral = this._config?.General;
+                vm.CfgRemember = this._config?.Remember;
                 if (parameter is string path && string.IsNullOrWhiteSpace(path) == false) {
                     vm.TemporaryDmodSourceDirectory = path;
                 }

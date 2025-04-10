@@ -17,7 +17,7 @@ using Avalonia.Threading;
 
 namespace Martridge.ViewModels.Installer
 {
-    public class DinkInstallerViewModel : ViewModelBase
+    public class DinkInstallerViewModel : ViewModelAppPage
     {
         // ------------------------------------------------------------------------------------------
         //      Progress reporting 

@@ -19,7 +19,7 @@ using ReactiveUI.Validation.Extensions;
 
 namespace Martridge.ViewModels.Installer {
     
-    public class DmodInstallerViewModel : ViewModelBase {
+    public class DmodInstallerViewModel : ViewModelAppPageWithCfg {
 
         /// <summary>
         /// A nice title to show at the top of the UI
@@ -168,7 +168,6 @@ namespace Martridge.ViewModels.Installer {
         
         private DmodInstallerDoneEventArgs _installerDoneEventArgs = new DmodInstallerDoneEventArgs(DinkInstallerResult.Cancelled);
         
-        private ConfigGeneral? _configGeneral = null;
         private DmodInstaller? _installerLogic = null;
         private readonly object _syncRoot_DesiredDmodDirectory = new object();
 
@@ -178,7 +177,7 @@ namespace Martridge.ViewModels.Installer {
         //
         
         public DmodInstallerViewModel() {
-            this.ResetInstallerStateAndFireDoneEvent(false);
+            this.ResetInstallerState();
             
             // validate source DMOD
             this.ValidationRule(x => x.TemporaryDmodSource,
@@ -224,32 +223,52 @@ namespace Martridge.ViewModels.Installer {
                 Localizer.Instance["DmodInstaller/ViewModel/Validation/DestinationAlreadyExists"]);
         }
 
-        public void InitializeConfiguration(ConfigGeneral cfg) {
-            if (this._configGeneral != null) {
-                this._configGeneral.Updated -= this.GeneralUpdated;
-            }
-
-            this._configGeneral = cfg;
-            if (this._configGeneral != null) {
-                this._configGeneral.Updated += this.GeneralUpdated;
-                this.InitializeDmodLocations();
-            }
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+            
+            if (this._installerLogic != null && this._installerLogic.InstallPhase != DmodInstallPhase.Finished)
+                this._installerLogic.Cancel();
         }
 
-        private void GeneralUpdated(object? sender, EventArgs e) {
+        protected override void OnConfigGeneralChanged() {
+            this.InitializeDmodLocations();
+        }
+        protected override void OnCfgGeneralUpdated(object? sender, ConfigUpdateEventArgs e) {
             this.InitializeDmodLocations();
         }
 
         private void InitializeDmodLocations() {
-            if (this._configGeneral == null) return;
+            if (this.CfgGeneral == null) return;
             this.BaseDestinations.Clear();
-            List<DirectoryInfo> dmodPlaces = this._configGeneral.GetRealDmodDirectories();
+            List<DirectoryInfo> dmodPlaces = this.CfgGeneral.GetRealDmodDirectories();
 
             foreach (DirectoryInfo dirInfo in dmodPlaces) {
                 this.BaseDestinations.Add(dirInfo);
             }
             
             this.SelectedBaseDestination = dmodPlaces.First();
+        }
+
+        protected override void OnConfigRememberChanged() {
+            if (this.CfgRemember == null) return;
+            
+            if (this._installerLogic == null || this._installerLogic.InstallPhase != DmodInstallPhase.Inactive) {
+                this.TemporaryDmodSource = this.CfgRemember.InstallDmodSourcePath;
+                if (string.IsNullOrWhiteSpace(this.CfgRemember.InstallDmodDestinationBaseDirectory) == false) {
+                    foreach (DirectoryInfo x in this.BaseDestinations) {
+                        if (
+#if PLATF_WINDOWS
+                            x.FullName.ToLowerInvariant() == this.CfgRemember.InstallDmodDestinationBaseDirectory.ToLowerInvariant()
+#else
+                            x.FullName == this.ConfigRemember.InstallDmodDestinationBaseDirectory
+#endif
+                        ) {
+                            this.SelectedBaseDestination = x;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         // ------------------------------------------------------------------------------------------
@@ -279,7 +298,9 @@ namespace Martridge.ViewModels.Installer {
             if (this.InstallPhase != DmodInstallPhase.Finished)
                 return;
             
-            this.ResetInstallerStateAndFireDoneEvent(true);
+            this.RememberSelections();
+            this.ResetInstallerState();
+            this.FireInstallerDoneEvent();
         }
         [DependsOn(nameof(InstallPhase))]
         public bool CanCmdFinish(object? parameter = null)
@@ -293,7 +314,9 @@ namespace Martridge.ViewModels.Installer {
             if (this._installerLogic == null)
             {
                 this._installerDoneEventArgs = new DmodInstallerDoneEventArgs(DinkInstallerResult.Cancelled);
-                this.ResetInstallerStateAndFireDoneEvent(true);
+                this.RememberSelections();
+                this.ResetInstallerState();
+                this.FireInstallerDoneEvent();
             }
             else
             {
@@ -334,7 +357,7 @@ namespace Martridge.ViewModels.Installer {
         }
 
         public async void CmdBrowseDmod(object? parameter = null) {
-            await this.BrowseDmod();
+            await this.BrowseDmodSource();
         }
 
         [DependsOn(nameof(IsFileBrowserActive))]
@@ -361,7 +384,7 @@ namespace Martridge.ViewModels.Installer {
             }
         }
         
-        private Task BrowseDmod() {
+        private Task BrowseDmodSource() {
             if (this.IsFileBrowserActive)
                 return Task.CompletedTask;
             
@@ -376,7 +399,7 @@ namespace Martridge.ViewModels.Installer {
                             new FilePickerFileType("DMOD") {
                                 Patterns = new [] { "*.dmod" },
                             },
-                        });
+                        }, this.TemporaryDmodSource);
 
                     if (storageFile != null)
                     {
@@ -409,7 +432,7 @@ namespace Martridge.ViewModels.Installer {
                     this._installerTraceListener = new MyTraceListenerGui("Installer Trace Listener");
                     this._installerTraceListener.ShowLevels = false;
                     this._installerTraceListener.Levels = MyTraceLevel.Critical | MyTraceLevel.Error | MyTraceLevel.Warning | MyTraceLevel.Information;
-                    this._installerTraceListener.PropertyChanged += ( sender,  args) => {
+                    this._installerTraceListener.PropertyChanged += ( _,  _) => {
                         this.RaisePropertyChanged(nameof(this.InstallerProgressLog));
                         this.InstallerProgressLogCaretIndex = int.MaxValue;
                     };
@@ -445,7 +468,7 @@ namespace Martridge.ViewModels.Installer {
 
         }
 
-        private void ResetInstallerStateAndFireDoneEvent(bool fireDone) {
+        private void ResetInstallerState() {
             if (this._installerLogic != null)
             {
                 this._installerLogic.CustomTrace.Flush();
@@ -469,10 +492,29 @@ namespace Martridge.ViewModels.Installer {
             this.DmodInstallerTitle = Localizer.Instance[@"DmodInstaller/ViewModel/Title"];
             this.DmodInstallerPhaseProgressPercent = 0.0;
             this.DmodInstallerInProgress = false;
+        }
 
-            if (fireDone)
+        private void RememberSelections() {
+            try {
+                if (this.CfgRemember != null) {
+                    Dictionary<string, object?> values = new Dictionary<string, object?>() {
+                        [nameof(ConfigRemember.InstallDmodSourcePath)] = this.TemporaryDmodSource,
+                        [nameof(ConfigRemember.InstallDmodDestinationBaseDirectory)] = this.SelectedBaseDestination?.FullName ?? "",
+                    };
+                    this.CfgRemember.UpdateProperties(values);
+                }
+            } catch (Exception ex)
             {
+                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+            }
+        }
+
+        private void FireInstallerDoneEvent() {
+            try {
                 this.InstallerDone?.Invoke(this, this._installerDoneEventArgs);
+            } catch (Exception ex)
+            {
+                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
             }
         }
         

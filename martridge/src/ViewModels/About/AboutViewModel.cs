@@ -9,7 +9,7 @@ using System.Reflection;
 using Martridge.Trace;
 
 namespace Martridge.ViewModels.About {
-    public class AboutViewModel : ViewModelBase
+    public class AboutViewModel : ViewModelAppPage
     {
         public event EventHandler? GoBackRequested;
 

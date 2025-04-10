@@ -4,7 +4,9 @@ namespace Martridge.Models.Configuration {
     public class Config {
         public ConfigGeneral General { get; } = new ConfigGeneral();
         public ConfigLaunch Launch { get; } = new ConfigLaunch();
-        
+
+        public ConfigRemember Remember { get; } = new ConfigRemember();
+
         // NOTE: no longer used...
         //public ConfigAlertResults AlertResults { get; } = new ConfigAlertResults();
 
@@ -12,6 +14,7 @@ namespace Martridge.Models.Configuration {
             ConfigData data = new ConfigData() {
                 General = this.General.GetData(),
                 Launch = this.Launch.GetData(),
+                Remember = this.Remember.GetData(),
                 //AlertResults = this.AlertResults.GetData(),
             };
 
@@ -25,8 +28,12 @@ namespace Martridge.Models.Configuration {
                 this.General.UpdateProperties(data.General.GetValues());
             }
             
+            if (data?.Remember != null) {
+                this.Remember.UpdateProperties(data.Remember.GetValues());
+            }
+            
             if (data?.Launch != null) {
-                this.Launch.UpdateFromData(data.Launch);
+                this.Launch.UpdateProperties(data.Launch.GetValues());
             }
 
             // if (data?.AlertResults != null) {

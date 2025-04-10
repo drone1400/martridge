@@ -102,16 +102,16 @@ namespace Martridge.Models {
         #region FilePicker stuff
 
 
-        public static IStorageFolder? BrowseFolderPicker(string title, string? baseDirectory = null)
+        public static IStorageFolder? BrowseFolderPicker(string title, string? suggestedDirectoryPath = null)
         {
             if (App.Instance?.StorageProvider is not IStorageProvider storageProvider ||
                 storageProvider.CanPickFolder == false)
                 return null;
 
             IStorageFolder? baseStorageDirectory = null;
-            if (string.IsNullOrWhiteSpace(baseDirectory) == false)
+            if (string.IsNullOrWhiteSpace(suggestedDirectoryPath) == false)
             {
-                Task<IStorageFolder?> task = storageProvider.TryGetFolderFromPathAsync(baseDirectory);
+                Task<IStorageFolder?> task = storageProvider.TryGetFolderFromPathAsync(suggestedDirectoryPath);
                 task.Wait();
                 baseStorageDirectory = task.Result;
             }
@@ -129,25 +129,37 @@ namespace Martridge.Models {
             return null;
         }
 
-        public static IStorageFile? BrowseFileOpen(string title, IReadOnlyList<FilePickerFileType>? fileTypes, string? baseDirectory = null)
+        public static IStorageFile? BrowseFileOpen(string title, IReadOnlyList<FilePickerFileType>? fileTypes, string? suggestedFilePath = null)
         {
             if (App.Instance?.StorageProvider is not IStorageProvider storageProvider ||
                 storageProvider.CanOpen == false)
                 return null;
             
-            IStorageFolder? baseStorageDirectory = null;
-            if (string.IsNullOrWhiteSpace(baseDirectory) == false)
+            IStorageFolder? suggestedStorageDirectory = null;
+            string? suggestedFileName = null;
+            if (string.IsNullOrWhiteSpace(suggestedFilePath) == false)
             {
-                Task<IStorageFolder?> task = storageProvider.TryGetFolderFromPathAsync(baseDirectory);
-                task.Wait();
-                baseStorageDirectory = task.Result;
+                Task<IStorageFile?> taskFile = storageProvider.TryGetFileFromPathAsync(suggestedFilePath);
+                taskFile.Wait();
+                
+                Task<IStorageFolder?> taskDir = taskFile.Result != null
+                    ? taskFile.Result.GetParentAsync()
+                    : storageProvider.TryGetFolderFromPathAsync(suggestedFilePath);
+                taskDir.Wait();
+
+                if (taskFile.Result != null) { 
+                    suggestedFileName = taskFile.Result.Name;
+                } else if (taskDir.Result != null) {
+                    suggestedStorageDirectory = taskDir.Result;
+                }
             }
             
             FilePickerOpenOptions fpo = new FilePickerOpenOptions() {
                 Title = title,
                 AllowMultiple = false,
                 FileTypeFilter = fileTypes,
-                SuggestedStartLocation = baseStorageDirectory,
+                SuggestedStartLocation = suggestedStorageDirectory,
+                SuggestedFileName = suggestedFileName,
             };
             
 
@@ -161,24 +173,36 @@ namespace Martridge.Models {
             return null;
         }
         
-        public static IStorageFile? BrowseFileSave(string title, IReadOnlyList<FilePickerFileType>? fileTypes, string? baseDirectory = null)
+        public static IStorageFile? BrowseFileSave(string title, IReadOnlyList<FilePickerFileType>? fileTypes, string? suggestedFilePath = null)
         {
             if (App.Instance?.StorageProvider is not IStorageProvider storageProvider ||
                 storageProvider.CanSave == false)
                 return null;
             
-            IStorageFolder? baseStorageDirectory = null;
-            if (string.IsNullOrWhiteSpace(baseDirectory) == false)
+            IStorageFolder? suggestedStorageDirectory = null;
+            string? suggestedFileName = null;
+            if (string.IsNullOrWhiteSpace(suggestedFilePath) == false)
             {
-                Task<IStorageFolder?> task = storageProvider.TryGetFolderFromPathAsync(baseDirectory);
-                task.Wait();
-                baseStorageDirectory = task.Result;
+                Task<IStorageFile?> taskFile = storageProvider.TryGetFileFromPathAsync(suggestedFilePath);
+                taskFile.Wait();
+                
+                Task<IStorageFolder?> taskDir = taskFile.Result != null
+                    ? taskFile.Result.GetParentAsync()
+                    : storageProvider.TryGetFolderFromPathAsync(suggestedFilePath);
+                taskDir.Wait();
+
+                if (taskFile.Result != null) { 
+                    suggestedFileName = taskFile.Result.Name;
+                } else if (taskDir.Result != null) {
+                    suggestedStorageDirectory = taskDir.Result;
+                }
             }
             
             FilePickerSaveOptions fpo = new FilePickerSaveOptions() {
                 Title = title,
                 FileTypeChoices = fileTypes,
-                SuggestedStartLocation = baseStorageDirectory,
+                SuggestedStartLocation = suggestedStorageDirectory,
+                SuggestedFileName = suggestedFileName,
             };
             
 

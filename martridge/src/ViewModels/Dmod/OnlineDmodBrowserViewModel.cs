@@ -23,7 +23,7 @@ namespace Martridge.ViewModels.Dmod {
         }
     }
     
-    public class OnlineDmodBrowserViewModel : ViewModelBase {
+    public class OnlineDmodBrowserViewModel : ViewModelAppPage {
 
         public event EventHandler<InstallOnlineDmodEventArgs>? InstallDmodRequested; 
 

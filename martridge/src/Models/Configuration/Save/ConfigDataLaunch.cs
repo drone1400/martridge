@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 namespace Martridge.Models.Configuration.Save {
     public class ConfigDataLaunch {
         
@@ -50,5 +51,20 @@ namespace Martridge.Models.Configuration.Save {
         /// Skip update check and stuff in DinkHD
         /// </summary>
         public bool? Skip { get; set; }
+        
+        public Dictionary<string, object?> GetValues() {
+            return new Dictionary<string, object?>() {
+                [nameof(ConfigLaunch.CustomUserArguments)] = this.CustomUserArguments,
+                [nameof(ConfigLaunch.UsePathQuotationMarks)] = this.UsePathQuotationMarks,
+                [nameof(ConfigLaunch.UsePathRelativeToGame)] = this.UsePathRelativeToGame,
+                [nameof(ConfigLaunch.TrueColor)] = this.TrueColor,
+                [nameof(ConfigLaunch.Windowed)] = this.Windowed,
+                [nameof(ConfigLaunch.Sound)] = this.Sound,
+                [nameof(ConfigLaunch.Joystick)] = this.Joystick,
+                [nameof(ConfigLaunch.Debug)] = this.Debug,
+                [nameof(ConfigLaunch.V107Mode)] = this.V107Mode,
+                [nameof(ConfigLaunch.Skip)] = this.Skip,
+            };
+        }
     }
 }

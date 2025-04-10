@@ -4,7 +4,7 @@ using Martridge.ViewModels.DinkyAlerts;
 using Martridge.ViewModels.DinkyGraphics;
 namespace Martridge.ViewModels.Dmod
 {
-    public class NoDinkyLinuxViewModel : ViewModelBase
+    public class NoDinkyLinuxViewModel : ViewModelAppPage
     {
         public event EventHandler? ShowConfigurationPageRequested;
         

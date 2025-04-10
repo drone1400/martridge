@@ -1,119 +1,104 @@
 ﻿using Martridge.Models.Configuration.Save;
 using System;
+using System.Collections.Generic;
 
 namespace Martridge.Models.Configuration {
-    public class ConfigLaunch {
-
-        public event EventHandler? Updated;
+    public class ConfigLaunch : IConfigGeneric{
+        public event EventHandler<ConfigUpdateEventArgs>? Updated;
 
         /// <summary>
         /// Additional custom user arguments
         /// </summary>
-        public string CustomUserArguments { get ; private set; } = "";
+        public string CustomUserArguments => this._customUserArguments;
+        private string _customUserArguments = string.Empty;
 
         /// <summary>
         /// Use quotation marks in the path (works only for DinkHD after 1.97 and FreeDink versions)
         /// </summary>
-        public bool UsePathQuotationMarks { get; private set; } = false;
+        public bool UsePathQuotationMarks => this._usePathQuotationMarks;
+        private bool _usePathQuotationMarks = false;
 
         /// <summary>
         /// Make the DMOD path relative to the chosen Dink Launcher
         /// </summary>
-        public bool UsePathRelativeToGame { get; private set; } = true;
+        public bool UsePathRelativeToGame => this._usePathRelativeToGame;
+        private bool _usePathRelativeToGame = false;
 
         /// <summary>
         /// Launches the game in true color mode
         /// </summary>
-        public bool TrueColor { get; private set; } = true;
+        public bool TrueColor => this._trueColor;
+        private bool _trueColor = false;
         
         /// <summary>
         /// Launches the game in windowed mode
         /// </summary>
-        public bool Windowed { get; private set; } = true;
+        public bool Windowed => this._windowed;
+        private bool _windowed = false;
         
         /// <summary>
         /// Launches the game with sound
         /// </summary>
-        public bool Sound { get; private set; } = true;
+        public bool Sound => this._sound;
+        private bool _sound = false;
         
         /// <summary>
         /// Launches the game with (questionable?) joystick support
         /// </summary>
-        public bool Joystick { get; private set; } = true;
+        public bool Joystick => this._joystick;
+        private bool _joystick = false;
         
         /// <summary>
         /// Launches the game in DEBUG mode
         /// </summary>
-        public bool Debug { get; private set; } = false;
+        public bool Debug => this._debug;
+        private bool _debug = false;
         
         /// <summary>
         /// Launches the game in V1.07 compatibility mode
         /// </summary>
-        public bool V107Mode { get; private set; } = false;
-        private void FireUpdatedEvent() {
-            this.Updated?.Invoke(this, EventArgs.Empty);
-        }
+        public bool V107Mode => this._v107Mode;
+        private bool _v107Mode = false;
         
         /// <summary>
         /// Skip update check and stuff in DinkHD
         /// </summary>
-        public bool Skip { get; private set; } = true;
+        public bool Skip => this._skip;
+        private bool _skip = false;
 
-        public void UpdateFromData(ConfigDataLaunch data) {
-            bool hasChanges = false;
-            if (data.TrueColor != null && this.TrueColor != data.TrueColor) {
-                this.TrueColor = (bool)data.TrueColor;
-                hasChanges = true;
-            }
-            
-            if (data.Windowed != null && this.Windowed != data.Windowed) {
-                this.Windowed = (bool)data.Windowed;
-                hasChanges = true;
-            }
-            
-            if (data.Sound != null && this.Sound != data.Sound) {
-                this.Sound = (bool)data.Sound;
-                hasChanges = true;
-            }
-            
-            if (data.Joystick != null && this.Joystick != data.Joystick) {
-                this.Joystick = (bool)data.Joystick;
-                hasChanges = true;
-            }
-            
-            if (data.Debug != null && this.Debug != data.Debug) {
-                this.Debug = (bool)data.Debug;
-                hasChanges = true;
-            }
-            
-            if (data.V107Mode != null && this.V107Mode != data.V107Mode) {
-                this.V107Mode = (bool)data.V107Mode;
-                hasChanges = true;
-            }
-            
-            if (data.UsePathQuotationMarks != null && this.UsePathQuotationMarks != data.UsePathQuotationMarks) {
-                this.UsePathQuotationMarks = (bool)data.UsePathQuotationMarks;
-                hasChanges = true;
-            }
-            
-            if (data.UsePathRelativeToGame != null && this.UsePathRelativeToGame != data.UsePathRelativeToGame) {
-                this.UsePathRelativeToGame = (bool)data.UsePathRelativeToGame;
-                hasChanges = true;
-            }
-            
-            if (data.CustomUserArguments != null && this.CustomUserArguments != data.CustomUserArguments) {
-                this.CustomUserArguments = data.CustomUserArguments;
-                hasChanges = true;
-            }
-            
-            if (data.Skip is bool skip && this.Skip != skip) {
-                this.Skip = skip;
-                hasChanges = true;
+        
+        public void UpdateProperties(Dictionary<string, object?> newValues) {
+            List<string> updatedProperties = new List<string>();
+
+            void TryUpdateGeneric<T>(KeyValuePair<string, object?> kvp, ref T myValue) {
+                if (kvp.Value is T value && myValue!.Equals(value) == false) {
+                    myValue = value;
+                    updatedProperties.Add(kvp.Key);
+                }
             }
 
-            if (hasChanges) {
-                this.FireUpdatedEvent();
+            foreach (var kvp in newValues) {
+                switch (kvp.Key) {
+                    case nameof(this.CustomUserArguments): TryUpdateGeneric(kvp, ref this._customUserArguments); break;
+                    case nameof(this.UsePathQuotationMarks): TryUpdateGeneric(kvp, ref this._usePathQuotationMarks); break;
+                    case nameof(this.UsePathRelativeToGame): TryUpdateGeneric(kvp, ref this._usePathRelativeToGame); break;
+                    case nameof(this.TrueColor): TryUpdateGeneric(kvp, ref this._trueColor); break;
+                    case nameof(this.Windowed): TryUpdateGeneric(kvp, ref this._windowed); break; 
+                    case nameof(this.Sound): TryUpdateGeneric(kvp, ref this._sound); break; 
+                    case nameof(this.Joystick): TryUpdateGeneric(kvp, ref this._joystick); break; 
+                    case nameof(this.Debug): TryUpdateGeneric(kvp, ref this._debug); break; 
+                    case nameof(this.V107Mode): TryUpdateGeneric(kvp, ref this._v107Mode); break; 
+                    case nameof(this.Skip): TryUpdateGeneric(kvp, ref this._skip); break; 
+                }
             }
+            
+            if (updatedProperties.Count > 0) {
+                this.FireUpdatedEvent(updatedProperties);
+            }
+        }
+        
+        private void FireUpdatedEvent(List<string> updatedProperties) {
+            this.Updated?.Invoke(this, new ConfigUpdateEventArgs(updatedProperties));
         }
         
         public ConfigDataLaunch GetData() {

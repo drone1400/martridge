@@ -195,7 +195,8 @@ namespace Martridge {
         }
 
         private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e) {
-
+            // save config when closing in order to save ConfigRemember
+            this._config.SaveToFile(this._defaultConfigFile);
         }
 
         private void MainWindow_Closed(object? sender, EventArgs e) {

@@ -53,6 +53,9 @@ namespace Martridge.ViewModels {
         private ViewModelAppPage? _currentViewModel = null;
 
         private ViewModelAppPage? _previousViewModel = null;
+        
+        
+        private DmodBrowserViewModel? _dmodBrowserViewModel = null;
 
         // ------------------------------------------------------------------------------------------
         //      Internal logic 
@@ -71,26 +74,39 @@ namespace Martridge.ViewModels {
             this.EnableDmodDeveloperFeatures = this._config.General.ShowDmodDevFeatures;
             this.EnableOnlineFeatures = this._config.General.EnableOnlineFeatures;
             
-            this._dmodManager = new DmodManager();
-            this._dmodManager.Initialize(this._config.General);
-
+            this.PropertyChanged += this.OnPropertyChanged;
+            
             if (this.EnableOnlineFeatures) {
                 this._dmodCrawler = new DmodCrawler();
                 _ = this._dmodCrawler.InitializeDmodLists(false); // no await
             }
+            
+            this._dmodManager = new DmodManager();
+            this._dmodManager.Initialize(this._config.General).ContinueWith((_) => {
+                try {
+                    // initialize view models after dmod manager is done initializing so that the selected DMOD remember feature works properly...
+                    
+                    // NOTE: unlike the other app page view models, always keep the DMOD browser VM around... 
+                    this._dmodBrowserViewModel = new DmodBrowserViewModel();
+                    this._dmodBrowserViewModel.DmodManager = this._dmodManager; // NOTE: initialize this first or the remembered selected DMOD won't be restored
+                    this._dmodBrowserViewModel.CfgGeneral = this._config?.General;
+                    this._dmodBrowserViewModel.CfgLaunch = this._config?.Launch;
+                    this._dmodBrowserViewModel.CfgRemember = this._config?.Remember;
 
-            this.InitializeMainViewModel();
+                    this.InitializeMainViewModel();
             
-            this.IsInitialized = true;
-            
-            this.PropertyChanged += this.OnPropertyChanged;
+                    this.IsInitialized = true;
+                } catch (Exception ex) {
+                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                }
+            });
         }
         private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
             if (e.PropertyName == nameof(this.EnableOnlineFeatures)) {
                 if (this.EnableOnlineFeatures == false) {
                     // TODO make sure no online features are being used...
                     if (this._previousViewModel is DualDmodBrowserViewModel or OnlineDmodBrowserViewModel) {
-                        this._previousViewModel?.Dispose();
+                        this.SafeDisposeViewModel(ref this._previousViewModel);
                         this._previousViewModel = null;
                     }
 
@@ -106,7 +122,7 @@ namespace Martridge.ViewModels {
                 else {
                     // make sure we are using online features...
                     if (this._previousViewModel is DmodBrowserViewModel) {
-                        this._previousViewModel?.Dispose();
+                        this.SafeDisposeViewModel(ref this._previousViewModel);
                         this._previousViewModel = null;
                     }
                     if (this.CurrentViewModel is DmodBrowserViewModel) {
@@ -201,14 +217,21 @@ namespace Martridge.ViewModels {
         #region Commands for switching view models
 
         private void SaveCurrentViewModel() {
-            this._previousViewModel?.Dispose();
+            this.SafeDisposeViewModel(ref this._previousViewModel);
             this._previousViewModel = this.CurrentViewModel;
+        }
+
+        private void SafeDisposeViewModel(ref ViewModelAppPage? viewModel) {
+            // NOTE: Don't ever dispose the dmod browser view model!!!
+            if (object.ReferenceEquals(this._dmodBrowserViewModel, viewModel)) 
+                return;
+            viewModel?.Dispose();
         }
         
         private void InitializeMainViewModel() {
             
             // make sure current view model is gone first...
-            this.CurrentViewModel?.Dispose();
+            this.SafeDisposeViewModel(ref this._currentViewModel);
             this.CurrentViewModel = null;
 
             if (this._config!.General.GameExePaths.Count == 0) {
@@ -235,12 +258,6 @@ namespace Martridge.ViewModels {
             }
             
             if (this._enableOnlineFeatures) {
-                DmodBrowserViewModel dbVm = new DmodBrowserViewModel();
-                dbVm.DmodManager = this._dmodManager; // NOTE: initialize this first or the remembered selected DMOD won't be restored
-                dbVm.CfgGeneral = this._config?.General;
-                dbVm.CfgLaunch = this._config?.Launch;
-                dbVm.CfgRemember = this._config?.Remember;
-
                 OnlineDmodBrowserViewModel odbVm = new OnlineDmodBrowserViewModel();
                 odbVm.DmodCrawler = this._dmodCrawler;
                 odbVm.InstallDmodRequested += (_, args) => {
@@ -248,32 +265,26 @@ namespace Martridge.ViewModels {
                 };
 
                 DualDmodBrowserViewModel vm = new DualDmodBrowserViewModel();
-                vm.DmodBrowserVm = dbVm;
+                vm.DmodBrowserVm = this._dmodBrowserViewModel;
                 vm.OnlineDmodBrowserVm = odbVm;
 
                 this.CurrentViewModel = vm;
             }
             else {
-                DmodBrowserViewModel dbVm = new DmodBrowserViewModel();
-                dbVm.DmodManager = this._dmodManager; // NOTE: initialize this first or the remembered selected DMOD won't be restored
-                dbVm.CfgGeneral = this._config?.General;
-                dbVm.CfgLaunch = this._config?.Launch;
-                dbVm.CfgRemember = this._config?.Remember;
-                    
-                this.CurrentViewModel = dbVm;
+                this.CurrentViewModel = this._dmodBrowserViewModel;
             }
         }
 
         private void RestorePreviousViewModel() {
             
-            this.CurrentViewModel?.Dispose();
+            this.SafeDisposeViewModel(ref this._currentViewModel);
             this.CurrentViewModel = null;
 
             if (this._previousViewModel != null) {
                 if (this._previousViewModel is NoDinkyViewModel or NoDinkyLinuxViewModel) {
                     if (this._config!.General.GameExePaths.Count > 0) {
                         // we now have the Dinky!
-                        this._previousViewModel.Dispose();
+                        this.SafeDisposeViewModel(ref this._previousViewModel);
                         this._previousViewModel = null;
 
                         this.InitializeMainViewModel();
@@ -420,7 +431,11 @@ namespace Martridge.ViewModels {
                     // if DMOD installed successfully, reinitialize dmod manager lists...
                     if (args.Result == DinkInstallerResult.Success) {
                         // refresh dmods...
-                        this._dmodManager?.Initialize(this._config!.General);
+                        this._dmodManager?.Initialize(this._config!.General).ContinueWith((_) =>
+                        {
+                            // select DMOD after installing!
+                            this._dmodBrowserViewModel?.InitializeSelectedDmod(args.Destination?.FullName ?? string.Empty);
+                        });
                     }
                 };
 

@@ -564,7 +564,7 @@ namespace Martridge.ViewModels.Installer {
                     case DmodInstallPhase.Finished:
                     {
                         // just finished overall...
-                        this._installerDoneEventArgs = new DmodInstallerDoneEventArgs(installer.InstallResult, installer.SourceFile, installer.InstallDestination);
+                        this._installerDoneEventArgs = new DmodInstallerDoneEventArgs(installer.InstallResult, installer.SourceFile, installer.InstallationFinalDestination ?? installer.InstallDestination);
                         if (installer.InstallResult == DinkInstallerResult.Cancelled) this.ShowInstallerCancelledMessageBox();
                         if (installer.InstallResult == DinkInstallerResult.Error) this.ShowInstallerErrorMessageBox(installer.InstallException);
                         break;

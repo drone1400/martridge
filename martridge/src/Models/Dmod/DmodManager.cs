@@ -15,8 +15,8 @@ namespace Martridge.Models.Dmod {
 
 
 
-        public void Initialize(ConfigGeneral cfg) {
-            Task task = new Task(() => { 
+        public Task Initialize(ConfigGeneral cfg) {
+            return Task.Run(() => { 
                 try {
                     Dictionary<string, DmodFileDefinition> tempAddedDirectories = new Dictionary<string, DmodFileDefinition>();
                     List<DmodFileDefinition> tempSymbolicLinks = new List<DmodFileDefinition>();
@@ -46,7 +46,6 @@ namespace Martridge.Models.Dmod {
                     this.DmodListInitialized?.Invoke(this, EventArgs.Empty);
                 }
             });
-            task.Start();
         }
 
         private static void ScanDirectoryForDmods(DirectoryInfo dirInfo, Dictionary<string, DmodFileDefinition> normalDmodDirs, List<DmodFileDefinition> symbolicLinkDmods) {

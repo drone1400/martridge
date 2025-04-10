@@ -27,6 +27,7 @@ namespace Martridge.Models.DmodInstaller {
         public string? DmodRootName => this._dmodRootDirName;
         
         // data that gets set during installation...
+        public DirectoryInfo? InstallationFinalDestination => this._installationFinalDestination;
         public DirectoryInfo? InstallDestination => this._installationDestination;
         public string? DestinationOverride => this._destinationOverride;
         public DinkInstallerResult InstallResult => this._installResult;
@@ -44,6 +45,7 @@ namespace Martridge.Models.DmodInstaller {
         private readonly List<string> _archiveTopLevelEntries = new List<string>();
         private string? _dmodRootDirName = null;
 
+        private DirectoryInfo? _installationFinalDestination = null;
         private DirectoryInfo? _installationDestination = null;
         private string? _destinationOverride = null;
         private DinkInstallerResult _installResult = DinkInstallerResult.Error;
@@ -470,7 +472,6 @@ namespace Martridge.Models.DmodInstaller {
                 }
                 
                 // extracting DMOD
-                this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodExtractStart"], $"    \"{this._sourceFile.FullName}\"", $"    \"{destinationDirectory.FullName}\"");
                 this.ReportActivityStart();
                 this.ExtractDmod(allowOverwrite);
                 this.ReportActivityEnd();
@@ -551,6 +552,15 @@ namespace Martridge.Models.DmodInstaller {
             string archiveName = this._tempTarArchive == null 
                 ? this._sourceFile.FullName
                 : this._tempTarArchive.FullName;
+
+            string finalDestination = this._installationDestination.FullName;
+            if (doTopLevelAppend) finalDestination = Path.Combine(finalDestination, topLevelOverride, this._dmodRootDirName ?? string.Empty);
+            else if (doTopLevelReplace) finalDestination = Path.Combine(finalDestination, topLevelOverride);
+            else Path.Combine(finalDestination,  this._dmodRootDirName ?? string.Empty);
+
+            this._installationFinalDestination = new DirectoryInfo(finalDestination);
+            
+            this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodExtractStart"], $"    \"{this._sourceFile.FullName}\"", $"    \"{finalDestination}\"");
 
             using FileStream fs = new FileStream(archiveName, FileMode.Open, FileAccess.Read);
             using IReader reader = ReaderFactory.Open(fs);

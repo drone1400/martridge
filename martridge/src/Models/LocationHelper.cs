@@ -8,6 +8,14 @@ using Avalonia.Platform.Storage;
 
 namespace Martridge.Models {
 
+    [Flags]
+    public enum LocationHelperPathCompareFlags : int {
+        None = 0,
+        IgnoreCaseAlways = 1,
+        IgnoreCaseNever = 2,
+        IgnoreDirectorySeparator = 4,
+    }
+
     public static class LocationHelper {
         public static string AppBaseDirectory { get => _appBaseDirectory; }
         private static readonly string _appBaseDirectory;
@@ -98,6 +106,27 @@ namespace Martridge.Models {
             }
             return newPaths;
         }
+
+        public static bool PathIsEqual(string? path1, string? path2, LocationHelperPathCompareFlags flags = LocationHelperPathCompareFlags.None) {
+            if (path1 == null || path2 == null) return false;
+            
+            if (flags.HasFlag(LocationHelperPathCompareFlags.IgnoreDirectorySeparator)) {
+                path1 = Path.TrimEndingDirectorySeparator(path1);
+                path2 = Path.TrimEndingDirectorySeparator(path2);
+            }
+            
+            if (flags.HasFlag(LocationHelperPathCompareFlags.IgnoreCaseAlways)) {
+                return path1.Equals(path2, StringComparison.InvariantCultureIgnoreCase);
+            }
+            if (flags.HasFlag(LocationHelperPathCompareFlags.IgnoreCaseNever)) {
+                return path1.Equals(path2, StringComparison.InvariantCulture);
+            }
+#if PLATF_WINDOWS
+            return path1.Equals(path2, StringComparison.InvariantCultureIgnoreCase);
+#else
+            return path1.Equals(path2, StringComparison.InvariantCulture);
+#endif
+        }
         
         #region FilePicker stuff
 
@@ -125,7 +154,7 @@ namespace Martridge.Models {
             IReadOnlyList<IStorageFolder> results = storageProvider.OpenFolderPickerAsync(fpo).Result;
             if (results.Count > 0)
                 return results[0];
-            
+        
             return null;
         }
 

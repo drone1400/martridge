@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Collections;
+using Martridge.Models;
 
 namespace Martridge.ViewModels.Dmod {
     
@@ -92,7 +93,7 @@ namespace Martridge.ViewModels.Dmod {
         protected override void OnConfigGeneralChanged() {
             this.LoadFromConfigGeneral();
 
-            this.InitializeSelectedDmod();
+            this.InitializeSelectedDmodFromRemembered();
         }
         protected override void OnCfgGeneralUpdated(object? sender, ConfigUpdateEventArgs e) {
             this.LoadFromConfigGeneral();
@@ -107,22 +108,25 @@ namespace Martridge.ViewModels.Dmod {
         }
 
         protected override void OnConfigRememberChanged() {
-            this.InitializeSelectedDmod();
+            this.InitializeSelectedDmodFromRemembered();
         }
 
         protected override void OnCfgRememberUpdated(object? sender, ConfigUpdateEventArgs e) {
             // don't care...
         }
 
-        private void InitializeSelectedDmod() {
-            if (this.CfgRemember == null) return;
-            
+
+        public void InitializeSelectedDmod(string dmodPath) {
             foreach (var dmod in this.DmodDefinitionsFiltered) {
-                if (dmod.DmodDirectory == this.CfgRemember.DmodBrowserSelectedDmodPath) {
+                if (LocationHelper.PathIsEqual(dmod.DmodDirectory, dmodPath, LocationHelperPathCompareFlags.IgnoreDirectorySeparator)) {
                     this.SelectedDmodDefinition = dmod;
                     return;
                 }
             }
+        }
+        private void InitializeSelectedDmodFromRemembered() {
+            if (this.CfgRemember == null) return;
+            this.InitializeSelectedDmod(this.CfgRemember.DmodBrowserSelectedDmodPath);
         }
 
         #endregion
@@ -524,12 +528,7 @@ namespace Martridge.ViewModels.Dmod {
                 this.DmodDefinitionsFiltered = dmods.AsEnumerable();
 
                 // restore selected dmod!
-                foreach (var def in this.DmodDefinitionsFiltered) {
-                    if (def.DmodDirectory == oldSelPath) {
-                        this.SelectedDmodDefinition = def;
-                        break;
-                    }
-                }
+                this.InitializeSelectedDmod(oldSelPath);
             }
             
             this._lastusedDmodDefinitions = newDmodList;

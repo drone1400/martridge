@@ -149,7 +149,9 @@ namespace Martridge.Models {
 
                 if (taskFile.Result != null) { 
                     suggestedFileName = taskFile.Result.Name;
-                } else if (taskDir.Result != null) {
+                } 
+                
+                if (taskDir.Result != null) {
                     suggestedStorageDirectory = taskDir.Result;
                 }
             }
@@ -193,7 +195,9 @@ namespace Martridge.Models {
 
                 if (taskFile.Result != null) { 
                     suggestedFileName = taskFile.Result.Name;
-                } else if (taskDir.Result != null) {
+                } 
+                
+                if (taskDir.Result != null) {
                     suggestedStorageDirectory = taskDir.Result;
                 }
             }

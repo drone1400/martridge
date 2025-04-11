@@ -20,13 +20,13 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(IsWindows)'=='true'">
-        <DefineConstants>PLATF_WINDOWS</DefineConstants>
+        <DefineConstants>$(DefineConstants);PLATF_WINDOWS</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition="'$(IsMacOs)'=='true'">
-        <DefineConstants>PLATF_MACOS</DefineConstants>
+        <DefineConstants>$(DefineConstants);PLATF_MACOS</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition="'$(IsLinux)'=='true'">
-        <DefineConstants>PLATF_LINUX</DefineConstants>
+        <DefineConstants>$(DefineConstants);PLATF_LINUX</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup>

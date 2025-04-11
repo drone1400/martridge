@@ -226,6 +226,8 @@ namespace Martridge {
                 this._mainWindow.Closed += this.MainWindow_Closed;
                 this._mainWindow.Closing += this.MainWindow_Closing;
                 this._mainWindow.Show();
+                
+                this._mainWindowViewModel.InitializeDragAndDrop(this._mainWindow);
             } else {
                 this._mainWindow.Activate();
             }

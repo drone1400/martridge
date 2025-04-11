@@ -20,68 +20,76 @@
         KeyDown="KeyDownHandler">
 
     <Design.DataContext>
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
     <Window.Styles>
-        <StyleInclude Source="avares://martridge/AppStyles.axaml"/>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </Window.Styles>
 
-    <Grid RowDefinitions="Auto,*">
-        
-        <Menu Grid.Row="0">
-            <MenuItem Header="{dloc:Localize MainWindow/MenuFile}">
-                <MenuItem Header="{dloc:Localize MainWindow/MenuDmodInstaller}"
-                          Command="{Binding CmdShowPageDmodInstallerAndBrowse}"/>
-                <MenuItem Header="{dloc:Localize MainWindow/MenuDmodPacker}"
-                          Command="{Binding CmdShowPageDmodPackerAndBrowse}"
-                          IsVisible="{Binding EnableDmodDeveloperFeatures}"
-                          IsEnabled="{Binding EnableDmodDeveloperFeatures}"/>
-                <MenuItem Header="{dloc:Localize MainWindow/MenuDinkInstaller}"
-                          Command="{Binding CmdShowPageDinkInstaller}"
-                          IsVisible="{Binding EnableOnlineFeatures}"
-                          IsEnabled="{Binding EnableOnlineFeatures}"/>
-                <MenuItem Header="{dloc:Localize MainWindow/MenuLogWindow}"
-                          Command="{Binding CmdShowLogWindow}"/>
-                <MenuItem Header="{dloc:Localize MainWindow/MenuExit}"
-                          Click="CloseWindow"/>
-            </MenuItem>
+    <Border
+        Margin="0"
+        Padding="0"
+        Background="Transparent"
+        BorderBrush="Transparent"
+        BorderThickness="0"
+        CornerRadius="0"
+        DragDrop.AllowDrop="True">
+        <Grid RowDefinitions="Auto,*">
+            <Menu Grid.Row="0">
+                <MenuItem Header="{dloc:Localize MainWindow/MenuFile}">
+                    <MenuItem Header="{dloc:Localize MainWindow/MenuDmodInstaller}"
+                              Command="{Binding CmdShowPageDmodInstallerAndBrowse}" />
+                    <MenuItem Header="{dloc:Localize MainWindow/MenuDmodPacker}"
+                              Command="{Binding CmdShowPageDmodPackerAndBrowse}"
+                              IsVisible="{Binding EnableDmodDeveloperFeatures}"
+                              IsEnabled="{Binding EnableDmodDeveloperFeatures}" />
+                    <MenuItem Header="{dloc:Localize MainWindow/MenuDinkInstaller}"
+                              Command="{Binding CmdShowPageDinkInstaller}"
+                              IsVisible="{Binding EnableOnlineFeatures}"
+                              IsEnabled="{Binding EnableOnlineFeatures}" />
+                    <MenuItem Header="{dloc:Localize MainWindow/MenuLogWindow}"
+                              Command="{Binding CmdShowLogWindow}" />
+                    <MenuItem Header="{dloc:Localize MainWindow/MenuExit}"
+                              Click="CloseWindow" />
+                </MenuItem>
 
-            <MenuItem Header="{dloc:Localize MainWindow/MenuSettings}"
-                      Command="{Binding CmdShowPageSettings}"/>
-            
-            <MenuItem Header="{dloc:Localize MainWindow/MenuTheme}">
-                <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Citrus}"
-                          Command="{Binding CmdChangeTheme}"
-                          CommandParameter="{x:Static martridge:ApplicationTheme.Citrus}"/>
-                
-                <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Sea}"
-                          Command="{Binding CmdChangeTheme}"
-                          CommandParameter="{x:Static martridge:ApplicationTheme.Sea}"/>
-                
-                <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Rust}"
-                          Command="{Binding CmdChangeTheme}"
-                          CommandParameter="{x:Static martridge:ApplicationTheme.Rust}"/>
-                
-                <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Candy}"
-                          Command="{Binding CmdChangeTheme}"
-                          CommandParameter="{x:Static martridge:ApplicationTheme.Candy}"/>
-                
-                <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Magma}"
-                          Command="{Binding CmdChangeTheme}"
-                          CommandParameter="{x:Static martridge:ApplicationTheme.Magma}"/>
-            </MenuItem>
+                <MenuItem Header="{dloc:Localize MainWindow/MenuSettings}"
+                          Command="{Binding CmdShowPageSettings}" />
 
-            <MenuItem Header="{dloc:Localize MainWindow/MenuAbout}"
-                      Command="{Binding CmdShowPageAbout}"/>
+                <MenuItem Header="{dloc:Localize MainWindow/MenuTheme}">
+                    <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Citrus}"
+                              Command="{Binding CmdChangeTheme}"
+                              CommandParameter="{x:Static martridge:ApplicationTheme.Citrus}" />
 
-        </Menu>
-        
-        <Grid Grid.Row="1">
-            <ContentControl Content="{Binding CurrentViewModel}">
-                <ContentControl.DataTemplates>
-                    <vm:MainViewLocator/>
-                </ContentControl.DataTemplates>
-            </ContentControl>
+                    <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Sea}"
+                              Command="{Binding CmdChangeTheme}"
+                              CommandParameter="{x:Static martridge:ApplicationTheme.Sea}" />
+
+                    <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Rust}"
+                              Command="{Binding CmdChangeTheme}"
+                              CommandParameter="{x:Static martridge:ApplicationTheme.Rust}" />
+
+                    <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Candy}"
+                              Command="{Binding CmdChangeTheme}"
+                              CommandParameter="{x:Static martridge:ApplicationTheme.Candy}" />
+
+                    <MenuItem Header="{dloc:Localize MainWindow/MenuTheme/Magma}"
+                              Command="{Binding CmdChangeTheme}"
+                              CommandParameter="{x:Static martridge:ApplicationTheme.Magma}" />
+                </MenuItem>
+
+                <MenuItem Header="{dloc:Localize MainWindow/MenuAbout}"
+                          Command="{Binding CmdShowPageAbout}" />
+
+            </Menu>
+
+            <Grid Grid.Row="1">
+                <ContentControl Content="{Binding CurrentViewModel}">
+                    <ContentControl.DataTemplates>
+                        <vm:MainViewLocator />
+                    </ContentControl.DataTemplates>
+                </ContentControl>
+            </Grid>
         </Grid>
-    </Grid>
+    </Border>
 </Window>

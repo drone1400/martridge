@@ -15,7 +15,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Platform.Storage;
 using Martridge.Models.Configuration;
 using Martridge.Models.OnlineDmods;
 
@@ -179,30 +181,46 @@ namespace Martridge.ViewModels {
         // TODO... fix this
 
         private void DragOver(object? sender, DragEventArgs e) {
-            if (e.Source is Control c && c.Name == "DmodBrowserView") {
-                e.DragEffects = e.DragEffects & (DragDropEffects.Copy); 
-            }
-
-            // Only allow if the dragged data contains filenames.
-            if (!e.Data.Contains(DataFormats.FileNames)) {
-                e.DragEffects = DragDropEffects.None;
+            if (e.Source is Control c) {
+                e.DragEffects &= (DragDropEffects.Copy); 
             }
         }
 
         private void Drop(object? sender, DragEventArgs e) {
-            if (e.Source is Control c && c.Name == "DmodBrowserView") {
-                e.DragEffects = e.DragEffects & (DragDropEffects.Copy);
-            }
-
-            if (e.Data.Contains(DataFormats.FileNames)) {
-                IEnumerable<string>? files = e.Data.GetFileNames();
-                if (files != null) {
-                    string file = files.First();
-                    FileInfo finfo = new FileInfo(file);
-                    if (finfo.Exists && finfo.Extension.ToLowerInvariant() == ".dmod") {
-                        this.CmdShowPageDmodInstaller(finfo.FullName);
-                    }
+            try {
+                if (e.Source is Control c) {
+                    e.DragEffects = DragDropEffects.None;
                 }
+
+                if (e.Data.Contains(DataFormats.Files)) {
+                    IEnumerable<IStorageItem>? files = e.Data.GetFiles();
+                    if (files == null)
+                        return;
+                    
+                    IStorageItem? file = files.FirstOrDefault();
+                    if (file != null) {
+                        this.CmdShowPageDmodInstaller(file.Path.LocalPath);
+                    }
+                } else if (e.Data.Contains(DataFormats.Text)) {
+                    string? text = e.Data.GetText();
+                    if (text == null)
+                        return;
+                    
+                    Task.Run(() => {
+                        try {
+                            Task<IStorageFile?>? taskFile = App.Instance?.StorageProvider?.TryGetFileFromPathAsync(text);
+                            taskFile?.Wait();
+                            if (taskFile?.Result is IStorageFile file) {
+                                this.CmdShowPageDmodInstaller(file.Path.LocalPath);
+                            }
+
+                        } catch (Exception ex) {
+                            MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                        }
+                    });
+                }
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
             }
         }
 

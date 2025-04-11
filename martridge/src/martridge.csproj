@@ -17,6 +17,8 @@
         <IsLinux Condition="'$(RuntimeIdentifier)' == 'linux-x64'">true</IsLinux>
         <IsMacOs Condition="'$(RuntimeIdentifier)' == 'osx-x64' or '$(RuntimeIdentifier)' == 'osx-arm64' ">true</IsMacOs>
         <IsWindows Condition="'$(IsLinux)' != 'true' and '$(IsMacOs)' != 'true'">true</IsWindows>
+        <IsDinkInstallerEnabled Condition="'$(DisableFeatureDinkInstaller)'!='true'">true</IsDinkInstallerEnabled>
+        <IsOnlineFeaturesEnabled Condition="'$(DisableFeatureOnline)'!='true'">true</IsOnlineFeaturesEnabled>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(IsWindows)'=='true'">
@@ -28,6 +30,17 @@
     <PropertyGroup Condition="'$(IsLinux)'=='true'">
         <DefineConstants>$(DefineConstants);PLATF_LINUX</DefineConstants>
     </PropertyGroup>
+
+    <!-- enable dink installer if building for windows, online features are enabled, and dink installer is explicitly enabled -->
+    <PropertyGroup Condition="'$(IsWindows)'=='true' And '$(IsOnlineFeaturesEnabled)'=='true' And '$(IsDinkInstallerEnabled)'=='true'">
+        <DefineConstants>$(DefineConstants);ENABLE_FEATURE_DINK_INSTALLER</DefineConstants>
+    </PropertyGroup>
+
+    <!-- enable online features -->
+    <PropertyGroup Condition="'$(IsOnlineFeaturesEnabled)'=='true'">
+        <DefineConstants>$(DefineConstants);ENABLE_FEATURE_ONLINE</DefineConstants>
+    </PropertyGroup>
+
 
     <PropertyGroup>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -45,99 +58,87 @@
 
 
     <ItemGroup>
-        <AvaloniaResource Include="Assets\**" />
-        <AvaloniaXaml Remove="AppStyles.axaml" />
-        <None Remove=".gitignore" />
-        <None Remove="Assets\dloc\en-US.json" />
+        <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaXaml Remove="AppStyles.axaml"/>
+        <None Remove=".gitignore"/>
+        <None Remove="Assets\dloc\en-US.json"/>
+        <Folder Include="Assets\graphics"/>
     </ItemGroup>
 
     <ItemGroup>
-        <AvaloniaResource Include="AppStyles.axaml" />
+        <AvaloniaResource Include="AppStyles.axaml"/>
     </ItemGroup>
     <ItemGroup>
         <!--This helps with theme dll-s trimming.
         If you will publish your application in self-contained mode with p:PublishTrimmed=true and it will use Fluent theme Default theme will be trimmed from the output and vice versa.
         https://github.com/AvaloniaUI/Avalonia/issues/5593 -->
-        <TrimmableAssembly Include="Avalonia.Themes.Fluent" />
-        <TrimmableAssembly Include="Avalonia.Themes.Default" />
+        <TrimmableAssembly Include="Avalonia.Themes.Fluent"/>
+        <TrimmableAssembly Include="Avalonia.Themes.Default"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.2.6" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.6" />
-        <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
-        <PackageReference Include="Avalonia.Desktop" Version="11.2.6" />
+        <PackageReference Include="Avalonia" Version="11.2.6"/>
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.2.6"/>
+        <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.6"/>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.2.6" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.6" />
-        <PackageReference Include="GetText.NET" Version="1.9.14" />
-        <PackageReference Include="HtmlAgilityPack" Version="1.11.60" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="ReactiveUI.Validation" Version="4.1.1" />
-        <PackageReference Condition="'$(IsWindows)'=='true'" Include="SevenZipExtractor" Version="1.0.17" />
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" 
+                          Include="Avalonia.Diagnostics" Version="11.2.6"/>
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.6"/>
+        <PackageReference Include="GetText.NET" Version="1.9.14"/>
+        <!-- only include HtmlAgilityPack if building with online features is enabled! -->
+        <PackageReference Condition="'$(IsOnlineFeaturesEnabled)'=='true'" 
+                          Include="HtmlAgilityPack" Version="1.11.60"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+        <PackageReference Include="ReactiveUI.Validation" Version="4.1.1"/>
+        <!-- only include SevenZipExtractor if building with dink installer enabled for windows -->
+        <PackageReference Condition="'$(IsWindows)'=='true' And '$(IsDinkInstallerEnabled)'=='true' And '$(IsOnlineFeaturesEnabled)'=='true'" 
+                          Include="SevenZipExtractor" Version="1.0.17"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\sharpcompress\src\SharpCompress\SharpCompress.csproj"/>
+        <ProjectReference Include="..\..\citrus\src\Citrus.Avalonia\Citrus.Avalonia.csproj"/>
+        <ProjectReference Include="..\..\citrus\src\Citrus.Avalonia.DataGrid\Citrus.Avalonia.DataGrid.csproj"/>
     </ItemGroup>
 
     <Target Name="Copy7zipLibs" AfterTargets="Publish" Condition="'$(IsWindows)'=='true'">
         <!-- currently it seems the 7zip libs don't get automagically included in the published single file, so we need to copy them to the published directory-->
-        
+
         <!-- before, i used to not copy the x64 version because i assumed it was automagically included, but that was not the case, the 7zip wrapper was just defaulting
             to my 7zip install in program files! not good since users might not have 7zip installed at all! -->
-        
-        <Copy Condition="'$(Platform)' == 'x86'" 
-              SourceFiles="$(ProjectDir)\lib\7zip\x86\7z.dll" 
-              DestinationFiles="$(PublishDir)\x86\7z.dll" />
-        
+
+        <Copy Condition="'$(Platform)' == 'x86'"
+              SourceFiles="$(ProjectDir)\lib\7zip\x86\7z.dll"
+              DestinationFiles="$(PublishDir)\x86\7z.dll"/>
+
         <Copy Condition="'$(Platform)' == 'x64'"
               SourceFiles="$(ProjectDir)\lib\7zip\x64\7z.dll"
               DestinationFiles="$(PublishDir)\x64\7z.dll"/>
-        
+
         <!-- copy license file too.. i think i was supposed to do this before as well but didn't notice?... oops! -->
-        <Copy SourceFiles="$(ProjectDir)\lib\7zip\7ZipLicense.txt" DestinationFiles="$(PublishDir)\7ZipLicense.txt" />
+        <Copy SourceFiles="$(ProjectDir)\lib\7zip\7ZipLicense.txt" DestinationFiles="$(PublishDir)\7ZipLicense.txt"/>
     </Target>
 
-    <ItemGroup>
-        <Folder Include="Assets\graphics" />
+    <!-- remove online features related code if they are not enabled -->
+    <ItemGroup Condition="'$(IsOnlineFeaturesEnabled)'!='true'">
+        <Compile Remove="Models\DinkInstaller\*"/>
+        <Compile Remove="Models\OnlineDmods\*"/>
+        <Compile Remove="ViewModels\DinkInstaller\*"/>
+        <Compile Remove="ViewModels\OnlineDmod\*"/>
+        <Compile Remove="ViewModels\Dmod\DualDmodBrowserViewModel.cs"/>
+        <Compile Remove="Views\DinkInstaller\*"/>
+        <Compile Remove="Views\OnlineDmod\*"/>
+        <Compile Remove="Views\Dmod\DualDmodBrowserView.axaml.cs"/>
+        <AvaloniaXaml Remove="Views\DinkInstaller\*"/>
+        <AvaloniaXaml Remove="Views\OnlineDmod\*"/>
+        <AvaloniaXaml Remove="Views\Dmod\DualDmodBrowserView.axaml"/>
     </ItemGroup>
-    
-    <ItemGroup>
-        <ProjectReference Include="..\..\sharpcompress\src\SharpCompress\SharpCompress.csproj" />
-        <ProjectReference Include="..\..\citrus\src\Citrus.Avalonia\Citrus.Avalonia.csproj" />
-        <ProjectReference Include="..\..\citrus\src\Citrus.Avalonia.DataGrid\Citrus.Avalonia.DataGrid.csproj" />
-    </ItemGroup>
-  
-    <ItemGroup Condition="'$(IsWindows)'!='true'">
-      <Compile Remove="Models\Installer\DinkInstaller.cs" />
-      <Compile Remove="ViewModels\Installer\DinkInstallerViewModel.cs" />
-      <Compile Update="Views\OnlineDmod\OnlineDmodBrowserDmodListView.axaml.cs">
-        <DependentUpon>OnlineDmodBrowserDmodListView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Views\OnlineDmod\OnlineDmodBrowserSelectedDmodView.axaml.cs">
-        <DependentUpon>OnlineDmodBrowserSelectedDmodView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Views\OnlineDmod\OnlineDmodBrowserView.axaml.cs">
-        <DependentUpon>OnlineDmodBrowserView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Views\OnlineDmod\OnlineUserHeaderView.axaml.cs">
-        <DependentUpon>OnlineUserHeaderView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Views\Dmod\DmodInstallerView.axaml.cs">
-        <DependentUpon>DmodInstallerView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Views\Dmod\DmodPackerView.axaml.cs">
-        <DependentUpon>DmodPackerView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-    </ItemGroup>
-      
-    
-    <ItemGroup>
-      <Compile Update="Views\Dmod\NoDinkyLinuxView.axaml.cs">
-        <DependentUpon>NoDinkyLinuxView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
+
+    <!-- remove DinkInstaller stuff if it is not enabled or we are not building for Windows -->
+    <ItemGroup Condition="'$(IsDinkInstallerEnabled)'!='true' Or '$(IsWindows)'!='true'">
+        <Compile Remove="Models\DinkInstaller\*"/>
+        <Compile Remove="ViewModels\DinkInstaller\*"/>
+        <Compile Remove="Views\DinkInstaller\*"/>
+        <AvaloniaXaml Remove="Views\DinkInstaller\*"/>
     </ItemGroup>
 </Project>

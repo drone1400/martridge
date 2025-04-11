@@ -3,14 +3,21 @@ using Avalonia.Controls.Templates;
 using Martridge.ViewModels;
 using Martridge.ViewModels.About;
 using Martridge.ViewModels.Configuration;
-using Martridge.ViewModels.DinkInstaller;
 using Martridge.ViewModels.Dmod;
-using Martridge.ViewModels.OnlineDmod;
 using Martridge.Views.About;
 using Martridge.Views.Configuration;
-using Martridge.Views.DinkInstaller;
 using Martridge.Views.Dmod;
+
+#if ENABLE_FEATURE_ONLINE
+using Martridge.ViewModels.OnlineDmod;
 using Martridge.Views.OnlineDmod;
+#endif
+
+#if ENABLE_FEATURE_DINK_INSTALLER && ENABLE_FEATURE_ONLINE
+using Martridge.ViewModels.DinkInstaller;
+using Martridge.Views.DinkInstaller;
+#endif
+
 namespace Martridge
 {
     public class MainViewLocator : IDataTemplate
@@ -20,12 +27,14 @@ namespace Martridge
         {
             switch (param?.GetType().Name ?? "")
             {
-#if PLATF_WINDOWS
+#if ENABLE_FEATURE_ONLINE
+                case nameof(OnlineDmodBrowserViewModel): return new OnlineDmodBrowserView();
+                case nameof(DualDmodBrowserViewModel): return new DualDmodBrowserView();
+#endif
+#if ENABLE_FEATURE_DINK_INSTALLER && ENABLE_FEATURE_ONLINE
                 case nameof(DinkInstallerViewModel): return new DinkInstallerView();
 #endif
-                case nameof(DualDmodBrowserViewModel): return new DualDmodBrowserView();
                 case nameof(DmodBrowserViewModel): return new DmodBrowserView();
-                case nameof(OnlineDmodBrowserViewModel): return new OnlineDmodBrowserView();
                 case nameof(DmodInstallerViewModel): return new DmodInstallerView();
                 case nameof(DmodPackerViewModel): return new DmodPackerView();
                 case nameof(AboutViewModel): return new AboutView();

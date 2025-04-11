@@ -45,8 +45,8 @@
                               IsEnabled="{Binding EnableDmodDeveloperFeatures}" />
                     <MenuItem Header="{dloc:Localize MainWindow/MenuDinkInstaller}"
                               Command="{Binding CmdShowPageDinkInstaller}"
-                              IsVisible="{Binding EnableOnlineFeatures}"
-                              IsEnabled="{Binding EnableOnlineFeatures}" />
+                              IsVisible="{Binding EnableDinkInstallerMenu}"
+                              IsEnabled="{Binding EnableDinkInstallerMenu}" />
                     <MenuItem Header="{dloc:Localize MainWindow/MenuLogWindow}"
                               Command="{Binding CmdShowLogWindow}" />
                     <MenuItem Header="{dloc:Localize MainWindow/MenuExit}"

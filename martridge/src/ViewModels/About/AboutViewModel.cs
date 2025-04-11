@@ -77,9 +77,11 @@ namespace Martridge.ViewModels.About {
                 new AboutUsedPackageViewModel(
                     name: Localizer.Instance[@"AboutWindow/Package/Citrus.Avalonia/Name"],
                     info: Localizer.Instance[@"AboutWindow/Package/Citrus.Avalonia/Description"]),
+#if PLATF_WINDOWS && ENABLE_FEATURE_DINK_INSTALLER
                 new AboutUsedPackageViewModel(
                     name: Localizer.Instance[@"AboutWindow/Package/SevenZipExtractor/Name"],
                     info: Localizer.Instance[@"AboutWindow/Package/SevenZipExtractor/Description"]),
+#endif
                 new AboutUsedPackageViewModel(
                     name: Localizer.Instance[@"AboutWindow/Package/SharpCompress/Name"],
                     info: Localizer.Instance[@"AboutWindow/Package/SharpCompress/Description"]),
@@ -92,9 +94,11 @@ namespace Martridge.ViewModels.About {
                 new AboutUsedPackageViewModel(
                     name: Localizer.Instance[@"AboutWindow/Package/GetText/Name"],
                     info: Localizer.Instance[@"AboutWindow/Package/GetText/Description"]),
+#if ENABLE_FEATURE_ONLINE
                 new AboutUsedPackageViewModel(
                     name: Localizer.Instance[@"AboutWindow/Package/HtmlAgilityPack/Name"],
                     info: Localizer.Instance[@"AboutWindow/Package/HtmlAgilityPack/Description"]),
+#endif
             };
         }
 

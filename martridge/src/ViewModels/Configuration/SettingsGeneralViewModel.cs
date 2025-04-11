@@ -18,6 +18,18 @@ namespace Martridge.ViewModels.Configuration {
 
         public event EventHandler? SettingsDone;
         
+#if ENABLE_FEATURE_DINK_INSTALLER && ENABLE_FEATURE_ONLINE
+        public bool ShowDinkInstallerSettings => true;
+#else 
+        public bool ShowDinkInstallerSettings => false;
+#endif
+        
+#if ENABLE_FEATURE_ONLINE
+        public bool ShowOnlineSettings => true;
+#else 
+        public bool ShowOnlineSettings => false;
+#endif
+        
         //
         // General Configuration properties
         //

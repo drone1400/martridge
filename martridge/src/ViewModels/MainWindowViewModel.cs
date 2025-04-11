@@ -18,9 +18,15 @@ using Avalonia;
 using Avalonia.Platform.Storage;
 using Martridge.Models;
 using Martridge.Models.Configuration;
+
+#if ENABLE_FEATURE_ONLINE
 using Martridge.Models.OnlineDmods;
-using Martridge.ViewModels.DinkInstaller;
 using Martridge.ViewModels.OnlineDmod;
+#endif
+
+#if ENABLE_FEATURE_DINK_INSTALLER && ENABLE_FEATURE_ONLINE
+using Martridge.ViewModels.DinkInstaller;
+#endif
 
 namespace Martridge.ViewModels {
     public class MainWindowViewModel : ViewModelBase
@@ -28,20 +34,33 @@ namespace Martridge.ViewModels {
 
         private Config? _config = null;
         private DmodManager? _dmodManager = null;
+        
+#if ENABLE_FEATURE_ONLINE
         private DmodCrawler? _dmodCrawler = null;
+
+        public bool EnableOnlineFeatures {
+            get => this._enableOnlineFeatures;
+            private set { 
+                this.RaiseAndSetIfChanged(ref this._enableOnlineFeatures, value);
+                this.RaisePropertyChanged(nameof(EnableDinkInstallerMenu));
+            }
+        }
+        private bool _enableOnlineFeatures = false;
+#else
+        public bool EnableOnlineFeatures => false;
+#endif
+        
+#if ENABLE_FEATURE_DINK_INSTALLER && ENABLE_FEATURE_ONLINE
+        public bool EnableDinkInstallerMenu => this.EnableOnlineFeatures;
+#else 
+        public bool EnableDinkInstallerMenu => false;
+#endif
 
         public bool EnableDmodDeveloperFeatures {
             get => this._enableDmodDeveloperFeatures;
             private set => this.RaiseAndSetIfChanged(ref this._enableDmodDeveloperFeatures, value);
         }
         private bool _enableDmodDeveloperFeatures = false;
-        
-        // TODO.. this will be set from config later...
-        public bool EnableOnlineFeatures {
-            get => this._enableOnlineFeatures;
-            private set => this.RaiseAndSetIfChanged(ref this._enableOnlineFeatures, value);
-        }
-        private bool _enableOnlineFeatures = false;
         
         public bool IsInitialized {
             get => this._isInitialized;
@@ -75,14 +94,16 @@ namespace Martridge.ViewModels {
             this._config.General.Updated += this.GeneralOnUpdated;
 
             this.EnableDmodDeveloperFeatures = this._config.General.ShowDmodDevFeatures;
+            
+#if ENABLE_FEATURE_ONLINE
             this.EnableOnlineFeatures = this._config.General.EnableOnlineFeatures;
-            
-            this.PropertyChanged += this.OnPropertyChanged;
-            
             if (this.EnableOnlineFeatures) {
                 this._dmodCrawler = new DmodCrawler();
                 _ = this._dmodCrawler.InitializeDmodLists(false); // no await
             }
+#endif
+            
+            this.PropertyChanged += this.OnPropertyChanged;
             
             this._dmodManager = new DmodManager();
             this._dmodManager.Initialize(this._config.General).ContinueWith((_) => {
@@ -105,6 +126,7 @@ namespace Martridge.ViewModels {
             });
         }
         private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
+#if ENABLE_FEATURE_ONLINE
             if (e.PropertyName == nameof(this.EnableOnlineFeatures)) {
                 if (this.EnableOnlineFeatures == false) {
                     // TODO make sure no online features are being used...
@@ -139,6 +161,7 @@ namespace Martridge.ViewModels {
                 }
                 
             }
+#endif
         }
         private void GeneralOnUpdated(object? sender, ConfigUpdateEventArgs e) {
             if (sender is not ConfigGeneral general) return;
@@ -150,9 +173,12 @@ namespace Martridge.ViewModels {
                     this._dmodManager?.Initialize(general);
                 } else if (name == nameof(ConfigGeneral.ShowDmodDevFeatures)) {
                     this.EnableDmodDeveloperFeatures = general.ShowDmodDevFeatures;
-                } else if (name == nameof(ConfigGeneral.EnableOnlineFeatures)) {
+                } 
+#if ENABLE_FEATURE_ONLINE
+                else if (name == nameof(ConfigGeneral.EnableOnlineFeatures)) {
                     this.EnableOnlineFeatures = general.EnableOnlineFeatures;
                 }
+#endif
             }
         }
 
@@ -254,7 +280,7 @@ namespace Martridge.ViewModels {
             this.CurrentViewModel = null;
 
             if (this._config!.General.GameExePaths.Count == 0) {
-#if PLATF_WINDOWS
+#if ENABLE_FEATURE_DINK_INSTALLER
                 if (this.EnableOnlineFeatures) {
                     NoDinkyViewModel vm = new NoDinkyViewModel();
                     vm.ShowConfigurationPageRequested += (_, _) => {
@@ -275,7 +301,8 @@ namespace Martridge.ViewModels {
                 this.CurrentViewModel = vml;
                 return;
             }
-            
+
+#if ENABLE_FEATURE_ONLINE
             if (this._enableOnlineFeatures) {
                 OnlineDmodBrowserViewModel odbVm = new OnlineDmodBrowserViewModel();
                 odbVm.DmodCrawler = this._dmodCrawler;
@@ -292,6 +319,9 @@ namespace Martridge.ViewModels {
             else {
                 this.CurrentViewModel = this._dmodBrowserViewModel;
             }
+#else
+            this.CurrentViewModel = this._dmodBrowserViewModel;
+#endif
         }
 
         private void RestorePreviousViewModel() {
@@ -368,16 +398,16 @@ namespace Martridge.ViewModels {
         [DependsOn(nameof(CurrentViewModel))]
         [DependsOn(nameof(EnableOnlineFeatures))]
         public bool CanCmdShowPageDinkInstaller(object? parameter = null) {
-            #if PLATF_WINDOWS
+#if ENABLE_FEATURE_DINK_INSTALLER && ENABLE_FEATURE_ONLINE
             return this.CanSwitchViewModel() && this.EnableOnlineFeatures;
-            #else
+#else
             return false;
-            #endif
+#endif
         }
         public void CmdShowPageDinkInstaller(object? parameter = null) {
             if (this.CanCmdShowPageDinkInstaller() == false) return;
             
-#if PLATF_WINDOWS
+#if ENABLE_FEATURE_DINK_INSTALLER && ENABLE_FEATURE_ONLINE
             try {
                 this.SaveCurrentViewModel();
 
@@ -518,11 +548,13 @@ namespace Martridge.ViewModels {
             
             switch (this.CurrentViewModel?.GetType().Name) {
                 default: return false;
+#if ENABLE_FEATURE_ONLINE
+                case nameof(DualDmodBrowserViewModel):
+                case nameof(OnlineDmodBrowserViewModel):
+#endif
                 case nameof(NoDinkyViewModel):
                 case nameof(NoDinkyLinuxViewModel):
-                case nameof(DualDmodBrowserViewModel):
                 case nameof(DmodBrowserViewModel):
-                case nameof(OnlineDmodBrowserViewModel):
                 case nameof(AboutViewModel):
                     return true;
             }

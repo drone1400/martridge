@@ -70,8 +70,8 @@
                   VerticalScrollBarVisibility="Visible"
                   HorizontalScrollBarVisibility="Disabled"
                   IsVisible="{Binding DmodDefinitionsFilteredHasItems}"
-                  ItemsSource="{Binding DmodDefinitionsFiltered}" 
-                  SelectedItem="{Binding SelectedDmodDefinition, Mode=TwoWay}">
+                  ItemsSource="{Binding DmodDefinitionsCollection}" 
+                  SelectionChanged="DataGridDmods_OnSelectionChanged">
             <DataGrid.Styles>
                 <Style Selector="TextBlock">
                     <Setter Property="TextWrapping" Value="Wrap"/>
@@ -94,8 +94,8 @@
             </DataGrid.CellTheme>
             <DataGrid.Columns>
                 <DataGridTemplateColumn
-                    Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Score}"
-                    Width="80"
+                    Header=""
+                    Width="60"
                     CanUserSort="True"
                     SortMemberPath="ScoreValue"
                     x:DataType="vm:OnlineDmodInfoViewModel">
@@ -127,7 +127,7 @@
                     x:DataType="vm:OnlineDmodInfoViewModel"/>
                 <DataGridTextColumn 
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Updated}"
-                    Width="100"
+                    Width="120"
                     Binding="{Binding Updated, Converter={StaticResource GenericDateConverter}, Mode=OneWay}"
                     x:DataType="vm:OnlineDmodInfoViewModel"/>
                 <DataGridTextColumn 

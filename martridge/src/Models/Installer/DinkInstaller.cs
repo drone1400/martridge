@@ -7,10 +7,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-
-#if PLATF_WINDOWS
 using SevenZipExtractor;
-#endif
 
 namespace Martridge.Models.Installer {
     public class DinkInstaller {
@@ -99,8 +96,6 @@ namespace Martridge.Models.Installer {
             
             this.InstallerDone?.Invoke(this, new DinkInstallerDoneEventArgs(DinkInstallerResult.Cancelled, null, null));
         }
-
-        #if PLATF_WINDOWS
 
         public void InstallDink(DirectoryInfo destinationDirectory, bool overrideDestination, ConfigInstaller config) {
             lock (this._syncRoot)
@@ -696,56 +691,5 @@ namespace Martridge.Models.Installer {
                 client.Dispose();
             }
         }
-        
-        #else
-
-        //
-        // NOTE, normally this should never get called in the first place,
-        // this is here just so that I don't have to modify the DinkInstallerViewModel for different platforms
-        //
-        
-        public void StartInstallingDink(DirectoryInfo destinationDirectory, bool overrideDestination, ConfigInstaller config) {
-            lock (this._syncRoot)
-            {
-                if (this._installPhase != DinkInstallPhase.Inactive)
-                    return;
-
-                this._installPhase = DinkInstallPhase.Preparing;
-            }
-            
-            
-
-            Task task = new Task( async () => {
-                bool cancelled = false;
-                Exception? exception = null;
-
-                try {
-                    this.LogMessage(
-                        Localizer.Instance["DinkInstaller/NotSupportedInBuild"],
-                        $"    {config.Name}");
-                    
-                    exception = new NotSupportedException(Localizer.Instance["DinkInstaller/NotSupportedInBuild"]);;
-                } catch (Exception ex) {
-                    exception = ex;
-
-                    this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, exception);
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, exception);
-                } finally {
-                    this.CustomTrace.Flush();
-                    this.CustomTrace.Close();
-                    
-                    lock (this._syncRoot)
-                    {
-                        this._installPhase = DinkInstallPhase.Finished;
-                    }
-
-                    this.InstallerDone?.Invoke(this,new DinkInstallerDoneEventArgs(exception, config, destinationDirectory));
-                }
-            });
-
-            task.Start();
-        }
-
-        #endif
     }
 }

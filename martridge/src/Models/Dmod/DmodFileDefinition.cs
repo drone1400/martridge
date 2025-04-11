@@ -22,6 +22,7 @@ namespace Martridge.Models.Dmod {
 
 
         public bool IsCorrectlyDefined { get; private set; } = false;
+        public bool IsCompletelyDefined { get; private set; } = false;
 
         public DirectoryInfo DmodRoot { get; private set; }
 
@@ -107,19 +108,25 @@ namespace Martridge.Models.Dmod {
                 }
             }
 
+            int fileCount = 0;
+            
+            if (this.DinkDat != null) fileCount++;
+            if (this.MapDat != null) fileCount++;
+            if (this.DmodDiz != null) fileCount++;
+            if (this.HardDat != null) fileCount++;
+            if (this.DinkIni != null) fileCount++;
+            
+            
+
             // NOTE: DMOD can be missing dink.ini and hard.dat, in which case the default ones from the core install will be used...
-            if (this.DinkDat != null &&
-                this.DmodDiz != null &&
-                this.MapDat != null) {
-                this.IsCorrectlyDefined = true;
-            }
+            this.IsCorrectlyDefined = (fileCount >= 2);
+            this.IsCompletelyDefined = (fileCount == 5) ;
         }
 
         public string? GetDescription() {
             try {
-                if (this.IsCorrectlyDefined == false) {
+                if (this.DmodDiz == null)
                     return null;
-                }
 
                 string desc = File.ReadAllText(this.DmodDiz!.FullName);
 
@@ -133,9 +140,13 @@ namespace Martridge.Models.Dmod {
         public string? GetName() {
             try {
                 string[]? lines = null;
-                
-                if (this.IsCorrectlyDefined) {
-                    lines = File.ReadAllLines(this.DmodDiz!.FullName);
+
+                if (this.DmodDiz != null) {
+                    try {
+                        lines = File.ReadAllLines(this.DmodDiz!.FullName);
+                    } catch (Exception ex) {
+                        MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex, MyTraceLevel.Warning);
+                    }
                 }
 
                 if (lines == null || lines.Length == 0 || string.IsNullOrWhiteSpace(lines[0])) {

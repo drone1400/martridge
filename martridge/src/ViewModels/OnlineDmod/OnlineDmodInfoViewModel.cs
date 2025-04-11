@@ -1,13 +1,12 @@
 using System;
-using Martridge.Models.OnlineDmods;
-using ReactiveUI;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
-
-namespace Martridge.ViewModels.Dmod {
+using Martridge.Models.OnlineDmods;
+using ReactiveUI;
+namespace Martridge.ViewModels.OnlineDmod {
     public class OnlineDmodInfoViewModel : ViewModelBase{
         
         //
@@ -16,7 +15,7 @@ namespace Martridge.ViewModels.Dmod {
         public OnlineDmodInfo DmodInfo { get;}
 
         public string Name { get => this.DmodInfo.Name; }
-        public string Author { get => _author; }
+        public string Author { get => this._author; }
         private string _author = "";
         public string UrlMain { get => this.DmodInfo.ResMain.Url; }
         public int Downloads { get => this.DmodInfo.Downloads; }

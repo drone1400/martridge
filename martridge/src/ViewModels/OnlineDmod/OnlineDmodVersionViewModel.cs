@@ -1,6 +1,5 @@
 using Martridge.Models.OnlineDmods;
-
-namespace Martridge.ViewModels.Dmod {
+namespace Martridge.ViewModels.OnlineDmod {
     public class OnlineDmodVersionViewModel {
         public OnlineDmodVersion DmodVersion { get;}
         

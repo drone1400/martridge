@@ -1,14 +1,6 @@
-﻿using Avalonia.Media.Imaging;
-using Avalonia.Metadata;
-using Martridge.Models.Dmod;
-using Martridge.Models.Localization;
-using Martridge.Models.OnlineDmods;
-using Martridge.Trace;
-using ReactiveUI;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -16,11 +8,15 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Collections;
+using Avalonia.Media.Imaging;
+using Avalonia.Metadata;
 using Avalonia.Threading;
-using Martridge.Models;
-using Martridge.Models.Configuration;
-
-namespace Martridge.ViewModels.Dmod {
+using Martridge.Models.Dmod;
+using Martridge.Models.Localization;
+using Martridge.Models.OnlineDmods;
+using Martridge.Trace;
+using ReactiveUI;
+namespace Martridge.ViewModels.OnlineDmod {
 
     public class MyOnlineDmodComparer : IComparer {
         public int Compare(object? x, object? y) {

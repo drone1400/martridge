@@ -7,7 +7,8 @@
              xmlns:dloc="clr-namespace:Martridge.ViewModels.Localization"
              xmlns:dmod="clr-namespace:Martridge.Views.Dmod"
              xmlns:dmodVm="clr-namespace:Martridge.ViewModels.Dmod"
-             
+             xmlns:onlineDmod="clr-namespace:Martridge.Views.OnlineDmod"
+
              mc:Ignorable="d" 
              d:DesignWidth="800" 
              d:DesignHeight="450">
@@ -28,7 +29,7 @@
         
         <TabItem  Classes="Big"
                   Header="{dloc:Localize MainWindow/TabItemOnlineDmods}">
-            <dmod:OnlineDmodBrowserView DataContext="{Binding OnlineDmodBrowserVm}" 
+            <onlineDmod:OnlineDmodBrowserView DataContext="{Binding OnlineDmodBrowserVm}" 
                                        Name="OnlineDmodBrowserView"/>
         </TabItem>
     </TabControl>

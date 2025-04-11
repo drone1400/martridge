@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using Martridge.ViewModels.OnlineDmod;
+using ReactiveUI;
 namespace Martridge.ViewModels.Dmod
 {
     public class DualDmodBrowserViewModel : ViewModelAppPage

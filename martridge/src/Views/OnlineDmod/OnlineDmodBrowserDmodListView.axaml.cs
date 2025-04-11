@@ -1,9 +1,7 @@
 using System.Linq;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-
-namespace Martridge.Views.Dmod {
+namespace Martridge.Views.OnlineDmod {
     public partial class OnlineDmodBrowserDmodListView : UserControl {
         public OnlineDmodBrowserDmodListView() {
             this.InitializeComponent();

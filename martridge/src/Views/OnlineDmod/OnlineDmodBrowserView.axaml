@@ -1,4 +1,4 @@
-<UserControl x:Class="Martridge.Views.Dmod.OnlineDmodBrowserView" 
+<UserControl x:Class="Martridge.Views.OnlineDmod.OnlineDmodBrowserView" 
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,13 +8,15 @@
              xmlns:vm="using:Martridge.ViewModels.Dmod"
              xmlns:vw="using:Martridge.Views.Dmod"
              xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
-             
+             xmlns:onlineDmod="clr-namespace:Martridge.ViewModels.OnlineDmod"
+             xmlns:onlineDmod1="clr-namespace:Martridge.Views.OnlineDmod"
+
              mc:Ignorable="d" 
              d:DesignWidth="800" 
              d:DesignHeight="450">
     
     <Design.DataContext>
-        <vm:OnlineDmodBrowserViewModel/>
+        <onlineDmod:OnlineDmodBrowserViewModel/>
     </Design.DataContext>
     <UserControl.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
@@ -32,7 +34,7 @@
                 Converter={StaticResource ConverterIsNotNullCheck}}" >
             
         <vw:MagicSplitPresenterView.LeftPanelContent>
-            <vw:OnlineDmodBrowserDmodListView DataContext="{Binding }"/>
+            <onlineDmod1:OnlineDmodBrowserDmodListView DataContext="{Binding }"/>
         </vw:MagicSplitPresenterView.LeftPanelContent>
             
         <vw:MagicSplitPresenterView.RightPanelContent>
@@ -45,7 +47,7 @@
                         Content="{dloc:Localize DmodBrowser/BackToList}"/>
             
             
-                <vw:OnlineDmodBrowserSelectedDmodView
+                <onlineDmod1:OnlineDmodBrowserSelectedDmodView
                     Grid.Row="1" 
                     DataContext="{Binding }"/>
             </Grid>

@@ -107,6 +107,22 @@
     <ItemGroup Condition="'$(IsWindows)'!='true'">
       <Compile Remove="Models\Installer\DinkInstaller.cs" />
       <Compile Remove="ViewModels\Installer\DinkInstallerViewModel.cs" />
+      <Compile Update="Views\OnlineDmod\OnlineDmodBrowserDmodListView.axaml.cs">
+        <DependentUpon>OnlineDmodBrowserDmodListView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\OnlineDmod\OnlineDmodBrowserSelectedDmodView.axaml.cs">
+        <DependentUpon>OnlineDmodBrowserSelectedDmodView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\OnlineDmod\OnlineDmodBrowserView.axaml.cs">
+        <DependentUpon>OnlineDmodBrowserView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\OnlineDmod\OnlineUserHeaderView.axaml.cs">
+        <DependentUpon>OnlineUserHeaderView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
       
     

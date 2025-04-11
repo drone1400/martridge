@@ -1,9 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-
-namespace Martridge.Views.Dmod {
-    public partial class OnlineDmodBrowserView : UserControl {
-        public OnlineDmodBrowserView() {
+namespace Martridge.Views.OnlineDmod {
+    public partial class OnlineUserHeaderView : UserControl {
+        public OnlineUserHeaderView() {
             this.InitializeComponent();
         }
 
@@ -12,3 +11,4 @@ namespace Martridge.Views.Dmod {
         }
     }
 }
+

@@ -20,6 +20,7 @@ using Avalonia;
 using Avalonia.Platform.Storage;
 using Martridge.Models.Configuration;
 using Martridge.Models.OnlineDmods;
+using Martridge.ViewModels.OnlineDmod;
 
 namespace Martridge.ViewModels {
     public class MainWindowViewModel : ViewModelBase

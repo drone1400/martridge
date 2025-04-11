@@ -1,12 +1,11 @@
+using System;
+using System.Collections.ObjectModel;
+using System.IO;
 using Avalonia.Media.Imaging;
 using Martridge.Models.OnlineDmods;
 using Martridge.Trace;
 using ReactiveUI;
-using System;
-using System.Collections.ObjectModel;
-using System.IO;
-
-namespace Martridge.ViewModels.Dmod {
+namespace Martridge.ViewModels.OnlineDmod {
     public class OnlineUserViewModel : ViewModelBase {
         public OnlineUser User { get; }
 

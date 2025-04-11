@@ -1,4 +1,4 @@
-<UserControl x:Class="Martridge.Views.Dmod.OnlineDmodBrowserSelectedDmodView"
+<UserControl x:Class="Martridge.Views.OnlineDmod.OnlineDmodBrowserSelectedDmodView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,13 +8,15 @@
              xmlns:vm="using:Martridge.ViewModels.Dmod"
              xmlns:vv="using:Martridge.Views.Dmod"
              xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
-             
+             xmlns:onlineDmod="clr-namespace:Martridge.ViewModels.OnlineDmod"
+             xmlns:onlineDmod1="clr-namespace:Martridge.Views.OnlineDmod"
+
              mc:Ignorable="d" 
              d:DesignWidth="800" 
              d:DesignHeight="450">
     
     <Design.DataContext>
-        <vm:OnlineDmodBrowserViewModel/>
+        <onlineDmod:OnlineDmodBrowserViewModel/>
     </Design.DataContext>
     <UserControl.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
@@ -165,7 +167,7 @@
                                 <StackLayout Spacing="4" Orientation="Vertical" />
                             </ItemsRepeater.Layout>
                             <ItemsRepeater.ItemTemplate>
-                                <DataTemplate DataType="vm:OnlineDmodVersionViewModel">
+                                <DataTemplate DataType="onlineDmod:OnlineDmodVersionViewModel">
                                     <Border BorderThickness="1"
                                             Padding="4"
                                             Margin="2,0"
@@ -220,7 +222,7 @@
                                 <StackLayout Spacing="4" Orientation="Vertical"/>
                             </ItemsRepeater.Layout>
                             <ItemsRepeater.ItemTemplate>
-                                <DataTemplate DataType="vm:OnlineDmodReviewViewModel">
+                                <DataTemplate DataType="onlineDmod:OnlineDmodReviewViewModel">
                                     <Border BorderThickness="1"
                                             Padding="4"
                                             Margin="2,0"
@@ -230,7 +232,7 @@
                                             <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Classes="Heading2B" 
                                                    Content="{Binding ReviewName}"/>
                       
-                                            <vv:OnlineUserHeaderView Grid.Row="1" Grid.Column="0" 
+                                            <onlineDmod1:OnlineUserHeaderView Grid.Row="1" Grid.Column="0" 
                                                                      DataContext="{Binding UserViewModel}"/>
                       
                                             <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto">
@@ -288,7 +290,7 @@
                                     </ItemsPanelTemplate>
                                 </ListBox.ItemsPanel>
                                 <ListBox.ItemTemplate>
-                                    <DataTemplate DataType="vm:OnlineDmodScreenshotViewModel">
+                                    <DataTemplate DataType="onlineDmod:OnlineDmodScreenshotViewModel">
                                         <Image Source="{Binding ScreenshotPreview }"
                                                Height="100"/>
                                     </DataTemplate>

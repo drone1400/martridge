@@ -1,4 +1,4 @@
-<UserControl x:Class="Martridge.Views.Dmod.OnlineDmodBrowserDmodListView" 
+<UserControl x:Class="Martridge.Views.OnlineDmod.OnlineDmodBrowserDmodListView" 
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,13 +7,14 @@
              xmlns:dloc="using:Martridge.ViewModels.Localization"
              xmlns:vm="using:Martridge.ViewModels.Dmod"
              xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
-             
+             xmlns:onlineDmod="clr-namespace:Martridge.ViewModels.OnlineDmod"
+
              mc:Ignorable="d" 
              d:DesignWidth="800" 
              d:DesignHeight="450">
     
     <Design.DataContext>
-        <vm:OnlineDmodBrowserViewModel/>
+        <onlineDmod:OnlineDmodBrowserViewModel/>
     </Design.DataContext>
     <UserControl.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
@@ -98,9 +99,9 @@
                     Width="60"
                     CanUserSort="True"
                     SortMemberPath="ScoreValue"
-                    x:DataType="vm:OnlineDmodInfoViewModel">
+                    x:DataType="onlineDmod:OnlineDmodInfoViewModel">
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate x:DataType="vm:OnlineDmodInfoViewModel">
+                        <DataTemplate x:DataType="onlineDmod:OnlineDmodInfoViewModel">
                             <Border 
                                 Margin="1"
                                 HorizontalAlignment="Stretch"
@@ -119,22 +120,22 @@
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Name}"
                     Width="*"
                     Binding="{Binding Name, Mode=OneWay}"
-                    x:DataType="vm:OnlineDmodInfoViewModel"/>
+                    x:DataType="onlineDmod:OnlineDmodInfoViewModel"/>
                 <DataGridTextColumn 
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Author}"
                     Width="140"
                     Binding="{Binding Author, Mode=OneWay}"
-                    x:DataType="vm:OnlineDmodInfoViewModel"/>
+                    x:DataType="onlineDmod:OnlineDmodInfoViewModel"/>
                 <DataGridTextColumn 
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Updated}"
                     Width="120"
                     Binding="{Binding Updated, Converter={StaticResource GenericDateConverter}, Mode=OneWay}"
-                    x:DataType="vm:OnlineDmodInfoViewModel"/>
+                    x:DataType="onlineDmod:OnlineDmodInfoViewModel"/>
                 <DataGridTextColumn 
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Downloads}"
                     Width="120"
                     Binding="{Binding Downloads, Mode=OneWay}"
-                    x:DataType="vm:OnlineDmodInfoViewModel"/>
+                    x:DataType="onlineDmod:OnlineDmodInfoViewModel"/>
             </DataGrid.Columns>
         </DataGrid>
         

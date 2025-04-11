@@ -19,10 +19,12 @@ namespace Martridge.ViewModels
         {
             switch (param?.GetType().Name ?? "")
             {
+#if PLATF_WINDOWS
+                case nameof(DinkInstallerViewModel): return new DinkInstallerView();
+#endif
                 case nameof(DualDmodBrowserViewModel): return new DualDmodBrowserView();
                 case nameof(DmodBrowserViewModel): return new DmodBrowserView();
                 case nameof(OnlineDmodBrowserViewModel): return new OnlineDmodBrowserView();
-                case nameof(DinkInstallerViewModel): return new DinkInstallerView();
                 case nameof(DmodInstallerViewModel): return new DmodInstallerView();
                 case nameof(DmodPackerViewModel): return new DmodPackerView();
                 case nameof(AboutViewModel): return new AboutView();

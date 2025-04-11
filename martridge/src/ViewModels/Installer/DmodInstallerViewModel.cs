@@ -256,13 +256,11 @@ namespace Martridge.ViewModels.Installer {
                 this.TemporaryDmodSource = this.CfgRemember.InstallDmodSourcePath;
                 if (string.IsNullOrWhiteSpace(this.CfgRemember.InstallDmodDestinationBaseDirectory) == false) {
                     foreach (DirectoryInfo x in this.BaseDestinations) {
-                        if (
-#if PLATF_WINDOWS
-                            x.FullName.ToLowerInvariant() == this.CfgRemember.InstallDmodDestinationBaseDirectory.ToLowerInvariant()
-#else
-                            x.FullName == this.ConfigRemember.InstallDmodDestinationBaseDirectory
-#endif
-                        ) {
+                        if (LocationHelper.PathIsEqual(
+                                x.FullName, 
+                                this.CfgRemember.InstallDmodDestinationBaseDirectory, 
+                                LocationHelperPathCompareFlags.IgnoreDirectorySeparator)) 
+                        {
                             this.SelectedBaseDestination = x;
                             break;
                         }

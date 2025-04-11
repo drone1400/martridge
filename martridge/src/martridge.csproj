@@ -103,6 +103,12 @@
         <ProjectReference Include="..\..\citrus\src\Citrus.Avalonia\Citrus.Avalonia.csproj" />
         <ProjectReference Include="..\..\citrus\src\Citrus.Avalonia.DataGrid\Citrus.Avalonia.DataGrid.csproj" />
     </ItemGroup>
+  
+    <ItemGroup Condition="'$(IsWindows)'!='true'">
+      <Compile Remove="Models\Installer\DinkInstaller.cs" />
+      <Compile Remove="ViewModels\Installer\DinkInstallerViewModel.cs" />
+    </ItemGroup>
+      
     
     <ItemGroup>
       <Compile Update="Views\Dmod\NoDinkyLinuxView.axaml.cs">

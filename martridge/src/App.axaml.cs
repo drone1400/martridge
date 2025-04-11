@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
@@ -15,6 +16,7 @@ using Martridge.Trace;
 using Martridge.ViewModels;
 using Martridge.Views;
 using Martridge.Views.Log;
+using Tmds.DBus.Protocol;
 
 namespace Martridge {
     
@@ -41,7 +43,7 @@ namespace Martridge {
 
         public override void OnFrameworkInitializationCompleted() {
             if (this.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
-                if (this._config.General.ShowLogWindowOnStartup) {
+                if (this._config.Remember.LogWindowShowOnStartup) {
                     this.ShowLogWindow();
                 }
                 
@@ -175,7 +177,34 @@ namespace Martridge {
         private MainWindow? _mainWindow;
         private MainWindowViewModel? _mainWindowViewModel;
         private LogWindow? _logWindow;
-        
+
+        private void RestoreWindowState(Window window, WindowState state, double width, double height, int positionX, int positionY) {
+            switch (state) {
+                case WindowState.Maximized:
+                case WindowState.FullScreen:
+                    window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    window.WindowState = state;
+                    break;
+                case WindowState.Minimized:
+                    window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    break;
+                case WindowState.Normal: {
+                    if (double.IsNaN(width) == false && double.IsFinite(width) && width > 0 &&
+                        double.IsNaN(height) == false && double.IsFinite(height) && height > 0) {
+                        window.Width = width;
+                        window.Height = height;
+                    }
+                    if (positionX != 0 && positionY != 0) {
+                        window.WindowStartupLocation = WindowStartupLocation.Manual;
+                        window.Position = new PixelPoint(positionX, positionY);
+                    }
+                    else {
+                        window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    }
+                    break;
+                }
+            }
+        }
         
         private void InitializeMainWindow(string[]? args = null) {
             if (this._mainWindow == null) {
@@ -185,6 +214,14 @@ namespace Martridge {
                 this._mainWindow = new MainWindow {
                     DataContext = this._mainWindowViewModel,
                 };
+
+                this.RestoreWindowState(
+                    this._mainWindow,
+                    this._config.Remember.MainWindowState,
+                    this._config.Remember.MainWindowWidth,
+                    this._config.Remember.MainWindowHeight,
+                    this._config.Remember.MainWindowPositionX,
+                    this._config.Remember.MainWindowPositionY);
                 
                 this._mainWindow.Closed += this.MainWindow_Closed;
                 this._mainWindow.Closing += this.MainWindow_Closing;
@@ -195,6 +232,29 @@ namespace Martridge {
         }
 
         private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e) {
+            if (this._logWindow is Window logWindow) {
+                Dictionary<string, object?> values = new Dictionary<string, object?>() {
+                    [nameof(ConfigRemember.LogWindowState)] = logWindow.WindowState,
+                    [nameof(ConfigRemember.LogWindowWidth)] = logWindow.Width,
+                    [nameof(ConfigRemember.LogWindowHeight)] = logWindow.Height,
+                    [nameof(ConfigRemember.LogWindowPositionX)] = logWindow.Position.X,
+                    [nameof(ConfigRemember.LogWindowPositionY)] = logWindow.Position.Y,
+                    [nameof(ConfigRemember.LogWindowShowOnStartup)] = true,
+                };
+                this._config.Remember.UpdateProperties(values);
+            }
+            
+            if (this._mainWindow is Window mainWindow) {
+                Dictionary<string, object?> values = new Dictionary<string, object?>() {
+                    [nameof(ConfigRemember.MainWindowState)] = mainWindow.WindowState,
+                    [nameof(ConfigRemember.MainWindowWidth)] = mainWindow.Width,
+                    [nameof(ConfigRemember.MainWindowHeight)] = mainWindow.Height,
+                    [nameof(ConfigRemember.MainWindowPositionX)] = mainWindow.Position.X,
+                    [nameof(ConfigRemember.MainWindowPositionY)] = mainWindow.Position.Y,
+                };
+                this._config.Remember.UpdateProperties(values);
+            }
+            
             // save config when closing in order to save ConfigRemember
             this._config.SaveToFile(this._defaultConfigFile);
         }
@@ -207,13 +267,43 @@ namespace Martridge {
         public void ShowLogWindow() {
             if (this._logWindow == null) {
                 this._logWindow = new LogWindow();
-                this._logWindow.Closed += (s,e) => { this._logWindow = null; };
+                
+                this.RestoreWindowState(
+                    this._logWindow,
+                    this._config.Remember.LogWindowState,
+                    this._config.Remember.LogWindowWidth,
+                    this._config.Remember.LogWindowHeight,
+                    this._config.Remember.LogWindowPositionX,
+                    this._config.Remember.LogWindowPositionY);
+
+                this._logWindow.Closing += this.LogWindowOnClosing;
+                this._logWindow.Closed += this.LogWindowOnClosed;
                 this._logWindow.Show();
             } else {
                 this._logWindow.Activate();
             }
         }
-        
+        private void LogWindowOnClosed(object? sender, EventArgs e) {
+            this._logWindow = null;
+        }
+        private void LogWindowOnClosing(object? sender, WindowClosingEventArgs e) {
+            if (sender is not Window window) 
+                return;
+
+            if (this._mainWindow == null) 
+                return;
+            
+            Dictionary<string, object?> values = new Dictionary<string, object?>() {
+                [nameof(ConfigRemember.LogWindowState)] = window.WindowState,
+                [nameof(ConfigRemember.LogWindowWidth)] = window.Width,
+                [nameof(ConfigRemember.LogWindowHeight)] = window.Height,
+                [nameof(ConfigRemember.LogWindowPositionX)] = window.Position.X,
+                [nameof(ConfigRemember.LogWindowPositionY)] = window.Position.Y,
+                [nameof(ConfigRemember.LogWindowShowOnStartup)] = false,
+            };
+            this._config.Remember.UpdateProperties(values);
+        }
+
         #endregion
     }
 }

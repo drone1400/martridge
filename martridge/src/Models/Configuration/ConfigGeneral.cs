@@ -234,7 +234,7 @@ namespace Martridge.Models.Configuration {
                     AutoUpdateInstallerList = this.AutoUpdateInstallerList,
                     ShowDmodDevFeatures = this.ShowDmodDevFeatures,
                     EnableOnlineFeatures = this.EnableOnlineFeatures,
-                    ShowLogWindowOnStartup = this.ShowLogWindowOnStartup,
+                    //ShowLogWindowOnStartup = this.ShowLogWindowOnStartup,
                     UseRelativePathForSubfolders = this.UseRelativePathForSubfolders,
                     ActiveGameExeIndex = this.ActiveGameExeIndex,
                     GameExePaths = gameExePaths,

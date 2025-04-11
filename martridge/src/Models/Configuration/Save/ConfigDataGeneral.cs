@@ -38,7 +38,7 @@ namespace Martridge.Models.Configuration.Save {
         /// <summary>
         /// Indicates if the application should show the info/error log window when starting
         /// </summary>
-        public bool? ShowLogWindowOnStartup { get; set; }
+        // public bool? ShowLogWindowOnStartup { get; set; }
         
         /// <summary>
         /// Indicates if the application should use relative paths for paths related to its subfolders.
@@ -83,7 +83,7 @@ namespace Martridge.Models.Configuration.Save {
                 [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
                 [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
                 [nameof(ConfigGeneral.EnableOnlineFeatures)] = this.EnableOnlineFeatures,
-                [nameof(ConfigGeneral.ShowLogWindowOnStartup)] = this.ShowLogWindowOnStartup,
+                //[nameof(ConfigGeneral.ShowLogWindowOnStartup)] = this.ShowLogWindowOnStartup,
                 [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,
                 [nameof(ConfigGeneral.ActiveGameExeIndex)] = this.ActiveGameExeIndex,
                 [nameof(ConfigGeneral.ActiveEditorExeIndex)] = this.ActiveEditorExeIndex,

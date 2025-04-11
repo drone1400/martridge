@@ -30,7 +30,9 @@
                 <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Localizations}"
                           HorizontalAlignment="Left"
                           SelectedItem="{Binding SelectedLocalization}"
-                          Width="360">
+                          Width="360"
+                          Height="40"
+                          Padding="0">
                     <ComboBox.DataTemplates>
                         <DataTemplate DataType="globalization:CultureInfo">
                             <Label Classes="Heading2I"
@@ -42,11 +44,12 @@
             
             <Grid ColumnDefinitions="*,*" 
                   RowDefinitions="Auto,Auto,Auto">
-                <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding ShowLogWindowOnStartup}" Content="{dloc:Localize SettingsGeneral/ShowLogWindowOnStartup}"/>
+                <!-- <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding ShowLogWindowOnStartup}" Content="{dloc:Localize SettingsGeneral/ShowLogWindowOnStartup}"/> -->
+                <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding EnableOnlineFeatures}" Content="{dloc:Localize SettingsGeneral/EnableOnlineFeatures}"/>
                 <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding AutoUpdateInstallerList}" Content="{dloc:Localize SettingsGeneral/AutoUpdateInstallerList}"/>
                 <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding ShowDmodDevFeatures}" Content="{dloc:Localize SettingsGeneral/ShowDmodDevFeatures}"/>
                 <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding UseRelativePathForSubfolders}" Content="{dloc:Localize SettingsGeneral/UseRelativePathForSubfolders}"/>
-                <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding EnableOnlineFeatures}" Content="{dloc:Localize SettingsGeneral/EnableOnlineFeatures}"/>
+                
             </Grid>
         </StackPanel>
 

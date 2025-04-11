@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Martridge.Models.Configuration;
 using Martridge.Trace;
-namespace Martridge.Models.Installer {
+namespace Martridge.Models.DinkInstaller {
     public class DinkInstallerOnlineListHelper {
 
         private HttpClient _httpClient = new HttpClient();
@@ -17,7 +17,7 @@ namespace Martridge.Models.Installer {
         
         public CancellationTokenSource CancelTokenSource { get; } = new CancellationTokenSource();
 
-        protected CancellationToken CancelToken => CancelTokenSource.Token;
+        protected CancellationToken CancelToken => this.CancelTokenSource.Token;
 
         private ConfigInstallerList? TryGetListFromLocalCachedFile(string path, bool checkWriteTime) {
             FileInfo finfo1 = new FileInfo(path);
@@ -49,7 +49,7 @@ namespace Martridge.Models.Installer {
 
                 if (this.CancelToken.IsCancellationRequested) throw new TaskCanceledException();
 
-                HttpStatusCode result = await DownloadWebContent(resourceTemp);
+                HttpStatusCode result = await this.DownloadWebContent(resourceTemp);
 
                 if (this.CancelToken.IsCancellationRequested) throw new TaskCanceledException();
 

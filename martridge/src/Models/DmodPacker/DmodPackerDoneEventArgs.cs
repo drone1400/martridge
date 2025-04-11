@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Martridge.Models.Installer;
 namespace Martridge.Models.DmodPacker {
     public class DmodPackerDoneEventArgs : EventArgs {
         public DinkInstallerResult Result { get; }

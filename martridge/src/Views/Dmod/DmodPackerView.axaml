@@ -1,20 +1,20 @@
-<UserControl x:Class="Martridge.Views.Installer.DmodPackerView"
+<UserControl x:Class="Martridge.Views.Dmod.DmodPackerView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              
              xmlns:dloc="using:Martridge.ViewModels.Localization"
-             xmlns:vm="using:Martridge.ViewModels.Installer"
              xmlns:dmodPacker="clr-namespace:Martridge.Models.DmodPacker"
              xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
-             
+             xmlns:dmod="clr-namespace:Martridge.ViewModels.Dmod"
+
              mc:Ignorable="d" 
              d:DesignWidth="800" 
              d:DesignHeight="450">
     
     <Design.DataContext>
-        <vm:DmodPackerViewModel/>
+        <dmod:DmodPackerViewModel/>
     </Design.DataContext>
     <UserControl.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />

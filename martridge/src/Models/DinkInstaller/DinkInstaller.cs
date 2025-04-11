@@ -1,15 +1,14 @@
-﻿using Martridge.Models.Configuration;
-using Martridge.Models.Localization;
-using Martridge.Trace;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Martridge.Models.Configuration;
+using Martridge.Models.Localization;
+using Martridge.Trace;
 using SevenZipExtractor;
-
-namespace Martridge.Models.Installer {
+namespace Martridge.Models.DinkInstaller {
     public class DinkInstaller {
 
         public event EventHandler<DinkInstallerProgressEventArgs>? ProgressReport;

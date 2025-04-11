@@ -1,5 +1,5 @@
 ﻿using Martridge.Models.Configuration;
-namespace Martridge.ViewModels.Installer {
+namespace Martridge.ViewModels.DinkInstaller {
     public class DinkInstallableEntry : ViewModelBase {
         public ConfigInstaller InstallerData { get; }
 

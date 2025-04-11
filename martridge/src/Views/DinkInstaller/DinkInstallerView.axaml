@@ -1,13 +1,13 @@
-<UserControl x:Class="Martridge.Views.Installer.DinkInstallerView"
+<UserControl x:Class="Martridge.Views.DinkInstaller.DinkInstallerView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              
              xmlns:dloc="using:Martridge.ViewModels.Localization"
-             xmlns:vw="using:Martridge.Views.Installer"
-             xmlns:vm="using:Martridge.ViewModels.Installer"
-             
+             xmlns:dinkInstaller="clr-namespace:Martridge.ViewModels.DinkInstaller"
+             xmlns:dinkInstaller1="clr-namespace:Martridge.Views.DinkInstaller"
+
              mc:Ignorable="d" 
              d:DesignWidth="800" 
              d:DesignHeight="800"
@@ -15,7 +15,7 @@
              Name="DinkInstallerUserControl">
 
     <Design.DataContext>
-        <vm:DinkInstallerViewModel/>
+        <dinkInstaller:DinkInstallerViewModel/>
     </Design.DataContext>
     <UserControl.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
@@ -23,13 +23,13 @@
 
     <Grid Margin="8">
         <Grid IsVisible="{Binding Path=DinkInstallerNotSupported}">
-            <vw:DinkInstallerNotSupportedView
+            <dinkInstaller1:DinkInstallerNotSupportedView
                 DataContext="{Binding DataContext, ElementName=DinkInstallerUserControl}"/>
         </Grid>
         
         <Grid IsVisible="{Binding Path=!DinkInstallerNotSupported}">
             <Grid RowDefinitions="*, Auto" IsVisible="{Binding Path=!IsInstallerStarted}">
-                <vw:DinkInstallerPrepareView
+                <dinkInstaller1:DinkInstallerPrepareView
                     Grid.Row="0"
                     DataContext="{Binding DataContext, ElementName=DinkInstallerUserControl}"/>
                 
@@ -45,7 +45,7 @@
             </Grid>
                 
             <Grid RowDefinitions="*, Auto" IsVisible="{Binding Path=IsInstallerStarted}">
-                <vw:InstallerProgressView 
+                <dinkInstaller1:InstallerProgressView 
                     Grid.Row="0"
                     DataContext="{Binding DataContext, ElementName=DinkInstallerUserControl}"/>
                 

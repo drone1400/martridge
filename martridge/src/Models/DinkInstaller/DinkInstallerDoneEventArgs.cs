@@ -1,8 +1,7 @@
-using Martridge.Models.Configuration;
 using System;
 using System.IO;
-
-namespace Martridge.Models.Installer {
+using Martridge.Models.Configuration;
+namespace Martridge.Models.DinkInstaller {
     public class DinkInstallerDoneEventArgs : EventArgs {
         public DinkInstallerResult Result { get; }
 

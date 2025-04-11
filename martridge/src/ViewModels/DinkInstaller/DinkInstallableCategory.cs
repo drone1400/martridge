@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using Martridge.Models.Configuration;
-namespace Martridge.ViewModels.Installer {
+namespace Martridge.ViewModels.DinkInstaller {
     public class DinkInstallableCategory : ViewModelBase {
         
         public string CategoryName { get; }

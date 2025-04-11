@@ -1,9 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-
-namespace Martridge.Views.Installer {
-    public partial class DmodInstallerView : UserControl {
-        public DmodInstallerView() {
+namespace Martridge.Views.DinkInstaller {
+    public partial class InstallerProgressView : UserControl {
+        public InstallerProgressView() {
             this.InitializeComponent();
         }
 

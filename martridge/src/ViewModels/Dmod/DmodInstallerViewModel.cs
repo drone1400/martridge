@@ -1,23 +1,21 @@
-﻿using Avalonia.Metadata;
-using Martridge.Models.Configuration;
-using Martridge.Models.Installer;
-using Martridge.Models.Localization;
-using Martridge.Trace;
-using ReactiveUI;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Metadata;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Martridge.Models;
+using Martridge.Models.Configuration;
 using Martridge.Models.DmodInstaller;
+using Martridge.Models.Localization;
+using Martridge.Trace;
 using Martridge.ViewModels.DinkyAlerts;
+using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
-
-namespace Martridge.ViewModels.Installer {
+namespace Martridge.ViewModels.Dmod {
     
     public class DmodInstallerViewModel : ViewModelAppPageWithCfg {
 

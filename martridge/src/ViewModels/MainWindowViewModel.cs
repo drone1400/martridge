@@ -2,12 +2,10 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Metadata;
 using Martridge.Models.Dmod;
-using Martridge.Models.Installer;
 using Martridge.Trace;
 using Martridge.ViewModels.About;
 using Martridge.ViewModels.Configuration;
 using Martridge.ViewModels.Dmod;
-using Martridge.ViewModels.Installer;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -18,8 +16,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Platform.Storage;
+using Martridge.Models;
 using Martridge.Models.Configuration;
 using Martridge.Models.OnlineDmods;
+using Martridge.ViewModels.DinkInstaller;
 using Martridge.ViewModels.OnlineDmod;
 
 namespace Martridge.ViewModels {

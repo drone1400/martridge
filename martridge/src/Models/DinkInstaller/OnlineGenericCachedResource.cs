@@ -1,5 +1,5 @@
 using System.IO;
-namespace Martridge.Models.Installer {
+namespace Martridge.Models.DinkInstaller {
     public class OnlineGenericCachedResource
     {
         public string Local { get; private set; } = "";

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using Martridge.Models.Installer;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using SharpCompress.Common;

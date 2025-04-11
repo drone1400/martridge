@@ -1,17 +1,16 @@
-<UserControl x:Class="Martridge.Views.Installer.InstallerProgressView"
+<UserControl x:Class="Martridge.Views.DinkInstaller.InstallerProgressView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             
-             xmlns:vm="using:Martridge.ViewModels.Installer"
-             
+             xmlns:dinkInstaller="clr-namespace:Martridge.ViewModels.DinkInstaller"
+
              mc:Ignorable="d" 
              d:DesignWidth="800" 
              d:DesignHeight="450">
 
     <Design.DataContext>
-        <vm:DinkInstallerViewModel />
+        <dinkInstaller:DinkInstallerViewModel />
     </Design.DataContext>
     <UserControl.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />

@@ -1,5 +1,4 @@
 ﻿using System;
-using Martridge.Models.Installer;
 namespace Martridge.Models.DmodInstaller
 {
     public class DmodInstallerProgressEventArgs {

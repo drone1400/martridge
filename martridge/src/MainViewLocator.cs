@@ -3,13 +3,13 @@ using Avalonia.Controls.Templates;
 using Martridge.ViewModels;
 using Martridge.ViewModels.About;
 using Martridge.ViewModels.Configuration;
+using Martridge.ViewModels.DinkInstaller;
 using Martridge.ViewModels.Dmod;
-using Martridge.ViewModels.Installer;
 using Martridge.ViewModels.OnlineDmod;
 using Martridge.Views.About;
 using Martridge.Views.Configuration;
+using Martridge.Views.DinkInstaller;
 using Martridge.Views.Dmod;
-using Martridge.Views.Installer;
 using Martridge.Views.OnlineDmod;
 namespace Martridge
 {

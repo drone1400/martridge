@@ -1,6 +1,5 @@
 using System;
-
-namespace Martridge.Models.Installer {
+namespace Martridge.Models.DinkInstaller {
     public class DinkInstallerProgressEventArgs {
         public DateTime Timestamp { get; }
         public string HeadingMain { get; }

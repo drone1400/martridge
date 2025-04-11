@@ -1,21 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using ReactiveUI;
+using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Metadata;
+using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using Martridge.Models;
 using Martridge.Models.Configuration;
-using Martridge.Models.Installer;
+using Martridge.Models.DinkInstaller;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using Martridge.ViewModels.DinkyAlerts;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Avalonia.Platform.Storage;
-using Avalonia.Threading;
-
-namespace Martridge.ViewModels.Installer
+using ReactiveUI;
+namespace Martridge.ViewModels.DinkInstaller
 {
     public class DinkInstallerViewModel : ViewModelAppPage
     {
@@ -180,7 +179,7 @@ namespace Martridge.ViewModels.Installer
         public event EventHandler<DinkInstallerDoneEventArgs>? InstallerDone;
         private DinkInstallerDoneEventArgs _lastInstallerDoneEventArgs = new DinkInstallerDoneEventArgs(DinkInstallerResult.Cancelled);
 
-        private DinkInstaller? _installerLogic = null;
+        private Models.DinkInstaller.DinkInstaller? _installerLogic = null;
         private DinkInstallerOnlineListHelper? _installerOnlineHelper = null;
 
 #if PLATF_WINDOWS
@@ -556,7 +555,7 @@ namespace Martridge.ViewModels.Installer
                     }
 
                     // create installer logic
-                    this._installerLogic = new DinkInstaller();
+                    this._installerLogic = new Models.DinkInstaller.DinkInstaller();
                     this._installerLogic.CustomTrace.Listeners.Add(this._installerTraceListener);
                     this._installerLogic.ProgressReport += this.InstallerOnPrimaryProgressReport;
                     this._installerLogic.SecondaryProgressReport += this.InstallerOnSecondaryProgressReport;

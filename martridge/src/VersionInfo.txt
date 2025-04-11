@@ -1,3 +1,14 @@
+--- V0.9.0.0 --- [WIP]
+- reworked the DMOD installer, nicer interface that shows if there are problems with the selected DMOD, lets you change the DMOD directory you want to install the DMOD in and prevents you from overriding existing DMOD files unless you explicitly tell it to 
+- installing a DMOD now automagically selects it after the install is done
+- reworked the DMOD packer, nicer interface, ignores certain files like git repo files, still a bit [WIP]
+- reworked the whole Citrus theme by forking it and changing tons of things, so it should be nicer and easier to maintain for me going forward (check it out here: https://github.com/drone1400/Citrus.Avalonia )
+- application now remembers last used paths for installing/packing DMODs, also remembers last selected DMOD and window size/position between sessions
+- drag and drop works once more (i forgot when i broke it...)
+- should now detect even DMODs that are missing some expected files (like dink.ini, or hard.dat)
+- cleaned up a lot of messy weird old code...
+- 
+
 --- V0.8.4.0 ---
 - updated 7zip libs to V24.9.0.0
 - fixed dmod browser listing dmods without dmod.diz data without any name

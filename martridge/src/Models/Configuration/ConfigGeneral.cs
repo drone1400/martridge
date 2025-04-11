@@ -127,15 +127,9 @@ namespace Martridge.Models.Configuration {
         }
 
         private bool CheckDuplicate(List<string> list, string path) {
-            #if PLATF_WINDOWS
-            // on windows, ignore uppercase...
-            string pathLow = path.ToLowerInvariant();
             foreach (string s in list) {
-                if (s.ToLowerInvariant() == pathLow) return true;
+                if (LocationHelper.PathIsEqual(s, path)) return true;
             }
-            #else
-            if (this._gameExePaths.Contains(path)) return true;
-            #endif
             return false;
         }
 

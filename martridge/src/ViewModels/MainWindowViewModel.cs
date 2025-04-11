@@ -434,7 +434,7 @@ namespace Martridge.ViewModels {
                         this._dmodManager?.Initialize(this._config!.General).ContinueWith((_) =>
                         {
                             // select DMOD after installing!
-                            this._dmodBrowserViewModel?.InitializeSelectedDmod(args.Destination?.FullName ?? string.Empty);
+                            this._dmodBrowserViewModel?.SelectDmodByPath(args.Destination?.FullName ?? string.Empty);
                         });
                     }
                 };

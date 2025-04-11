@@ -63,7 +63,7 @@
                   HorizontalScrollBarVisibility="Disabled"
                   IsVisible="{Binding DmodDefinitionsFilteredHasItems}"
                   ItemsSource="{Binding DmodDefinitionsCollection}" 
-                  SelectedItem="{Binding SelectedDmodDefinition, Mode=TwoWay}">
+                  SelectionChanged="DataGridDmods_OnSelectionChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn 
                     Header="{dloc:Localize DmodBrowser/DataGrid/ColumnHeader/Name}"

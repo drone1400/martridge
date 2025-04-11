@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Collections;
+using Avalonia.Threading;
 using Martridge.Models;
 
 namespace Martridge.ViewModels.Dmod {
@@ -59,35 +60,21 @@ namespace Martridge.ViewModels.Dmod {
             };
             
             // self properties changed
-            this.PropertyChanged += ( sender,  args) => {
-                switch (args.PropertyName) {
+            this.PropertyChanged += this.OnPropertyChanged; 
+
+        }
+        private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
+            try {
+                switch (e.PropertyName) {
                     case nameof(this.DmodSearchString):
                         if (this._dmodSearchTimer.Enabled == false) {
                             this._dmodSearchTimer.Start();
                         }
                         break;
-                    case nameof(this.ActiveGameExePath):
-                        this.RefreshIsLauncherFreeDink();
-                        break;
-                    case nameof(this.DmodDefinitionsFiltered): {
-                        var collectionView = new DataGridCollectionView(this.DmodDefinitionsFiltered);
-                        collectionView.GroupDescriptions.Add(new DataGridPathGroupDescription("DmodParentDirectory"));
-                        collectionView.SortDescriptions.Add(new DataGridComparerSortDescription(new MyDmodComparer(), ListSortDirection.Ascending));
-                        this.DmodDefinitionsCollection = collectionView;
-                        break;
-                    }
-                    case nameof(this.SelectedDmodDefinition): {
-                        if (this.SelectedDmodDefinition == null ||
-                            this.CfgRemember == null)
-                            break;
-                        Dictionary<string, object?> values = new Dictionary<string, object?>() {
-                            [nameof(ConfigRemember.DmodBrowserSelectedDmodPath)] = this.SelectedDmodDefinition.DmodDirectory
-                        };
-                        this.CfgRemember.UpdateProperties(values);
-                        break;
-                    }
                 }
-            };
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+            }
         }
 
         protected override void OnConfigGeneralChanged() {
@@ -116,17 +103,19 @@ namespace Martridge.ViewModels.Dmod {
         }
 
 
-        public void InitializeSelectedDmod(string dmodPath) {
-            foreach (var dmod in this.DmodDefinitionsFiltered) {
+        public void SelectDmodByPath(string dmodPath) {
+            foreach (var dmod in this._dmodDefinitionsFiltered) {
                 if (LocationHelper.PathIsEqual(dmod.DmodDirectory, dmodPath, LocationHelperPathCompareFlags.IgnoreDirectorySeparator)) {
-                    this.SelectedDmodDefinition = dmod;
+                    Dispatcher.UIThread.InvokeAsync(() => {
+                        this.DmodDefinitionsCollection?.MoveCurrentTo(dmod);
+                    });
                     return;
                 }
             }
         }
         private void InitializeSelectedDmodFromRemembered() {
             if (this.CfgRemember == null) return;
-            this.InitializeSelectedDmod(this.CfgRemember.DmodBrowserSelectedDmodPath);
+            this.SelectDmodByPath(this.CfgRemember.DmodBrowserSelectedDmodPath);
         }
 
         #endregion
@@ -251,7 +240,7 @@ namespace Martridge.ViewModels.Dmod {
         
         public DmodLauncherSelectionViewModel? ActiveGameExePath {
             get => this._activeGameExePath;
-            set => this.RaiseAndSetIfChanged(ref this._activeGameExePath, value);
+            private set => this.RaiseAndSetIfChanged(ref this._activeGameExePath, value);
         }
         private DmodLauncherSelectionViewModel? _activeGameExePath = null;
 
@@ -314,16 +303,18 @@ namespace Martridge.ViewModels.Dmod {
                     this.GameExePaths = listGameExe;
                     if (cfg.ActiveGameExeIndex >= 0 && cfg.ActiveGameExeIndex < cfg.GameExePaths.Count) {
                         this.ActiveGameExePath = this.GameExePaths[cfg.ActiveGameExeIndex];
+                        this.RefreshIsLauncherFreeDink();
                     } else {
                         this.ActiveGameExePath = null;
+                        this.RefreshIsLauncherFreeDink();
                     }
                 }
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
                 this.GameExePaths = listGameExe;
                 this.ActiveGameExePath = null;
+                this.RefreshIsLauncherFreeDink();
             }
-
 
 
             ObservableCollection<DmodLauncherSelectionViewModel> listEditorExe = new ObservableCollection<DmodLauncherSelectionViewModel>();
@@ -428,8 +419,7 @@ namespace Martridge.ViewModels.Dmod {
         // -----------------------------------------------------------------------------------------------------------------------------------
 
         private void RefreshIsLauncherFreeDink() {
-            if (this.ActiveGameExePath == null ||
-                this.ActiveGameExePath?.PathExists != true) {
+            if (this.ActiveGameExePath == null || this.ActiveGameExePath?.PathExists != true) {
                 this.IsLauncherFreeDink = false;
                 return;
             }
@@ -480,24 +470,16 @@ namespace Martridge.ViewModels.Dmod {
             }
         }
         private string? _dmodSearchString = null;
-        
-        public IEnumerable<DmodDefinition> DmodDefinitionsFiltered {
-            get => this._dmodDefinitionsFiltered;
-            set {
-                this.RaiseAndSetIfChanged(ref this._dmodDefinitionsFiltered, value);
-                this.RaisePropertyChanged(nameof(this.DmodDefinitionsFilteredHasItems));
-            }
-        }
-        private IEnumerable<DmodDefinition> _dmodDefinitionsFiltered = new List<DmodDefinition>();
 
         public DataGridCollectionView? DmodDefinitionsCollection {
             get => this._dmodDefinitionsCollection;
-            set => this.RaiseAndSetIfChanged(ref this._dmodDefinitionsCollection, value);
+            private set => this.RaiseAndSetIfChanged(ref this._dmodDefinitionsCollection, value);
         }
         private DataGridCollectionView? _dmodDefinitionsCollection = null;
         
-        public bool DmodDefinitionsFilteredHasItems => this.DmodDefinitionsFiltered.Any();
+        public bool DmodDefinitionsFilteredHasItems => this._dmodDefinitionsFiltered.Any();
         private List<DmodDefinition> _lastusedDmodDefinitions = new List<DmodDefinition>();
+        private IEnumerable<DmodDefinition> _dmodDefinitionsFiltered = new List<DmodDefinition>();
 
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Methods
@@ -525,10 +507,21 @@ namespace Martridge.ViewModels.Dmod {
             void SetFilteredDmods(IEnumerable<DmodDefinition> dmods) {
                 string oldSelPath = this.SelectedDmodDefinition?.DmodDirectory ?? "";
 
-                this.DmodDefinitionsFiltered = dmods.AsEnumerable();
+                if (this.DmodDefinitionsCollection != null) {
+                    this.DmodDefinitionsCollection.PropertyChanged -= this.DmodDefinitionsCollectionOnPropertyChanged;
+                }
+
+                this._dmodDefinitionsFiltered = dmods.AsEnumerable();
+                this.RaisePropertyChanged(nameof(this.DmodDefinitionsFilteredHasItems));
+                
+                DataGridCollectionView collectionView = new DataGridCollectionView(this._dmodDefinitionsFiltered);
+                collectionView.GroupDescriptions.Add(new DataGridPathGroupDescription("DmodParentDirectory"));
+                collectionView.SortDescriptions.Add(new DataGridComparerSortDescription(new MyDmodComparer(), ListSortDirection.Ascending));
+                collectionView.PropertyChanged += this.DmodDefinitionsCollectionOnPropertyChanged;
+                this.DmodDefinitionsCollection = collectionView;
 
                 // restore selected dmod!
-                this.InitializeSelectedDmod(oldSelPath);
+                this.SelectDmodByPath(oldSelPath);
             }
             
             this._lastusedDmodDefinitions = newDmodList;
@@ -546,6 +539,18 @@ namespace Martridge.ViewModels.Dmod {
                 SetFilteredDmods(newDmodList);
             }
         }
+        private void DmodDefinitionsCollectionOnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
+            if (sender is IDataGridCollectionView dgcv && e.PropertyName == nameof (DataGridCollectionView.CurrentItem)) {
+                this.SelectedDmodDefinition = dgcv.CurrentItem as DmodDefinition;
+
+                if (this.SelectedDmodDefinition != null && this.CfgRemember != null) {
+                    Dictionary<string, object?> values = new Dictionary<string, object?>() {
+                        [nameof(ConfigRemember.DmodBrowserSelectedDmodPath)] = this.SelectedDmodDefinition.DmodDirectory
+                    };
+                    this.CfgRemember.UpdateProperties(values);
+                }
+            }
+        }
 
         #endregion
 
@@ -558,7 +563,7 @@ namespace Martridge.ViewModels.Dmod {
         
         public DmodDefinition? SelectedDmodDefinition {
             get => this._selectedDmodDefinition;
-            set => this.RaiseAndSetIfChanged(ref this._selectedDmodDefinition, value);
+            private set => this.RaiseAndSetIfChanged(ref this._selectedDmodDefinition, value);
         }
         private DmodDefinition? _selectedDmodDefinition;
         

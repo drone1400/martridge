@@ -41,14 +41,14 @@ namespace Martridge {
 
         public override void OnFrameworkInitializationCompleted() {
             if (this.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
-                this.InitializeMainWindow(desktop.Args);
-                desktop.MainWindow = this._mainWindow;
-                
                 if (this._config.General.ShowLogWindowOnStartup) {
                     this.ShowLogWindow();
                 }
                 
                 MyTrace.Global.WriteMessage(MyTraceCategory.General, $"App Path = \"{LocationHelper.AppBaseDirectory}\"");
+                
+                this.InitializeMainWindow(desktop.Args);
+                desktop.MainWindow = this._mainWindow;
             }
 
             base.OnFrameworkInitializationCompleted();

@@ -145,6 +145,9 @@ namespace Martridge.ViewModels.Configuration {
                 this._themeName = app.GetCitrusPalette();
                 app.OnThemePaletteChange += this.AppOnThemePaletteChanged;
             }
+            else {
+                this._themeName = "Citrus"; // fallback...
+            }
             
             
             try {

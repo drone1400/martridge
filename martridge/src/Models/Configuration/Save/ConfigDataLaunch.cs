@@ -51,7 +51,17 @@ namespace Martridge.Models.Configuration.Save {
         /// Skip update check and stuff in DinkHD
         /// </summary>
         public bool? Skip { get; set; }
-        
+
+        /// <summary>
+        /// If true, passes the --refdir argument when launching or editing DMODs
+        /// </summary>
+        public bool? UseRefDir { get; set; }
+
+        /// <summary>
+        /// The RefDir path to use...
+        /// </summary>
+        public string? RefDirPath { get; set; }
+
         public Dictionary<string, object?> GetValues() {
             return new Dictionary<string, object?>() {
                 [nameof(ConfigLaunch.CustomUserArguments)] = this.CustomUserArguments,
@@ -64,6 +74,8 @@ namespace Martridge.Models.Configuration.Save {
                 [nameof(ConfigLaunch.Debug)] = this.Debug,
                 [nameof(ConfigLaunch.V107Mode)] = this.V107Mode,
                 [nameof(ConfigLaunch.Skip)] = this.Skip,
+                [nameof(ConfigLaunch.UseRefDir)] = this.UseRefDir,
+                [nameof(ConfigLaunch.RefDirPath)] = this.RefDirPath,
             };
         }
     }

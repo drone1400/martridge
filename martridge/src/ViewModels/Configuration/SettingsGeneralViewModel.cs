@@ -123,6 +123,16 @@ namespace Martridge.ViewModels.Configuration {
             set => this.RaiseAndSetIfChanged(ref this._additionalDmodLocations, value);
         }
         private ObservableCollection<string> _additionalDmodLocations = new ObservableCollection<string>();
+        
+        //
+        // Launch settings
+        //
+        
+        public string LaunchRefDirPath {
+            get => this._launchRefDirPath;
+            set => this.RaiseAndSetIfChanged(ref this._launchRefDirPath, value);
+        }
+        private string _launchRefDirPath = string.Empty;
 
         //
         // Internal logic
@@ -196,7 +206,29 @@ namespace Martridge.ViewModels.Configuration {
             this.LoadFromConfig();
         }
 
+        protected override void OnConfigLaunchChanged() {
+            this.LoadFromConfigLaunch();
+        }
+
+        protected override void OnCfgLaunchUpdated(object? sender, ConfigUpdateEventArgs e) {
+            this.LoadFromConfigLaunch();
+        }
+
         #region LOAD / SAVE Config
+        
+        private void LoadFromConfigLaunch() {
+            if (this.CfgLaunch == null) return;
+
+            this.LaunchRefDirPath = this.CfgLaunch.RefDirPath;
+        }
+
+        private void SaveToConfigLaunch() {
+            if (this.CfgLaunch == null) return;
+            
+            this.CfgLaunch.UpdateProperties(new Dictionary<string, object?>() {
+                [nameof(ConfigLaunch.RefDirPath)] = this.LaunchRefDirPath,
+            });
+        }
 
         private void LoadFromConfig() {
             if (this.CfgGeneral == null) { return; }
@@ -297,13 +329,16 @@ namespace Martridge.ViewModels.Configuration {
 
         public void CmdSettingsOk(object? parameter = null) {
             this.SaveToConfig();
+            this.SaveToConfigLaunch();
             // signal that settings are done...
             this.SettingsDone?.Invoke(this, EventArgs.Empty);
         }
 
-        [DependsOn(nameof(Configuration))]
+        [DependsOn(nameof(CfgGeneral))]
+        [DependsOn(nameof(CfgLaunch))]
         public bool CanCmdSettingsOk(object? parameter = null) {
             if (this.CfgGeneral == null) { return false; }
+            if (this.CfgLaunch == null) { return false; }
             return true;
         }
 
@@ -318,12 +353,57 @@ namespace Martridge.ViewModels.Configuration {
             // signal that settings are done...
             this.SettingsDone?.Invoke(this, EventArgs.Empty);
         }
-        [DependsOn(nameof(Configuration))]
+        [DependsOn(nameof(CfgGeneral))]
         public bool CanCmdSettingsCancel(object? parameter = null) {
             //if (this.Configuration == null) { return false; }
             return true;
         }
         
+        #endregion
+
+        #region COMMANDS LAUNCH
+
+        //
+        // Default dmods
+        //
+        
+        public async void CmdLaunchRefDirBrowse(object? parameter = null) {
+            if (this.IsBusy ) return;
+            
+            this.IsBusy = true;
+
+            await Task.Run(() => {
+                try
+                {
+                    IStorageFolder? storageFolder = LocationHelper.BrowseFolderPicker(
+                        Localizer.Instance["SettingsGeneral/BrowseRefDirDirectory"],
+                        string.IsNullOrWhiteSpace(this.LaunchRefDirPath) 
+                            ? LocationHelper.AppBaseDirectory
+                            : this.LaunchRefDirPath );
+                    
+                    if (storageFolder != null)
+                    {
+                        this.LaunchRefDirPath = storageFolder.Path.LocalPath;
+                    }
+                } catch (Exception ex)
+                {
+                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                }
+                finally
+                {
+                    this.IsBusy = false;
+                }
+            });
+        }
+        
+        [DependsOn(nameof(IsBusy))]
+        public bool CanCmdLaunchRefDirBrowse(object? parameter = null) {
+            // general conditions
+            if (this.IsBusy ) return false;
+            // specific conditions
+            return true;
+        }
+
         #endregion
         
         #region COMMANDS - DMODs
@@ -339,7 +419,7 @@ namespace Martridge.ViewModels.Configuration {
         // Default dmods
         //
         
-        public async void CmdDefaultDmodsSet(object? parameter = null) {
+        public async void CmdDefaultDmodsBrowse(object? parameter = null) {
             if (this.IsBusy ) return;
             
             this.IsBusy = true;
@@ -369,7 +449,7 @@ namespace Martridge.ViewModels.Configuration {
         }
         
         [DependsOn(nameof(IsBusy))]
-        public bool CanCmdDefaultDmodsSet(object? parameter = null) {
+        public bool CanCmdDefaultDmodsBrowse(object? parameter = null) {
             // general conditions
             if (this.IsBusy ) return false;
             // specific conditions

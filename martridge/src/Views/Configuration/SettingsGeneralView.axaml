@@ -71,6 +71,22 @@
                               Content="{dloc:Localize SettingsGeneral/UseRelativePathForSubfolders}" />
 
                 </Grid>
+                
+                <!-- RefDir -->
+                <Border BorderThickness="1"
+                        BorderBrush="{DynamicResource ThemeBorderHighBrush}"
+                        Margin="6">
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,*">
+                        <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
+                               Content="{dloc:Localize SettingsGeneral/RefDirLocation}" />
+                        <Button Grid.Row="1" Grid.Column="1"
+                                Content="{dloc:Localize SettingsGeneral/RefDirLocation/Browse}"
+                                Command="{Binding CmdLaunchRefDirBrowse}" />
+
+                        <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                 Text="{Binding LaunchRefDirPath}" />
+                    </Grid>
+                </Border>
             </StackPanel>
 
 
@@ -94,8 +110,8 @@
                                             <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
                                                    Content="{dloc:Localize SettingsGeneral/DefaultDmodLocation}" />
                                             <Button Grid.Row="1" Grid.Column="1"
-                                                    Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
-                                                    Command="{Binding CmdDefaultDmodsSet}" />
+                                                    Content="{dloc:Localize SettingsGeneral/DefaultDmodLocation/Browse}"
+                                                    Command="{Binding CmdDefaultDmodsBrowse}" />
 
                                             <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                                                      Text="{Binding DefaultDmodLocation}" />
@@ -181,7 +197,7 @@
                                                                Content="{dloc:Localize SettingsGeneral/DefaultDmodLocation}" />
                                                         <Button Grid.Row="1" Grid.Column="1"
                                                                 Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
-                                                                Command="{Binding CmdDefaultDmodsSet}" />
+                                                                Command="{Binding CmdDefaultDmodsBrowse}" />
 
                                                         <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                                                                  Text="{Binding DefaultDmodLocation}" />

@@ -382,6 +382,7 @@ namespace Martridge.ViewModels {
                 
                 SettingsGeneralViewModel vm = new SettingsGeneralViewModel();
                 vm.CfgGeneral = this._config?.General;
+                vm.CfgLaunch = this._config?.Launch;
                 vm.SettingsDone += (_, _) => {
                     // return to previous view model...
                     // NOTE: this should also clean up the current view model...

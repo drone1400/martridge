@@ -186,6 +186,18 @@ namespace Martridge.ViewModels.Dmod {
             set => this.RaiseAndSetIfChanged(ref this._launchSkip, value);
         }
         private bool _launchSkip= true;
+        
+        public bool LaunchUseRefDir {
+            get => this._launchUseRefDir;
+            set => this.RaiseAndSetIfChanged(ref this._launchUseRefDir, value);
+        }
+        private bool _launchUseRefDir= true;
+
+        public string LaunchRefDirPath {
+            get => this._launchRefDirPath;
+            set => this.RaiseAndSetIfChanged(ref this._launchRefDirPath, value);
+        }
+        private string _launchRefDirPath = string.Empty;
 
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Methods
@@ -204,6 +216,8 @@ namespace Martridge.ViewModels.Dmod {
             this.LaunchUsePathRelativeToGame = cfg.UsePathRelativeToGame;
             this.LaunchCustomUserArguments = cfg.CustomUserArguments;
             this.LaunchSkip = cfg.Skip;
+            this.LaunchUseRefDir = cfg.UseRefDir;
+            this.LaunchRefDirPath = cfg.RefDirPath;
         }
 
         private void SaveToConfigLauncher() {
@@ -220,6 +234,8 @@ namespace Martridge.ViewModels.Dmod {
                 [nameof(ConfigLaunch.UsePathRelativeToGame)] = this.LaunchUsePathRelativeToGame,
                 [nameof(ConfigLaunch.CustomUserArguments)] = this.LaunchCustomUserArguments,
                 [nameof(ConfigLaunch.Skip)] = this.LaunchSkip,
+                [nameof(ConfigLaunch.UseRefDir)] = this.LaunchUseRefDir,
+                [nameof(ConfigLaunch.RefDirPath)] = this.LaunchRefDirPath,
             };
             cfg.UpdateProperties(values);
         }

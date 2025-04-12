@@ -65,6 +65,18 @@ namespace Martridge.Models.Configuration {
         /// </summary>
         public bool Skip => this._skip;
         private bool _skip = false;
+        
+        /// <summary>
+        /// If true, passes the --refdir argument when launching or editing DMODs
+        /// </summary>
+        public bool UseRefDir => this._useRefDir; 
+        private bool _useRefDir;
+
+        /// <summary>
+        /// The RefDir path to use...
+        /// </summary>
+        public string RefDirPath => this._refDirPath;
+        private string _refDirPath = string.Empty;
 
         
         public void UpdateProperties(Dictionary<string, object?> newValues) {
@@ -89,6 +101,8 @@ namespace Martridge.Models.Configuration {
                     case nameof(this.Debug): TryUpdateGeneric(kvp, ref this._debug); break; 
                     case nameof(this.V107Mode): TryUpdateGeneric(kvp, ref this._v107Mode); break; 
                     case nameof(this.Skip): TryUpdateGeneric(kvp, ref this._skip); break; 
+                    case nameof(this.UseRefDir): TryUpdateGeneric(kvp, ref this._useRefDir); break; 
+                    case nameof(this.RefDirPath): TryUpdateGeneric(kvp, ref this._refDirPath); break; 
                 }
             }
             
@@ -113,6 +127,9 @@ namespace Martridge.Models.Configuration {
                 UsePathQuotationMarks = this.UsePathQuotationMarks,
                 UsePathRelativeToGame = this.UsePathRelativeToGame,
                 CustomUserArguments = this.CustomUserArguments,
+                Skip = this.Skip,
+                UseRefDir = this.UseRefDir,
+                RefDirPath = this.RefDirPath,
             };
         }
     }

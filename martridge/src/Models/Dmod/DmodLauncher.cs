@@ -73,6 +73,16 @@ namespace Martridge.Models.Dmod
                     arguments += finalPath;
                 }
 
+                if (launch.UseRefDir && string.IsNullOrWhiteSpace(launch.RefDirPath) == false) {
+                    arguments += " --refdir ";
+                    if (launch.UsePathQuotationMarks) {
+                        arguments += $"\"{launch.RefDirPath}\"";
+                    }
+                    else {
+                        arguments += launch.RefDirPath;
+                    }
+                }
+
                 if (!string.IsNullOrWhiteSpace(launch.CustomUserArguments)) {
                     arguments += " ";
                     arguments += launch.CustomUserArguments;

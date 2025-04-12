@@ -13,8 +13,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Collections;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Martridge.Models;
+using Martridge.Models.Localization;
 
 namespace Martridge.ViewModels.Dmod {
     
@@ -198,6 +200,18 @@ namespace Martridge.ViewModels.Dmod {
             set => this.RaiseAndSetIfChanged(ref this._launchRefDirPath, value);
         }
         private string _launchRefDirPath = string.Empty;
+        
+        public bool ShowLaunchRefDirPathInMainWindow {
+            get => this._showLaunchRefDirPathInMainWindow;
+            set => this.RaiseAndSetIfChanged(ref this._showLaunchRefDirPathInMainWindow, value);
+        }
+        private bool _showLaunchRefDirPathInMainWindow = false;
+        
+        public bool ShowLaunchCustomArgsInMainWindow {
+            get => this._showLaunchCustomArgsInMainWindow;
+            set => this.RaiseAndSetIfChanged(ref this._showLaunchCustomArgsInMainWindow, value);
+        }
+        private bool _showLaunchCustomArgsInMainWindow = false;
 
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Methods
@@ -375,6 +389,8 @@ namespace Martridge.ViewModels.Dmod {
             this.RaisePropertyChanged(nameof(this.EditorExeFound));
             
             this.ShowDmodDevFeatures = cfg.ShowDmodDevFeatures;
+            this.ShowLaunchRefDirPathInMainWindow = cfg.ShowLaunchRefDirPathInMainWindow;
+            this.ShowLaunchCustomArgsInMainWindow = cfg.ShowLaunchCustomArgsInMainWindow;
         }
 
         private void SaveActiveIndexToConfigGeneral() {
@@ -687,6 +703,61 @@ namespace Martridge.ViewModels.Dmod {
                 return false;
             }
 
+            return true;
+        }
+
+        #endregion
+        
+        #region COMMANDS LAUNCH
+        
+        //
+        // Internal logic
+        //
+        public bool IsBusy {
+            get { lock (this._isBusyLock) { return this._isBusy; } }
+            private set { lock (this._isBusyLock)  { this.RaiseAndSetIfChanged(ref this._isBusy, value); } }
+        }
+        private bool _isBusy = false;
+        private readonly object _isBusyLock = new object();
+
+        //
+        // Default dmods
+        //
+        
+        public async void CmdLaunchRefDirBrowse(object? parameter = null) {
+            if (this.IsBusy ) return;
+            
+            this.IsBusy = true;
+
+            await Task.Run(() => {
+                try
+                {
+                    IStorageFolder? storageFolder = LocationHelper.BrowseFolderPicker(
+                        Localizer.Instance["SettingsGeneral/BrowseRefDirDirectory"],
+                        string.IsNullOrWhiteSpace(this.LaunchRefDirPath) 
+                            ? LocationHelper.AppBaseDirectory
+                            : this.LaunchRefDirPath );
+                    
+                    if (storageFolder != null)
+                    {
+                        this.LaunchRefDirPath = storageFolder.Path.LocalPath;
+                    }
+                } catch (Exception ex)
+                {
+                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                }
+                finally
+                {
+                    this.IsBusy = false;
+                }
+            });
+        }
+        
+        [DependsOn(nameof(IsBusy))]
+        public bool CanCmdLaunchRefDirBrowse(object? parameter = null) {
+            // general conditions
+            if (this.IsBusy ) return false;
+            // specific conditions
             return true;
         }
 

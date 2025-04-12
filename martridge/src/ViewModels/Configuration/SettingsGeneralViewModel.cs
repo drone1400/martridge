@@ -57,6 +57,18 @@ namespace Martridge.ViewModels.Configuration {
             set => this.RaiseAndSetIfChanged(ref this._enableOnlineFeatures, value);
         }
         private bool _enableOnlineFeatures = false;
+        
+        public bool ShowLaunchRefDirPathInMainWindow {
+            get => this._showLaunchRefDirPathInMainWindow;
+            set => this.RaiseAndSetIfChanged(ref this._showLaunchRefDirPathInMainWindow, value);
+        }
+        private bool _showLaunchRefDirPathInMainWindow = false;
+        
+        public bool ShowLaunchCustomArgsInMainWindow {
+            get => this._showLaunchCustomArgsInMainWindow;
+            set => this.RaiseAndSetIfChanged(ref this._showLaunchCustomArgsInMainWindow, value);
+        }
+        private bool _showLaunchCustomArgsInMainWindow = false;
 
         public bool ShowLogWindowOnStartup {
             get => this._showLogWindowOnStartup;
@@ -133,6 +145,12 @@ namespace Martridge.ViewModels.Configuration {
             set => this.RaiseAndSetIfChanged(ref this._launchRefDirPath, value);
         }
         private string _launchRefDirPath = string.Empty;
+        
+        public string LaunchCustomUserArguments {
+            get => this._launchCustomuserArguments;
+            set => this.RaiseAndSetIfChanged(ref this._launchCustomuserArguments, value);
+        }
+        private string _launchCustomuserArguments = string.Empty;
 
         //
         // Internal logic
@@ -220,6 +238,7 @@ namespace Martridge.ViewModels.Configuration {
             if (this.CfgLaunch == null) return;
 
             this.LaunchRefDirPath = this.CfgLaunch.RefDirPath;
+            this.LaunchCustomUserArguments = this.CfgLaunch.CustomUserArguments;
         }
 
         private void SaveToConfigLaunch() {
@@ -227,6 +246,7 @@ namespace Martridge.ViewModels.Configuration {
             
             this.CfgLaunch.UpdateProperties(new Dictionary<string, object?>() {
                 [nameof(ConfigLaunch.RefDirPath)] = this.LaunchRefDirPath,
+                [nameof(ConfigLaunch.CustomUserArguments)] = this.LaunchCustomUserArguments,
             });
         }
 
@@ -255,6 +275,8 @@ namespace Martridge.ViewModels.Configuration {
             this.ShowLogWindowOnStartup = this.CfgGeneral.ShowLogWindowOnStartup;
             this.ShowDmodDevFeatures = this.CfgGeneral.ShowDmodDevFeatures;
             this.EnableOnlineFeatures = this.CfgGeneral.EnableOnlineFeatures;
+            this.ShowLaunchRefDirPathInMainWindow = this.CfgGeneral.ShowLaunchRefDirPathInMainWindow;
+            this.ShowLaunchCustomArgsInMainWindow = this.CfgGeneral.ShowLaunchCustomArgsInMainWindow;
             this.UseRelativePathForSubfolders = this.CfgGeneral.UseRelativePathForSubfolders;
             this.AutoUpdateInstallerList = this.CfgGeneral.AutoUpdateInstallerList;
             this.AdditionalDmodLocationsIndex = -1;
@@ -312,6 +334,8 @@ namespace Martridge.ViewModels.Configuration {
                 [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
                 [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
                 [nameof(ConfigGeneral.EnableOnlineFeatures)] = this.EnableOnlineFeatures,
+                [nameof(ConfigGeneral.ShowLaunchRefDirPathInMainWindow)] = this.ShowLaunchRefDirPathInMainWindow,
+                [nameof(ConfigGeneral.ShowLaunchCustomArgsInMainWindow)] = this.ShowLaunchCustomArgsInMainWindow,
                 [nameof(ConfigGeneral.ShowLogWindowOnStartup)] = this.ShowLogWindowOnStartup,
                 [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,
                 [nameof(ConfigGeneral.ActiveGameExeIndex)] = this.ActiveGameExeIndex,

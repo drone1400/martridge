@@ -44,6 +44,19 @@ namespace Martridge.Models.Configuration {
         /// <remarks>NOTE: Not really used much right now...</remarks>
         public bool EnableOnlineFeatures { get => this._EnableOnlineFeatures; }
         private bool _EnableOnlineFeatures = true;
+        
+        
+        /// <summary>
+        /// If true, displays the --refdir path launch config in the main window in the selected dmod view
+        /// </summary>
+        public bool ShowLaunchRefDirPathInMainWindow => this._showLaunchRefDirPathInMainWindow;
+        private bool _showLaunchRefDirPathInMainWindow = true;
+
+        /// <summary>
+        /// If true, displays the custom args launch config in the main window in the selected dmod view
+        /// </summary>
+        public bool ShowLaunchCustomArgsInMainWindow => this._showLaunchCustomArgsInMainWindow;
+        private bool _showLaunchCustomArgsInMainWindow = false;
 
         /// <summary>
         /// Indicates if the application should show the info/error log window when starting
@@ -188,6 +201,8 @@ namespace Martridge.Models.Configuration {
                     case nameof(this.AutoUpdateInstallerList): TryUpdateGeneric(kvp, ref this._autoUpdateInstallerList); break;
                     case nameof(this.ShowDmodDevFeatures): TryUpdateGeneric(kvp, ref this._ShowDmodDevFeatures); break;
                     case nameof(this.EnableOnlineFeatures): TryUpdateGeneric(kvp, ref this._EnableOnlineFeatures); break;
+                    case nameof(this.ShowLaunchRefDirPathInMainWindow): TryUpdateGeneric(kvp, ref this._showLaunchRefDirPathInMainWindow); break;
+                    case nameof(this.ShowLaunchCustomArgsInMainWindow): TryUpdateGeneric(kvp, ref this._showLaunchCustomArgsInMainWindow); break;
                     case nameof(this.ShowLogWindowOnStartup): TryUpdateGeneric(kvp, ref this._showLogWindowOnStartup); break;
                     case nameof(this.UseRelativePathForSubfolders): TryUpdateGeneric(kvp, ref this._useRelativePathForSubfolders); break;
                     case nameof(this.ActiveGameExeIndex): TryUpdateGeneric(kvp, ref this._activeGameExeIndex); break;
@@ -228,6 +243,8 @@ namespace Martridge.Models.Configuration {
                     AutoUpdateInstallerList = this.AutoUpdateInstallerList,
                     ShowDmodDevFeatures = this.ShowDmodDevFeatures,
                     EnableOnlineFeatures = this.EnableOnlineFeatures,
+                    ShowLaunchRefDirPathInMainWindow = this.ShowLaunchRefDirPathInMainWindow,
+                    ShowLaunchCustomArgsInMainWindow = this.ShowLaunchCustomArgsInMainWindow,
                     //ShowLogWindowOnStartup = this.ShowLogWindowOnStartup,
                     UseRelativePathForSubfolders = this.UseRelativePathForSubfolders,
                     ActiveGameExeIndex = this.ActiveGameExeIndex,

@@ -65,26 +65,34 @@
                 <Grid ColumnDefinitions="*,*"
                       RowDefinitions="Auto,Auto,Auto">
                     <!-- <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding ShowLogWindowOnStartup}" Content="{dloc:Localize SettingsGeneral/ShowLogWindowOnStartup}"/> -->
-                    <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding ShowDmodDevFeatures}"
+                    <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding ShowDmodDevFeatures}"
                               Content="{dloc:Localize SettingsGeneral/ShowDmodDevFeatures}" />
-                    <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding UseRelativePathForSubfolders}"
+                    <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding UseRelativePathForSubfolders}"
                               Content="{dloc:Localize SettingsGeneral/UseRelativePathForSubfolders}" />
-
                 </Grid>
                 
                 <!-- RefDir -->
                 <Border BorderThickness="1"
                         BorderBrush="{DynamicResource ThemeBorderHighBrush}"
                         Margin="6">
-                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,*">
-                        <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
-                               Content="{dloc:Localize SettingsGeneral/RefDirLocation}" />
-                        <Button Grid.Row="1" Grid.Column="1"
-                                Content="{dloc:Localize SettingsGeneral/RefDirLocation/Browse}"
+                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                        <Label Grid.Row="0" Grid.Column="0" Classes="Heading2B"
+                               Content="{dloc:Localize SettingsGeneral/LaunchRefDirLocation}" />
+                        <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding ShowLaunchRefDirPathInMainWindow}"
+                                  Content="{dloc:Localize SettingsGeneral/ShowLaunchRefDirPathInMainWindow}" />
+                        <Button Grid.Row="0" Grid.Column="2"
+                                Content="{dloc:Localize SettingsGeneral/LaunchRefDirLocation/Browse}"
                                 Command="{Binding CmdLaunchRefDirBrowse}" />
 
-                        <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                        <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
                                  Text="{Binding LaunchRefDirPath}" />
+                        
+                        <Label Grid.Row="2" Grid.Column="0" Classes="Heading2B"
+                               Content="{dloc:Localize SettingsGeneral/LaunchCustomUserArguments}" />
+                        <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding ShowLaunchCustomArgsInMainWindow}"
+                                  Content="{dloc:Localize SettingsGeneral/ShowLaunchCustomArgsInMainWindow}" />
+                        <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
+                                 Text="{Binding LaunchCustomUserArguments}" />
                     </Grid>
                 </Border>
             </StackPanel>

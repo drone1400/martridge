@@ -34,6 +34,16 @@ namespace Martridge.Models.Configuration.Save {
         /// Indicates if the application should enable online features...
         /// </summary>
         public bool? EnableOnlineFeatures { get; set; }
+
+        /// <summary>
+        /// If true, displays the --refdir path launch config in the main window in the selected dmod view
+        /// </summary>
+        public bool? ShowLaunchRefDirPathInMainWindow { get; set; }
+
+        /// <summary>
+        /// If true, displays the custom args launch config in the main window in the selected dmod view
+        /// </summary>
+        public bool? ShowLaunchCustomArgsInMainWindow { get; set; }
         
         /// <summary>
         /// Indicates if the application should show the info/error log window when starting
@@ -83,6 +93,8 @@ namespace Martridge.Models.Configuration.Save {
                 [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
                 [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
                 [nameof(ConfigGeneral.EnableOnlineFeatures)] = this.EnableOnlineFeatures,
+                [nameof(ConfigGeneral.ShowLaunchRefDirPathInMainWindow)] = this.ShowLaunchRefDirPathInMainWindow,
+                [nameof(ConfigGeneral.ShowLaunchCustomArgsInMainWindow)] = this.ShowLaunchCustomArgsInMainWindow,
                 //[nameof(ConfigGeneral.ShowLogWindowOnStartup)] = this.ShowLogWindowOnStartup,
                 [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,
                 [nameof(ConfigGeneral.ActiveGameExeIndex)] = this.ActiveGameExeIndex,

@@ -565,15 +565,11 @@ namespace Martridge.ViewModels {
         #region Other commands
 
         public void CmdChangeTheme(object? parameter) {
-            string? themeName = null;
-            if (parameter is ApplicationTheme themeValue) themeName = themeValue.ToString();
-            if (parameter is string themeStr) themeName = themeStr;
-
-            if (themeName == null) return;
-            
-            // update in configuration...
-            if (Application.Current is not App app) return;
-            app.SetCitrusThemePalette(themeName);
+            if (parameter is string themeName) {
+                // update in configuration...
+                if (Application.Current is not App app) return;
+                app.SetCitrusThemePalette(themeName);
+            }
         }
         
         public bool CanCmdOpenLocation(object? parameter) {

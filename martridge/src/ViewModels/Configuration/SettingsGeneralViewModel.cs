@@ -34,11 +34,11 @@ namespace Martridge.ViewModels.Configuration {
         // General Configuration properties
         //
 
-        public ApplicationTheme ThemeName {
+        public string ThemeName {
             get => this._themeName;
             set => this.RaiseAndSetIfChanged(ref this._themeName, value);
         }
-        private ApplicationTheme _themeName;
+        private string _themeName;
         
         public bool AutoUpdateInstallerList {
             get => this._autoUpdateInstallerList;
@@ -142,10 +142,7 @@ namespace Martridge.ViewModels.Configuration {
         public SettingsGeneralViewModel() {
             // set current theme...
             if (Application.Current is App app) {
-                string themeName = app.GetCitrusPalette();
-                if (Enum.TryParse(themeName, out ApplicationTheme themeValue)) {
-                    this._themeName = themeValue;
-                }
+                this._themeName = app.GetCitrusPalette();
                 app.OnThemePaletteChange += this.AppOnThemePaletteChanged;
             }
             
@@ -173,11 +170,7 @@ namespace Martridge.ViewModels.Configuration {
         }
         private void AppOnThemePaletteChanged(object? sender, EventArgs e) {
             if (sender is not App app) return;
-            string themeName = app.GetCitrusPalette();
-            if (Enum.TryParse(themeName, out ApplicationTheme themeValue)) {
-                this.ThemeName = themeValue;
-            }
-            
+            this.ThemeName = app.GetCitrusPalette();
         }
 
         private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
@@ -187,12 +180,8 @@ namespace Martridge.ViewModels.Configuration {
                     Localizer.Instance.LoadLanguage(this.SelectedLocalization.Name);
                 }
             } else if (e.PropertyName == nameof(this.ThemeName)) {
-                // update in configuration...
-                this.CfgGeneral?.UpdateProperties(new Dictionary<string, object?>() {
-                    [nameof(this.CfgGeneral.ThemeName)] = this.ThemeName.ToString(),
-                });
                 if (Application.Current is not App app) return;
-                app.SetCitrusThemePalette(this.ThemeName.ToString());
+                app.SetCitrusThemePalette(this.ThemeName);
             }
         }
 
@@ -225,9 +214,8 @@ namespace Martridge.ViewModels.Configuration {
                 listDmod.Add(str);
             }
 
-            if (Enum.TryParse(this.CfgGeneral.ThemeName, out ApplicationTheme theme )) {
-                this.ThemeName = theme;
-            }
+            // NOTE: set theme from application and only use config as fallback
+            this.ThemeName = (Application.Current as App)?.GetCitrusPalette() ?? this.CfgGeneral.ThemeName;
             
             this.ShowLogWindowOnStartup = this.CfgGeneral.ShowLogWindowOnStartup;
             this.ShowDmodDevFeatures = this.CfgGeneral.ShowDmodDevFeatures;
@@ -284,7 +272,7 @@ namespace Martridge.ViewModels.Configuration {
             }
 
             this.CfgGeneral.UpdateProperties(new Dictionary<string, object?>() {
-                [nameof(ConfigGeneral.ThemeName)] = this.ThemeName.ToString(),
+                [nameof(ConfigGeneral.ThemeName)] = this.ThemeName,
                 [nameof(ConfigGeneral.LocalizationName)] = this._savedLocalization ?? "en-US",
                 [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
                 [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
@@ -453,22 +441,13 @@ namespace Martridge.ViewModels.Configuration {
 
         public void CmdSetApplicationTheme(object? parameter = null) {
             if (parameter is string themeName) {
-                if (Enum.TryParse(themeName, out ApplicationTheme themeValue )) {
-                    this.ThemeName = themeValue;
-                }
-            } else if (parameter is ApplicationTheme themeValue) {
-                this.ThemeName = themeValue;
+                this.ThemeName = themeName;
             }
         }
         
         public bool CanCmdSetApplicationTheme(object? parameter = null) {
-            if (parameter is string themeName) {
-                if (Enum.TryParse(themeName, out ApplicationTheme _ )) {
-                    return true;
-                }
-            } else if (parameter is ApplicationTheme) {
+            if (parameter is string themeName)
                 return true;
-            }
             return false;
         }
         

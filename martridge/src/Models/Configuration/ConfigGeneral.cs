@@ -22,7 +22,7 @@ namespace Martridge.Models.Configuration {
         /// Name of the current Citrus.Avalonia theme
         /// </summary>
         public string ThemeName { get => this._themeName; }
-        private string _themeName = ApplicationTheme.Citrus.ToString();
+        private string _themeName = "Citrus";
 
         /// <summary>
         /// Indicates if the application should automatically update the existing 'configInstallerList.json' file

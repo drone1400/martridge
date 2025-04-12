@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
@@ -19,11 +20,6 @@ using Martridge.Views.Log;
 using Tmds.DBus.Protocol;
 
 namespace Martridge {
-    
-    public enum ApplicationTheme {
-        // default theme palettes
-        Citrus, Sea, Rust, Candy, Magma,
-    }
     
     public partial class App : Application {
         public static App? Instance => Application.Current as App;
@@ -76,9 +72,7 @@ namespace Martridge {
             
             // try to set loaded theme...
             string themeName = this._config.General.ThemeName;
-            if (Enum.TryParse(themeName, out ApplicationTheme themeValue)) {
-                this.SetCitrusThemePalette(themeName);
-            }
+            this.SetCitrusThemePalette(themeName);
         }
         
         private void LaunchOnUpdated(object? sender, EventArgs e) {
@@ -140,16 +134,48 @@ namespace Martridge {
             this._styles.Add(this._citrusTheme);
             this._styles.Add(this._stylesDataGridCitrus);
             this._styles.Add(this._customStyles);
+            
+            // initialize custom themes
+            try {
+                string path = Path.Combine(LocationHelper.AppBaseDirectory, "CustomThemes");
+                if (Directory.Exists(path)) {
+                    DirectoryInfo di = new DirectoryInfo(path);
+                    FileInfo[] files = di.GetFiles();
+                    foreach (FileInfo file in files) {
+                        try {
+                            string ext = file.Extension.ToLowerInvariant();
+                            if (ext != ".xaml" && ext != ".axaml")
+                                continue;
+                            string name = file.Name.Substring(0, file.Name.Length - ext.Length);
+                            using FileStream fileStream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read);
+                            object obj = AvaloniaRuntimeXamlLoader.Load(fileStream);
+                            if (obj is not ResourceDictionary resDic)
+                                continue;
+                            CitrusPaletteData paletteData = new CitrusPaletteData(name, resDic);
+                            this._citrusTheme.RegisterPalette(paletteData);
+                        } catch (Exception ex) {
+                            MyTrace.Global.WriteMessage(MyTraceCategory.General, ex.ToString(), MyTraceLevel.Warning);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                MyTrace.Global.WriteMessage(MyTraceCategory.General, ex.ToString(), MyTraceLevel.Critical);
+            }
         }
         
         public void SetCitrusThemePalette(string paletteKey) {
             if (this._citrusTheme == null) return;
             this._citrusTheme.ColorPalette = paletteKey;
-
+            
+            // update in configuration...
+            this._config.General.UpdateProperties(new Dictionary<string, object?>() {
+                [nameof(ConfigGeneral.ThemeName)] = paletteKey,
+            });
+            
             try {
                 this.OnThemePaletteChange?.Invoke(this, EventArgs.Empty);
-            } catch (Exception) {
-                // TODO...
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
             }
         }
 
@@ -168,6 +194,16 @@ namespace Martridge {
         public string GetCitrusPalette() {
             if (this._citrusTheme == null) return "";
             return this._citrusTheme.ColorPalette;
+        }
+
+        public IList<string> GetThemeNames() {
+            List<string> customThemes = new List<string>();
+            if (this._citrusTheme == null) 
+                return customThemes;
+            foreach (var kvp in this._citrusTheme.GetRegisteredPalettes()) {
+                customThemes.Add(kvp.Key);
+            }
+            return customThemes;
         }
         
         #endregion

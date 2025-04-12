@@ -1,7 +1,13 @@
+using System;
+using System.Collections.Generic;
 using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Data;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
+using Citrus.Avalonia;
+using Martridge.Trace;
 using Martridge.ViewModels;
 using Martridge.Views.About;
 
@@ -13,6 +19,8 @@ namespace Martridge.Views {
 #if DEBUG
             this.AttachDevTools();
 #endif
+
+            this.InitializeThemeMenu();
         }
 
         private void InitializeComponent() {
@@ -29,6 +37,26 @@ namespace Martridge.Views {
 
         public void CloseWindow(object? sender, RoutedEventArgs e) {
             this.Close();
+        }
+
+        private void InitializeThemeMenu() {
+            try {
+                MenuItem? menu = this.FindControl<MenuItem>("menuItemThemes");
+                if (menu is null) return;
+
+                IList<string> themeNames = App.Instance?.GetThemeNames() ?? new List<string>();
+
+                foreach (string theme in themeNames) {
+                    MenuItem menuItem = new MenuItem() {
+                        Header = theme,
+                        CommandParameter = theme,
+                    };
+                    menuItem.Bind(MenuItem.CommandProperty, new Binding("CmdChangeTheme"));
+                    menu.Items.Add(menuItem);
+                }
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+            }
         }
     }
 }

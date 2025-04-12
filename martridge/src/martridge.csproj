@@ -63,6 +63,10 @@
         <None Remove=".gitignore"/>
         <None Remove="Assets\dloc\en-US.json"/>
         <Folder Include="Assets\graphics"/>
+        
+        <Content  Include="CustomThemes\*">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
@@ -83,6 +87,7 @@
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Condition="'$(Configuration)' == 'Debug'" 
                           Include="Avalonia.Diagnostics" Version="11.2.6"/>
+        <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="11.2.6" />
         <PackageReference Include="Avalonia.ReactiveUI" Version="11.2.6"/>
         <PackageReference Include="GetText.NET" Version="1.9.14"/>
         <!-- only include HtmlAgilityPack if building with online features is enabled! -->

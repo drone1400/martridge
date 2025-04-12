@@ -325,13 +325,19 @@ namespace Martridge.ViewModels.Configuration {
         
         #region COMMANDS - DMODs
         
+        private bool IsDuplicatePath(ObservableCollection<string> list, string path) {
+            foreach (string s in list) {
+                if (LocationHelper.PathIsEqual(s, path)) return true;
+            }
+            return false;
+        }
+        
         //
         // Default dmods
         //
         
         public async void CmdDefaultDmodsSet(object? parameter = null) {
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return;
+            if (this.IsBusy ) return;
             
             this.IsBusy = true;
 
@@ -358,13 +364,11 @@ namespace Martridge.ViewModels.Configuration {
                 }
             });
         }
-
-        [DependsOn(nameof(Configuration))]
+        
         [DependsOn(nameof(IsBusy))]
         public bool CanCmdDefaultDmodsSet(object? parameter = null) {
             // general conditions
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return false;
+            if (this.IsBusy ) return false;
             // specific conditions
             return true;
         }
@@ -375,29 +379,25 @@ namespace Martridge.ViewModels.Configuration {
         //
 
         public void CmdAdditionalDmodsRemoveSelected(object? parameter = null) {
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return;
+            if (this.IsBusy ) return;
 
             if (this.AdditionalDmodLocationsIndex >= 0 && this.AdditionalDmodLocationsIndex < this.AdditionalDmodLocations.Count) {
                 this.AdditionalDmodLocations.RemoveAt(this.AdditionalDmodLocationsIndex);
             }
         }
-
-        [DependsOn(nameof(Configuration))]
+        
         [DependsOn(nameof(IsBusy))]
         [DependsOn(nameof(AdditionalDmodLocationsIndex))]
         [DependsOn(nameof(AdditionalDmodLocations))]
         public bool CanCmdAdditionalDmodsRemoveSelected(object? parameter = null) {
             // general conditions
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return false;
+            if (this.IsBusy ) return false;
             // specific conditions
             return this.AdditionalDmodLocationsIndex >= 0 && this.AdditionalDmodLocationsIndex < this.AdditionalDmodLocations.Count;
         }
 
         public async void CmdAdditionalDmodsAddNew(object? parameter = null) {
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return;
+            if (this.IsBusy ) return;
 
             this.IsBusy = true;
             
@@ -410,9 +410,9 @@ namespace Martridge.ViewModels.Configuration {
                             ? LocationHelper.AppBaseDirectory
                             : this.DefaultDmodLocation );
 
-                    if (storageFolder != null)
+                    if (storageFolder != null && this.IsDuplicatePath(this.AdditionalDmodLocations, storageFolder.Path.LocalPath) == false)
                     {
-                        this.CfgGeneral.AddAdditionalDmodPath(storageFolder.Path.LocalPath);
+                        this.AdditionalDmodLocations.Add(storageFolder.Path.LocalPath);
                     }
                 } catch (Exception ex)
                 {
@@ -424,13 +424,11 @@ namespace Martridge.ViewModels.Configuration {
                 }
             });
         }
-
-        [DependsOn(nameof(Configuration))]
+        
         [DependsOn(nameof(IsBusy))]
         public bool CanCmdAdditionalDmodsAddNew(object? parameter = null) {
             // general conditions
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return false;
+            if (this.IsBusy ) return false;
             // specific conditions
             return true;
         }
@@ -459,30 +457,26 @@ namespace Martridge.ViewModels.Configuration {
         // Game exe paths
         //
         public void CmdGameExeRemoveSelected(object? parameter = null) {
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return;
+            if (this.IsBusy ) return;
 
             if (this.ActiveGameExeIndex >= 0 && this.ActiveGameExeIndex < this.GameExePaths.Count) {
                 this.GameExePaths.RemoveAt(this.ActiveGameExeIndex);
             }
         }
         
-        [DependsOn(nameof(Configuration))]
         [DependsOn(nameof(IsBusy))]
         [DependsOn(nameof(ActiveGameExeIndex))]
         [DependsOn(nameof(GameExePaths))]
         public bool CanCmdGameExeRemoveSelected(object? parameter = null) {
             // general conditions
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return false;
+            if (this.IsBusy ) return false;
             // specific conditions
             return this.ActiveGameExeIndex >= 0 && this.ActiveGameExeIndex < this.GameExePaths.Count;
         }
 
 
         public async void CmdGameExeAddNew(object? parameter = null) {
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return;
+            if (this.IsBusy ) return;
 
             this.IsBusy = true;
 
@@ -504,9 +498,9 @@ namespace Martridge.ViewModels.Configuration {
 #endif
                         LocationHelper.AppBaseDirectory);
 
-                    if (storageFile != null)
+                    if (storageFile != null && this.IsDuplicatePath(this.GameExePaths, storageFile.Path.LocalPath) == false)
                     {
-                        this.CfgGeneral.AddGameExePath(storageFile.Path.LocalPath);
+                        this.GameExePaths.Add(storageFile.Path.LocalPath);
                     }
                 } catch (Exception ex)
                 {
@@ -519,12 +513,10 @@ namespace Martridge.ViewModels.Configuration {
             });
         }
 
-        [DependsOn(nameof(Configuration))]
         [DependsOn(nameof(IsBusy))]
         public bool CanCmdGameExeAddNew(object? parameter = null) {
             // general conditions
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return false;
+            if (this.IsBusy ) return false;
             // specific conditions
             return true;
         }
@@ -537,30 +529,26 @@ namespace Martridge.ViewModels.Configuration {
         // Editor exe paths
         //
         public void CmdEditorExeRemoveSelected(object? parameter = null) {
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return;
+            if (this.IsBusy ) return;
 
             if (this.ActiveEditorExeIndex >= 0 && this.ActiveEditorExeIndex < this.EditorExePaths.Count) {
                 this.EditorExePaths.RemoveAt(this.ActiveEditorExeIndex);
             }
         }
         
-        [DependsOn(nameof(Configuration))]
         [DependsOn(nameof(IsBusy))]
         [DependsOn(nameof(ActiveEditorExeIndex))]
         [DependsOn(nameof(EditorExePaths))]
         public bool CanCmdEditorExeRemoveSelected(object? parameter = null) {
             // general conditions
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return false;
+            if (this.IsBusy ) return false;
             // specific conditions
             return this.ActiveEditorExeIndex >= 0 && this.ActiveEditorExeIndex < this.EditorExePaths.Count;
         }
 
 
         public async void CmdEditorExeAddNew(object? parameter = null) {
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return;
+            if (this.IsBusy ) return;
 
             this.IsBusy = true;
 
@@ -583,9 +571,8 @@ namespace Martridge.ViewModels.Configuration {
 #endif
                         LocationHelper.AppBaseDirectory);
 
-                    if (storageFile != null)
-                    {
-                        this.CfgGeneral.AddEditorExePath(storageFile.Path.LocalPath);
+                    if (storageFile != null && this.IsDuplicatePath(this.EditorExePaths, storageFile.Path.LocalPath) == false) {
+                        this.EditorExePaths.Add(storageFile.Path.LocalPath);
                     }
                 } catch (Exception ex)
                 {
@@ -598,12 +585,10 @@ namespace Martridge.ViewModels.Configuration {
             });
         }
 
-        [DependsOn(nameof(Configuration))]
         [DependsOn(nameof(IsBusy))]
         public bool CanCmdEditorExeAddNew(object? parameter = null) {
             // general conditions
-            if (this.CfgGeneral == null ||
-                this.IsBusy ) return false;
+            if (this.IsBusy ) return false;
             // specific conditions
             return true;
         }

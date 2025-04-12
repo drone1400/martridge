@@ -19,51 +19,60 @@
     </UserControl.Styles>
     <UserControl.Resources>
         <x:String x:Key="DataNotAvailable">N/A</x:String>
+        <GridLength x:Key="LeftColumnWidth">160</GridLength>
     </UserControl.Resources>
   
     <Grid>
-        <Grid RowDefinitions="Auto,Auto,Auto"
+        <StackPanel
               VerticalAlignment="Center"
               HorizontalAlignment="Center"
               IsVisible="{Binding SelectedDmodDefinition,
                       Converter={x:Static ObjectConverters.IsNull}}">
 
-            <Label Grid.Row="0" Classes="HeadingTitle"
+            <Label Classes="HeadingTitle"
                    HorizontalAlignment="Center"
                    Content="{dloc:Localize DmodBrowser/NoDmodSelectedTitle}"/>
 
-            <Label Grid.Row="1" Classes="Heading2IWrapping"
+            <Label Classes="Heading3IWrapping"
                    HorizontalAlignment="Center"
                    MaxWidth="400"
                    Content="{dloc:Localize DmodBrowser/NoDmodSelectedBody}"/>
-        </Grid>
-        <Grid RowDefinitions="Auto,Auto,Auto,*"
+        </StackPanel>
+        
+        <Grid RowDefinitions="Auto,*"
               IsVisible="{Binding SelectedDmodDefinition,
                       Converter={x:Static ObjectConverters.IsNotNull}}">
-            <Label Grid.Row="0" Classes="Heading2B"
-                   Content="{Binding SelectedDmodDefinition.Name, 
-                        FallbackValue={StaticResource DataNotAvailable},
-                        TargetNullValue={StaticResource DataNotAvailable} }" />
-            <Label Grid.Row="1" Classes="Heading2IWrapping"
-                   Content="{Binding SelectedDmodDefinition.DmodDirectory, 
-                        FallbackValue={StaticResource DataNotAvailable},
-                        TargetNullValue={StaticResource DataNotAvailable} }"
-                   ToolTip.Tip="{Binding SelectedDmodDefinition.DmodDirectory, 
-                        FallbackValue={StaticResource DataNotAvailable},
-                        TargetNullValue={StaticResource DataNotAvailable} }"/>
 
-            <StackPanel Grid.Row="2">
-                <Grid RowDefinitions="Auto" ColumnDefinitions="160, *">
+            <StackPanel Grid.Row="0">
+                <Label Classes="Heading2B"
+                       Content="{Binding SelectedDmodDefinition.Name, 
+                            FallbackValue={StaticResource DataNotAvailable},
+                            TargetNullValue={StaticResource DataNotAvailable} }" />
+                <Label Classes="Heading3IWrapping"
+                       Content="{Binding SelectedDmodDefinition.DmodDirectory, 
+                            FallbackValue={StaticResource DataNotAvailable},
+                            TargetNullValue={StaticResource DataNotAvailable} }"
+                       ToolTip.Tip="{Binding SelectedDmodDefinition.DmodDirectory, 
+                            FallbackValue={StaticResource DataNotAvailable},
+                            TargetNullValue={StaticResource DataNotAvailable} }"/>
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{StaticResource LeftColumnWidth}"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
                     <Button Grid.Row="0" Grid.Column="0"
                             Content="{dloc:Localize DmodBrowser/LaunchDmod}"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch"
-                            Width="NaN" Height="NaN"
+                            Width="NaN" 
+                            Height="NaN"
                             Command="{Binding CmdLaunchDmod}"/>
-                    <ComboBox   Grid.Row="0" Grid.Column="1"
-                                HorizontalAlignment="Stretch"
-                                ItemsSource="{Binding GameExePaths}"
-                                SelectedItem="{Binding ActiveGameExePath, Mode=TwoWay}">
+                    <ComboBox Grid.Row="0" Grid.Column="1"
+                              HorizontalAlignment="Stretch"
+                              ItemsSource="{Binding GameExePaths}"
+                              SelectedItem="{Binding ActiveGameExePath, Mode=TwoWay}">
                         <ComboBox.ItemTemplate>
                             <DataTemplate DataType="vm:DmodLauncherSelectionViewModel">
                                 <Label Classes="Heading2B" Content="{Binding DisplayName}"/>
@@ -76,7 +85,7 @@
                     <Label  Grid.Row="0" Classes="Heading2B"
                             Content="{dloc:Localize DmodBrowser/ExeNotFound}"
                             IsVisible="{Binding !ActiveGameExePath.PathExists, FallbackValue=False}"/>
-                    <Label Grid.Row="1" Classes="Heading2IWrapping"
+                    <Label Grid.Row="1" Classes="Heading3IWrapping"
                            Content="{Binding ActiveGameExePath.Path, 
                                   FallbackValue={StaticResource DataNotAvailable},
                                   TargetNullValue={StaticResource DataNotAvailable} }" 
@@ -85,7 +94,7 @@
                                   TargetNullValue={StaticResource DataNotAvailable} }"/>
                 </Grid>
                 
-                <Grid RowDefinitions="Auto,Auto,Auto"
+                <Grid RowDefinitions="Auto,Auto"
                       ColumnDefinitions="*, *, *, *, *">
                     
                     <CheckBox   Grid.Row="0"  Grid.Column="0" 
@@ -124,38 +133,46 @@
                                 Content="{dloc:Localize DmodBrowser/LaunchUsePathQuotationMarks}"
                                 ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchUsePathQuotationMarks/Tooltip}"
                                 IsChecked="{Binding LaunchUsePathQuotationMarks}"/>
-                    
-                    <Grid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="5" 
-                          ColumnDefinitions="Auto, *"
-                          RowDefinitions="Auto, Auto">
-                        <Label Grid.Row="0" Grid.Column="0" 
-                               Content="{dloc:Localize DmodBrowser/FreeDinkLocalization}" 
-                               Classes="Heading2B" 
-                               IsVisible="{Binding IsLauncherFreeDink}"/>
-                        <ComboBox Grid.Row="0" Grid.Column="1"
-                                  HorizontalAlignment="Stretch"
-                                  SelectedItem="{Binding SelectedLocalization}"
-                                  ItemsSource="{Binding  SelectedDmodDefinition.Localizations }"
-                                  IsVisible="{Binding IsLauncherFreeDink}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate DataType="vm:DmodLocalizationDefinition">
-                                    <Grid>
-                                        <Label Content="{Binding Header}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        
-                        <Label Grid.Row="1" Grid.Column="0" Content="{dloc:Localize DmodBrowser/LaunchCustomUserArguments}" Classes="Heading2B" />
-                        <TextBox Grid.Row="1" Grid.Column="1"
-                                 HorizontalAlignment="Stretch"
-                                 Text="{Binding  LaunchCustomUserArguments}">
-                        </TextBox>
-                    </Grid>
                 </Grid>
                 
-                <Grid RowDefinitions="Auto" ColumnDefinitions="160, *"
+                <Grid RowDefinitions="Auto, Auto">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{StaticResource LeftColumnWidth}"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <Label Grid.Row="0" Grid.Column="0" 
+                           Content="{dloc:Localize DmodBrowser/FreeDinkLocalization}" 
+                           Classes="Heading2B" 
+                           IsVisible="{Binding IsLauncherFreeDink}"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1"
+                              HorizontalAlignment="Stretch"
+                              SelectedItem="{Binding SelectedLocalization}"
+                              ItemsSource="{Binding  SelectedDmodDefinition.Localizations }"
+                              IsVisible="{Binding IsLauncherFreeDink}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="vm:DmodLocalizationDefinition">
+                                <Grid>
+                                    <Label Content="{Binding Header}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                        
+                    <Label Grid.Row="1" Grid.Column="0" Content="{dloc:Localize DmodBrowser/LaunchCustomUserArguments}" Classes="Heading2B" />
+                    <TextBox Grid.Row="1" Grid.Column="1"
+                             HorizontalAlignment="Stretch"
+                             Text="{Binding  LaunchCustomUserArguments}">
+                    </TextBox>
+                </Grid>
+                
+                <Grid RowDefinitions="Auto"
                       IsVisible="{Binding ShowDmodDevFeatures}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{StaticResource LeftColumnWidth}"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
                     <Button Grid.Row="0" Grid.Column="0"
                             Content="{dloc:Localize DmodBrowser/EditDmod}"
                             HorizontalAlignment="Stretch"
@@ -180,7 +197,7 @@
                     <Label  Grid.Row="0" Classes="Heading2B"
                             Content="{dloc:Localize DmodBrowser/ExeNotFound}"
                             IsVisible="{Binding !ActiveEditorExePath.PathExists, FallbackValue=False}"/>
-                    <Label Grid.Row="1" Classes="Heading2IWrapping"
+                    <Label Grid.Row="1" Classes="Heading3IWrapping"
                            Content="{Binding ActiveEditorExePath.Path, 
                                       FallbackValue={StaticResource DataNotAvailable},
                                       TargetNullValue={StaticResource DataNotAvailable} }"
@@ -190,7 +207,7 @@
                 </Grid>
             </StackPanel>
       
-            <Grid Grid.Row="3"
+            <Grid Grid.Row="1"
                   ColumnDefinitions="Auto, *">
                 
                 <Image Grid.Column="0" 

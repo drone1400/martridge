@@ -289,6 +289,8 @@ namespace Martridge.ViewModels.OnlineDmod {
                     this._selectedDmodDefinition.UnloadOnlineData();
                 }
                 this.RaiseAndSetIfChanged(ref this._selectedDmodDefinition, value);
+                this.RaisePropertyChanged(nameof(this.SelectedDmodScreenshotIsFirst));
+                this.RaisePropertyChanged(nameof(this.SelectedDmodScreenshotIsLast));
             }
         }
         private OnlineDmodInfoViewModel? _selectedDmodDefinition;
@@ -301,9 +303,16 @@ namespace Martridge.ViewModels.OnlineDmod {
 
         public int SelectedDmodScreenshotIndex {
             get => this._selectedDmodScreenshotIndex;
-            set => this.RaiseAndSetIfChanged(ref this._selectedDmodScreenshotIndex, value);
+            set {
+                this.RaiseAndSetIfChanged(ref this._selectedDmodScreenshotIndex, value);
+                this.RaisePropertyChanged(nameof(this.SelectedDmodScreenshotIsFirst));
+                this.RaisePropertyChanged(nameof(this.SelectedDmodScreenshotIsLast));
+            }
         }
         private int _selectedDmodScreenshotIndex = -1;
+
+        public bool SelectedDmodScreenshotIsFirst => this._selectedDmodDefinition == null ||  this._selectedDmodScreenshotIndex <= 0;
+        public bool SelectedDmodScreenshotIsLast => this._selectedDmodDefinition == null || this._selectedDmodScreenshotIndex >= this._selectedDmodDefinition.Screenshots.Count;
 
         public Bitmap? SelectedDmodScreenshot {
             get => this._selectedDmodScreenshot;

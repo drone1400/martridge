@@ -3,27 +3,28 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             
+
              xmlns:dloc="using:Martridge.ViewModels.Localization"
              xmlns:vm="using:Martridge.ViewModels.Dmod"
              xmlns:vv="using:Martridge.Views.Dmod"
              xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
              xmlns:onlineDmod="clr-namespace:Martridge.ViewModels.OnlineDmod"
              xmlns:onlineDmod1="clr-namespace:Martridge.Views.OnlineDmod"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
 
-             mc:Ignorable="d" 
-             d:DesignWidth="800" 
+             mc:Ignorable="d"
+             d:DesignWidth="800"
              d:DesignHeight="450">
-    
+
     <Design.DataContext>
-        <onlineDmod:OnlineDmodBrowserViewModel/>
+        <onlineDmod:OnlineDmodBrowserViewModel />
     </Design.DataContext>
     <UserControl.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </UserControl.Styles>
     <UserControl.Resources>
         <x:String x:Key="DataNotAvailable">N/A</x:String>
-        <valueConverters:DmodScoreToSolidColorBrushConverter x:Key="DmodScoreToSolidColorBrushConverter"/>
+        <valueConverters:DmodScoreToSolidColorBrushConverter x:Key="DmodScoreToSolidColorBrushConverter" />
     </UserControl.Resources>
     <Grid>
         <!-- this is needed to trigger the context menu when right clicking empty spaces... -->
@@ -36,12 +37,12 @@
                 <MenuItem Header="{dloc:Localize OnlineDmodBrowser/ContextMenu/OpenDmodLocation}"
                           Command="{Binding SelectedDmodDefinition.CmdOpenDmodHyperlink}" />
                 <MenuItem Header="{dloc:Localize OnlineDmodBrowser/ContextMenu/OpenDmodCacheLocation}"
-                          Command="{Binding SelectedDmodDefinition.CmdOpenCacheLocation}"/>
+                          Command="{Binding SelectedDmodDefinition.CmdOpenCacheLocation}" />
                 <MenuItem Header="{dloc:Localize OnlineDmodBrowser/ContextMenu/ReloadDmodData}"
-                          Command="{Binding CmdReloadSelectedDmodFromWeb}"/>
+                          Command="{Binding CmdReloadSelectedDmodFromWeb}" />
             </ContextMenu>
         </Grid.ContextMenu>
-    
+
         <Grid RowDefinitions="Auto,Auto,Auto"
               VerticalAlignment="Center"
               HorizontalAlignment="Center"
@@ -49,79 +50,79 @@
                       Converter={x:Static ObjectConverters.IsNull}}">
 
             <Label Grid.Row="0" Classes="HeadingTitle"
-                       HorizontalAlignment="Center"
-                       Content="{dloc:Localize DmodBrowser/NoDmodSelectedTitle}"/>
+                   HorizontalAlignment="Center"
+                   Content="{dloc:Localize DmodBrowser/NoDmodSelectedTitle}" />
 
             <Label Grid.Row="1" Classes="Heading2IWrapping"
-                       HorizontalAlignment="Center"
-                       MaxWidth="400"
-                       Content="{dloc:Localize DmodBrowser/NoDmodSelectedBody}"/>
+                   HorizontalAlignment="Center"
+                   MaxWidth="400"
+                   Content="{dloc:Localize DmodBrowser/NoDmodSelectedBody}" />
         </Grid>
-    
+
         <Grid RowDefinitions="Auto,Auto,Auto,*"
               IsVisible="{Binding SelectedDmodDefinition,
                       Converter={x:Static ObjectConverters.IsNotNull}}">
-      
+
             <Grid Grid.Row="0"
                   ColumnDefinitions="Auto,Auto,*,200"
                   RowDefinitions="Auto,Auto,Auto">
-                
+
                 <Label Grid.Row="0" Grid.Column="0"
-                           Classes="Heading2B"
-                           Content="{dloc:Localize OnlineDmodBrowser/ReloadLastRefreshed}" />
+                       Classes="Heading2B"
+                       Content="{dloc:Localize OnlineDmodBrowser/ReloadLastRefreshed}" />
                 <Label Grid.Row="0" Grid.Column="1"
-                           Classes="Heading2I"
-                           Content="{Binding LastRefreshedDmodString }" />
-                <Button Grid.Row="0" Grid.Column="3" 
+                       Classes="Heading2I"
+                       Content="{Binding LastRefreshedDmodString }" />
+                <Button Grid.Row="0" Grid.Column="3"
                         Command="{Binding CmdReloadSelectedDmodFromWeb}"
                         HorizontalAlignment="Stretch"
                         Width="NaN"
-                        Content="{dloc:Localize OnlineDmodBrowser/ReloadDmod}"/>
-                
+                        Content="{dloc:Localize OnlineDmodBrowser/ReloadDmod}" />
+
             </Grid>
-            
+
             <!-- Header Grid... -->
-            <Grid Grid.Row="1" 
-                  RowDefinitions="Auto,Auto,Auto" 
+            <Grid Grid.Row="1"
+                  RowDefinitions="Auto,Auto,Auto"
                   ColumnDefinitions="*, Auto, Auto" Margin="4">
-        
+
                 <Label Grid.Row="0" Grid.Column="0" Classes="Heading2B"
                        Content="{Binding SelectedDmodDefinition.Name, 
                         FallbackValue={StaticResource DataNotAvailable},
-                        TargetNullValue={StaticResource DataNotAvailable} }"/>
+                        TargetNullValue={StaticResource DataNotAvailable} }" />
                 <Label Grid.Row="0" Grid.Column="1" Classes="Heading2"
                        Content="{dloc:Localize OnlineDmodBrowser/LastUpdate}"
-                           HorizontalAlignment="Left"/>
+                       HorizontalAlignment="Left" />
                 <Label Grid.Row="0" Grid.Column="2" Classes="Heading2IWrapping"
                        Content="{Binding SelectedDmodDefinition.Updated,
                        FallbackValue={StaticResource DataNotAvailable},
                        TargetNullValue={StaticResource DataNotAvailable} }"
-                       HorizontalAlignment="Right"/>
-        
+                       HorizontalAlignment="Right" />
+
                 <Label Grid.Row="1" Grid.Column="0" Classes="Heading2I"
                        Content="{Binding SelectedDmodDefinition.Author, 
                        FallbackValue={StaticResource DataNotAvailable},
-                       TargetNullValue={StaticResource DataNotAvailable} }"/>
+                       TargetNullValue={StaticResource DataNotAvailable} }" />
                 <Label Grid.Row="1" Grid.Column="1" Classes="Heading2"
                        Content="{dloc:Localize OnlineDmodBrowser/Downloads}"
-                       HorizontalAlignment="Left"/>
+                       HorizontalAlignment="Left" />
                 <Label Grid.Row="1" Grid.Column="2" Classes="Heading2IWrapping"
                        Content="{Binding SelectedDmodDefinition.Downloads, 
                        FallbackValue={StaticResource DataNotAvailable},
                        TargetNullValue={StaticResource DataNotAvailable} }"
-                       HorizontalAlignment="Right"/>
-        
-                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" 
+                       HorizontalAlignment="Right" />
+
+                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
                         Classes="Invisibutton"
                         HorizontalAlignment="Left"
-                        Command="{Binding SelectedDmodDefinition.CmdOpenDmodHyperlink}" >
+                        Command="{Binding SelectedDmodDefinition.CmdOpenDmodHyperlink}">
                     <Label Classes="HyperlinkWrapping"
                            Content="{Binding SelectedDmodDefinition.UrlMain, 
                           FallbackValue={StaticResource DataNotAvailable},
-                          TargetNullValue={StaticResource DataNotAvailable} }"/>  
+                          TargetNullValue={StaticResource DataNotAvailable} }" />
                 </Button>
             </Grid>
-      
+
             <!-- Loading Grid... -->
             <Grid Grid.Row="2" Grid.Column="0"
                   RowDefinitions="Auto,Auto"
@@ -131,33 +132,33 @@
                 <ProgressBar Grid.Row="1"
                              Minimum="0" Maximum="1"
                              Value="{Binding ProgressBarPercent}"
-                             IsIndeterminate="{Binding ProgressIsIndeterminate}"/>
+                             IsIndeterminate="{Binding ProgressIsIndeterminate}" />
             </Grid>
-        
+
             <!-- Dmod More info -->
             <TabControl Grid.Row="3" Name="TheTabControl">
-                <TabItem  Classes="MediumTab"
-                          Header="{dloc:Localize OnlineDmodBrowser/Description}">
-                    <ScrollViewer VerticalContentAlignment="Top" 
-                                      VerticalAlignment="Stretch"
-                                      HorizontalAlignment="Stretch"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      Margin="4">
-                            <Border BorderThickness="1"
-                                    Padding="4"
-                                    Margin="2,0"
-                                    HorizontalAlignment="Stretch"
-                                    BorderBrush="{DynamicResource ThemeBorderHighBrush}">
-                                <Label Classes="Heading2Wrapping"
-                                       VerticalAlignment="Top"
-                                       Content="{Binding SelectedDmodDefinition.Description, 
+                <TabItem Classes="MediumTab"
+                         Header="{dloc:Localize OnlineDmodBrowser/Description}">
+                    <ScrollViewer VerticalContentAlignment="Top"
+                                  VerticalAlignment="Stretch"
+                                  HorizontalAlignment="Stretch"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  Margin="4">
+                        <Border BorderThickness="1"
+                                Padding="4"
+                                Margin="2,0"
+                                HorizontalAlignment="Stretch"
+                                BorderBrush="{DynamicResource ThemeBorderHighBrush}">
+                            <Label Classes="Heading2Wrapping"
+                                   VerticalAlignment="Top"
+                                   Content="{Binding SelectedDmodDefinition.Description, 
                                        FallbackValue={StaticResource DataNotAvailable},
-                                       TargetNullValue={StaticResource DataNotAvailable} }"/>
-                            </Border>
-                        </ScrollViewer>
+                                       TargetNullValue={StaticResource DataNotAvailable} }" />
+                        </Border>
+                    </ScrollViewer>
                 </TabItem>
-                <TabItem  Classes="MediumTab"
-                          Header="{dloc:Localize OnlineDmodBrowser/Versions}">
+                <TabItem Classes="MediumTab"
+                         Header="{dloc:Localize OnlineDmodBrowser/Versions}">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                                   VerticalScrollBarVisibility="Visible"
                                   VerticalAlignment="Stretch"
@@ -172,36 +173,36 @@
                                             Padding="4"
                                             Margin="2,0"
                                             BorderBrush="{DynamicResource ThemeBorderHighBrush}">
-                    
+
                                         <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="150, *">
-                                            <Label Grid.Row="0" Grid.Column="0" Classes="Heading2BWrapping" 
-                                                   Content="{Binding Name}"/>
+                                            <Label Grid.Row="0" Grid.Column="0" Classes="Heading2BWrapping"
+                                                   Content="{Binding Name}" />
                                             <Button Grid.Row="0" Grid.Column="1"
                                                     HorizontalAlignment="Left"
                                                     Content="{dloc:Localize OnlineDmodBrowser/Versions/InstallDmod}"
                                                     Command="{Binding $parent[UserControl].DataContext.CmdInstallDmod}"
-                                                    CommandParameter="{Binding}"/>
-                      
-                                            <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B" 
-                                                   Content="{dloc:Localize OnlineDmodBrowser/Versions/Released}"/>
-                                            <Label Grid.Row="1" Grid.Column="1" Classes="Heading2" 
-                                                   Content="{Binding Released}"/>
-                      
-                                            <Label Grid.Row="2" Grid.Column="0" Classes="Heading2B" 
-                                                   Content="{dloc:Localize OnlineDmodBrowser/Versions/FileSize}"/>
-                                            <Label Grid.Row="2" Grid.Column="1" Classes="Heading2" 
-                                                   Content="{Binding FileSizeString}"/>
-                      
-                                            <Label Grid.Row="3" Grid.Column="0" Classes="Heading2B" 
-                                                   Content="{dloc:Localize OnlineDmodBrowser/Versions/Downloads}"/>
-                                            <Label Grid.Row="3" Grid.Column="1" Classes="Heading2" 
-                                                   Content="{Binding Downloads}"/>
-                      
-                                            <Label Grid.Row="4" Grid.Column="0" Classes="Heading2B" 
-                                                   Content="{dloc:Localize OnlineDmodBrowser/Versions/ReleaseNotes}"/>
-                                            <Label Grid.Row="4" Grid.Column="1" Classes="Heading2Wrapping" 
-                                                   Content="{Binding ReleaseNotes}"/>
-                      
+                                                    CommandParameter="{Binding}" />
+
+                                            <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
+                                                   Content="{dloc:Localize OnlineDmodBrowser/Versions/Released}" />
+                                            <Label Grid.Row="1" Grid.Column="1" Classes="Heading2"
+                                                   Content="{Binding Released}" />
+
+                                            <Label Grid.Row="2" Grid.Column="0" Classes="Heading2B"
+                                                   Content="{dloc:Localize OnlineDmodBrowser/Versions/FileSize}" />
+                                            <Label Grid.Row="2" Grid.Column="1" Classes="Heading2"
+                                                   Content="{Binding FileSizeString}" />
+
+                                            <Label Grid.Row="3" Grid.Column="0" Classes="Heading2B"
+                                                   Content="{dloc:Localize OnlineDmodBrowser/Versions/Downloads}" />
+                                            <Label Grid.Row="3" Grid.Column="1" Classes="Heading2"
+                                                   Content="{Binding Downloads}" />
+
+                                            <Label Grid.Row="4" Grid.Column="0" Classes="Heading2B"
+                                                   Content="{dloc:Localize OnlineDmodBrowser/Versions/ReleaseNotes}" />
+                                            <Label Grid.Row="4" Grid.Column="1" Classes="Heading2Wrapping"
+                                                   Content="{Binding ReleaseNotes}" />
+
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -209,17 +210,17 @@
                         </ItemsRepeater>
                     </ScrollViewer>
                 </TabItem>
-        
+
                 <!-- Reviews -->
-                <TabItem  Classes="MediumTab"
-                          Header="{dloc:Localize OnlineDmodBrowser/Reviews}">
-                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" 
+                <TabItem Classes="MediumTab"
+                         Header="{dloc:Localize OnlineDmodBrowser/Reviews}">
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                                   VerticalScrollBarVisibility="Visible"
                                   VerticalAlignment="Stretch"
                                   Margin="4">
                         <ItemsRepeater ItemsSource="{Binding SelectedDmodDefinition.Reviews}">
                             <ItemsRepeater.Layout>
-                                <StackLayout Spacing="4" Orientation="Vertical"/>
+                                <StackLayout Spacing="4" Orientation="Vertical" />
                             </ItemsRepeater.Layout>
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate DataType="onlineDmod:OnlineDmodReviewViewModel">
@@ -228,19 +229,19 @@
                                             Margin="2,0"
                                             BorderBrush="{DynamicResource ThemeBorderHighBrush}">
                                         <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto, *">
-                      
-                                            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Classes="Heading2B" 
-                                                   Content="{Binding ReviewName}"/>
-                      
-                                            <onlineDmod1:OnlineUserHeaderView Grid.Row="1" Grid.Column="0" 
-                                                                     DataContext="{Binding UserViewModel}"/>
-                      
+
+                                            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Classes="Heading2B"
+                                                   Content="{Binding ReviewName}" />
+
+                                            <onlineDmod1:OnlineUserHeaderView Grid.Row="1" Grid.Column="0"
+                                                                              DataContext="{Binding UserViewModel}" />
+
                                             <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto">
-                                                <Label Grid.Row="0" Grid.Column="1" Classes="Heading2" 
-                                                       Content="{Binding ReviewDate}"/>
-                                                <Label Grid.Row="1" Grid.Column="1" Classes="Heading2" 
-                                                       Content="{Binding ReviewVersion}"/>
-                        
+                                                <Label Grid.Row="0" Grid.Column="1" Classes="Heading2"
+                                                       Content="{Binding ReviewDate}" />
+                                                <Label Grid.Row="1" Grid.Column="1" Classes="Heading2"
+                                                       Content="{Binding ReviewVersion}" />
+
                                                 <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="2"
                                                         Classes="PfpFrame">
                                                     <Border Width="50" Height="50"
@@ -249,14 +250,14 @@
                                                         <Label Classes="Heading2I"
                                                                HorizontalAlignment="Center"
                                                                Foreground="Black"
-                                                               Content="{Binding ReviewScore}"/>
+                                                               Content="{Binding ReviewScore}" />
                                                     </Border>
                                                 </Border>
                                             </Grid>
-                      
-                                            <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Classes="Heading2Wrapping" 
-                                                   Content="{Binding ReviewText}"/>
-                      
+
+                                            <Label Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Classes="Heading2Wrapping"
+                                                   Content="{Binding ReviewText}" />
+
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -264,53 +265,89 @@
                         </ItemsRepeater>
                     </ScrollViewer>
                 </TabItem>
-                <TabItem  Classes="MediumTab"
-                          Header="{dloc:Localize OnlineDmodBrowser/Screenshots}">
-                    <Grid RowDefinitions="*,Auto"
-                          Margin="4">
-                        <Border Grid.Row="1" Classes="PfpFrame"
-                                BorderThickness="1,0,1,1"
-                                Margin="2,0"
-                                HorizontalAlignment="Stretch">
-                            <ListBox ItemsSource="{Binding SelectedDmodDefinition.Screenshots}"
+                <TabItem Classes="MediumTab"
+                         Header="{dloc:Localize OnlineDmodBrowser/Screenshots}">
+                    <Border Classes="PfpFrame"
+                            BorderThickness="1"
+                            Margin="4"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            x:Name="borderScreenshotsTab">
+                        <Border.Resources>
+                            <valueConverters:DoubleCompareBoolConverter x:Key="DoubleCompareBoolConverter"/>
+                            <system:Double x:Key="BorderScreenshotsTabMinHeightThresh">300</system:Double>
+                        </Border.Resources>
+                        <Grid RowDefinitions="*,Auto">
+                            <ListBox Grid.Row="1" 
+                                     ItemsSource="{Binding SelectedDmodDefinition.Screenshots}"
                                      SelectedItem="{Binding SelectedDmodScreenshotVm}"
                                      SelectedIndex="{Binding SelectedDmodScreenshotIndex}"
+                                     IsVisible="{Binding Bounds.Height, ElementName=borderScreenshotsTab, 
+                                        Converter={StaticResource DoubleCompareBoolConverter},
+                                        ConverterParameter={StaticResource BorderScreenshotsTabMinHeightThresh}}"
                                      ScrollViewer.VerticalScrollBarVisibility="Disabled"
                                      ScrollViewer.HorizontalScrollBarVisibility="Visible">
                                 <ListBox.Styles>
                                     <Style Selector="ListBoxItem">
-                                        <Setter Property="BorderThickness" Value="0"/>
-                                        <Setter Property="Padding" Value="0"/>
-                                        <Setter Property="Margin" Value="3,0"/>
+                                        <Setter Property="BorderThickness" Value="2" />
+                                        <Setter Property="Padding" Value="2" />
+                                        <Setter Property="Margin" Value="2" />
+                                        <Setter Property="BorderBrush" Value="Transparent"/>
+                                        
+                                        <Style Selector="^:selected">
+                                            <Setter Property="BorderBrush" Value="{DynamicResource HighlightBrush}"/>
+                                        </Style>
                                     </Style>
                                 </ListBox.Styles>
                                 <ListBox.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal"/>
+                                        <StackPanel Orientation="Horizontal" />
                                     </ItemsPanelTemplate>
                                 </ListBox.ItemsPanel>
                                 <ListBox.ItemTemplate>
                                     <DataTemplate DataType="onlineDmod:OnlineDmodScreenshotViewModel">
                                         <Image Source="{Binding ScreenshotPreview }"
-                                               Height="100"/>
+                                               Height="100" />
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
-                        </Border>
-                        <Border Grid.Row="0" Classes="PfpFrame"
-                                BorderThickness="1,1,1,0"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                Margin="2,0">
-                            <Grid ColumnDefinitions="*,*">
+
+                            <Grid Grid.Row="0" ColumnDefinitions="*,*">
+                                <Path Grid.Column="0"
+                                      Opacity="0.5"
+                                      Height="45"
+                                      HorizontalAlignment="Left"
+                                      VerticalAlignment="Center"
+                                      Data="{DynamicResource PathArrowDown}"
+                                      Fill="{DynamicResource ThemeForegroundBrush}"
+                                      Stretch="Uniform"
+                                      IsVisible="{Binding !SelectedDmodScreenshotIsFirst}">
+                                    <Path.RenderTransform>
+                                        <RotateTransform Angle="90" />
+                                    </Path.RenderTransform>
+                                </Path>
+                                <Path Grid.Column="1"
+                                      Opacity="0.5"
+                                      Height="45"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Center"
+                                      Data="{DynamicResource PathArrowUp}"
+                                      Fill="{DynamicResource ThemeForegroundBrush}"
+                                      Stretch="Uniform"
+                                      IsVisible="{Binding !SelectedDmodScreenshotIsLast}">
+                                    <Path.RenderTransform>
+                                        <RotateTransform Angle="90" />
+                                    </Path.RenderTransform>
+                                </Path>
+                                
                                 <Image
                                     Grid.Column="0" Grid.ColumnSpan="2"
-                                    HorizontalAlignment="Center" 
-                                       VerticalAlignment="Center" 
-                                       Width="NaN" Height="NaN"
-                                       Source="{Binding SelectedDmodScreenshot}"/>
-                                
-                                <Button Grid.Column="0" 
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Width="NaN" Height="NaN"
+                                    Source="{Binding SelectedDmodScreenshot}" />
+
+                                <Button Grid.Column="0"
                                         Width="NaN"
                                         Height="NaN"
                                         HorizontalAlignment="Stretch"
@@ -321,7 +358,7 @@
                                         Padding="0"
                                         Margin="5"
                                         Command="{Binding CmdGoScreenshotPrevious}"/>
-                                <Button Grid.Column="1" 
+                                <Button Grid.Column="1"
                                         Width="NaN"
                                         Height="NaN"
                                         HorizontalAlignment="Stretch"
@@ -331,12 +368,10 @@
                                         BorderThickness="0"
                                         Padding="0"
                                         Margin="5"
-                                        Command="{Binding CmdGoScreenshotNext}"/>
+                                        Command="{Binding CmdGoScreenshotNext}" />
                             </Grid>
-                            
-                        </Border>
-            
-                    </Grid>
+                        </Grid>
+                    </Border>
                 </TabItem>
             </TabControl>
         </Grid>

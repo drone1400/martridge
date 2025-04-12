@@ -257,6 +257,9 @@
   "SettingsGeneral/BrowseFileTypeExe": "Executable",
   "SettingsGeneral/BrowseAddGameExe": "Martridge - Select a Dink game executable",
   "SettingsGeneral/BrowseAddEditorExe": "Martridge - Select a Dink editor executable",
+  "SettingsGeneral/TabItemPathDmod": "DMOD paths",
+  "SettingsGeneral/TabItemPathGame": "Game paths",
+  "SettingsGeneral/TabItemPathEditor": "Editor paths",
 
   "DmodBrowser/BackToList" : "Go back to DMOD List",
   "DmodBrowser/ContextMenu/OpenDmodLocation" : "Open Location In Explorer",

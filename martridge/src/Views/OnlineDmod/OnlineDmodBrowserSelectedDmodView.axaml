@@ -136,7 +136,7 @@
         
             <!-- Dmod More info -->
             <TabControl Grid.Row="3" Name="TheTabControl">
-                <TabItem  Classes="Medium"
+                <TabItem  Classes="MediumTab"
                           Header="{dloc:Localize OnlineDmodBrowser/Description}">
                     <ScrollViewer VerticalContentAlignment="Top" 
                                       VerticalAlignment="Stretch"
@@ -156,7 +156,7 @@
                             </Border>
                         </ScrollViewer>
                 </TabItem>
-                <TabItem  Classes="Medium"
+                <TabItem  Classes="MediumTab"
                           Header="{dloc:Localize OnlineDmodBrowser/Versions}">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                                   VerticalScrollBarVisibility="Visible"
@@ -211,7 +211,7 @@
                 </TabItem>
         
                 <!-- Reviews -->
-                <TabItem  Classes="Medium"
+                <TabItem  Classes="MediumTab"
                           Header="{dloc:Localize OnlineDmodBrowser/Reviews}">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" 
                                   VerticalScrollBarVisibility="Visible"
@@ -264,7 +264,7 @@
                         </ItemsRepeater>
                     </ScrollViewer>
                 </TabItem>
-                <TabItem  Classes="Medium"
+                <TabItem  Classes="MediumTab"
                           Header="{dloc:Localize OnlineDmodBrowser/Screenshots}">
                     <Grid RowDefinitions="*,Auto"
                           Margin="4">

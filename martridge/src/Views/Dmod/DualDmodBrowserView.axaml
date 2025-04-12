@@ -21,13 +21,13 @@
     </UserControl.Styles>
     
     <TabControl>
-        <TabItem  Classes="Big"
+        <TabItem  Classes="BigTab"
                   Header="{dloc:Localize MainWindow/TabItemInstalledDmods}">
             <dmod:DmodBrowserView DataContext="{Binding DmodBrowserVm}"
                                   Name="DmodBrowserView" />
         </TabItem>
         
-        <TabItem  Classes="Big"
+        <TabItem  Classes="BigTab"
                   Header="{dloc:Localize MainWindow/TabItemOnlineDmods}">
             <onlineDmod:OnlineDmodBrowserView DataContext="{Binding OnlineDmodBrowserVm}" 
                                        Name="OnlineDmodBrowserView"/>

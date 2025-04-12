@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 
 namespace Martridge.Models {
 
@@ -150,12 +152,36 @@ namespace Martridge.Models {
                 AllowMultiple = false,
                 SuggestedStartLocation = baseStorageDirectory,
             };
-
-            IReadOnlyList<IStorageFolder> results = storageProvider.OpenFolderPickerAsync(fpo).Result;
-            if (results.Count > 0)
-                return results[0];
-        
-            return null;
+            
+            //
+            //          Important NOTE:
+            // Under OSX, IStorageFolder.OpenFolderPickerAsync must be called from the UI thread, otherwise 
+            // it will crash with this error message:
+            //      'NSWindow drag regions should only be invalidated on the Main Thread!'
+            //
+            // The funky thing about it is, after calling it on the UI thread I can't just wait for the
+            // IStorageFolder.OpenFolderPickerAsync result since that would lock up the whole UI thread,
+            // so instead I have to use an async function and properly await the OpenFolderPickerAsync...
+            //
+            
+            IStorageFolder? result = null;
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            Dispatcher.UIThread.Invoke(async () => {
+                try {
+                    IReadOnlyList<IStorageFolder> results = await storageProvider.OpenFolderPickerAsync(fpo);
+                    if (results.Count > 0)
+                        result = results[0];
+                } catch (Exception) {
+                    result = null;
+                }
+                finally {
+                    cancellationTokenSource.Cancel();
+                }
+            });
+            while (cancellationTokenSource.IsCancellationRequested == false) {
+                Thread.Sleep(50);
+            }
+            return result;
         }
 
         public static IStorageFile? BrowseFileOpen(string title, IReadOnlyList<FilePickerFileType>? fileTypes, string? suggestedFilePath = null)
@@ -192,16 +218,26 @@ namespace Martridge.Models {
                 SuggestedStartLocation = suggestedStorageDirectory,
                 SuggestedFileName = suggestedFileName,
             };
-            
 
-            Task<IReadOnlyList<IStorageFile>> fpoTask = storageProvider.OpenFilePickerAsync(fpo);
-            fpoTask.Wait();
-            IReadOnlyList<IStorageFile> results = fpoTask.Result;
-            
-            if (results.Count > 0)
-                return results[0];
-            
-            return null;
+            // call OpenFilePickerAsync fromt he UIThread to prevent crash on OSX
+            IStorageFile? result = null;
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            Dispatcher.UIThread.Invoke(async () => {
+                try {
+                    IReadOnlyList<IStorageFile> results = await storageProvider.OpenFilePickerAsync(fpo);
+                    if (results.Count > 0)
+                        result = results[0];
+                } catch (Exception) {
+                    result = null;
+                }
+                finally {
+                    cancellationTokenSource.Cancel();
+                }
+            });
+            while (cancellationTokenSource.IsCancellationRequested == false) {
+                Thread.Sleep(50);
+            }
+            return result;
         }
         
         public static IStorageFile? BrowseFileSave(string title, IReadOnlyList<FilePickerFileType>? fileTypes, string? suggestedFilePath = null)
@@ -238,10 +274,23 @@ namespace Martridge.Models {
                 SuggestedFileName = suggestedFileName,
             };
             
-
-            Task<IStorageFile?> fpoTask = storageProvider.SaveFilePickerAsync(fpo);
-            fpoTask.Wait();
-            return fpoTask.Result;
+            // call SaveFilePickerAsync fromt he UIThread to prevent crash on OSX 
+            IStorageFile? result = null;
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            Dispatcher.UIThread.Invoke(async () => {
+                try {
+                    result = await storageProvider.SaveFilePickerAsync(fpo);
+                } catch (Exception) {
+                    result = null;
+                }
+                finally {
+                    cancellationTokenSource.Cancel();
+                }
+            });
+            while (cancellationTokenSource.IsCancellationRequested == false) {
+                Thread.Sleep(50);
+            }
+            return result;
         }
         
         #endregion

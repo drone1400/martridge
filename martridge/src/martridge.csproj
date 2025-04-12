@@ -46,7 +46,8 @@
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 
-        <BaseIntermediateOutputPath>..\output.obj\</BaseIntermediateOutputPath>
+        <!-- BaseIntermediateOutputPath is set in Directory.Build.props !! -->
+        <!-- <BaseIntermediateOutputPath>..\output.obj\</BaseIntermediateOutputPath> -->
         <IntermediateOutputPath>..\output.obj\$(TargetFramework)_$(Configuration)_$(Platform)\Martridge\</IntermediateOutputPath>
         <OutputPath>..\output\$(TargetFramework)_$(Configuration)_$(Platform)\Martridge\</OutputPath>
         <WarningLevel>4</WarningLevel>

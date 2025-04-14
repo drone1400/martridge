@@ -62,6 +62,8 @@ namespace Martridge.Models.Dmod
                     if (launch.UsePathRelativeToGame && finfo.DirectoryName != null) {
                         finalPath = Path.GetRelativePath(finfo.DirectoryName, dmodPath);
                     }
+                    
+                    finalPath = Path.TrimEndingDirectorySeparator(finalPath);
 
                     // NOTE: If path contains whitespace, force quotation marks on since otherwise you can't launch the DMOD
                     if (launch.UsePathQuotationMarks ||
@@ -74,12 +76,14 @@ namespace Martridge.Models.Dmod
                 }
 
                 if (launch.UseRefDir && string.IsNullOrWhiteSpace(launch.RefDirPath) == false) {
+                    string refDirPath = Path.TrimEndingDirectorySeparator(launch.RefDirPath);
+                    
                     arguments += " --refdir ";
                     if (launch.UsePathQuotationMarks) {
-                        arguments += $"\"{launch.RefDirPath}\"";
+                        arguments += $"\"{refDirPath}\"";
                     }
                     else {
-                        arguments += launch.RefDirPath;
+                        arguments += refDirPath;
                     }
                 }
 

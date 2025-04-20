@@ -39,58 +39,9 @@
     <Color x:Key="ErrorColor">#FFFF0000</Color>
     <Color x:Key="ErrorLowColor">#AAFF0000</Color>
     
-    <!-- If you are just tweaking colors, just leave the stuff below as it is -->
-
-    <SolidColorBrush x:Key="ThemeCardBrush" Color="{DynamicResource ThemeCardColor}"/>
-    <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="{DynamicResource ThemeBackgroundColor}"/>
-    <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="{DynamicResource ThemeBorderLowColor}"/>
-    <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="{DynamicResource ThemeBorderMidColor}"/>
-    <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="{DynamicResource ThemeBorderHighColor}"/>
-    <SolidColorBrush x:Key="ThemeControlLowBrush" Color="{DynamicResource ThemeControlLowColor}"/>
-    <SolidColorBrush x:Key="ThemeControlMidBrush" Color="{DynamicResource ThemeControlMidColor}"/>
-    <SolidColorBrush x:Key="ThemeControlMidHighBrush" Color="{DynamicResource ThemeControlMidHighColor}"/>
-    <SolidColorBrush x:Key="ThemeControlHighBrush" Color="{DynamicResource ThemeControlHighColor}"/>
-    <SolidColorBrush x:Key="ThemeControlVeryHighBrush" Color="{DynamicResource ThemeControlVeryHighColor}"/>
-    <SolidColorBrush x:Key="ThemeControlHighlightLowBrush" Color="{DynamicResource ThemeControlHighlightLowColor}"/>
-    <SolidColorBrush x:Key="ThemeControlHighlightMidBrush" Color="{DynamicResource ThemeControlHighlightMidColor}"/>
-    <SolidColorBrush x:Key="ThemeControlHighlightHighBrush" Color="{DynamicResource ThemeControlHighlightHighColor}"/>
-    <SolidColorBrush x:Key="ThemeForegroundBrush" Color="{DynamicResource ThemeForegroundColor}"/>
-    <SolidColorBrush x:Key="ThemeForegroundLowBrush" Color="{DynamicResource ThemeForegroundLowColor}"/>
-
-    <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource HighlightColor}"/>
-    <SolidColorBrush x:Key="HighlightBadgeBrush" Color="{DynamicResource HighlightBadgeColor}"/>
-    <SolidColorBrush x:Key="HighlightHoverBrush" Color="{DynamicResource HighlightHoverColor}"/>
-    <SolidColorBrush x:Key="HighlightForegroundBrush" Color="{DynamicResource HighlightForegroundColor}"/>
-    <SolidColorBrush x:Key="ThemeAccentBrush" Color="{DynamicResource ThemeAccentColor}"/>
-    <SolidColorBrush x:Key="ThemeAccentBrush2" Color="{DynamicResource ThemeAccentColor2}"/>
-    <SolidColorBrush x:Key="ThemeAccentBrush3" Color="{DynamicResource ThemeAccentColor3}"/>
-    <SolidColorBrush x:Key="ThemeAccentBrush4" Color="{DynamicResource ThemeAccentColor4}"/>
-    <SolidColorBrush x:Key="ThemeAccentBadgeBrush" Color="{DynamicResource ThemeAccentBadgeColor}"/>
-    <SolidColorBrush x:Key="ErrorBrush" Color="{DynamicResource ErrorColor}"/>
-    <SolidColorBrush x:Key="ErrorLowBrush" Color="{DynamicResource ErrorLowColor}"/>
-
-    <!-- NOTE: the NotificationCard brushes are currently not being used... -->
-    <SolidColorBrush x:Key="NotificationCardBackgroundBrush" Color="#444444" Opacity="0.75"/>
-    <SolidColorBrush x:Key="NotificationCardInformationBackgroundBrush" Color="#007ACC" Opacity="0.75"/>
-    <SolidColorBrush x:Key="NotificationCardSuccessBackgroundBrush" Color="#1F9E45" Opacity="0.75"/>
-    <SolidColorBrush x:Key="NotificationCardWarningBackgroundBrush" Color="#FDB328" Opacity="0.75"/>
-    <SolidColorBrush x:Key="NotificationCardErrorBackgroundBrush" Color="#BD202C" Opacity="0.75"/>
-
-    <SolidColorBrush x:Key="DatePickerFlyoutPresenterHighlightFill" Color="{DynamicResource ThemeAccentColor}" Opacity="0.4" />
-    <SolidColorBrush x:Key="TimePickerFlyoutPresenterHighlightFill" Color="{DynamicResource ThemeAccentColor}" Opacity="0.4" />
-
-    <SolidColorBrush x:Key="ThemeControlTransparentBrush" Color="Transparent" />
-  
-    <Thickness x:Key="ThemeBorderThickness">1,1,1,1</Thickness>
-    <sys:Double x:Key="ThemeDisabledOpacity">0.5</sys:Double>
-
-    <sys:Double x:Key="FontSizeSmall">13</sys:Double>
-    <sys:Double x:Key="FontSizeNormal">14</sys:Double>
-    <sys:Double x:Key="FontSizeLarge">14</sys:Double>
-
-    <sys:Double x:Key="ScrollBarThickness">18</sys:Double>
-    <sys:Double x:Key="ScrollBarThumbThickness">8</sys:Double>
-
-    <sys:Double x:Key="IconElementThemeHeight">20</sys:Double>
-    <sys:Double x:Key="IconElementThemeWidth">20</sys:Double>
+    <Color x:Key="NotificationCardBackgroundColor">#444444</Color>
+    <Color x:Key="NotificationCardInformationBackgroundColor">#007ACC</Color>
+    <Color x:Key="NotificationCardSuccessBackgroundColor">#1F9E45</Color>
+    <Color x:Key="NotificationCardWarningBackgroundColor">#FDB328</Color>
+    <Color x:Key="NotificationCardErrorBackgroundColor">#BD202C</Color>
 </ResourceDictionary>

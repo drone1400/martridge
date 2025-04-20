@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
@@ -17,7 +16,6 @@ using Martridge.Trace;
 using Martridge.ViewModels;
 using Martridge.Views;
 using Martridge.Views.Log;
-using Tmds.DBus.Protocol;
 
 namespace Martridge {
     
@@ -151,8 +149,8 @@ namespace Martridge {
                             object obj = AvaloniaRuntimeXamlLoader.Load(fileStream);
                             if (obj is not ResourceDictionary resDic)
                                 continue;
-                            CitrusPaletteData paletteData = new CitrusPaletteData(name, resDic);
-                            this._citrusTheme.RegisterPalette(paletteData);
+                            CitrusThemeVariantData paletteData = new CitrusThemeVariantData(name, resDic);
+                            this._citrusTheme.RegisterThemeVariant(paletteData);
                         } catch (Exception ex) {
                             MyTrace.Global.WriteMessage(MyTraceCategory.General, ex.ToString(), MyTraceLevel.Warning);
                         }
@@ -162,14 +160,25 @@ namespace Martridge {
                 MyTrace.Global.WriteMessage(MyTraceCategory.General, ex.ToString(), MyTraceLevel.Critical);
             }
         }
+
+        public void SetCitrusThemePalette(string themeKey) {
+            List<ThemeVariant>? themeVariants = this._citrusTheme?.GetRegisteredThemeVariants();
+            if (themeVariants == null)
+                return;
+            foreach (ThemeVariant themeVariant in themeVariants) {
+                if (themeVariant.Key.ToString() == themeKey) {
+                    this.SetCitrusThemePalette(themeVariant);
+                    return;
+                }
+            }
+        }
         
-        public void SetCitrusThemePalette(string paletteKey) {
-            if (this._citrusTheme == null) return;
-            this._citrusTheme.ColorPalette = paletteKey;
+        public void SetCitrusThemePalette(ThemeVariant themeVariant) {
+            this.RequestedThemeVariant = themeVariant;
             
             // update in configuration...
             this._config.General.UpdateProperties(new Dictionary<string, object?>() {
-                [nameof(ConfigGeneral.ThemeName)] = paletteKey,
+                [nameof(ConfigGeneral.ThemeName)] = themeVariant.Key.ToString(),
             });
             
             try {
@@ -181,7 +190,7 @@ namespace Martridge {
 
         public void SetCitrusNextPalette() {
             if (this._citrusTheme == null) return;
-            string newPalette = this._citrusTheme.ColorPalette switch {
+            string newPalette = this.RequestedThemeVariant?.ToString() switch {
                 "Citrus" => "Sea",
                 "Sea" => "Rust",
                 "Rust" => "Candy",
@@ -192,16 +201,18 @@ namespace Martridge {
         }
 
         public string GetCitrusPalette() {
-            if (this._citrusTheme == null) return "";
-            return this._citrusTheme.ColorPalette;
+            return this.RequestedThemeVariant?.ToString() ?? "Default";
         }
 
         public IList<string> GetThemeNames() {
             List<string> customThemes = new List<string>();
             if (this._citrusTheme == null) 
                 return customThemes;
-            foreach (var kvp in this._citrusTheme.GetRegisteredPalettes()) {
-                customThemes.Add(kvp.Key);
+            foreach (var kvp in this._citrusTheme.GetRegisteredThemeVariants()) {
+                string? key = kvp.Key.ToString();
+                if (key == null)
+                    continue;
+                customThemes.Add(key);
             }
             return customThemes;
         }

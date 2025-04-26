@@ -18,7 +18,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" 
-                              MinWidth="480"/>
+                              MinWidth="580"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*" 
                               MinWidth="480"/>

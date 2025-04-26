@@ -10,7 +10,7 @@ namespace Martridge.Views.Dmod {
         // -----------------------------------------------------------------------------------------------------------------------------------
         
         public static readonly AvaloniaProperty<double> OnePageSwitchThresholdProperty =
-            AvaloniaProperty.Register<MagicSplitPresenterView, double>(nameof(OnePageSwitchThreshold), 1000);
+            AvaloniaProperty.Register<MagicSplitPresenterView, double>(nameof(OnePageSwitchThreshold), 1100);
         public double OnePageSwitchThreshold {
             get => (double)(this.GetValue(OnePageSwitchThresholdProperty) ?? double.NaN);
             set => this.SetValue(OnePageSwitchThresholdProperty,value);
@@ -49,7 +49,7 @@ namespace Martridge.Views.Dmod {
         }
         
         public static readonly AvaloniaProperty<double> LeftPanelMinWidthProperty =
-            AvaloniaProperty.Register<MagicSplitPresenterView, double>(nameof(LeftPanelMinWidth), 480);
+            AvaloniaProperty.Register<MagicSplitPresenterView, double>(nameof(LeftPanelMinWidth), 600);
         public double LeftPanelMinWidth {
             get => (double)(this.GetValue(LeftPanelMinWidthProperty) ?? double.NaN);
             set => this.SetValue(LeftPanelMinWidthProperty,value);

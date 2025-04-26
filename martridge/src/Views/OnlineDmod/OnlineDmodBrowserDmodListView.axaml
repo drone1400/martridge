@@ -64,7 +64,6 @@
         
         <DataGrid Grid.Row="2"
                   Name="dataGridDmods"
-                  Width="{Binding ElementName=HeaderGrid, Path=Width}"
                   Margin="6,2"
                   SelectionMode="Single"
                   IsReadOnly="True"

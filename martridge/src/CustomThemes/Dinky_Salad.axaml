@@ -1,6 +1,5 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:sys="clr-namespace:System;assembly=netstandard">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     
     <!-- 
         NOTE: if you are making your own custom theme color palette definition 
@@ -8,40 +7,44 @@
         https://github.com/drone1400/Citrus.Avalonia/blob/main/src/Citrus.Avalonia/Palette/SeaPalette.xaml
     -->
     
-    <Color x:Key="ThemeAccentColor">#DD5D16</Color>
-    <Color x:Key="ThemeAccentColor2">#4E633D</Color>
-    <Color x:Key="ThemeAccentColor3">#DD5D16</Color>
-    <Color x:Key="ThemeAccentColor4">#DD5D16</Color>
-    <Color x:Key="ThemeAccentBadgeColor">#7B1200</Color>
-
-    <Color x:Key="ThemeCardColor">#FFFFFF</Color>
-    <Color x:Key="ThemeBackgroundColor">#FFECECEC</Color>
-    <Color x:Key="ThemeBorderLowColor">#FFF3F3F3</Color>
-    <Color x:Key="ThemeBorderMidColor">#FFECECEC</Color>
-    <Color x:Key="ThemeBorderHighColor">#FFAAAAAA</Color>
-  
-    <Color x:Key="ThemeControlLowColor">#FF868999</Color>
-    <Color x:Key="ThemeControlMidColor">#FFF5F5F5</Color>
-    <Color x:Key="ThemeControlMidHighColor">#FFC2C3C9</Color>
-    <Color x:Key="ThemeControlHighColor">#FF686868</Color>
-    <Color x:Key="ThemeControlVeryHighColor">#FF5B5B5B</Color>
-
-    <Color x:Key="ThemeControlHighlightLowColor">#FFF0F0F0</Color>
-    <Color x:Key="ThemeControlHighlightMidColor">#FFD0D0D0</Color>
-    <Color x:Key="ThemeControlHighlightHighColor">#FF808080</Color>
-    <Color x:Key="ThemeForegroundColor">#FF000000</Color>
-    <Color x:Key="ThemeForegroundLowColor">#FF808080</Color>
+    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#DD5D16" />
+    <SolidColorBrush x:Key="ThemeAccentBrush2" Color="#4E633D" />
+    <SolidColorBrush x:Key="ThemeAccentBrush3" Color="#DD5D16" />
+    <SolidColorBrush x:Key="ThemeAccentBrush4" Color="#DD5D16" />
+    <SolidColorBrush x:Key="ThemeAccentBadgeBrush" Color="#7B1200" />
     
-    <Color x:Key="HighlightBadgeColor">#9E0A00</Color>
-    <Color x:Key="HighlightColor">#D31100</Color>
-    <Color x:Key="HighlightHoverColor">#BB1100</Color>
-    <Color x:Key="HighlightForegroundColor">#FFFFFFFF</Color>
-    <Color x:Key="ErrorColor">#FFFF0000</Color>
-    <Color x:Key="ErrorLowColor">#AAFF0000</Color>
+    <SolidColorBrush x:Key="HighlightBrush" Color="#D31100" />
+    <SolidColorBrush x:Key="HighlightHoverBrush" Color="#BB1100" />
+    <SolidColorBrush x:Key="HighlightBadgeBrush" Color="#9E0A00" />
+    <SolidColorBrush x:Key="HighlightForegroundBrush" Color="#FFFFFFFF" />
     
-    <Color x:Key="NotificationCardBackgroundColor">#444444</Color>
-    <Color x:Key="NotificationCardInformationBackgroundColor">#007ACC</Color>
-    <Color x:Key="NotificationCardSuccessBackgroundColor">#1F9E45</Color>
-    <Color x:Key="NotificationCardWarningBackgroundColor">#FDB328</Color>
-    <Color x:Key="NotificationCardErrorBackgroundColor">#BD202C</Color>
+    <SolidColorBrush x:Key="ErrorBrush" Color="#FFFF0000" />
+    <SolidColorBrush x:Key="ErrorLowBrush" Color="#AAFF0000" />
+    
+    <SolidColorBrush x:Key="ThemeCardBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#FFECECEC" />
+    <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="#FFF3F3F3" />
+    <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#FFECECEC" />
+    <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="#FFAAAAAA" />
+    
+    <SolidColorBrush x:Key="ThemeControlLowBrush" Color="#FF868999" />
+    <SolidColorBrush x:Key="ThemeControlMidBrush" Color="#FFF5F5F5" />
+    <SolidColorBrush x:Key="ThemeControlMidHighBrush" Color="#FFC2C3C9" />
+    <SolidColorBrush x:Key="ThemeControlHighBrush" Color="#FF686868" />
+    <SolidColorBrush x:Key="ThemeControlVeryHighBrush" Color="#FF5B5B5B" />
+    
+    <SolidColorBrush x:Key="ThemeControlHighlightLowBrush" Color="#FFF0F0F0" />
+    <SolidColorBrush x:Key="ThemeControlHighlightMidBrush" Color="#FFD0D0D0" />
+    <SolidColorBrush x:Key="ThemeControlHighlightHighBrush" Color="#FF808080" />
+    
+    <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#FF000000" />
+    <SolidColorBrush x:Key="ThemeForegroundLowBrush" Color="#FF808080" />
+
+    <SolidColorBrush x:Key="NotificationCardBackgroundBrush" Color="#444444" Opacity="0.75" />
+    <SolidColorBrush x:Key="NotificationCardInformationBackgroundBrush" Color="#007ACC" Opacity="0.75" />
+    <SolidColorBrush x:Key="NotificationCardSuccessBackgroundBrush" Color="#1F9E45" Opacity="0.75" />
+    <SolidColorBrush x:Key="NotificationCardWarningBackgroundBrush" Color="#FDB328" Opacity="0.75" />
+    <SolidColorBrush x:Key="NotificationCardErrorBackgroundBrush" Color="#BD202C" Opacity="0.75" />
+
+    <SolidColorBrush x:Key="ThemeControlTransparentBrush" Color="Transparent" />
 </ResourceDictionary>

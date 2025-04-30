@@ -18,6 +18,16 @@ namespace Martridge.Models.Configuration.Save {
         /// Name of the current Citrus.Avalonia theme
         /// </summary>
         public string? ThemeName { get; set; }
+
+        /// <summary>
+        /// Override the default Citrus Dark theme with this
+        /// </summary>
+        public string? DarkThemeOverride { get; set; }
+
+        /// <summary>
+        /// Override the default Citrus Light theme with this
+        /// </summary>
+        public string? LightThemeOverride { get; set; }
         
         /// <summary>
         /// Indicates if the application should automatically update the existing 'configInstallerList.json' file
@@ -89,6 +99,8 @@ namespace Martridge.Models.Configuration.Save {
         public Dictionary<string, object?> GetValues() {
             return new Dictionary<string, object?>() {
                 [nameof(ConfigGeneral.ThemeName)] = this.ThemeName,
+                [nameof(ConfigGeneral.DarkThemeOverride)] = this.DarkThemeOverride,
+                [nameof(ConfigGeneral.LightThemeOverride)] = this.LightThemeOverride,
                 [nameof(ConfigGeneral.LocalizationName)] = this.LocalizationName,
                 [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
                 [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,

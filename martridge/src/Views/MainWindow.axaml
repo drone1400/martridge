@@ -5,19 +5,20 @@
         xmlns:dloc="using:Martridge.ViewModels.Localization"
         xmlns:vm="using:Martridge.ViewModels"
         xmlns:martridge="clr-namespace:Martridge"
+        xmlns:controls="clr-namespace:Martridge.Controls"
+        xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
 
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
-        
-        MinWidth="600"
+
+        MinWidth="780"
         MinHeight="580"
-        
+
         x:Class="Martridge.Views.MainWindow"
-        
+
         Icon="/Assets/martridge_new.ico"
         Title="{dloc:Localize MainWindow/Title}"
         Background="{DynamicResource ThemeBackgroundColor}"
-        Name="TheMainWindow"
-        KeyDown="KeyDownHandler">
+        Name="TheMainWindow">
 
     <Design.DataContext>
         <vm:MainWindowViewModel />
@@ -25,6 +26,9 @@
     <Window.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </Window.Styles>
+    <Window.Resources>
+        <valueConverters:TypeCompareToBoolConverter x:Key="TypeCompareToBoolConverter"/>
+    </Window.Resources>
 
     <Border
         Margin="0"
@@ -34,36 +38,101 @@
         BorderThickness="0"
         CornerRadius="0"
         DragDrop.AllowDrop="True">
-        <Grid RowDefinitions="Auto,*">
-            <Menu Grid.Row="0">
-                <MenuItem Header="{dloc:Localize MainWindow/MenuFile}">
-                    <MenuItem Header="{dloc:Localize MainWindow/MenuDmodInstaller}"
-                              Command="{Binding CmdShowPageDmodInstallerAndBrowse}" />
-                    <MenuItem Header="{dloc:Localize MainWindow/MenuDmodPacker}"
-                              Command="{Binding CmdShowPageDmodPackerAndBrowse}"
-                              IsVisible="{Binding EnableDmodDeveloperFeatures}"
-                              IsEnabled="{Binding EnableDmodDeveloperFeatures}" />
-                    <MenuItem Header="{dloc:Localize MainWindow/MenuDinkInstaller}"
-                              Command="{Binding CmdShowPageDinkInstaller}"
-                              IsVisible="{Binding EnableDinkInstallerMenu}"
-                              IsEnabled="{Binding EnableDinkInstallerMenu}" />
-                    <MenuItem Header="{dloc:Localize MainWindow/MenuLogWindow}"
-                              Command="{Binding CmdShowLogWindow}" />
-                    <MenuItem Header="{dloc:Localize MainWindow/MenuExit}"
-                              Click="CloseWindow" />
-                </MenuItem>
+        <Grid RowDefinitions="Auto,*" ColumnDefinitions="Auto,*">
+            <!-- <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"> -->
+            <!--     <MenuItem Header="{dloc:Localize MainWindow/MenuLogWindow}" -->
+            <!--               Command="{Binding CmdShowLogWindow}" /> -->
+            <!--     <MenuItem Header="{dloc:Localize MainWindow/MenuTheme}" x:Name="menuItemThemes"/> -->
+            <!-- </Menu> -->
 
-                <MenuItem Header="{dloc:Localize MainWindow/MenuSettings}"
-                          Command="{Binding CmdShowPageSettings}" />
+            <Grid Grid.Row="1" Grid.Column="0" RowDefinitions="*,Auto">
+                <Grid.Styles>
+                    <Style Selector="controls|SelectableButton">
+                        <Setter Property="Width" Value="200"/>
+                    </Style>
+                </Grid.Styles>
 
-                <MenuItem Header="{dloc:Localize MainWindow/MenuTheme}" x:Name="menuItemThemes"/>
+                <WrapPanel Grid.Row="0"
+                           Background="{DynamicResource ThemeAccentBrush2}"
+                           Orientation="Vertical">
 
-                <MenuItem Header="{dloc:Localize MainWindow/MenuAbout}"
-                          Command="{Binding CmdShowPageAbout}" />
+                    <controls:SelectableButton
+                        Content="My DMODs" 
+                        Command="{Binding CmdShowPageMyDmods}" 
+                        IsSelected="{Binding CurrentViewModel,
+                            Converter={StaticResource TypeCompareToBoolConverter},
+                            ConverterParameter={}DmodBrowserViewModel,
+                            Mode=OneWay}" />
+                    
+                    <controls:SelectableButton
+                        Content="Online DMODs" 
+                        Command="{Binding CmdShowPageOnlineDmods}" 
+                        IsSelected="{Binding CurrentViewModel,
+                            Converter={StaticResource TypeCompareToBoolConverter},
+                            ConverterParameter={}OnlineDmodBrowserViewModel,
+                            Mode=OneWay}" />
 
-            </Menu>
+                    <controls:SelectableButton
+                        Content="DMOD Installer"
+                        Command="{Binding CmdShowPageDmodInstallerAndBrowse}" 
+                        IsSelected="{Binding CurrentViewModel,
+                            Converter={StaticResource TypeCompareToBoolConverter},
+                            ConverterParameter={}DmodInstallerViewModel,
+                            Mode=OneWay}" />
 
-            <Grid Grid.Row="1">
+                    <controls:SelectableButton
+                        Content="DMOD Packer"
+                        Command="{Binding CmdShowPageDmodPackerAndBrowse}"
+                        IsSelected="{Binding CurrentViewModel,
+                            Converter={StaticResource TypeCompareToBoolConverter},
+                            ConverterParameter={}DmodPackerViewModel,
+                            Mode=OneWay}"
+                        IsVisible="{Binding EnableDmodDeveloperFeatures}"
+                        IsEnabled="{Binding EnableDmodDeveloperFeatures}" />
+
+                    <controls:SelectableButton
+                        Content="Dink Installer"
+                        Command="{Binding CmdShowPageDinkInstaller}"
+                        IsSelected="{Binding CurrentViewModel,
+                            Converter={StaticResource TypeCompareToBoolConverter},
+                            ConverterParameter={}DinkInstallerViewModel,
+                            Mode=OneWay}"
+                        IsVisible="{Binding EnableDinkInstallerMenu}"
+                        IsEnabled="{Binding EnableDinkInstallerMenu}" />
+
+                </WrapPanel>
+
+                <WrapPanel Grid.Row="1"
+                           Background="{DynamicResource ThemeAccentBrush2}"
+                           Orientation="Vertical">
+                    <controls:SelectableButton
+                        Content="Theme"
+                        IsSelected="{Binding CurrentViewModel,
+                            Converter={StaticResource TypeCompareToBoolConverter},
+                            ConverterParameter={}SettingsThemeViewModel,
+                            Mode=OneWay}"
+                        Command="{Binding CmdShowPageSettingsTheme}" />
+                    
+                    <controls:SelectableButton
+                        Content="Settings"
+                        IsSelected="{Binding CurrentViewModel,
+                            Converter={StaticResource TypeCompareToBoolConverter},
+                            ConverterParameter={}SettingsGeneralViewModel,
+                            Mode=OneWay}"
+                        Command="{Binding CmdShowPageSettings}" />
+
+                    <controls:SelectableButton
+                        Content="About"
+                        IsSelected="{Binding CurrentViewModel,
+                            Converter={StaticResource TypeCompareToBoolConverter},
+                            ConverterParameter={}AboutViewModel,
+                            Mode=OneWay}"
+                        Command="{Binding CmdShowPageAbout}" />
+                </WrapPanel>
+
+            </Grid>
+
+            <Grid Grid.Row="1" Grid.Column="1">
                 <ContentControl Content="{Binding CurrentViewModel}">
                     <ContentControl.DataTemplates>
                         <martridge:MainViewLocator />

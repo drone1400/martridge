@@ -116,6 +116,16 @@ namespace Martridge {
         private CitrusTheme? _citrusTheme = null;
         private StyleInclude? _stylesDataGridCitrus = null;
         private StyleInclude? _customStyles = null;
+        private IList<ThemeVariant> _themeVariants = null;
+
+        private Dictionary<string, FileInfo> _customThemeVariantDefinitions = new Dictionary<string, FileInfo>();
+        private Dictionary<string, Uri> _defaultCitrusThemeVariants = new Dictionary<string, Uri>() {
+            [CitrusDefaultPalettes.Citrus.ToString()] = new Uri("avares://Citrus.Avalonia/Palette/CitrusPalette.xaml"),
+            [CitrusDefaultPalettes.Candy.ToString()] = new Uri("avares://Citrus.Avalonia/Palette/CandyPalette.xaml"),
+            [CitrusDefaultPalettes.Magma.ToString()] = new Uri("avares://Citrus.Avalonia/Palette/MagmaPalette.xaml"),
+            [CitrusDefaultPalettes.Rust.ToString()] = new Uri("avares://Citrus.Avalonia/Palette/RustPalette.xaml"),
+            [CitrusDefaultPalettes.Sea.ToString()] = new Uri("avares://Citrus.Avalonia/Palette/SeaPalette.xaml"),
+        };
 
         private void InitializeTheme()
         {
@@ -141,16 +151,13 @@ namespace Martridge {
                     FileInfo[] files = di.GetFiles();
                     foreach (FileInfo file in files) {
                         try {
-                            string ext = file.Extension.ToLowerInvariant();
-                            if (ext != ".xaml" && ext != ".axaml")
-                                continue;
-                            string name = file.Name.Substring(0, file.Name.Length - ext.Length);
-                            using FileStream fileStream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read);
-                            object obj = AvaloniaRuntimeXamlLoader.Load(fileStream);
-                            if (obj is not ResourceDictionary resDic)
-                                continue;
-                            CitrusThemeVariantData paletteData = new CitrusThemeVariantData(name, resDic);
+                            CitrusThemeVariantData? paletteData = TryLoadThemeVariantFromFile(file);
+                            if (paletteData == null) continue;
                             this._citrusTheme.RegisterThemeVariant(paletteData);
+                            string key = paletteData.Variant.Key.ToString() ?? string.Empty;
+                            if (string.IsNullOrWhiteSpace(key))
+                                continue;
+                            this._customThemeVariantDefinitions.Add(key, file);
                         } catch (Exception ex) {
                             MyTrace.Global.WriteMessage(MyTraceCategory.General, ex.ToString(), MyTraceLevel.Warning);
                         }
@@ -159,13 +166,58 @@ namespace Martridge {
             } catch (Exception ex) {
                 MyTrace.Global.WriteMessage(MyTraceCategory.General, ex.ToString(), MyTraceLevel.Critical);
             }
+
+            this._themeVariants = this._citrusTheme.GetRegisteredThemeVariants();
+        }
+
+        private static CitrusThemeVariantData? TryLoadThemeVariantFromFile(FileInfo file) {
+            try {
+                string ext = file.Extension.ToLowerInvariant();
+                if (ext != ".xaml" && ext != ".axaml")
+                    return null;
+                string name = file.Name.Substring(0, file.Name.Length - ext.Length);
+                using FileStream fileStream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read);
+                object obj = AvaloniaRuntimeXamlLoader.Load(fileStream);
+                if (obj is not ResourceDictionary resDic)
+                    return null;
+                CitrusThemeVariantData paletteData = new CitrusThemeVariantData(name, resDic);
+                return paletteData;
+            } catch (Exception ex) {
+                MyTrace.Global.WriteMessage(MyTraceCategory.General, ex.ToString(), MyTraceLevel.Warning);
+                return null;
+            }
+        }
+
+        private CitrusThemeVariantData? TryGetThemeVariantDataFromKey(string themeKey) {
+            try {
+                if (this._customThemeVariantDefinitions.TryGetValue(themeKey, out FileInfo? fileInfo)) {
+                    return TryLoadThemeVariantFromFile(fileInfo);
+                }
+                if (this._defaultCitrusThemeVariants.TryGetValue(themeKey, out Uri? uri)) {
+                    return new CitrusThemeVariantData(themeKey, uri);
+                }
+                return null;
+            } catch (Exception ex) {
+                MyTrace.Global.WriteMessage(MyTraceCategory.General, ex.ToString(), MyTraceLevel.Warning);
+                return null;
+            }
         }
 
         public void SetCitrusThemePalette(string themeKey) {
-            List<ThemeVariant>? themeVariants = this._citrusTheme?.GetRegisteredThemeVariants();
-            if (themeVariants == null)
+            if (themeKey == ThemeVariant.Default.Key.ToString()) {
+                this.SetCitrusThemePalette(ThemeVariant.Default);
                 return;
-            foreach (ThemeVariant themeVariant in themeVariants) {
+            }
+            if (themeKey == ThemeVariant.Light.Key.ToString()) {
+                this.SetCitrusThemePalette(ThemeVariant.Light);
+                return;
+            }
+            if (themeKey == ThemeVariant.Dark.Key.ToString()) {
+                this.SetCitrusThemePalette(ThemeVariant.Dark);
+                return;
+            }
+            
+            foreach (ThemeVariant themeVariant in this._themeVariants) {
                 if (themeVariant.Key.ToString() == themeKey) {
                     this.SetCitrusThemePalette(themeVariant);
                     return;
@@ -173,7 +225,7 @@ namespace Martridge {
             }
         }
         
-        public void SetCitrusThemePalette(ThemeVariant themeVariant) {
+        private void SetCitrusThemePalette(ThemeVariant themeVariant) {
             this.RequestedThemeVariant = themeVariant;
             
             // update in configuration...
@@ -188,16 +240,28 @@ namespace Martridge {
             }
         }
 
-        public void SetCitrusNextPalette() {
-            if (this._citrusTheme == null) return;
-            string newPalette = this.RequestedThemeVariant?.ToString() switch {
-                "Citrus" => "Sea",
-                "Sea" => "Rust",
-                "Rust" => "Candy",
-                "Candy" => "Magma",
-                _ => "Citrus",
-            };
-            this.SetCitrusThemePalette(newPalette);
+        public void OverrideCitrusLightTheme(string themeKey) {
+            CitrusThemeVariantData? data = this.TryGetThemeVariantDataFromKey(themeKey);
+            if (data != null && this._citrusTheme != null) {
+                // update in configuration...
+                this._config.General.UpdateProperties(new Dictionary<string, object?>() {
+                    [nameof(ConfigGeneral.LightThemeOverride)] = themeKey,
+                });
+                // set desired light theme
+                this._citrusTheme.DesiredLightThemeVariant = data.VariantProvider;
+            }
+        }
+        
+        public void OverrideCitrusDarkTheme(string themeKey) {
+            CitrusThemeVariantData? data = this.TryGetThemeVariantDataFromKey(themeKey);
+            if (data != null && this._citrusTheme != null) {
+                // update in configuration...
+                this._config.General.UpdateProperties(new Dictionary<string, object?>() {
+                    [nameof(ConfigGeneral.DarkThemeOverride)] = themeKey,
+                });
+                // set desired dark theme
+                this._citrusTheme.DesiredDarkThemeVariant = data.VariantProvider;
+            }
         }
 
         public string GetCitrusPalette() {
@@ -206,9 +270,7 @@ namespace Martridge {
 
         public IList<string> GetThemeNames() {
             List<string> customThemes = new List<string>();
-            if (this._citrusTheme == null) 
-                return customThemes;
-            foreach (var kvp in this._citrusTheme.GetRegisteredThemeVariants()) {
+            foreach (var kvp in this._themeVariants) {
                 string? key = kvp.Key.ToString();
                 if (key == null)
                     continue;

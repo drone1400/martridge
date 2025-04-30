@@ -25,6 +25,18 @@ namespace Martridge.Models.Configuration {
         private string _themeName = "Citrus";
 
         /// <summary>
+        /// Override the default Citrus Dark theme with this
+        /// </summary>
+        public string DarkThemeOverride => this._darkThemeOverride;
+        private string _darkThemeOverride = string.Empty;
+        
+        /// <summary>
+        /// Override the default Citrus Light theme with this
+        /// </summary>
+        public string LightThemeOverride => this._lightThemeOverride;
+        private string _lightThemeOverride = string.Empty;
+
+        /// <summary>
         /// Indicates if the application should automatically update the existing 'configInstallerList.json' file
         /// </summary>
         public bool AutoUpdateInstallerList { get => this._autoUpdateInstallerList; }
@@ -197,6 +209,8 @@ namespace Martridge.Models.Configuration {
             foreach (var kvp in newValues) {
                 switch (kvp.Key) {
                     case nameof(this.ThemeName): TryUpdateGeneric(kvp, ref this._themeName); break;
+                    case nameof(this.DarkThemeOverride): TryUpdateGeneric(kvp, ref this._darkThemeOverride); break;
+                    case nameof(this.LightThemeOverride): TryUpdateGeneric(kvp, ref this._lightThemeOverride); break;
                     case nameof(this.LocalizationName): TryUpdateGeneric(kvp, ref this._localizationName); break;
                     case nameof(this.AutoUpdateInstallerList): TryUpdateGeneric(kvp, ref this._autoUpdateInstallerList); break;
                     case nameof(this.ShowDmodDevFeatures): TryUpdateGeneric(kvp, ref this._ShowDmodDevFeatures); break;
@@ -239,6 +253,8 @@ namespace Martridge.Models.Configuration {
 
                 ConfigDataGeneral data = new ConfigDataGeneral()  {
                     ThemeName = this.ThemeName,
+                    DarkThemeOverride = this.DarkThemeOverride,
+                    LightThemeOverride = this.LightThemeOverride,
                     LocalizationName = this.LocalizationName,
                     AutoUpdateInstallerList = this.AutoUpdateInstallerList,
                     ShowDmodDevFeatures = this.ShowDmodDevFeatures,

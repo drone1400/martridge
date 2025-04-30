@@ -1,0 +1,123 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:configuration="clr-namespace:Martridge.ViewModels.Configuration"
+             xmlns:localization="clr-namespace:Martridge.ViewModels.Localization"
+             xmlns:dloc="using:Martridge.ViewModels.Localization"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Martridge.Views.Configuration.SettingsThemeView"
+
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+
+    <Design.DataContext>
+        <configuration:SettingsThemeViewModel />
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml" />
+    </UserControl.Styles>
+    <UserControl.Resources>
+
+    </UserControl.Resources>
+
+    <Border>
+        <Grid ColumnDefinitions="Auto, *">
+            <ListBox
+                x:Name="listBox"
+                Grid.Column="0"
+                Width="200"
+                ItemsSource="{Binding AvailableThemes}"
+                SelectionMode="Single"
+                SelectedItem="{Binding SelectedPreviewTheme}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Label Content="{Binding Key}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <ThemeVariantScope
+                x:Name="themeVariantScope"
+                RequestedThemeVariant="{Binding SelectedPreviewTheme}"
+                Grid.Column="1">
+                <Border Classes="MartridgeCard">
+                    <Grid RowDefinitions="Auto,*">
+                        
+                        <StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch">
+                            <StackPanel Orientation="Horizontal">
+                                <Label
+                                    Classes="Heading2B"
+                                    Content="{dloc:Localize SettingsThemeView/PreviewTheme}" />
+                                <Label
+                                    Classes="Heading2B"
+                                    Content="{Binding SelectedPreviewTheme.Key, FallbackValue={}... }" />
+                            </StackPanel>
+                            
+                            <Separator/>
+                            
+                            <StackPanel Orientation="Horizontal">
+                                <Label
+                                    Classes="Heading2B"
+                                    Content="{dloc:Localize SettingsThemeView/CurrentTheme}" />
+                                <Label
+                                    Classes="Heading2B"
+                                    Content="{Binding CurrentTheme}" />
+                            </StackPanel>
+                            
+                            <Separator/>
+                            <Button
+                                Width="NaN"
+                                HorizontalAlignment="Stretch"
+                                Content="{dloc:Localize SettingsThemeView/CmdUseDefaultLightTheme}" 
+                                Classes="Primary"
+                                Command="{Binding CmdUseDefaultLightTheme}"/>
+                            <Button
+                                Width="NaN"
+                                HorizontalAlignment="Stretch"
+                                Content="{dloc:Localize SettingsThemeView/CmdUseDefaultDarkTheme}"
+                                Classes="Primary"
+                                Command="{Binding CmdUseDefaultDarkTheme}"/>
+                            <Button
+                                Width="NaN"
+                                HorizontalAlignment="Stretch"
+                                Content="{dloc:Localize SettingsThemeView/CmdUseDefaultSystemTheme}"
+                                Classes="Primary"
+                                Command="{Binding CmdUseDefaultSystemTheme}"/>
+                            <Separator/>
+                            <Button
+                                Width="NaN"
+                                HorizontalAlignment="Stretch"
+                                Content="{dloc:Localize SettingsThemeView/CmdUseSelectedTheme}"
+                                Command="{Binding CmdUseSelectedTheme}"/>
+                            <Separator/>
+                            <Button
+                                Width="NaN"
+                                HorizontalAlignment="Stretch"
+                                Content="{dloc:Localize SettingsThemeView/CmdUseSelectedThemeAsLight}" 
+                                Command="{Binding CmdUseSelectedThemeAsLight}"/>
+                            <Button
+                                Width="NaN"
+                                HorizontalAlignment="Stretch"
+                                Content="{dloc:Localize SettingsThemeView/CmdUseSelectedThemeAsDark}"
+                                Command="{Binding CmdUseSelectedThemeAsDark}"/>
+                            <Separator/>
+                        </StackPanel>
+                        
+                        <DataGrid Grid.Row="1"
+                                  IsReadOnly="True"
+                                  ItemsSource="{Binding SampleDmods}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn
+                                    Header="{localization:Localize SettingsThemeView/DmodPreview}"
+                                    Width="*"
+                                    Binding="{Binding Name}"
+                                    x:DataType="configuration:DmodDefinitionPlaceholderViewModel" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </ThemeVariantScope>
+        </Grid>
+    </Border>
+</UserControl>

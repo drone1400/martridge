@@ -39,6 +39,7 @@ namespace Martridge
                 case nameof(DmodPackerViewModel): return new DmodPackerView();
                 case nameof(AboutViewModel): return new AboutView();
                 case nameof(SettingsGeneralViewModel): return new SettingsGeneralView();
+                case nameof(SettingsThemeViewModel): return new SettingsThemeView();
                 case nameof(NoDinkyViewModel): return new NoDinkyView();
                 case nameof(NoDinkyLinuxViewModel): return new NoDinkyLinuxView();
                 

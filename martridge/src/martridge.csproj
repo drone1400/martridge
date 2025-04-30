@@ -61,6 +61,7 @@
 
     <ItemGroup>
         <AvaloniaResource Include="Assets\**"/>
+        <AvaloniaResource Include="Controls\*.xaml" />
         <AvaloniaXaml Remove="AppStyles.axaml"/>
         <None Remove=".gitignore"/>
         <None Remove="Assets\dloc\en-US.json"/>

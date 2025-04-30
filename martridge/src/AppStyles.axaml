@@ -4,7 +4,7 @@
         <Border Padding="20">
             <!-- Add Controls for Previewer Here -->
             <StackPanel Orientation="Vertical">
-                <Button Content="Test Button"/>
+                <Button Content="Test Button" />
                 <TextBox Text="Hello world" />
                 <TextBox>
                     This Text box
@@ -16,15 +16,20 @@
     </Design.PreviewWith>
 
     <!-- Add Styles Here -->
-    
     <Styles.Resources>
-        <Thickness x:Key="MartridgeControlMargin">6,3</Thickness>
-        <Thickness x:Key="MartridgeLabelMarginH3">6,0,6,3</Thickness>
-        <Thickness x:Key="MartridgeLabelMarginH2">6,3</Thickness>
-        <Thickness x:Key="MartridgeLabelMarginH1">6,3</Thickness>
-        <Thickness x:Key="MartridgeLabelPadding">1</Thickness>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <MergeResourceInclude Source="avares://martridge/Controls/SelectableButton.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Thickness x:Key="MartridgeControlMargin">6,3</Thickness>
+            <Thickness x:Key="MartridgeLabelMarginH3">6,0,6,3</Thickness>
+            <Thickness x:Key="MartridgeLabelMarginH2">6,3</Thickness>
+            <Thickness x:Key="MartridgeLabelMarginH1">6,3</Thickness>
+            <Thickness x:Key="MartridgeLabelPadding">1</Thickness>
+        </ResourceDictionary>
     </Styles.Resources>
-    
+
     <Style Selector="Border.MartridgeCard">
         <Setter Property="Padding" Value="10" />
         <Setter Property="CornerRadius" Value="5" />
@@ -36,162 +41,162 @@
 
     <!-- TextBox -->
     <Style Selector="TextBox">
-        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}"/>
-        <Setter Property="Padding" Value="8,3"/>
-        <Setter Property="Height" Value="NaN"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}" />
+        <Setter Property="Padding" Value="8,3" />
+        <Setter Property="Height" Value="NaN" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     <Style Selector="TextBox.BigTextBox">
-        <Setter Property="Margin" Value="6,12"/>
-        <Setter Property="Padding" Value="8,4"/>
-        <Setter Property="Height" Value="NaN"/>
-        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="Margin" Value="6,12" />
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="Height" Value="NaN" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
     </Style>
-    
+
     <!-- Label -->
     <Style Selector="Label.HeadingTitle">
-        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}"/>
-        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH1}"/>
-        <Setter Property="FontSize" Value="24"/>
-        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}" />
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH1}" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontWeight" Value="Bold" />
     </Style>
     <Style Selector="Label.Heading2B">
-        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}"/>
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}"/>
+        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}" />
     </Style>
     <Style Selector="Label.Heading2I">
-        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}"/>
-        <Setter Property="FontStyle" Value="Italic"/>
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}"/>
+        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}" />
+        <Setter Property="FontStyle" Value="Italic" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}" />
     </Style>
     <Style Selector="Label.Heading2">
-        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}"/>
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}"/>
+        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}" />
     </Style>
     <Style Selector="Label.Heading2BWrapping">
-        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}"/>
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}"/>
+        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}" />
         <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
     </Style>
     <Style Selector="Label.Heading2IWrapping">
-        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}"/>
-        <Setter Property="FontStyle" Value="Italic"/>
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}"/>
+        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}" />
+        <Setter Property="FontStyle" Value="Italic" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}" />
         <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
     </Style>
     <Style Selector="Label.Heading2Wrapping">
-        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}"/>
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}"/>
+        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}" />
         <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
     </Style>
     <Style Selector="Label.Heading3I">
-        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}"/>
-        <Setter Property="FontStyle" Value="Italic"/>
-        <Setter Property="FontSize" Value="12"/>
-        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH3}"/>
+        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}" />
+        <Setter Property="FontStyle" Value="Italic" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH3}" />
     </Style>
     <Style Selector="Label.Heading3IWrapping">
-        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}"/>
-        <Setter Property="FontStyle" Value="Italic"/>
-        <Setter Property="FontSize" Value="12"/>
-        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH3}"/>
+        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}" />
+        <Setter Property="FontStyle" Value="Italic" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH3}" />
         <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
     </Style>
-    
+
     <!-- CheckBox -->
     <Style Selector="CheckBox.Heading2B">
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}"/>
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}" />
     </Style>
     <Style Selector="CheckBox">
-        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}"/>
+        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}" />
     </Style>
 
     <!-- ListBox -->
     <Style Selector="ListBox">
-        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}"/>
+        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}" />
     </Style>
     <Style Selector="ListBoxItem">
-        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}"/>
+        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}" />
     </Style>
 
     <!-- ComboBox -->
     <Style Selector="ComboBox">
-        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}"/>
-        <Setter Property="Padding" Value="3"/>
+        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}" />
+        <Setter Property="Padding" Value="3" />
         <Setter Property="Height" Value="40" />
     </Style>
 
     <!-- Button -->
     <Style Selector="Button">
-        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}"/>
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="Width" Value="120"/>
-        <Setter Property="Height" Value="32"/>
+        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="Width" Value="120" />
+        <Setter Property="Height" Value="32" />
     </Style>
-    
+
     <Style Selector="DataGridCell">
-        <Setter Property="MinHeight" Value="24"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="FontSize" Value="13" />
     </Style>
     <Style Selector="DataGridRowGroupHeader">
-        <Setter Property="MinHeight" Value="28"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="FontSize" Value="13" />
     </Style>
     <Style Selector="DataGridColumnHeader">
-        <Setter Property="MinHeight" Value="28"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="FontSize" Value="13" />
     </Style>
 
 
     <Style Selector="ProgressBar">
-        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}"/>
-        <Setter Property="Height" Value="28"/>
+        <Setter Property="Margin" Value="{DynamicResource MartridgeControlMargin}" />
+        <Setter Property="Height" Value="28" />
     </Style>
-  
+
     <Style Selector="Border.PfpFrame">
-        <Setter Property="Height" Value="NaN"/>
-        <Setter Property="Width" Value="NaN"/>
-        <Setter Property="HorizontalAlignment" Value="Center"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="3"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}"/>
+        <Setter Property="Height" Value="NaN" />
+        <Setter Property="Width" Value="NaN" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="3" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderHighBrush}" />
     </Style>
 
     <Style Selector="TabItem.BigTab">
-        <Setter Property="MinHeight" Value="56"/>
-        <Setter Property="Height" Value="56"/>
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Padding" Value="8,3"/>
-        <Setter Property="Width" Value="240"/>
+        <Setter Property="MinHeight" Value="56" />
+        <Setter Property="Height" Value="56" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="8,3" />
+        <Setter Property="Width" Value="240" />
     </Style>
-  
+
     <Style Selector="TabItem.MediumTab">
-        <Setter Property="MinHeight" Value="42"/>
-        <Setter Property="Height" Value="42"/>
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Padding" Value="8,3"/>
-        <Setter Property="Width" Value="120"/>
+        <Setter Property="MinHeight" Value="42" />
+        <Setter Property="Height" Value="42" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="8,3" />
+        <Setter Property="Width" Value="120" />
     </Style>
     <Style Selector="TabItem.SmallTab">
-        <Setter Property="MinHeight" Value="36"/>
-        <Setter Property="Height" Value="36"/>
-        <Setter Property="Margin" Value="0"/>
-        <Setter Property="Padding" Value="8,3"/>
-        <Setter Property="Width" Value="120"/>
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="Height" Value="36" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="8,3" />
+        <Setter Property="Width" Value="120" />
     </Style>
-  
+
     <!-- Hyperlink Button -->
     <Style Selector="Button.Invisibutton">
         <Setter Property="BorderThickness" Value="0" />
@@ -199,33 +204,33 @@
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="CornerRadius" Value="0"></Setter>
-        <Setter Property="Width" Value="NaN"/>
-        <Setter Property="Height" Value="NaN"/>
+        <Setter Property="Width" Value="NaN" />
+        <Setter Property="Height" Value="NaN" />
     </Style>
     <Style Selector="Button.Invisibutton:pointerover /template/ ContentPresenter">
-        <Setter Property="Background" Value="Transparent"/>
-    </Style> 
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
     <Style Selector="Button.Invisibutton:pressed /template/ ContentPresenter">
         <Setter Property="Background" Value="Transparent" />
     </Style>
     <Style Selector="TextBlock.Hyperlink">
-        <Setter Property="FontStyle" Value="Italic"/>
-        <Setter Property="Margin" Value="10,3"/>
-        <Setter Property="TextDecorations" Value="Underline"/>
+        <Setter Property="FontStyle" Value="Italic" />
+        <Setter Property="Margin" Value="10,3" />
+        <Setter Property="TextDecorations" Value="Underline" />
         <Setter Property="Foreground" Value="{DynamicResource HighlightColor}" />
-    </Style> 
+    </Style>
     <Style Selector="Label.Hyperlink">
-        <Setter Property="FontStyle" Value="Italic"/>
-        <Setter Property="Margin" Value="10,3"/>
+        <Setter Property="FontStyle" Value="Italic" />
+        <Setter Property="Margin" Value="10,3" />
         <Setter Property="Foreground" Value="{DynamicResource HighlightColor}" />
         <Setter Property="TextBlock.TextDecorations" Value="Underline" />
     </Style>
     <Style Selector="Label.HyperlinkWrapping">
-        <Setter Property="FontStyle" Value="Italic"/>
-        <Setter Property="Margin" Value="10,3"/>
+        <Setter Property="FontStyle" Value="Italic" />
+        <Setter Property="Margin" Value="10,3" />
         <Setter Property="Foreground" Value="{DynamicResource HighlightColor}" />
         <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
         <Setter Property="TextBlock.TextDecorations" Value="Underline" />
     </Style>
-  
+
 </Styles>

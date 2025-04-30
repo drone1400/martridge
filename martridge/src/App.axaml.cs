@@ -112,7 +112,7 @@ namespace Martridge {
         private CitrusTheme? _citrusTheme = null;
         private StyleInclude? _stylesDataGridCitrus = null;
         private StyleInclude? _customStyles = null;
-        private IList<ThemeVariant> _themeVariants = null;
+        private IList<ThemeVariant> _themeVariants = new List<ThemeVariant>();
 
         private Dictionary<string, FileInfo> _customThemeVariantDefinitions = new Dictionary<string, FileInfo>();
         private Dictionary<string, Uri> _defaultCitrusThemeVariants = new Dictionary<string, Uri>() {

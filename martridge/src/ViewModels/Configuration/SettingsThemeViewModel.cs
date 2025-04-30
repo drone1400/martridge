@@ -16,7 +16,7 @@ namespace Martridge.ViewModels.Configuration {
             get => this._availableThemes; 
             set => this.RaiseAndSetIfChanged(ref this._availableThemes, value);
         }
-        private IList<ThemeVariant> _availableThemes;
+        private IList<ThemeVariant> _availableThemes = new List<ThemeVariant>();
 
         public IList<DmodDefinitionPlaceholderViewModel> SampleDmods =>
             new List<DmodDefinitionPlaceholderViewModel>() {

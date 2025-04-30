@@ -30,8 +30,8 @@ namespace Martridge {
 
         public override void Initialize()
         {
-            this.InitializeTheme();
             this.InitializeConfiguration();
+            this.InitializeTheme();
         }
 
 
@@ -67,10 +67,6 @@ namespace Martridge {
             
             this._config.General.Updated += this.GeneralOnUpdated;
             this._config.Launch.Updated += this.LaunchOnUpdated;
-            
-            // try to set loaded theme...
-            string themeName = this._config.General.ThemeName;
-            this.SetCitrusThemePalette(themeName);
         }
         
         private void LaunchOnUpdated(object? sender, EventArgs e) {
@@ -168,6 +164,18 @@ namespace Martridge {
             }
 
             this._themeVariants = this._citrusTheme.GetRegisteredThemeVariants();
+
+            if (string.IsNullOrWhiteSpace(this._config.General.DarkThemeOverride) == false) {
+                this.OverrideCitrusDarkTheme(this._config.General.DarkThemeOverride);
+            }
+            
+            if (string.IsNullOrWhiteSpace(this._config.General.LightThemeOverride) == false) {
+                this.OverrideCitrusLightTheme(this._config.General.LightThemeOverride);
+            }
+            
+            // try to set loaded theme...
+            string themeName = this._config.General.ThemeName;
+            this.SetCitrusThemePalette(themeName);
         }
 
         private static CitrusThemeVariantData? TryLoadThemeVariantFromFile(FileInfo file) {
@@ -233,6 +241,9 @@ namespace Martridge {
                 [nameof(ConfigGeneral.ThemeName)] = themeVariant.Key.ToString(),
             });
             
+            // save config to file after changes!
+            this._config.SaveToFile(this._defaultConfigFile);
+            
             try {
                 this.OnThemePaletteChange?.Invoke(this, EventArgs.Empty);
             } catch (Exception ex) {
@@ -249,6 +260,9 @@ namespace Martridge {
                 });
                 // set desired light theme
                 this._citrusTheme.DesiredLightThemeVariant = data.VariantProvider;
+                
+                // save config to file after changes!
+                this._config.SaveToFile(this._defaultConfigFile);
             }
         }
         
@@ -261,6 +275,9 @@ namespace Martridge {
                 });
                 // set desired dark theme
                 this._citrusTheme.DesiredDarkThemeVariant = data.VariantProvider;
+                
+                // save config to file after changes!
+                this._config.SaveToFile(this._defaultConfigFile);
             }
         }
 

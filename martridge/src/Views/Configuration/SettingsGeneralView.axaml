@@ -82,6 +82,7 @@
                                   Content="{dloc:Localize SettingsGeneral/ShowLaunchRefDirPathInMainWindow}" />
                         <Button Grid.Row="0" Grid.Column="2"
                                 Content="{dloc:Localize SettingsGeneral/LaunchRefDirLocation/Browse}"
+                                Classes="Primary"
                                 Command="{Binding CmdLaunchRefDirBrowse}" />
 
                         <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
@@ -119,6 +120,7 @@
                                                    Content="{dloc:Localize SettingsGeneral/DefaultDmodLocation}" />
                                             <Button Grid.Row="1" Grid.Column="1"
                                                     Content="{dloc:Localize SettingsGeneral/DefaultDmodLocation/Browse}"
+                                                    Classes="Primary"
                                                     Command="{Binding CmdDefaultDmodsBrowse}" />
 
                                             <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
@@ -135,6 +137,7 @@
                                                    Content="{dloc:Localize SettingsGeneral/AdditionalDmodLocations}" />
                                             <Button Grid.Row="1" Grid.Column="1"
                                                     Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
+                                                    Classes="Primary"
                                                     Command="{Binding CmdAdditionalDmodsAddNew}" />
                                             <Button Grid.Row="1" Grid.Column="2"
                                                     Content="{dloc:Localize SettingsGeneral/GameExePaths_Remove}"
@@ -156,6 +159,7 @@
 
                                             <Button Grid.Row="1" Grid.Column="1"
                                                     Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
+                                                    Classes="Primary"
                                                     Command="{Binding CmdGameExeAddNew}" />
                                             <Button Grid.Row="1" Grid.Column="2"
                                                     Content="{dloc:Localize SettingsGeneral/GameExePaths_Remove}"
@@ -177,6 +181,7 @@
 
                                             <Button Grid.Row="1" Grid.Column="1"
                                                     Content="{dloc:Localize SettingsGeneral/EditorExePaths_Add}"
+                                                    Classes="Primary"
                                                     Command="{Binding CmdEditorExeAddNew}" />
                                             <Button Grid.Row="1" Grid.Column="2"
                                                     Content="{dloc:Localize SettingsGeneral/EditorExePaths_Remove}"
@@ -286,10 +291,16 @@
             </Grid>
 
             <!-- Ok / Cancel buttons -->
-            <Grid Grid.Row="2" ColumnDefinitions="*,Auto,Auto">
-                <Button Grid.Column="1" Content="{dloc:Localize Generic/ButtonOk}"
+            <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto,Auto">
+                                    
+                <Button Grid.Row="0" Grid.Column="0"
+                        Content="{dloc:Localize SettingsGeneral/ShowLogWindow}"
+                        Command="{Binding CmdShowLogWindow}" />
+                
+                <Button Grid.Column="2" Content="{dloc:Localize Generic/ButtonOk}"
+                        Classes="Primary"
                         Command="{Binding CmdSettingsOk}" />
-                <Button Grid.Column="2" Content="{dloc:Localize Generic/ButtonCancel}"
+                <Button Grid.Column="3" Content="{dloc:Localize Generic/ButtonCancel}"
                         Command="{Binding CmdSettingsCancel}" />
             </Grid>
         </Grid>

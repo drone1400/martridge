@@ -658,5 +658,13 @@ namespace Martridge.ViewModels.Configuration {
         }
         
         #endregion
+        
+        #region COMMANDS - OTHER
+        
+        public void CmdShowLogWindow(object? parameter = null) {
+            App.Instance?.ShowLogWindow();
+        }
+        
+        #endregion
     }
 }

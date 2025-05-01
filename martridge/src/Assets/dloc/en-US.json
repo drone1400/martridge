@@ -267,6 +267,7 @@
   "SettingsGeneral/TabItemPathDmod": "DMOD paths",
   "SettingsGeneral/TabItemPathGame": "Game paths",
   "SettingsGeneral/TabItemPathEditor": "Editor paths",
+  "SettingsGeneral/ShowLogWindow": "Show Log Window",
   
   "SettingsThemeView/PreviewTheme": "Preview Theme: ",
   "SettingsThemeView/CurrentTheme": "Currently selected theme: ",

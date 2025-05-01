@@ -661,10 +661,6 @@ namespace Martridge.ViewModels {
             Process.Start(pinfo);
         }
         
-        public void CmdShowLogWindow(object? parameter = null) {
-            App.Instance?.ShowLogWindow();
-        }
-        
         #endregion
 
 

@@ -57,7 +57,7 @@
                            Orientation="Vertical">
 
                     <controls:SelectableButton
-                        Content="My DMODs" 
+                        Content="{dloc:Localize MainWindow/PageSelect/DmodBrwoser}" 
                         Command="{Binding CmdShowPageMyDmods}" 
                         IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
@@ -65,7 +65,7 @@
                             Mode=OneWay}" />
                     
                     <controls:SelectableButton
-                        Content="Online DMODs" 
+                        Content="{dloc:Localize MainWindow/PageSelect/OnlineDmodBrwoser}" 
                         Command="{Binding CmdShowPageOnlineDmods}" 
                         IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
@@ -73,7 +73,7 @@
                             Mode=OneWay}" />
 
                     <controls:SelectableButton
-                        Content="DMOD Installer"
+                        Content="{dloc:Localize MainWindow/PageSelect/DmodInstaller}"
                         Command="{Binding CmdShowPageDmodInstallerAndBrowse}" 
                         IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
@@ -81,7 +81,7 @@
                             Mode=OneWay}" />
 
                     <controls:SelectableButton
-                        Content="DMOD Packer"
+                        Content="{dloc:Localize MainWindow/PageSelect/DmodPacker}"
                         Command="{Binding CmdShowPageDmodPackerAndBrowse}"
                         IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
@@ -91,7 +91,7 @@
                         IsEnabled="{Binding EnableDmodDeveloperFeatures}" />
 
                     <controls:SelectableButton
-                        Content="Dink Installer"
+                        Content="{dloc:Localize MainWindow/PageSelect/DinkInstaller}"
                         Command="{Binding CmdShowPageDinkInstaller}"
                         IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
@@ -106,7 +106,7 @@
                            Background="{DynamicResource ThemeAccentBrush2}"
                            Orientation="Vertical">
                     <controls:SelectableButton
-                        Content="Theme"
+                        Content="{dloc:Localize MainWindow/PageSelect/Theme}"
                         IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
                             ConverterParameter={}SettingsThemeViewModel,
@@ -114,7 +114,7 @@
                         Command="{Binding CmdShowPageSettingsTheme}" />
                     
                     <controls:SelectableButton
-                        Content="Settings"
+                        Content="{dloc:Localize MainWindow/PageSelect/Settings}"
                         IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
                             ConverterParameter={}SettingsGeneralViewModel,
@@ -122,7 +122,7 @@
                         Command="{Binding CmdShowPageSettings}" />
 
                     <controls:SelectableButton
-                        Content="About"
+                        Content="{dloc:Localize MainWindow/PageSelect/About}"
                         IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
                             ConverterParameter={}AboutViewModel,

@@ -213,21 +213,6 @@
   "LogWindow/Title": "Martridge - Log Window",
 
   "MainWindow/Title": "Martridge - The DMOD Wizard",
-  "MainWindow/MenuFile": "File",
-  "MainWindow/MenuExit": "Exit",
-  "MainWindow/MenuTools": "Tools",
-  "MainWindow/MenuDinkInstaller": "Install Dink!",
-  "MainWindow/MenuDmodInstaller": "Install DMOD",
-  "MainWindow/MenuDmodPacker": "Pack DMOD",
-  "MainWindow/MenuSettings": "Settings",
-  "MainWindow/MenuLogWindow": "Show Log Window",
-  "MainWindow/MenuAbout": "About",
-  "MainWindow/MenuTheme": "Theme",
-  "MainWindow/MenuTheme/Citrus": "Citrus",
-  "MainWindow/MenuTheme/Sea": "Sea",
-  "MainWindow/MenuTheme/Rust": "Rust",
-  "MainWindow/MenuTheme/Candy": "Candy",
-  "MainWindow/MenuTheme/Magma": "Magma",
   "MainWindow/NoDmods_Title": "Oups! No Dinky?...",
   "MainWindow/NoDmods_Body": "It seems that the game files could not be located correctly! Do you want to install Dink? Or perhaps manually configure the install location?",
   "MainWindow/NoDmodsLinux_Title": "Oups! No Dinky?...",
@@ -235,6 +220,16 @@
   "MainWindow/TabItemSettings": "App Settings",
   "MainWindow/TabItemInstalledDmods": "Installed DMOD Browser",
   "MainWindow/TabItemOnlineDmods": "Online DMOD Browser",
+  
+  "MainWindow/PageSelect/DmodBrwoser":"My DMODs",
+  "MainWindow/PageSelect/OnlineDmodBrwoser":"Online DMODs",
+  "MainWindow/PageSelect/DmodInstaller":"Install a DMOD",
+  "MainWindow/PageSelect/DmodPacker":"Pack a DMOD",
+  "MainWindow/PageSelect/DinkInstaller":"Install Dink",
+  "MainWindow/PageSelect/Theme":"Theme",
+  "MainWindow/PageSelect/Settings":"Settings",
+  "MainWindow/PageSelect/About":"About",
+  
 
 
 

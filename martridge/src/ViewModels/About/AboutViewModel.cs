@@ -11,8 +11,6 @@ using Martridge.Trace;
 namespace Martridge.ViewModels.About {
     public class AboutViewModel : ViewModelAppPage
     {
-        public event EventHandler? GoBackRequested;
-
         public List<AboutUsedPackageViewModel> UsedPackages {
             get => this._usedPackages;
             set => this.RaiseAndSetIfChanged(ref this._usedPackages, value);
@@ -100,17 +98,6 @@ namespace Martridge.ViewModels.About {
                     info: Localizer.Instance[@"AboutWindow/Package/HtmlAgilityPack/Description"]),
 #endif
             };
-        }
-
-        public void CmdGoBack()
-        {
-            try
-            {
-                this.GoBackRequested?.Invoke(this, EventArgs.Empty);
-            } catch (Exception ex)
-            {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
-            }
         }
     }
 }

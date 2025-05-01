@@ -333,6 +333,7 @@ namespace Martridge.ViewModels {
                 case nameof(NoDinkyLinuxViewModel):
                 case nameof(DmodBrowserViewModel):
                 case nameof(SettingsThemeViewModel):
+                case nameof(AboutViewModel):
                     return true;
             }
         }
@@ -352,12 +353,8 @@ namespace Martridge.ViewModels {
             if (this.CanCmdShowPageAbout() == false) return;
             
             try {
-                
                 AboutViewModel vm = new AboutViewModel();
                 vm.Configuration = this._config!.General;
-                vm.GoBackRequested += (_, _) => {
-                    this.InitializeDefaultViewModel();
-                };
 
                 this.SafeDisposeCurentViewModel();
                 this.CurrentViewModel = vm;

@@ -13,7 +13,7 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </UserControl.Styles>
     
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,*">
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*">
             <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto">
                 <Label Grid.Row="0"
@@ -93,12 +93,5 @@
                 </ItemsRepeater>
             </ScrollViewer>
         </Grid>
-    
-        <Button Grid.Row="2" 
-                Margin="20"
-                Content="{dloc:Localize Generic/ButtonOk}"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Command="{Binding CmdGoBack}"/>
     </Grid>
 </UserControl>

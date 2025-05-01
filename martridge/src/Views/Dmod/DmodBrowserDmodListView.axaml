@@ -75,7 +75,7 @@
                               Command="{Binding $parent[Window].DataContext.CmdOpenLocation}"
                               CommandParameter="{Binding SelectedDmodDefinition.DmodDirectory}" />
                     <MenuItem Header="{dloc:Localize DmodBrowser/ContextMenu/PackDmodLocation}"
-                              IsVisible="{Binding $parent[Window].DataContext.VmGeneralSettings.ShowDmodDevFeatures, FallbackValue=False}"
+                              IsVisible="{Binding $parent[Window].DataContext.EnableDmodDeveloperFeatures, FallbackValue=False}"
                               Command="{Binding $parent[Window].DataContext.CmdShowPageDmodPacker}"
                               CommandParameter="{Binding SelectedDmodDefinition.DmodDirectory}"/>
                 </ContextMenu>

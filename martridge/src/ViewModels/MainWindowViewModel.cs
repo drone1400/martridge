@@ -14,7 +14,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Platform.Storage;
 using Martridge.Models;
 using Martridge.Models.Configuration;
@@ -188,17 +187,15 @@ namespace Martridge.ViewModels {
 
         #region Drag and drop
 
-        // TODO... fix this
-
         private void DragOver(object? sender, DragEventArgs e) {
-            if (e.Source is Control c) {
+            if (e.Source is Control) {
                 e.DragEffects &= (DragDropEffects.Copy); 
             }
         }
 
         private void Drop(object? sender, DragEventArgs e) {
             try {
-                if (e.Source is Control c) {
+                if (e.Source is Control) {
                     e.DragEffects = DragDropEffects.None;
                 }
 
@@ -257,6 +254,7 @@ namespace Martridge.ViewModels {
             this.CurrentViewModel = null;
         }
 
+        
         private bool CheckGameExeDefinedIfNotShowNoDinkyViewModel() {
             if (this._config == null ||
                 this._config.General.GameExePaths.Count > 0 ||
@@ -321,11 +319,34 @@ namespace Martridge.ViewModels {
             }
         }
 #endif
-
         
+        private bool CanSwitchViewModel() {
+            if (this.IsInitialized == false) 
+                return false;
+            
+            switch (this.CurrentViewModel?.GetType().Name) {
+                default: return false;
+#if ENABLE_FEATURE_ONLINE
+                case nameof(OnlineDmodBrowserViewModel):
+#endif
+                case nameof(NoDinkyViewModel):
+                case nameof(NoDinkyLinuxViewModel):
+                case nameof(DmodBrowserViewModel):
+                case nameof(SettingsThemeViewModel):
+                    return true;
+            }
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------------------
+        
+        
+        // ----------------------------------------------------------------------------------------------------------------------------
+        // AboutViewModel
+        //
         [DependsOn(nameof(IsInitialized))]
         [DependsOn(nameof(CurrentViewModel))]
-        public bool CanCmdShowPageAbout(object? parameter = null) => this.CurrentViewModel is AboutViewModel || this.CanSwitchViewModel();
+        public bool CanCmdShowPageAbout(object? parameter = null) 
+            => this.CurrentViewModel is AboutViewModel || this.CanSwitchViewModel();
         public void CmdShowPageAbout(object? parameter = null) {
             if (this.CurrentViewModel is AboutViewModel) return; // already the correct view model
             if (this.CanCmdShowPageAbout() == false) return;
@@ -344,10 +365,16 @@ namespace Martridge.ViewModels {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);
             }
         }
+        // ----------------------------------------------------------------------------------------------------------------------------
         
+        
+        // ----------------------------------------------------------------------------------------------------------------------------
+        // SettingsThemeViewModel
+        //
         [DependsOn(nameof(IsInitialized))]
         [DependsOn(nameof(CurrentViewModel))]
-        public bool CanCmdShowPageSettingsTheme(object? parameter = null) => this.CurrentViewModel is SettingsThemeViewModel || this.CanSwitchViewModel();
+        public bool CanCmdShowPageSettingsTheme(object? parameter = null) 
+            => this.CurrentViewModel is SettingsThemeViewModel || this.CanSwitchViewModel();
         public void CmdShowPageSettingsTheme(object? parameter = null) {
             if (this.CurrentViewModel is SettingsThemeViewModel) return; // already the correct view model
             if (this.CanCmdShowPageSettingsTheme() == false) return;
@@ -362,9 +389,16 @@ namespace Martridge.ViewModels {
             }
         }
         
+        // ----------------------------------------------------------------------------------------------------------------------------
+        
+
+        // ----------------------------------------------------------------------------------------------------------------------------
+        // SettingsGeneralViewModel
+        // 
         [DependsOn(nameof(IsInitialized))]
         [DependsOn(nameof(CurrentViewModel))]
-        public bool CanCmdShowPageSettings(object? parameter = null) => this.CurrentViewModel is SettingsGeneralViewModel || this.CanSwitchViewModel();
+        public bool CanCmdShowPageSettings(object? parameter = null) 
+            => this.CurrentViewModel is SettingsGeneralViewModel || this.CanSwitchViewModel();
         public void CmdShowPageSettings(object? parameter = null) {
             if (this.CurrentViewModel is SettingsGeneralViewModel) return; // already the correct view model
             if (this.CanCmdShowPageSettings() == false) return;
@@ -385,7 +419,12 @@ namespace Martridge.ViewModels {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);
             }
         }
+        // ----------------------------------------------------------------------------------------------------------------------------
+        
 
+        // ----------------------------------------------------------------------------------------------------------------------------
+        // DinkInstallerViewModel
+        // 
         [DependsOn(nameof(IsInitialized))]
         [DependsOn(nameof(CurrentViewModel))]
         [DependsOn(nameof(EnableOnlineFeatures))]
@@ -437,7 +476,12 @@ namespace Martridge.ViewModels {
             }
 #endif
         }
+        // ----------------------------------------------------------------------------------------------------------------------------
+        
 
+        // ----------------------------------------------------------------------------------------------------------------------------
+        // DmodInstallerViewModel
+        // 
         [DependsOn(nameof(IsInitialized))]
         [DependsOn(nameof(CurrentViewModel))]
         public bool CanCmdShowPageDmodInstallerAndBrowse(object? parameter = null) 
@@ -447,7 +491,6 @@ namespace Martridge.ViewModels {
             if (this.CanCmdShowPageDmodInstallerAndBrowse() == false) return;
             this.ShowDmodInstallerCommon(parameter, true);
         }
-
         [DependsOn(nameof(IsInitialized))]
         [DependsOn(nameof(CurrentViewModel))]
         public bool CanCmdShowPageDmodInstaller(object? parameter = null) 
@@ -457,8 +500,6 @@ namespace Martridge.ViewModels {
             if (this.CanCmdShowPageDmodInstaller() == false) return;
             this.ShowDmodInstallerCommon(parameter, false);
         }
-        
-
         private void ShowDmodInstallerCommon(object? parameter = null, bool browseDmodImmediately = false) {
             try {
                 DmodInstallerViewModel vm = new DmodInstallerViewModel();
@@ -492,7 +533,12 @@ namespace Martridge.ViewModels {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);
             }
         }
+        // ----------------------------------------------------------------------------------------------------------------------------
         
+        
+        // ----------------------------------------------------------------------------------------------------------------------------
+        // DmodPackerViewModel
+        // 
         [DependsOn(nameof(IsInitialized))]
         [DependsOn(nameof(CurrentViewModel))]
         public bool CanCmdShowPageDmodPackerAndBrowse(object? parameter = null) 
@@ -502,8 +548,6 @@ namespace Martridge.ViewModels {
             if (this.CanCmdShowPageDmodPackerAndBrowse(parameter) == false) return;
             this.ShowDmodPackerCommon(parameter, true);
         }
-
-        
         [DependsOn(nameof(IsInitialized))]
         [DependsOn(nameof(CurrentViewModel))]
         public bool CanCmdShowPageDmodPacker(object? parameter = null) 
@@ -513,7 +557,6 @@ namespace Martridge.ViewModels {
             if (this.CanCmdShowPageDmodPacker(parameter) == false) return; // can't switch
             this.ShowDmodPackerCommon(parameter, false);
         }
-
         private void ShowDmodPackerCommon(object? parameter = null, bool browseDmodImmediately = false) {
             try {
                 DmodPackerViewModel vm = new DmodPackerViewModel();
@@ -536,10 +579,16 @@ namespace Martridge.ViewModels {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);
             }
         }
+        // ----------------------------------------------------------------------------------------------------------------------------
         
+        
+        // ----------------------------------------------------------------------------------------------------------------------------
+        // DmodBrowserViewModel
+        // 
         [DependsOn(nameof(IsInitialized))]
         [DependsOn(nameof(CurrentViewModel))]
-        public bool CanCmdShowPageMyDmods(object? parameter = null) => this.CurrentViewModel is DmodBrowserViewModel || this.CanSwitchViewModel();
+        public bool CanCmdShowPageMyDmods(object? parameter = null) 
+            => this.CurrentViewModel is DmodBrowserViewModel || this.CanSwitchViewModel();
         public void CmdShowPageMyDmods(object? parameter = null) {
             if (this.CurrentViewModel is DmodBrowserViewModel) return; // already the correct view model
             if (this.CanCmdShowPageMyDmods() == false) return; // can't switch
@@ -551,10 +600,16 @@ namespace Martridge.ViewModels {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);
             }
         }
+        // ----------------------------------------------------------------------------------------------------------------------------
         
+        
+        // ----------------------------------------------------------------------------------------------------------------------------
+        // OnlineDmodBrowserViewModel
+        // 
         [DependsOn(nameof(IsInitialized))]
         [DependsOn(nameof(CurrentViewModel))]
-        public bool CanCmdShowPageOnlineDmods(object? parameter = null) => this.CurrentViewModel is OnlineDmodBrowserViewModel || this.CanSwitchViewModel();
+        public bool CanCmdShowPageOnlineDmods(object? parameter = null) 
+            => this.CurrentViewModel is OnlineDmodBrowserViewModel || this.CanSwitchViewModel();
         public void CmdShowPageOnlineDmods(object? parameter = null) {
             if (this.CurrentViewModel is OnlineDmodBrowserViewModel) return; // already the correct view model
             if (this.CanCmdShowPageMyDmods() == false) return; // can't switch
@@ -567,36 +622,15 @@ namespace Martridge.ViewModels {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);
             }
         }
-
-        private bool CanSwitchViewModel() {
-            if (this.IsInitialized == false) 
-                return false;
-            
-            switch (this.CurrentViewModel?.GetType().Name) {
-                default: return false;
-#if ENABLE_FEATURE_ONLINE
-                case nameof(OnlineDmodBrowserViewModel):
-#endif
-                case nameof(NoDinkyViewModel):
-                case nameof(NoDinkyLinuxViewModel):
-                case nameof(DmodBrowserViewModel):
-                case nameof(SettingsThemeViewModel):
-                    return true;
-            }
-        }
+        // ----------------------------------------------------------------------------------------------------------------------------
         
         #endregion
 
         #region Other commands
-
-        public void CmdChangeTheme(object? parameter) {
-            if (parameter is string themeName) {
-                // update in configuration...
-                if (Application.Current is not App app) return;
-                app.SetCitrusThemePalette(themeName);
-            }
-        }
         
+        //
+        // NOTE: rider may say these are unused, but they are used in bindings over in DmodBrowserDmodListView.axaml
+        //
         public bool CanCmdOpenLocation(object? parameter) {
             if (parameter is not string path) return false;
             if (File.Exists(path) || Directory.Exists(path)) return true;

@@ -5,6 +5,7 @@
              xmlns:configuration="clr-namespace:Martridge.ViewModels.Configuration"
              xmlns:localization="clr-namespace:Martridge.ViewModels.Localization"
              xmlns:dloc="using:Martridge.ViewModels.Localization"
+             xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Martridge.Views.Configuration.SettingsThemeView"
 
@@ -18,7 +19,7 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </UserControl.Styles>
     <UserControl.Resources>
-
+        <valueConverters:ThemeVariantNameConverter x:Key="ThemeVariantNameConverter"/>
     </UserControl.Resources>
 
     <Border>
@@ -32,7 +33,8 @@
                 SelectedItem="{Binding SelectedPreviewTheme}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Label Content="{Binding Key}" />
+                        <Label Content="{Binding Key,
+                            Converter={StaticResource ThemeVariantNameConverter} }" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -51,7 +53,9 @@
                                     Content="{dloc:Localize SettingsThemeView/PreviewTheme}" />
                                 <Label
                                     Classes="Heading2B"
-                                    Content="{Binding SelectedPreviewTheme.Key, FallbackValue={}... }" />
+                                    Content="{Binding SelectedPreviewTheme.Key, 
+                                        Converter={StaticResource ThemeVariantNameConverter},
+                                        FallbackValue={}... }" />
                             </StackPanel>
                             
                             <Separator/>

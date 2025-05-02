@@ -51,7 +51,7 @@
             <Setter Property="Background" Value="{DynamicResource HighlightBrush}" />
         </Style>
         <Style Selector="^:pointerover">
-            <Setter Property="Background" Value="{DynamicResource ThemeAccentBrush4}" />
+            <Setter Property="Background" Value="{DynamicResource ThemeAccentHoverBrush}" />
         </Style>
         <Style Selector="^:pressed">
             <Setter Property="Background" Value="{DynamicResource HighlightBrush}" />

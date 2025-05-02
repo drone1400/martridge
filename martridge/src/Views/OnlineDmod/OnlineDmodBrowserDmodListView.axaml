@@ -82,7 +82,7 @@
                 <ControlTheme TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
                     <ControlTheme.Children>
                         <Style Selector="^:nth-child(2n+1)">
-                            <Setter Property="Background" Value="{DynamicResource ThemeBackgroundBrush}" />
+                            <Setter Property="Background" Value="{DynamicResource ThemeBorderLowBrush}" />
                         </Style>
                     </ControlTheme.Children>
                 </ControlTheme>

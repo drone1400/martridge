@@ -5,57 +5,59 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
 
-             mc:Ignorable="d" 
-             d:DesignWidth="800" 
+             mc:Ignorable="d"
+             d:DesignWidth="800"
              d:DesignHeight="450"
-             
-             Name="Myself">
-    
-    <UserControl.Resources>
-        <valueConverters:MultiBoolOrConverter x:Key="ConverterMultiBoolOr"/>
-    </UserControl.Resources>
-    
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" 
-                              MinWidth="580"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*" 
-                              MinWidth="480"/>
-        </Grid.ColumnDefinitions>
-        
-        <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch" 
-                      IsVisible="{Binding !IsViewOnePageMode, ElementName=Myself}"
-                      ResizeBehavior="PreviousAndNext" 
-                      ResizeDirection="Columns"/>
 
-        <ContentPresenter
-            Grid.Column="{Binding Path=LeftPanelColumn, ElementName=Myself}"
-            Grid.ColumnSpan="{Binding Path=LeftPanelColumnSpan, ElementName=Myself}"
-            Content="{Binding Path=LeftPanelContent, ElementName=Myself}">
-            
-            <ContentPresenter.IsVisible>
-                <MultiBinding Converter="{StaticResource ConverterMultiBoolOr}" >
-                    <Binding Path="!IsViewOnePageMode" ElementName="Myself"/>
-                    <Binding Path="!IsOnePageShowingRightContent" ElementName="Myself"/>
-                </MultiBinding>
-            </ContentPresenter.IsVisible>
-            
-        </ContentPresenter>
-        
-        <ContentPresenter
-            Grid.Column="{Binding Path=RightPanelColumn, ElementName=Myself}"
-            Grid.ColumnSpan="{Binding Path=RightPanelColumnSpan, ElementName=Myself}"
-            Content="{Binding Path=RightPanelContent, ElementName=Myself}">
-            
-            <ContentPresenter.IsVisible>
-                <MultiBinding Converter="{StaticResource ConverterMultiBoolOr}" >
-                    <Binding Path="!IsViewOnePageMode" ElementName="Myself"/>
-                    <Binding Path="IsOnePageShowingRightContent" ElementName="Myself"/>
-                </MultiBinding>
-            </ContentPresenter.IsVisible>
-            
-        </ContentPresenter>
-    </Grid>
-    
+             Name="Myself">
+
+    <UserControl.Resources>
+        <valueConverters:MultiBoolOrConverter x:Key="ConverterMultiBoolOr" />
+    </UserControl.Resources>
+
+    <Border Classes="MartridgeCard">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"
+                                  MinWidth="580" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*"
+                                  MinWidth="480" />
+            </Grid.ColumnDefinitions>
+
+            <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch"
+                          IsVisible="{Binding !IsViewOnePageMode, ElementName=Myself}"
+                          ResizeBehavior="PreviousAndNext"
+                          ResizeDirection="Columns" />
+
+            <ContentPresenter
+                Grid.Column="{Binding Path=LeftPanelColumn, ElementName=Myself}"
+                Grid.ColumnSpan="{Binding Path=LeftPanelColumnSpan, ElementName=Myself}"
+                Content="{Binding Path=LeftPanelContent, ElementName=Myself}">
+
+                <ContentPresenter.IsVisible>
+                    <MultiBinding Converter="{StaticResource ConverterMultiBoolOr}">
+                        <Binding Path="!IsViewOnePageMode" ElementName="Myself" />
+                        <Binding Path="!IsOnePageShowingRightContent" ElementName="Myself" />
+                    </MultiBinding>
+                </ContentPresenter.IsVisible>
+
+            </ContentPresenter>
+
+            <ContentPresenter
+                Grid.Column="{Binding Path=RightPanelColumn, ElementName=Myself}"
+                Grid.ColumnSpan="{Binding Path=RightPanelColumnSpan, ElementName=Myself}"
+                Content="{Binding Path=RightPanelContent, ElementName=Myself}">
+
+                <ContentPresenter.IsVisible>
+                    <MultiBinding Converter="{StaticResource ConverterMultiBoolOr}">
+                        <Binding Path="!IsViewOnePageMode" ElementName="Myself" />
+                        <Binding Path="IsOnePageShowingRightContent" ElementName="Myself" />
+                    </MultiBinding>
+                </ContentPresenter.IsVisible>
+
+            </ContentPresenter>
+        </Grid>
+    </Border>
+
 </UserControl>

@@ -246,8 +246,10 @@ namespace Martridge.ViewModels {
             
             if (ReferenceEquals(this._currentViewModel, this._dmodBrowserViewModel)) 
                 return;
+#if ENABLE_FEATURE_ONLINE
             if (ReferenceEquals(this._currentViewModel, this._onlineDmodBrowserViewModel))
                 return;
+#endif
             
             // safe to dispose
             this._currentViewModel?.Dispose();
@@ -434,10 +436,10 @@ namespace Martridge.ViewModels {
 #endif
         }
         public void CmdShowPageDinkInstaller(object? parameter = null) {
+#if ENABLE_FEATURE_DINK_INSTALLER && ENABLE_FEATURE_ONLINE
             if (this.CurrentViewModel is DinkInstallerViewModel) return; // already the correct view model
             if (this.CanCmdShowPageDinkInstaller() == false) return;
             
-#if ENABLE_FEATURE_DINK_INSTALLER && ENABLE_FEATURE_ONLINE
             try {
                 DinkInstallerViewModel vm = new DinkInstallerViewModel();
                 vm.InitializeInstallerList(this._config!.General.AutoUpdateInstallerList);
@@ -603,6 +605,7 @@ namespace Martridge.ViewModels {
         // ----------------------------------------------------------------------------------------------------------------------------
         // OnlineDmodBrowserViewModel
         // 
+#if ENABLE_FEATURE_ONLINE
         [DependsOn(nameof(IsInitialized))]
         [DependsOn(nameof(CurrentViewModel))]
         public bool CanCmdShowPageOnlineDmods(object? parameter = null) 
@@ -619,6 +622,7 @@ namespace Martridge.ViewModels {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);
             }
         }
+#endif
         // ----------------------------------------------------------------------------------------------------------------------------
         
         #endregion

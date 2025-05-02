@@ -134,8 +134,12 @@ namespace Martridge.ViewModels {
                     }
 
                     if (this._dmodCrawler != null) {
-                        // TODO.. make DMOD Crawler disposable and dispose of it here?...
+                        this._dmodCrawler.Dispose();
                         this._dmodCrawler = null;
+                    }
+                    if (this._onlineDmodBrowserViewModel != null) {
+                        this._onlineDmodBrowserViewModel.Dispose();
+                        this._onlineDmodBrowserViewModel = null;
                     }
                 }
                 else {
@@ -307,6 +311,9 @@ namespace Martridge.ViewModels {
         
 #if ENABLE_FEATURE_ONLINE
         private void EnsureInitializedOnlineDmodBrowser() {
+            if (this.EnableOnlineFeatures == false)
+                return;
+            
             if (this._dmodCrawler == null) {
                 this._dmodCrawler = new DmodCrawler();
                 _ = this._dmodCrawler.InitializeDmodLists(false); // no await
@@ -606,11 +613,13 @@ namespace Martridge.ViewModels {
         // OnlineDmodBrowserViewModel
         // 
 #if ENABLE_FEATURE_ONLINE
+        [DependsOn(nameof(EnableOnlineFeatures))]
         [DependsOn(nameof(IsInitialized))]
         [DependsOn(nameof(CurrentViewModel))]
         public bool CanCmdShowPageOnlineDmods(object? parameter = null) 
-            => this.CurrentViewModel is OnlineDmodBrowserViewModel || this.CanSwitchViewModel();
+            => this.EnableOnlineFeatures && (this.CurrentViewModel is OnlineDmodBrowserViewModel || this.CanSwitchViewModel());
         public void CmdShowPageOnlineDmods(object? parameter = null) {
+            if (this.EnableOnlineFeatures == false) return;
             if (this.CurrentViewModel is OnlineDmodBrowserViewModel) return; // already the correct view model
             if (this.CanCmdShowPageMyDmods() == false) return; // can't switch
             

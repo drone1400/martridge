@@ -67,6 +67,7 @@
                     <controls:SelectableButton
                         Content="{dloc:Localize MainWindow/PageSelect/OnlineDmodBrwoser}" 
                         Command="{Binding CmdShowPageOnlineDmods}" 
+                        IsVisible="{Binding EnableOnlineFeatures}"
                         IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
                             ConverterParameter={}OnlineDmodBrowserViewModel,

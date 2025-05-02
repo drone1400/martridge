@@ -210,6 +210,7 @@
                                                                Content="{dloc:Localize SettingsGeneral/DefaultDmodLocation}" />
                                                         <Button Grid.Row="1" Grid.Column="1"
                                                                 Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
+                                                                Classes="Primary"
                                                                 Command="{Binding CmdDefaultDmodsBrowse}" />
 
                                                         <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
@@ -226,6 +227,7 @@
                                                                Content="{dloc:Localize SettingsGeneral/AdditionalDmodLocations}" />
                                                         <Button Grid.Row="1" Grid.Column="1"
                                                                 Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
+                                                                Classes="Primary"
                                                                 Command="{Binding CmdAdditionalDmodsAddNew}" />
                                                         <Button Grid.Row="1" Grid.Column="2"
                                                                 Content="{dloc:Localize SettingsGeneral/GameExePaths_Remove}"
@@ -249,6 +251,7 @@
 
                                                     <Button Grid.Row="1" Grid.Column="1"
                                                             Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
+                                                            Classes="Primary"
                                                             Command="{Binding CmdGameExeAddNew}" />
                                                     <Button Grid.Row="1" Grid.Column="2"
                                                             Content="{dloc:Localize SettingsGeneral/GameExePaths_Remove}"
@@ -271,6 +274,7 @@
 
                                                     <Button Grid.Row="1" Grid.Column="1"
                                                             Content="{dloc:Localize SettingsGeneral/EditorExePaths_Add}"
+                                                            Classes="Primary"
                                                             Command="{Binding CmdEditorExeAddNew}" />
                                                     <Button Grid.Row="1" Grid.Column="2"
                                                             Content="{dloc:Localize SettingsGeneral/EditorExePaths_Remove}"
@@ -295,6 +299,7 @@
                                     
                 <Button Grid.Row="0" Grid.Column="0"
                         Content="{dloc:Localize SettingsGeneral/ShowLogWindow}"
+                        Classes="Primary"
                         Command="{Binding CmdShowLogWindow}" />
                 
                 <Button Grid.Column="2" Content="{dloc:Localize Generic/ButtonOk}"

@@ -6,18 +6,23 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using ReactiveUI;
 
 namespace Martridge.ViewModels.Dmod {
 
-    public class DmodDefinition {
-        public DmodFileDefinition Files { get; private set; }
+    public class DmodDefinition : ReactiveObject{
+        public DmodFileDefinition Files { get; }
 
-        public List<DmodLocalizationDefinition> Localizations { get; private set; } = new List<DmodLocalizationDefinition>();
-        public string? Description { get; private set; }
-        public string? Name { get; private set; }
-        public string? DmodParentDirectory { get; private set; }
-        public string? DmodDirectory { get; private set; }
-        public Bitmap? Thumbnail { get; private set; }
+        public List<DmodLocalizationDefinition> Localizations { get; } = new List<DmodLocalizationDefinition>();
+        public string? Description { get; }
+        public string? Name { get; }
+        public string? DmodParentDirectory { get; }
+        public string? DmodDirectory { get; }
+        public Bitmap? Thumbnail {
+            get => this._thumbnail; 
+            private set => this.RaiseAndSetIfChanged(ref this._thumbnail, value);
+        }
+        private Bitmap? _thumbnail = null;
 
         public DmodDefinition(DmodFileDefinition fileDef) {
             this.Files = fileDef;
@@ -32,7 +37,6 @@ namespace Martridge.ViewModels.Dmod {
                 string dirName = this.Files.DmodRoot.Name;
                 this.DmodParentDirectory = dirPath.Substring(0, dirPath.Length - dirName.Length);
             }
-            this.Thumbnail = this.Files.GetThumbnail();
 
             this.InitializeLocalizations();
         }
@@ -54,6 +58,16 @@ namespace Martridge.ViewModels.Dmod {
                     });
                 }
             }
+        }
+
+        public void LoadThumbnail() {
+            this.Thumbnail?.Dispose();
+            this.Thumbnail = this.Files.GetThumbnail();
+        }
+
+        public void UnloadThumbnail() {
+            this.Thumbnail?.Dispose();
+            this.Thumbnail = null;
         }
 
         public override string ToString() {

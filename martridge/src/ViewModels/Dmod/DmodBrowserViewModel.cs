@@ -595,7 +595,11 @@ namespace Martridge.ViewModels.Dmod {
         
         public DmodDefinition? SelectedDmodDefinition {
             get => this._selectedDmodDefinition;
-            private set => this.RaiseAndSetIfChanged(ref this._selectedDmodDefinition, value);
+            private set {
+                this._selectedDmodDefinition?.UnloadThumbnail();
+                value?.LoadThumbnail();
+                this.RaiseAndSetIfChanged(ref this._selectedDmodDefinition, value);
+            }
         }
         private DmodDefinition? _selectedDmodDefinition;
         

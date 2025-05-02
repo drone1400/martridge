@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Martridge.Models.OnlineDmods {
-    public class DmodCrawler {
+    public class DmodCrawler : IDisposable {
 
         public DateTime DmodPagesLastWriteTime { get; private set; } = DateTime.MinValue;
         public event EventHandler? DmodListInitialized;
@@ -417,8 +417,7 @@ namespace Martridge.Models.OnlineDmods {
         }
         
         #endregion
-
-
+        
         #region  Misc Helper Functions
 
         private static DateTime ShittyParseDateTime(string dateStr) {
@@ -436,5 +435,30 @@ namespace Martridge.Models.OnlineDmods {
         
 
         #endregion
+
+
+        ~DmodCrawler() {
+            this.Dispose(false);
+        }
+        
+        public void Dispose() {
+            this.Dispose(true);
+        }
+
+        private bool _disposed = false;
+        protected virtual void Dispose(bool disposing) {
+            if (this._disposed)
+                return;
+            
+            if (disposing) {
+                // ...
+                this._onlineUsers.Clear();
+                this._dmodList.Clear();
+            }
+            
+            this._httpClient.Dispose();
+            
+            this._disposed = true;
+        }
     }
 }

@@ -41,6 +41,7 @@
                                Content="{dloc:Localize DmodPacker/View/DmodSelectSource}" />
                         <Button Grid.Row="0" Grid.Column="1"
                                 Content="{dloc:Localize DmodPacker/View/DmodSelectBrowse}"
+                                Classes="Primary"
                                 Command="{Binding CmdBrowseDmodSource}" />
                     </Grid>
 
@@ -81,6 +82,7 @@
                                Content="{dloc:Localize DmodPacker/View/DmodDestination}" />
                         <Button Grid.Row="0" Grid.Column="1"
                                 Content="{dloc:Localize DmodPacker/View/DmodSelectBrowse}"
+                                Classes="Primary"
                                 Command="{Binding CmdBrowseDmodDestination}" />
                     </Grid>
                     <TextBox Text="{Binding TemporaryDmodDestination}" />
@@ -97,18 +99,15 @@
             <!-- Footer... buttons -->
             <Grid Grid.Row="2" ColumnDefinitions="*, Auto">
                 <WrapPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Content="{dloc:Localize DmodPacker/View/Button/Cancel}"
-                            Command="{Binding CmdCancel}"
-                            IsVisible="{Binding PackerPhase,
-                                        Converter={StaticResource GenericNotEqualsBoolConverter},
-                                        ConverterParameter={x:Static dmodPacker:DmodPackerPhase.Finished} }" />
                     <Button Content="{dloc:Localize DmodPacker/View/Button/InitializeDmod}"
+                            Classes="Primary"
                             Command="{Binding CmdInitializeDmod}"
                             CommandParameter="{Binding TemporaryDmodSourceDirectory}"
                             IsVisible="{Binding PackerPhase,
                                         Converter={StaticResource GenericEqualsBoolConverter},
                                         ConverterParameter={x:Static dmodPacker:DmodPackerPhase.Inactive} }" />
                     <Button Content="{dloc:Localize DmodPacker/View/Button/StartPacking}"
+                            Classes="Primary"
                             Command="{Binding CmdStartPacking}"
                             CommandParameter="{Binding TemporaryDmodDestination}"
                             IsVisible="{Binding PackerPhase,
@@ -118,6 +117,11 @@
                             Command="{Binding CmdFinish}"
                             IsVisible="{Binding PackerPhase,
                                         Converter={StaticResource GenericEqualsBoolConverter},
+                                        ConverterParameter={x:Static dmodPacker:DmodPackerPhase.Finished} }" />
+                    <Button Content="{dloc:Localize DmodPacker/View/Button/Cancel}"
+                            Command="{Binding CmdCancel}"
+                            IsVisible="{Binding PackerPhase,
+                                        Converter={StaticResource GenericNotEqualsBoolConverter},
                                         ConverterParameter={x:Static dmodPacker:DmodPackerPhase.Finished} }" />
                 </WrapPanel>
             </Grid>

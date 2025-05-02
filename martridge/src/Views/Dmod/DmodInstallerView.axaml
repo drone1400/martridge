@@ -40,6 +40,7 @@
                                Content="{dloc:Localize DmodInstaller/View/DmodSelect/SelectDmod}" />
                         <Button Grid.Row="0" Grid.Column="1"
                                 Content="{dloc:Localize DmodInstaller/View/DmodSelect/Browse}"
+                                Classes="Primary"
                                 Command="{Binding CmdBrowseDmod}" />
                     </Grid>
 
@@ -116,18 +117,15 @@
             <!-- Footer... buttons -->
             <Grid Grid.Row="2" ColumnDefinitions="*, Auto">
                 <WrapPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Content="{dloc:Localize DmodInstaller/View/Button/Cancel}"
-                            Command="{Binding CmdCancel}"
-                            IsVisible="{Binding InstallPhase,
-                                        Converter={StaticResource GenericNotEqualsBoolConverter},
-                                        ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Finished} }" />
                     <Button Content="{dloc:Localize DmodInstaller/View/Button/InitializeDmod}"
+                            Classes="Primary"
                             Command="{Binding CmdInitializeDmod}"
                             CommandParameter="{Binding TemporaryDmodSource}"
                             IsVisible="{Binding InstallPhase,
                                         Converter={StaticResource GenericEqualsBoolConverter},
                                         ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Inactive} }" />
                     <Button Content="{dloc:Localize DmodInstaller/View/Button/StartInstall}"
+                            Classes="Primary"
                             Command="{Binding CmdStartInstall}"
                             IsVisible="{Binding InstallPhase,
                                         Converter={StaticResource GenericEqualsBoolConverter},
@@ -136,6 +134,11 @@
                             Command="{Binding CmdFinish}"
                             IsVisible="{Binding InstallPhase,
                                         Converter={StaticResource GenericEqualsBoolConverter},
+                                        ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Finished} }" />
+                    <Button Content="{dloc:Localize DmodInstaller/View/Button/Cancel}"
+                            Command="{Binding CmdCancel}"
+                            IsVisible="{Binding InstallPhase,
+                                        Converter={StaticResource GenericNotEqualsBoolConverter},
                                         ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Finished} }" />
                 </WrapPanel>
             </Grid>

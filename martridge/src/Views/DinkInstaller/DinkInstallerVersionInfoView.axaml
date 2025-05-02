@@ -36,6 +36,7 @@
                        Content="{dloc:Localize DinkInstallerView/SelectDestination}" />
                 <Button Grid.Row="0" Grid.Column="1"
                         Content="{dloc:Localize Generic/ButtonBrowse}"
+                        Classes="Primary"
                         Command="{Binding CmdBrowseDestination}" />
             </Grid>
 

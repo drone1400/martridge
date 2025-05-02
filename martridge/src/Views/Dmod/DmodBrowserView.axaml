@@ -29,8 +29,9 @@
         <vw:MagicSplitPresenterView
             Name="MagicSplit"
             Margin="0"
-            LeftPanelMinWidth="450"
-            RightPanelMinWidth="540"
+            OnePageSwitchThreshold="940"
+            LeftPanelMinWidth="375"
+            RightPanelMinWidth="560"
             IsOnePageShowingRightContent="{Binding SelectedDmodDefinition, 
                 Converter={StaticResource ConverterIsNotNullCheck}}">
 

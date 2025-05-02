@@ -7,9 +7,9 @@
         https://github.com/drone1400/Citrus.Avalonia/blob/main/src/Citrus.Avalonia/Palette/SeaPalette.xaml
     -->
     
-    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#DD5D16" />
+    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#DB7A46" />
     <SolidColorBrush x:Key="ThemeAccentBrush2" Color="#4E633D" />
-    <SolidColorBrush x:Key="ThemeAccentHoverBrush" Color="#DD5D16" />
+    <SolidColorBrush x:Key="ThemeAccentHoverBrush" Color="#DB7843" />
     
     <SolidColorBrush x:Key="HighlightBrush" Color="#D31100" />
     <SolidColorBrush x:Key="HighlightHoverBrush" Color="#BB1100" />

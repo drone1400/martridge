@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using Avalonia.Media.Imaging;
@@ -7,10 +8,10 @@ using Martridge.Trace;
 using ReactiveUI;
 namespace Martridge.ViewModels.OnlineDmod {
     public class OnlineUserViewModel : ViewModelBase {
-        public OnlineUser User { get; }
+        private OnlineUser? _user = null;
 
-        public string Name { get => this.User.Name; }
-        public string TagLine { get => this.User.TagLine; }
+        public string Name { get => this._user?.Name ?? string.Empty; }
+        public string TagLine { get => this._user?.TagLine ?? string.Empty; }
         
         public Bitmap? PfpImageBackground {
             get => this._pfpImageBackground;
@@ -24,20 +25,26 @@ namespace Martridge.ViewModels.OnlineDmod {
         }
         private Bitmap? _pfpImageForeground;
         
-        public ObservableCollection<Bitmap> BadgeImages {
+        public IReadOnlyList<Bitmap> BadgeImages {
             get => this._badgeImages;
             private set => this.RaiseAndSetIfChanged(ref this._badgeImages, value);
         }
-        private ObservableCollection<Bitmap> _badgeImages = new ObservableCollection<Bitmap>();
+        private IReadOnlyList<Bitmap> _badgeImages = new ObservableCollection<Bitmap>();
 
         public OnlineUserViewModel(OnlineUser user) {
-            this.User = user;
+            this._user = user;
             this.ReloadImages();
         }
 
         public void ReloadImages() {
-            OnlineDmodCachedResource? pfpBack = OnlineDmodCachedResource.FromRelativeFileUrl(this.User.RelativePfpBackgroundUrl);
-            OnlineDmodCachedResource? pfpFore = OnlineDmodCachedResource.FromRelativeFileUrl(this.User.RelativePfpForegroundUrl);
+            if (this._user == null)
+                return;
+            
+            // make sure to unload old images first...
+            this.UnloadImages();
+            
+            OnlineDmodCachedResource? pfpBack = OnlineDmodCachedResource.FromRelativeFileUrl(this._user.RelativePfpBackgroundUrl);
+            OnlineDmodCachedResource? pfpFore = OnlineDmodCachedResource.FromRelativeFileUrl(this._user.RelativePfpForegroundUrl);
 
             try {
                 if (pfpBack != null && File.Exists(pfpBack.Local)) {
@@ -61,8 +68,8 @@ namespace Martridge.ViewModels.OnlineDmod {
                 this.PfpImageForeground = null;
             }
 
-            ObservableCollection<Bitmap> badges = new ObservableCollection<Bitmap>();
-            foreach (string relativeImg in this.User.RelativeBadgeIconUrls) {
+            List<Bitmap> badges = new List<Bitmap>();
+            foreach (string relativeImg in this._user.RelativeBadgeIconUrls) {
                 try {
                     OnlineDmodCachedResource? res = OnlineDmodCachedResource.FromRelativeFileUrl(relativeImg);
                     if (res != null && File.Exists(res.Local)) {
@@ -74,6 +81,31 @@ namespace Martridge.ViewModels.OnlineDmod {
                 }
             }
             this.BadgeImages = badges;
+        }
+
+        public void UnloadImages() {
+            this.PfpImageBackground?.Dispose();
+            this.PfpImageForeground?.Dispose();
+            foreach (var badge in this.BadgeImages) {
+                badge.Dispose();
+            }
+            this.BadgeImages = new List<Bitmap>();
+        }
+
+        
+        private bool _disposed = false;
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+
+            if (this._disposed) return;
+            
+            if (disposing) {
+                // ...
+            }
+            
+            this.UnloadImages();
+            
+            this._disposed = true;
         }
     }
 }

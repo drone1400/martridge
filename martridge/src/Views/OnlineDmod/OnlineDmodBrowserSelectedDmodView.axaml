@@ -345,7 +345,7 @@
                                     HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
                                     Width="NaN" Height="NaN"
-                                    Source="{Binding SelectedDmodScreenshot}" />
+                                    Source="{Binding SelectedDmodScreenshotVm.Screenshot}" />
 
                                 <Button Grid.Column="0"
                                         Width="NaN"

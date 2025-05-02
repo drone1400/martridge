@@ -6,36 +6,46 @@ using Martridge.Trace;
 using ReactiveUI;
 namespace Martridge.ViewModels.OnlineDmod {
     public class OnlineDmodScreenshotViewModel : ViewModelBase {
-        public OnlineDmodScreenshot DmodScreenshot { get; }
+        private OnlineDmodScreenshot? _dmodScreenshot = null;
 
         public Bitmap? ScreenshotPreview {
             get => this._screenshotPreview;
-            set => this.RaiseAndSetIfChanged(ref this._screenshotPreview, value);
+            private set => this.RaiseAndSetIfChanged(ref this._screenshotPreview, value);
         }
         private Bitmap? _screenshotPreview;
         
         public Bitmap? Screenshot {
             get => this._screenshot;
-            set => this.RaiseAndSetIfChanged(ref this._screenshot, value);
+            private set => this.RaiseAndSetIfChanged(ref this._screenshot, value);
         }
         private Bitmap? _screenshot;
+        
         public OnlineDmodScreenshotViewModel(OnlineDmodScreenshot screenshot) {
-            this.DmodScreenshot = screenshot;
+            this._dmodScreenshot = screenshot;
 
-            this.ReloadScreenshotPreviewFile();
-            
-            // normal screenshot file is loaded in later...
+            this.ReloadScreenshotPreviewFile(false);
+            //this.ReloadScreenshotFile();
         }
 
-        public void ReloadScreenshotPreviewFile() {
+        public void ReloadScreenshotPreviewFile(bool force) {
             try {
-                OnlineDmodCachedResource? res = OnlineDmodCachedResource.FromRelativeFileUrl(this.DmodScreenshot.RelativePreviewUrl);
+                if (this._dmodScreenshot == null)
+                    return;
+
+                if (this.ScreenshotPreview != null) {
+                    if (force == false)
+                        return;
+                    this.ScreenshotPreview.Dispose();
+                    this.ScreenshotPreview = null;
+                }
+                
+                OnlineDmodCachedResource? res = OnlineDmodCachedResource.FromRelativeFileUrl(this._dmodScreenshot.RelativePreviewUrl);
                 if (res != null && File.Exists(res.Local)) {
                     try {
                         this.ScreenshotPreview = new Bitmap(res.Local);
                     } catch (Exception) {
                         // some of the preview files are corrupted... if we can't load them, use the full image for preview i guess
-                        OnlineDmodCachedResource? res2 = OnlineDmodCachedResource.FromRelativeFileUrl(this.DmodScreenshot.RelativeScreenshotUrl);
+                        OnlineDmodCachedResource? res2 = OnlineDmodCachedResource.FromRelativeFileUrl(this._dmodScreenshot.RelativeScreenshotUrl);
                         if (res2 != null && File.Exists(res2.Local)) {
                             this.ScreenshotPreview = new Bitmap(res2.Local);
                         } else {
@@ -51,9 +61,19 @@ namespace Martridge.ViewModels.OnlineDmod {
             }
         }
         
-        public void ReloadScreenshotFile() {
+        public void ReloadScreenshotFile(bool force) {
             try {
-                OnlineDmodCachedResource? res = OnlineDmodCachedResource.FromRelativeFileUrl(this.DmodScreenshot.RelativeScreenshotUrl);
+                if (this._dmodScreenshot == null)
+                    return;
+                
+                if (this.Screenshot != null) {
+                    if (force == false)
+                        return;
+                    this.Screenshot.Dispose();
+                    this.Screenshot = null;
+                }
+                
+                OnlineDmodCachedResource? res = OnlineDmodCachedResource.FromRelativeFileUrl(this._dmodScreenshot.RelativeScreenshotUrl);
                 if (res != null && File.Exists(res.Local)) {
                     this.Screenshot = new Bitmap(res.Local);
                 } else {
@@ -63,6 +83,26 @@ namespace Martridge.ViewModels.OnlineDmod {
                 MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
                 this.Screenshot = null;
             }
+        }
+
+
+        private bool _disposed = false;
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+
+            if (this._disposed) return;
+
+            if (disposing) {
+                this._dmodScreenshot = null;
+            }
+            
+            this.ScreenshotPreview?.Dispose();
+            this.ScreenshotPreview = null;
+                
+            this.Screenshot?.Dispose();
+            this.Screenshot = null;
+            
+            this._disposed = true;
         }
     }
 }

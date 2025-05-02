@@ -1,16 +1,30 @@
 using Martridge.Models.OnlineDmods;
 namespace Martridge.ViewModels.OnlineDmod {
-    public class OnlineDmodVersionViewModel {
-        public OnlineDmodVersion DmodVersion { get;}
+    public class OnlineDmodVersionViewModel : ViewModelBase {
+        private OnlineDmodVersion? _dmodVersion = null;
         
-        public string Name { get => this.DmodVersion.Name; }
-        public string Released { get => this.DmodVersion.Released.ToString("d"); }
-        public string Downloads { get => this.DmodVersion.Downloads.ToString(); }
-        public string FileSizeString { get => this.DmodVersion.FileSizeString; }
-        public string ReleaseNotes { get => this.DmodVersion.ReleaseNotes; }
+        public string Name { get => this._dmodVersion?.Name ?? string.Empty; }
+        public string Released { get => this._dmodVersion?.Released.ToString("d") ?? string.Empty; }
+        public string Downloads { get => this._dmodVersion?.Downloads.ToString() ?? string.Empty; }
+        public string FileSizeString { get => this._dmodVersion?.FileSizeString ?? string.Empty; }
+        public string ReleaseNotes { get => this._dmodVersion?.ReleaseNotes ?? string.Empty; }
+        public string RelativeDownloadUrl {get => this._dmodVersion?.RelativeDownloadUrl ?? string.Empty; }
         
         public OnlineDmodVersionViewModel(OnlineDmodVersion dmodVersion) {
-            this.DmodVersion = dmodVersion;
+            this._dmodVersion = dmodVersion;
+        }
+
+        private bool _disposed = false;
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+            
+            if (this._disposed) return;
+
+            if (disposing) {
+                this._dmodVersion = null;
+            }
+            
+            this._disposed = true;
         }
     }
 }

@@ -8,7 +8,6 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Collections;
-using Avalonia.Media.Imaging;
 using Avalonia.Metadata;
 using Avalonia.Threading;
 using Martridge.Models.Dmod;
@@ -313,13 +312,6 @@ namespace Martridge.ViewModels.OnlineDmod {
 
         public bool SelectedDmodScreenshotIsFirst => this._selectedDmodDefinition == null ||  this._selectedDmodScreenshotIndex <= 0;
         public bool SelectedDmodScreenshotIsLast => this._selectedDmodDefinition == null || this._selectedDmodScreenshotIndex >= this._selectedDmodDefinition.Screenshots.Count;
-
-        public Bitmap? SelectedDmodScreenshot {
-            get => this._selectedDmodScreenshot;
-            set => this.RaiseAndSetIfChanged(ref this._selectedDmodScreenshot, value);
-        }
-        private Bitmap? _selectedDmodScreenshot = null;
-        
         
         
         private Dictionary<string, OnlineUserViewModel> _cachedUserViewModels = new Dictionary<string, OnlineUserViewModel>();
@@ -341,7 +333,6 @@ namespace Martridge.ViewModels.OnlineDmod {
                     this.ProgressMessage = Localizer.Instance[@"OnlineDmodBrowser/Progress/DownloadingData"];
                     this.ProgressIsVisible = true;
                     this.SelectedDmodScreenshotVm = null;
-                    this.SelectedDmodScreenshot = null;
 
                     await this.DmodCrawler.UpdateDmodData(this.SelectedDmodDefinition.DmodInfo, forceReloadFromWeb);
 
@@ -389,20 +380,9 @@ namespace Martridge.ViewModels.OnlineDmod {
         /// </summary>
         private void OnDmodScreenshotVmChanged() {
             try {
-                if (this.SelectedDmodScreenshotVm == null) {
-                    this.SelectedDmodScreenshot = null;
-                    return;
-                }
-                
-                OnlineDmodCachedResource? resScreenshot = OnlineDmodCachedResource.FromRelativeFileUrl(this.SelectedDmodScreenshotVm.DmodScreenshot.RelativeScreenshotUrl);
-                if (resScreenshot != null && File.Exists(resScreenshot.Local)) {
-                    this.SelectedDmodScreenshot = new Bitmap(resScreenshot.Local);
-                } else {
-                    this.SelectedDmodScreenshot = null;
-                }
+                this.SelectedDmodScreenshotVm?.ReloadScreenshotFile(false);
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
-                this.SelectedDmodScreenshot = null;
             }
         }
 
@@ -424,7 +404,6 @@ namespace Martridge.ViewModels.OnlineDmod {
                 
                 this.SelectedDmodDefinition = null;
                 this.SelectedDmodScreenshotVm = null;
-                this.SelectedDmodScreenshot = null;
                 this.DmodSearchString = null;
                 await this.DmodCrawler.InitializeDmodLists(true);
                 this.InitializeDmods();
@@ -479,7 +458,7 @@ namespace Martridge.ViewModels.OnlineDmod {
             if (this.DmodCrawler == null) return;
             if (!(parameter is OnlineDmodVersionViewModel def)) return;
 
-            string url = def.DmodVersion.RelativeDownloadUrl;
+            string url = def.RelativeDownloadUrl;
             OnlineDmodCachedResource? resource = OnlineDmodCachedResource.FromRelativeFileUrl(url);
             if (resource != null) {
 
@@ -529,5 +508,29 @@ namespace Martridge.ViewModels.OnlineDmod {
         }
 
         #endregion
+
+        private bool _disposed = false;
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+
+            if (this._disposed)
+                return;
+
+            if (disposing) {
+                this.DmodDefinitionsCollection = null;
+
+                foreach (OnlineDmodInfoViewModel x in this._lastusedDmodDefinitions) {
+                    x.Dispose();
+                }
+
+                foreach (KeyValuePair<string, OnlineUserViewModel> x in this._cachedUserViewModels) {
+                    x.Value.Dispose();
+                }
+                
+                this._cachedUserViewModels.Clear();
+            }
+            
+            this._disposed = true;
+        }
     }
 }

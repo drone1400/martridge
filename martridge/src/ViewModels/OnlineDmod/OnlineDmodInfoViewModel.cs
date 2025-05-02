@@ -35,23 +35,23 @@ namespace Martridge.ViewModels.OnlineDmod {
         }
         private string _description = "";
 
-        public ObservableCollection<OnlineDmodVersionViewModel> Versions {
+        public IReadOnlyList<OnlineDmodVersionViewModel> Versions {
             get => this._versions;
             private set => this.RaiseAndSetIfChanged(ref this._versions, value);
         }
-        private ObservableCollection<OnlineDmodVersionViewModel> _versions = new ObservableCollection<OnlineDmodVersionViewModel>();
+        private IReadOnlyList<OnlineDmodVersionViewModel> _versions = new List<OnlineDmodVersionViewModel>();
 
-        public ObservableCollection<OnlineDmodReviewViewModel> Reviews {
+        public IReadOnlyList<OnlineDmodReviewViewModel> Reviews {
             get => this._reviews;
             private set => this.RaiseAndSetIfChanged(ref this._reviews, value);
         }
-        private ObservableCollection<OnlineDmodReviewViewModel> _reviews = new ObservableCollection<OnlineDmodReviewViewModel>();
+        private IReadOnlyList<OnlineDmodReviewViewModel> _reviews = new List<OnlineDmodReviewViewModel>();
         
-        public ObservableCollection<OnlineDmodScreenshotViewModel> Screenshots {
+        public IReadOnlyList<OnlineDmodScreenshotViewModel> Screenshots {
             get => this._screenshots;
             private set => this.RaiseAndSetIfChanged(ref this._screenshots, value);
         }
-        private ObservableCollection<OnlineDmodScreenshotViewModel> _screenshots = new ObservableCollection<OnlineDmodScreenshotViewModel>();
+        private IReadOnlyList<OnlineDmodScreenshotViewModel> _screenshots = new List<OnlineDmodScreenshotViewModel>();
         
         public OnlineDmodInfoViewModel(OnlineDmodInfo dmodInfo) {
             this.DmodInfo = dmodInfo;
@@ -63,19 +63,19 @@ namespace Martridge.ViewModels.OnlineDmod {
         public void RefreshOnlineData(Dictionary<string, OnlineUserViewModel> cachedUsersViewModels) {
             this.Description = this.DmodInfo.Description ?? "";
             
-            ObservableCollection<OnlineDmodVersionViewModel> versions = new ObservableCollection<OnlineDmodVersionViewModel>();
+            List<OnlineDmodVersionViewModel> versions = new List<OnlineDmodVersionViewModel>();
             foreach (OnlineDmodVersion ver in this.DmodInfo.DmodVersions) {
                 versions.Add(new OnlineDmodVersionViewModel(ver));
             }
             this.Versions = versions;
             
-            ObservableCollection<OnlineDmodReviewViewModel> reviews = new ObservableCollection<OnlineDmodReviewViewModel>();
+            List<OnlineDmodReviewViewModel> reviews = new List<OnlineDmodReviewViewModel>();
             foreach (OnlineDmodReview rev in this.DmodInfo.DmodReviews) {
                 reviews.Add(new OnlineDmodReviewViewModel(rev, cachedUsersViewModels[rev.User.Name]));
             }
             this.Reviews = reviews;
             
-            ObservableCollection<OnlineDmodScreenshotViewModel> screenshots = new ObservableCollection<OnlineDmodScreenshotViewModel>();
+            List<OnlineDmodScreenshotViewModel> screenshots = new List<OnlineDmodScreenshotViewModel>();
             foreach (OnlineDmodScreenshot scr in this.DmodInfo.DmodScreenshots) {
                 screenshots.Add(new OnlineDmodScreenshotViewModel(scr));
             }
@@ -83,10 +83,20 @@ namespace Martridge.ViewModels.OnlineDmod {
         }
 
         public void UnloadOnlineData() {
+            foreach (var version in this.Versions) {
+                version.Dispose();
+            }
+            foreach (var review in this.Reviews) {
+                review.Dispose();
+            }
+            foreach (var screenshot in this.Screenshots) {
+                screenshot.Dispose();
+            }
+            
             this.Description = "";
-            this.Versions = new ObservableCollection<OnlineDmodVersionViewModel>();
-            this.Reviews = new ObservableCollection<OnlineDmodReviewViewModel>();
-            this.Screenshots = new ObservableCollection<OnlineDmodScreenshotViewModel>();
+            this.Versions = new List<OnlineDmodVersionViewModel>();
+            this.Reviews = new List<OnlineDmodReviewViewModel>();
+            this.Screenshots = new List<OnlineDmodScreenshotViewModel>();
         }
         
         public override string ToString() {
@@ -101,7 +111,6 @@ namespace Martridge.ViewModels.OnlineDmod {
             };
             Process.Start(pinfo);
         }
-        
         public bool CanCmdOpenDmodHyperlink(object? parameter = null) {
             return true;
         }
@@ -113,10 +122,22 @@ namespace Martridge.ViewModels.OnlineDmod {
             };
             Process.Start(pinfo);
         }
-
         public bool CanCmdOpenCacheLocation(object? parameter) {
             if (Directory.Exists(this.DmodInfo.LocalBase)) return true;
             return false;
+        }
+
+        private bool _disposed = false;
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+
+            if (this._disposed) return;
+
+            if (disposing) {
+                this.UnloadOnlineData();
+            }
+            
+            this._disposed = true;
         }
     }
 }

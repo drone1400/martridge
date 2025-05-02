@@ -48,7 +48,7 @@
             <Grid Grid.Row="1" Grid.Column="0" RowDefinitions="*,Auto">
                 <Grid.Styles>
                     <Style Selector="controls|SelectableButton">
-                        <Setter Property="Width" Value="200"/>
+                        <Setter Property="Width" Value="180"/>
                     </Style>
                 </Grid.Styles>
 

@@ -1,0 +1,52 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!--
+        Theme inspired by the one and only Dink Network:
+            https://www.dinknetwork.com/
+    -->
+    
+    <!-- 
+        NOTE: if you are making your own custom theme color palette definition 
+        and you are making a dark theme, then use this as a base instead:
+            https://github.com/drone1400/Citrus.Avalonia/blob/main/src/Citrus.Avalonia/Palette/SeaPalette.xaml
+    -->
+    
+    <SolidColorBrush x:Key="ThemeAccentBrush" Color="#70708F" />
+    <SolidColorBrush x:Key="ThemeAccentBrush2" Color="#202F5F" />
+    <SolidColorBrush x:Key="ThemeAccentHoverBrush" Color="#585870" />
+    
+    <SolidColorBrush x:Key="HighlightBrush" Color="#A4A621" />
+    <SolidColorBrush x:Key="HighlightHoverBrush" Color="#828218" />
+    <SolidColorBrush x:Key="HighlightForegroundBrush" Color="#FFFFFFFF" />
+    
+    <SolidColorBrush x:Key="ErrorBrush" Color="#FFFF0000" />
+    <SolidColorBrush x:Key="ErrorLowBrush" Color="#AAFF0000" />
+    
+    <SolidColorBrush x:Key="ThemeCardBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ThemeBackgroundBrush" Color="#B7B3B4" />
+    <SolidColorBrush x:Key="ThemeBorderLowBrush" Color="#F3F3F3" />
+    <SolidColorBrush x:Key="ThemeBorderMidBrush" Color="#ECECEC" />
+    <SolidColorBrush x:Key="ThemeBorderHighBrush" Color="#AAAAAA" />
+    
+    <SolidColorBrush x:Key="ThemeControlLowBrush" Color="#FF868999" />
+    <SolidColorBrush x:Key="ThemeControlMidBrush" Color="#FFF5F5F5" />
+    <SolidColorBrush x:Key="ThemeControlMidHighBrush" Color="#FFC2C3C9" />
+    <SolidColorBrush x:Key="ThemeControlHighBrush" Color="#FF686868" />
+    <SolidColorBrush x:Key="ThemeControlVeryHighBrush" Color="#FF5B5B5B" />
+    
+    <SolidColorBrush x:Key="ThemeControlHighlightLowBrush" Color="#FFF0F0F0" />
+    <SolidColorBrush x:Key="ThemeControlHighlightMidBrush" Color="#FFD0D0D0" />
+    <SolidColorBrush x:Key="ThemeControlHighlightHighBrush" Color="#FF808080" />
+    
+    <SolidColorBrush x:Key="ThemeForegroundBrush" Color="#FF000000" />
+    <SolidColorBrush x:Key="ThemeForegroundLowBrush" Color="#FF808080" />
+
+    <SolidColorBrush x:Key="NotificationCardBackgroundBrush" Color="#444444" Opacity="0.75" />
+    <SolidColorBrush x:Key="NotificationCardInformationBackgroundBrush" Color="#007ACC" Opacity="0.75" />
+    <SolidColorBrush x:Key="NotificationCardSuccessBackgroundBrush" Color="#1F9E45" Opacity="0.75" />
+    <SolidColorBrush x:Key="NotificationCardWarningBackgroundBrush" Color="#FDB328" Opacity="0.75" />
+    <SolidColorBrush x:Key="NotificationCardErrorBackgroundBrush" Color="#BD202C" Opacity="0.75" />
+
+    <SolidColorBrush x:Key="ThemeControlTransparentBrush" Color="Transparent" />
+</ResourceDictionary>

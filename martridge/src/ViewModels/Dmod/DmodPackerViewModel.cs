@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Avalonia.Input;
 using Avalonia.Metadata;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
@@ -557,6 +558,15 @@ namespace Martridge.ViewModels.Dmod {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                 }
             });
+        }
+        
+        public override bool ProcessKeyDown(Key key, KeyModifiers modifiers) {
+            switch (key) {
+                case Key.Escape:
+                    this.CmdCancel();
+                    return true;
+            }
+            return false;
         }
     }
 }

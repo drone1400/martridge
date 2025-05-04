@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Input;
 using Avalonia.Platform.Storage;
 
 namespace Martridge.ViewModels.Configuration {
@@ -666,5 +667,14 @@ namespace Martridge.ViewModels.Configuration {
         }
         
         #endregion
+        
+        public override bool ProcessKeyDown(Key key, KeyModifiers modifiers) {
+            switch (key) {
+                case Key.Escape:
+                    this.CmdSettingsCancel();
+                    return true;
+            }
+            return false;
+        }
     }
 }

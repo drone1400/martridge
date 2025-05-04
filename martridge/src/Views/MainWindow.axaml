@@ -18,7 +18,9 @@
         Icon="/Assets/martridge_new.ico"
         Title="{dloc:Localize MainWindow/Title}"
         Background="{DynamicResource ThemeBackgroundColor}"
-        Name="TheMainWindow">
+        Name="TheMainWindow"
+        
+        KeyDown="InputElement_OnKeyDown">
 
     <Design.DataContext>
         <vm:MainWindowViewModel />

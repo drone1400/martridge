@@ -221,14 +221,14 @@
   "MainWindow/TabItemInstalledDmods": "Installed DMOD Browser",
   "MainWindow/TabItemOnlineDmods": "Online DMOD Browser",
   
-  "MainWindow/PageSelect/DmodBrwoser":"My DMODs",
-  "MainWindow/PageSelect/OnlineDmodBrwoser":"Online DMODs",
-  "MainWindow/PageSelect/DmodInstaller":"Install a DMOD",
-  "MainWindow/PageSelect/DmodPacker":"Pack a DMOD",
-  "MainWindow/PageSelect/DinkInstaller":"Install Dink",
-  "MainWindow/PageSelect/Theme":"Theme",
-  "MainWindow/PageSelect/Settings":"Settings",
-  "MainWindow/PageSelect/About":"About",
+  "MainWindow/PageSelect/DmodBrwoser":"F2 - My DMODs",
+  "MainWindow/PageSelect/OnlineDmodBrwoser":"F2 - Online DMODs",
+  "MainWindow/PageSelect/DmodInstaller":"F5 - Install a DMOD",
+  "MainWindow/PageSelect/DmodPacker":"F6 - Pack a DMOD",
+  "MainWindow/PageSelect/DinkInstaller":"F7 - Install Dink",
+  "MainWindow/PageSelect/Theme":"F4 - Theme",
+  "MainWindow/PageSelect/Settings":"F3 - Settings",
+  "MainWindow/PageSelect/About":"F1 - About",
   
 
 

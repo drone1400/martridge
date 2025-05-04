@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
@@ -23,6 +24,13 @@ namespace Martridge.Views {
 
         private void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
+        }
+        private void InputElement_OnKeyDown(object? sender, KeyEventArgs e) {
+            if (this.DataContext is MainWindowViewModel mwvm) {
+                if (mwvm.ProcessKeyDown(e.Key, e.KeyModifiers)) {
+                    e.Handled = true;
+                }
+            }
         }
     }
 }

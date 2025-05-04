@@ -667,7 +667,8 @@ namespace Martridge.ViewModels.DinkInstaller
         public override bool ProcessKeyDown(Key key, KeyModifiers modifiers) {
             switch (key) {
                 case Key.Escape:
-                    this.CmdCancel();
+                    if (this.CanCmdExit()) this.CmdExit();
+                    else if (this.CanCmdCancel()) this.CmdCancel();
                     return true;
             }
             return false;

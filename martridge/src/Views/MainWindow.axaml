@@ -20,7 +20,8 @@
         Background="{DynamicResource ThemeBackgroundColor}"
         Name="TheMainWindow"
         
-        KeyDown="InputElement_OnKeyDown">
+        KeyDown="InputElement_OnKeyDown"
+        XYFocus.NavigationModes="Enabled">
 
     <Design.DataContext>
         <vm:MainWindowViewModel />

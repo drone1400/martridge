@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Collections;
+using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Martridge.Models;
@@ -773,6 +774,21 @@ namespace Martridge.ViewModels.Dmod {
         }
 
         #endregion
+        
+        public override bool ProcessKeyDown(Key key, KeyModifiers modifiers) {
+            switch (key) {
+                case Key.D:
+                    if (modifiers != KeyModifiers.Control) return false;
+                    this.CmdLaunchDmod();
+                    return true;
+                
+                case Key.E:
+                    if (modifiers != KeyModifiers.Control) return false;
+                    this.CmdLaunchDmod(this.LaunchEditorParameter);
+                    return true;
+            }
+            return false;
+        }
         
     }
 }

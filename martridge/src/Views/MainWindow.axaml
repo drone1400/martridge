@@ -39,12 +39,6 @@
         CornerRadius="0"
         DragDrop.AllowDrop="True">
         <Grid RowDefinitions="Auto,*" ColumnDefinitions="Auto,*">
-            <!-- <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"> -->
-            <!--     <MenuItem Header="{dloc:Localize MainWindow/MenuLogWindow}" -->
-            <!--               Command="{Binding CmdShowLogWindow}" /> -->
-            <!--     <MenuItem Header="{dloc:Localize MainWindow/MenuTheme}" x:Name="menuItemThemes"/> -->
-            <!-- </Menu> -->
-
             <Grid Grid.Row="1" Grid.Column="0" RowDefinitions="*,Auto">
                 <Grid.Styles>
                     <Style Selector="controls|SelectableButton">

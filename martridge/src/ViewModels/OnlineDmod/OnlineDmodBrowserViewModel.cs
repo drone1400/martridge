@@ -162,19 +162,17 @@ namespace Martridge.ViewModels.OnlineDmod {
             this.InitializeFilteredDmods(dmodList);
         }
         
-        /// <summary>
-        /// Initializes filtered dmods list for the view using current <see cref="DmodDefinitions"/>
-        /// </summary>
-        private void InitializeFilteredDmods(List<OnlineDmodInfoViewModel> newDmodList) {
-            void SetFilteredDmods(IEnumerable<OnlineDmodInfoViewModel> dmods) {
+        public void ReinitializeDataGridCollectionView() {
+            try {
                 string oldSelPath = this.SelectedDmodDefinition?.Name ?? string.Empty;
 
                 if (this.DmodDefinitionsCollection != null) {
                     this.DmodDefinitionsCollection.PropertyChanged -= this.DmodDefinitionsCollectionOnPropertyChanged;
                 }
 
-                this._dmodDefinitionsFiltered = dmods.AsEnumerable();
-                this.RaisePropertyChanged(nameof(this.DmodDefinitionsFilteredHasItems));
+                if (this.DmodDefinitionsCollection != null) {
+                    this.DmodDefinitionsCollection.PropertyChanged -= this.DmodDefinitionsCollectionOnPropertyChanged;
+                }
                 
                 DataGridCollectionView collectionView = new DataGridCollectionView(this._dmodDefinitionsFiltered);
                 collectionView.PropertyChanged += this.DmodDefinitionsCollectionOnPropertyChanged;
@@ -182,8 +180,15 @@ namespace Martridge.ViewModels.OnlineDmod {
 
                 // restore selected dmod!
                 this.SelectDmodByName(oldSelPath);
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
             }
-            
+        }
+        
+        /// <summary>
+        /// Initializes filtered dmods list for the view using current <see cref="DmodDefinitions"/>
+        /// </summary>
+        private void InitializeFilteredDmods(List<OnlineDmodInfoViewModel> newDmodList) {
             this._lastusedDmodDefinitions = newDmodList;
 
             if (this.DmodSearchString != null && this.DmodSearchString.Length >= 2) {
@@ -194,12 +199,16 @@ namespace Martridge.ViewModels.OnlineDmod {
                     definition.Name.ToLowerInvariant().Contains(searchStr) ||
                     definition.Author.ToLowerInvariant().Contains(searchStr) );
                 
-                // filter definitions
-                SetFilteredDmods(filtered);
+                this._dmodDefinitionsFiltered = filtered;
+                this.RaisePropertyChanged(nameof(this.DmodDefinitionsFilteredHasItems));
+                
+                this.ReinitializeDataGridCollectionView();
             }
             else {
-                // use all the definitions
-                SetFilteredDmods(newDmodList);
+                this._dmodDefinitionsFiltered = newDmodList;
+                this.RaisePropertyChanged(nameof(this.DmodDefinitionsFilteredHasItems));
+
+                this.ReinitializeDataGridCollectionView();
             }
         }
         

@@ -45,10 +45,10 @@
         
             <Grid Grid.Row="2" ColumnDefinitions="Auto,Auto" Margin="10" HorizontalAlignment="Center">
                 <Button Grid.Column="0"
-                        Content="{dloc:Localize MainWindow/MenuDinkInstaller}"
+                        Content="{dloc:Localize MainWindow/NoDinky/DinkInstaller}"
                         Command="{Binding CmdShowDinkInstallerPage}"/>
                 <Button Grid.Column="1"
-                        Content="{dloc:Localize MainWindow/MenuSettings}"
+                        Content="{dloc:Localize MainWindow/NoDinky/Settings}"
                         Command="{Binding CmdShowConfigurationPage}"/>
             </Grid>
         </Grid>

@@ -45,7 +45,7 @@
                    Content="{dloc:Localize MainWindow/NoDmodsLinux_Body}"/>
         
             <Button Grid.Row="2"
-                    Content="{dloc:Localize MainWindow/MenuSettings}"
+                    Content="{dloc:Localize MainWindow/NoDinky/Settings}"
                     Command="{Binding CmdShowConfigurationPage}"/>
         </Grid>
     </Grid>

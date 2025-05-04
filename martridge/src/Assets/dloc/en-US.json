@@ -229,6 +229,9 @@
   "MainWindow/PageSelect/Theme":"F4 - Theme",
   "MainWindow/PageSelect/Settings":"F3 - Settings",
   "MainWindow/PageSelect/About":"F1 - About",
+
+  "MainWindow/NoDinky/DinkInstaller": "Install Dink",
+  "MainWindow/NoDinky/Settings": "Settings",
   
 
 

@@ -408,6 +408,8 @@
   "AboutWindow/Package/GetText/Description": "git: https://github.com/perpetualKid/GetText.NET\n\r\n\rC# implementation of gettext. Used for parsing FreeDink localization files.",
   "AboutWindow/Package/HtmlAgilityPack/Name": "Html Agility Pack",
   "AboutWindow/Package/HtmlAgilityPack/Description": "Official website: https://html-agility-pack.net/\n\rgit: https://github.com/zzzprojects/html-agility-pack\n\r\n\rHTML parser - used to parse data from The Dink Network in the online DMOD browser",
+  "AboutWindow/Package/Ignore/Name": "Ignore",
+  "AboutWindow/Package/Ignore/Description": "git: https://github.com/goelhardik/ignore\n\r\n\r.gitignore parser implemented in C#",
   
 
   "HelloWorld": "Hello World!"

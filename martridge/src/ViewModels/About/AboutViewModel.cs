@@ -92,6 +92,9 @@ namespace Martridge.ViewModels.About {
                 new AboutUsedPackageViewModel(
                     name: Localizer.Instance[@"AboutWindow/Package/GetText/Name"],
                     info: Localizer.Instance[@"AboutWindow/Package/GetText/Description"]),
+                new AboutUsedPackageViewModel(
+                    name: Localizer.Instance[@"AboutWindow/Package/Ignore/Name"],
+                    info: Localizer.Instance[@"AboutWindow/Package/Ignore/Description"]),
 #if ENABLE_FEATURE_ONLINE
                 new AboutUsedPackageViewModel(
                     name: Localizer.Instance[@"AboutWindow/Package/HtmlAgilityPack/Name"],

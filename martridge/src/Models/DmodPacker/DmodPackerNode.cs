@@ -8,16 +8,21 @@ namespace Martridge.Models.DmodPacker
         public string Name => this.Info.Name;
         
         public DirectoryInfo Info { get; }
+        public string RelativePath { get; }
 
         public bool Ignore { get; set; } = false;
         
         public Dictionary<string, DmodPackerFileNode> Files { get; } = new Dictionary<string, DmodPackerFileNode>();
         public Dictionary<string, DmodPackerDirectoryNode> Directories { get; } = new Dictionary<string, DmodPackerDirectoryNode>();
 
-        public DmodPackerDirectoryNode(DirectoryInfo dirInfo)
+        public DmodPackerDirectoryNode(DirectoryInfo dirInfo, DirectoryInfo baseDirectory)
         {
             this.Info = dirInfo;
             this.NameLower = this.Name.ToLowerInvariant();
+            
+            string relativePath = Path.GetRelativePath(baseDirectory.FullName, dirInfo.FullName);
+            // NOTE: we need to use '/' as a separator for the gitignore parser to work correctly...
+            this.RelativePath = Path.DirectorySeparatorChar != '/' ? relativePath.Replace(Path.DirectorySeparatorChar, '/') : relativePath;
         }
 
 
@@ -47,12 +52,22 @@ namespace Martridge.Models.DmodPacker
         
         public FileInfo Info { get; }
 
+        
+        /// <summary>
+        /// NOTE: uses / for directory separator
+        /// </summary>
+        public string RelativePath { get; }
+
         public bool Ignore { get; set; } = false;
 
-        public DmodPackerFileNode(FileInfo fileInfo)
+        public DmodPackerFileNode(FileInfo fileInfo, DirectoryInfo baseDirectory)
         {
             this.Info = fileInfo;
             this.NameLower = this.Name.ToLowerInvariant();
+            
+            string relativePath = Path.GetRelativePath(baseDirectory.FullName, fileInfo.FullName);
+            // NOTE: we need to use '/' as a separator for the gitignore parser to work correctly...
+            this.RelativePath = Path.DirectorySeparatorChar != '/' ? relativePath.Replace(Path.DirectorySeparatorChar, '/') : relativePath;
         }
     }
 }

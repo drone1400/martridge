@@ -96,6 +96,7 @@
         <!-- only include HtmlAgilityPack if building with online features is enabled! -->
         <PackageReference Condition="'$(IsOnlineFeaturesEnabled)'=='true'" 
                           Include="HtmlAgilityPack" Version="1.11.60"/>
+        <PackageReference Include="Ignore" Version="0.2.1" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
         <PackageReference Include="ReactiveUI.Validation" Version="4.1.1"/>
         <!-- only include SevenZipExtractor if building with dink installer enabled for windows -->

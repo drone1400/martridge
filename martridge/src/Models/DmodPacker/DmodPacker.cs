@@ -30,10 +30,13 @@ namespace Martridge.Models.DmodPacker {
         private DinkInstallerResult _packResult = DinkInstallerResult.Error;
         private Exception? _packException = null;
         private MyTrace _customTrace;
+        private FileInfo? _dmodIgnoreFile = null;
         
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly object _syncRoot = new object();
         private readonly DinkTempFileHelper _temp = new DinkTempFileHelper();
+
+        private Ignore.Ignore _dmodIgnore = new Ignore.Ignore();
         
         private void ReportProgressPrimary() {
             try
@@ -139,11 +142,11 @@ namespace Martridge.Models.DmodPacker {
                 this.LogMessage(Localizer.Instance["DmodPacker/Log/Initializing/StartInitializing"], $"    \"{this._sourceDirectory.FullName}\"");
                 
                 this.ReportActivityStart();
+                this.InitializeDmodIgnore();
                 bool result = this.ScanDmodDirectory();
                 this.ReportActivityEnd();
                 
-                if (result)
-                {
+                if (result) {
                     this.LogMessage(Localizer.Instance["DmodPacker/Log/Initializing/Success"]);
 
                     lock (this._syncRoot)
@@ -192,46 +195,57 @@ namespace Martridge.Models.DmodPacker {
             }
         }
 
-        
-        private static string[] FILE_IGNORE_LIST = new string[] {
-            "DEBUG.TXT", // DinkHD debug file...
-            "sprite_report.txt", // WDED V2.5 sprite report
-        };
-        
-        private bool CheckIsIgnored(DmodPackerFileNode node)
-        {
-            // todo...
-            
-            // for now, just have a simple name match...
-            foreach (string file in FILE_IGNORE_LIST)
-            {
-                if (file == node.NameLower)
-                    return true;
-            }
-            
-            return false;
+
+        private void GenerateIgnore() {
+            this._dmodIgnore = new Ignore.Ignore();
+            this._dmodIgnore.Add(DEFAULT_DMOD_IGNORE);
         }
-
-
-        private static string[] DIR_IGNORE_LIST = new [] {
-            ".git",
-            ".wded",
-            ".wded_backup",
-            ".martridge",
+        
+        private static string[] DEFAULT_DMOD_IGNORE = new string[] {
+            "DEBUG.TXT",
+            "sprite_report.txt",
+            ".wded/**",
+            ".wded_backup/**",
+            ".martridge/**",
+            ".dmodignore",
+            ".git/**",
+            ".gitignore",
         };
+        
+        private bool CheckIsIgnored(DmodPackerFileNode node) {
+            return this._dmodIgnore.IsIgnored(node.RelativePath);
+        }
         
         private bool CheckIsIgnored(DmodPackerDirectoryNode node)
         {
-            // todo...
-            
-            // for now, just have a simple name match...
-            foreach (string dir in DIR_IGNORE_LIST)
-            {
-                if (dir == node.NameLower)
-                    return true;
+            return this._dmodIgnore.IsIgnored(node.RelativePath);
+        }
+
+        private void InitializeDmodIgnore() {
+            if (this._sourceDirectory == null) {
+                return;
+            }
+
+            string path = Path.Combine(this._sourceDirectory.FullName, ".dmodignore");
+            this._dmodIgnoreFile = new FileInfo(path);
+            this._dmodIgnore = new Ignore.Ignore();
+
+            if (this._dmodIgnoreFile.Exists == false) {
+                this.GenerateIgnore();
+                return;
             }
             
-            return false;
+            try {
+                using FileStream fs = new FileStream(path, FileMode.Open);
+                using StreamReader sr = new StreamReader(fs);
+
+                string? line = null;
+                while ((line = sr.ReadLine()) != null) {
+                    this._dmodIgnore.Add(line);
+                }
+            } catch (Exception) {
+                this.GenerateIgnore();
+            }
         }
 
         private bool ScanDmodDirectory()
@@ -241,7 +255,7 @@ namespace Martridge.Models.DmodPacker {
             if (this._sourceDirectory == null) 
                 return false;
             
-            this._rootNode = new DmodPackerDirectoryNode(this._sourceDirectory);
+            this._rootNode = new DmodPackerDirectoryNode(this._sourceDirectory, this._sourceDirectory);
             
             Queue<DmodPackerDirectoryNode> queue = new Queue<DmodPackerDirectoryNode>();
 
@@ -252,7 +266,7 @@ namespace Martridge.Models.DmodPacker {
             while (queue.Count > 0)
             {
                 DmodPackerDirectoryNode node = queue.Dequeue();
-
+                
                 FileInfo[] files = node.Info.GetFiles();
 
                 foreach (FileInfo file in files)
@@ -265,7 +279,7 @@ namespace Martridge.Models.DmodPacker {
                     }
 
                     // add to the node's children
-                    DmodPackerFileNode newNode = new DmodPackerFileNode(file);
+                    DmodPackerFileNode newNode = new DmodPackerFileNode(file, this._sourceDirectory);
                     newNode.Ignore = this.CheckIsIgnored(newNode);
                     node.AddChildNode(newNode);
 
@@ -284,7 +298,7 @@ namespace Martridge.Models.DmodPacker {
                     }
 
                     // add to the node's children
-                    DmodPackerDirectoryNode newNode = new DmodPackerDirectoryNode(dir);
+                    DmodPackerDirectoryNode newNode = new DmodPackerDirectoryNode(dir, this._sourceDirectory);
                     newNode.Ignore = this.CheckIsIgnored(newNode);
                     node.AddChildNode(newNode);
                     // also queue up the directory to process

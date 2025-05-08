@@ -116,6 +116,12 @@ namespace Martridge.ViewModels.Dmod {
         }
         private bool _isFileBrowserActive = false;
 
+        public bool ConvertBmpToPng {
+            get => this._convertBmpToPng;
+            set => this.RaiseAndSetIfChanged( ref this._convertBmpToPng, value);
+        }
+        private bool _convertBmpToPng = false;
+
         // ------------------------------------------------------------------------------------------
         //      Installer logic 
         //
@@ -185,6 +191,7 @@ namespace Martridge.ViewModels.Dmod {
             if (this._packerLogic == null || this._packerLogic.PackPhase != DmodPackerPhase.Inactive) {
                 this.TemporaryDmodSourceDirectory = this.CfgRemember.PackDmodSourcePath;
                 this.TemporaryDmodDestination = this.CfgRemember.PackDmodDestinationPath;
+                this.ConvertBmpToPng = this.CfgRemember.PackDmodConvertBmpToPng;
             }
         }
 
@@ -418,7 +425,7 @@ namespace Martridge.ViewModels.Dmod {
                     FileInfo fileInfo = new FileInfo(this.FinalDmodDestination);
                     if (fileInfo.Exists) return;
                     
-                    this._packerLogic.PackDmod(fileInfo);
+                    this._packerLogic.PackDmod(fileInfo, this.ConvertBmpToPng);
                     
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
@@ -457,7 +464,8 @@ namespace Martridge.ViewModels.Dmod {
                 if (this.CfgRemember != null) {
                     Dictionary<string, object?> values = new Dictionary<string, object?>() {
                         [nameof(ConfigRemember.PackDmodSourcePath)] = this.TemporaryDmodSourceDirectory,
-                        [nameof(ConfigRemember.PackDmodDestinationPath)] = this.TemporaryDmodDestination
+                        [nameof(ConfigRemember.PackDmodDestinationPath)] = this.TemporaryDmodDestination,
+                        [nameof(ConfigRemember.PackDmodConvertBmpToPng)] = this.ConvertBmpToPng,
                     };
                     this.CfgRemember.UpdateProperties(values);
                 }

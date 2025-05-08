@@ -22,7 +22,12 @@ namespace Martridge.Models.Configuration.Save {
         /// Last used DMOD destination path for Pack DMOD
         /// </summary>
         public string? PackDmodDestinationPath { get; set; }
-        
+
+        /// <summary>
+        /// Last used option for converting DMOD BMPs to PNGs when packing
+        /// </summary>
+        public bool? PackDmodConvertBmpToPng { get; set; }
+
         /// <summary>
         /// Last selected DMOD in the DMOD browser
         /// </summary>
@@ -59,6 +64,7 @@ namespace Martridge.Models.Configuration.Save {
                 [nameof(ConfigRemember.InstallDmodDestinationBaseDirectory)] = this.InstallDmodDestinationBaseDirectory,
                 [nameof(ConfigRemember.PackDmodSourcePath)] = this.PackDmodSourcePath,
                 [nameof(ConfigRemember.PackDmodDestinationPath)] = this.PackDmodDestinationPath,
+                [nameof(ConfigRemember.PackDmodConvertBmpToPng)] = this.PackDmodConvertBmpToPng,
                 [nameof(ConfigRemember.DmodBrowserSelectedDmodPath)] = this.DmodBrowserSelectedDmodPath,
                 // Main Window
                 [nameof(ConfigRemember.MainWindowState)] = mainWindowState,

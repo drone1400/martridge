@@ -32,6 +32,12 @@ namespace Martridge.Models.Configuration {
         private string _packDmodDestinationPath = string.Empty;
         
         /// <summary>
+        /// Last used option for converting DMOD BMPs to PNGs when packing
+        /// </summary>
+        public bool PackDmodConvertBmpToPng => this._packDmodConvertBmpToPng;
+        private bool _packDmodConvertBmpToPng = false;
+        
+        /// <summary>
         /// Last selected DMOD in the DMOD browser
         /// </summary>
         public string DmodBrowserSelectedDmodPath => this._dmodBrowserSelectedDmodPath;
@@ -94,6 +100,7 @@ namespace Martridge.Models.Configuration {
                     case nameof(this.InstallDmodDestinationBaseDirectory): TryUpdateGeneric(kvp, ref this._installDmodDestinationBaseDirectory); break;
                     case nameof(this.PackDmodSourcePath): TryUpdateGeneric(kvp, ref this._packDmodSourcePath); break;
                     case nameof(this.PackDmodDestinationPath): TryUpdateGeneric(kvp, ref this._packDmodDestinationPath); break;
+                    case nameof(this.PackDmodConvertBmpToPng): TryUpdateGeneric(kvp, ref this._packDmodConvertBmpToPng); break;
                     case nameof(this.DmodBrowserSelectedDmodPath): TryUpdateGeneric(kvp, ref this._dmodBrowserSelectedDmodPath); break;
                     // main window
                     case nameof(this.MainWindowState): TryUpdateGeneric(kvp, ref this._mainWindowState); break;
@@ -126,6 +133,7 @@ namespace Martridge.Models.Configuration {
                 InstallDmodDestinationBaseDirectory = this.InstallDmodDestinationBaseDirectory,
                 PackDmodSourcePath = this.PackDmodSourcePath,
                 PackDmodDestinationPath = this.PackDmodDestinationPath,
+                PackDmodConvertBmpToPng = this.PackDmodConvertBmpToPng,
                 DmodBrowserSelectedDmodPath = this.DmodBrowserSelectedDmodPath,
                 
                 MainWindowState = this.MainWindowState.ToString(),

@@ -86,6 +86,10 @@
                                 Command="{Binding CmdBrowseDmodDestination}" />
                     </Grid>
                     <TextBox Text="{Binding TemporaryDmodDestination}" />
+                    
+                    <CheckBox IsChecked="{Binding ConvertBmpToPng}"
+                              Classes="Heading2B"
+                              Content="{dloc:Localize DmodPacker/View/ConvertBmpsToPng}"/>
                 </StackPanel>
 
                 <!-- Install log... -->

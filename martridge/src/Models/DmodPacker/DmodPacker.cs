@@ -7,6 +7,7 @@ using Martridge.Trace;
 using SharpCompress.Common;
 using SharpCompress.Compressors.PBZip2;
 using SharpCompress.Writers.Tar;
+using SkiaSharp;
 
 namespace Martridge.Models.DmodPacker {
     public class DmodPacker {
@@ -69,6 +70,10 @@ namespace Martridge.Models.DmodPacker {
             }
         }
 
+        private void LogError(Exception ex)
+        {
+            this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, ex);
+        }
         private void LogMessage(string line1)
         {
             this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, line1);
@@ -312,7 +317,7 @@ namespace Martridge.Models.DmodPacker {
         }
 
 
-        public void PackDmod(FileInfo destinationFile) {
+        public void PackDmod(FileInfo destinationFile, bool convertBmpsToPngs) {
             lock (this._syncRoot)
             {
                 if (this._packPhase != DmodPackerPhase.AwaitingUserInput) return;
@@ -344,7 +349,7 @@ namespace Martridge.Models.DmodPacker {
                 
                 // extracting DMOD
                 this.ReportActivityStart();
-                this.PackDmodToFile();
+                this.PackDmodToFile(convertBmpsToPngs);
                 this.ReportActivityEnd();
             } catch (DinkInstallerCancelledByUserException) {
                 cancelled = true;
@@ -387,7 +392,7 @@ namespace Martridge.Models.DmodPacker {
         }
         
 
-        private void PackDmodToFile()
+        private void PackDmodToFile(bool convertBmpsToPngs)
         {
             if (this._destinationFile == null) return;
             if (this._rootNode == null) return;
@@ -439,7 +444,30 @@ namespace Martridge.Models.DmodPacker {
                             Path.GetRelativePath(rootPath, kvp.Value.Info.FullName));
                         
                         using (FileStream fileStream = new FileStream(kvp.Value.Info.FullName, FileMode.Open, FileAccess.Read)) {
-                            writer.Write(relativeFileName, fileStream, kvp.Value.Info.LastWriteTime);
+                            if (convertBmpsToPngs && kvp.Value.Info.Extension.ToLowerInvariant() == ".bmp") {
+                                try {
+                                    using SKImage? image = SKImage.FromEncodedData(fileStream);
+                                    using SKData? data = image?.Encode(SKEncodedImageFormat.Png, 100);
+
+                                    if (data != null) {
+                                        using MemoryStream ms = new MemoryStream();
+                                        data.SaveTo(ms);
+                                        ms.Seek(0, SeekOrigin.Begin);
+                                        writer.Write(relativeFileName, ms, kvp.Value.Info.LastWriteTime);
+                                    }
+                                    else {
+                                        fileStream.Seek(0, SeekOrigin.Begin);
+                                        writer.Write(relativeFileName, fileStream, kvp.Value.Info.LastWriteTime);
+                                    }
+                                } catch (Exception ex) {
+                                    this.LogError(ex);
+                                    // try to write the original file instead...
+                                    fileStream.Seek(0, SeekOrigin.Begin);
+                                    writer.Write(relativeFileName, fileStream, kvp.Value.Info.LastWriteTime);
+                                }
+                            } else {
+                                writer.Write(relativeFileName, fileStream, kvp.Value.Info.LastWriteTime);
+                            }
                         }
 
                         fileCount++;

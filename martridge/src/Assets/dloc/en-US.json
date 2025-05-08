@@ -171,6 +171,7 @@
   "DmodPacker/Log/CleaningUpEnd": "Done cleaning up temporary files.",
   "DmodPacker/View/DmodSelectSource": "Source DMOD",
   "DmodPacker/View/DmodSelectBrowse": "Browse",
+  "DmodPacker/View/ConvertBmpsToPng": "Convert all BMPs to PNGs [WARNING: DMOD will not be playable with older engines]",
   "DmodPacker/View/DmodDestination": "Destination DMOD file",
   "DmodPacker/View/Button/Cancel": "Cancel",
   "DmodPacker/View/Button/InitializeDmod": "Next",

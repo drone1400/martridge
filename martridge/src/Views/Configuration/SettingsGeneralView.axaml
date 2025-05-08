@@ -24,6 +24,7 @@
     </UserControl.Styles>
     <UserControl.Resources>
         <valueConverters:DoubleCompareBoolConverter x:Key="DoubleCompareBoolConverter" />
+        <valueConverters:BoolToGridSizeZeroStarConverter x:Key="BoolToGridSizeZeroStarConverter" />
         <system:Double x:Key="MinimumPathUiHeightThreshold">400</system:Double>
     </UserControl.Resources>
 
@@ -114,8 +115,14 @@
                             <DataTemplate x:Key="true">
                                 <Grid
                                     x:Name="gridPathSettingsMain"
-                                    DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=configuration:SettingsGeneralView}}"
-                                    RowDefinitions="Auto,*,*,*">
+                                    DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=configuration:SettingsGeneralView}}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="{Binding ShowDmodDevFeatures,
+                                                Converter={StaticResource BoolToGridSizeZeroStarConverter}}"/>
+                                    </Grid.RowDefinitions>
                                     <Border Grid.Row="0"
                                             BorderThickness="1"
                                             BorderBrush="{DynamicResource ThemeBorderHighBrush}"
@@ -177,6 +184,7 @@
                                     </Border>
 
                                     <Border Grid.Row="3"
+                                            IsVisible="{Binding ShowDmodDevFeatures}"
                                             BorderThickness="1"
                                             BorderBrush="{DynamicResource ThemeBorderHighBrush}"
                                             Margin="6,3">
@@ -269,7 +277,8 @@
                                             </Border>
                                         </TabItem>
                                         <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathEditor}"
-                                                 Classes="SmallTab">
+                                                 Classes="SmallTab"
+                                                 IsVisible="{Binding ShowDmodDevFeatures}">
                                             <Border BorderThickness="1"
                                                     BorderBrush="{DynamicResource ThemeBorderHighBrush}"
                                                     Margin="6,3">

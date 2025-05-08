@@ -238,6 +238,8 @@
 
   "SettingsGeneral/ShowLogWindowOnStartup": "Show App Log Window on start up",
   "SettingsGeneral/UseRelativePathForSubfolders": "Try to use relative paths in config files",
+  "SettingsGeneral/QuitMartridgeOnGameLaunch": "Quit after launching DMOD",
+  "SettingsGeneral/QuitMartridgeOnEditorLaunch": "Quit after launching DMOD editor",
   "SettingsGeneral/ShowDmodDevFeatures": "Show DMOD developer features",
   "SettingsGeneral/EnableOnlineFeatures": "Enable online features (like the online dmod browser)",
   "SettingsGeneral/AutoUpdateInstallerList": "Auto update existing configInstallerList.json file",

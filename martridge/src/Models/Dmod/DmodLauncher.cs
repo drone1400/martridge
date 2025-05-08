@@ -6,12 +6,13 @@ using DynamicData.Kernel;
 using Martridge.Models.Configuration;
 using Martridge.Trace;
 using System.Linq;
+using Avalonia;
 
 namespace Martridge.Models.Dmod
 {
     public static class DmodLauncher
     {
-        public static void LaunchDmod(string exePath, string dmodPath, ConfigLaunch launch, string? localization = null)
+        public static void LaunchDmod(string exePath, string dmodPath, ConfigLaunch launch, bool quitAfterLaunching, string? localization = null)
         {
             try {
                 bool isProbablyFreeDink = false;
@@ -126,6 +127,10 @@ namespace Martridge.Models.Dmod
                 }
                 
                 Process? proc = Process.Start(pinfo);
+
+                if (quitAfterLaunching) {
+                    (Application.Current as App)?.QuitApplication();
+                }
                 
                 proc?.WaitForExit();
                 MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {

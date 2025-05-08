@@ -62,6 +62,17 @@ namespace Martridge.Models.Configuration.Save {
         /// </summary>
         public string? RefDirPath { get; set; }
 
+
+        /// <summary>
+        /// If true, Martridge will exit after successfully launching the game
+        /// </summary>
+        public bool QuitMartridgeOnGameLaunch { get; set; }
+
+        /// <summary>
+        /// If true, Martridge will exit after successfully launching the editor
+        /// </summary>
+        public bool QuitMartridgeOnEditorLaunch { get; set; }
+
         public Dictionary<string, object?> GetValues() {
             return new Dictionary<string, object?>() {
                 [nameof(ConfigLaunch.CustomUserArguments)] = this.CustomUserArguments,
@@ -76,6 +87,8 @@ namespace Martridge.Models.Configuration.Save {
                 [nameof(ConfigLaunch.Skip)] = this.Skip,
                 [nameof(ConfigLaunch.UseRefDir)] = this.UseRefDir,
                 [nameof(ConfigLaunch.RefDirPath)] = this.RefDirPath,
+                [nameof(ConfigLaunch.QuitMartridgeOnGameLaunch)] = this.QuitMartridgeOnGameLaunch,
+                [nameof(ConfigLaunch.QuitMartridgeOnEditorLaunch)] = this.QuitMartridgeOnEditorLaunch,
             };
         }
     }

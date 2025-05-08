@@ -69,6 +69,11 @@
                               Content="{dloc:Localize SettingsGeneral/ShowDmodDevFeatures}" />
                     <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding UseRelativePathForSubfolders}"
                               Content="{dloc:Localize SettingsGeneral/UseRelativePathForSubfolders}" />
+                    <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding QuitMartridgeOnGameLaunch}"
+                              Content="{dloc:Localize SettingsGeneral/QuitMartridgeOnGameLaunch}" />
+                    <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding QuitMartridgeOnEditorLaunch}"
+                              IsVisible="{Binding ShowDmodDevFeatures}"
+                              Content="{dloc:Localize SettingsGeneral/QuitMartridgeOnEditorLaunch}" />
                 </Grid>
                 
                 <!-- RefDir -->

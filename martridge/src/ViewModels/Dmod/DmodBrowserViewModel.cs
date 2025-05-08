@@ -654,13 +654,16 @@ namespace Martridge.ViewModels.Dmod {
                 if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.DmodDirectory)) return;
 
                 string exePath;
+                bool quitAfterLaunch = false;
                 
                 if (launchEditor) {
                     if (string.IsNullOrEmpty(this.ActiveEditorExePath?.Path)) return;
                     exePath = this.ActiveEditorExePath.Path;
+                    quitAfterLaunch = this.CfgLaunch.QuitMartridgeOnEditorLaunch;
                 } else {
                     if (string.IsNullOrEmpty(this.ActiveGameExePath?.Path)) return;
                     exePath = this.ActiveGameExePath.Path;
+                    quitAfterLaunch = this.CfgLaunch.QuitMartridgeOnGameLaunch;
                 }
                 
                 string dmodPath = this.SelectedDmodDefinition.DmodDirectory;
@@ -672,7 +675,7 @@ namespace Martridge.ViewModels.Dmod {
 
                 // launch dmod with separate task to prevent gui lockup
                 await Task.Run(() => {
-                    DmodLauncher.LaunchDmod(exePath, dmodPath, this.CfgLaunch, this.SelectedLocalization?.CultureInfo?.Name);
+                    DmodLauncher.LaunchDmod(exePath, dmodPath, this.CfgLaunch, quitAfterLaunch, this.SelectedLocalization?.CultureInfo?.Name);
                 });
                 this._dmodLauncherDelay.Start();
             } catch (Exception ex) {

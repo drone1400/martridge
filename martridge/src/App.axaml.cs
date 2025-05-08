@@ -8,6 +8,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Citrus.Avalonia;
 using Martridge.Models;
 using Martridge.Models.Configuration;
@@ -48,6 +49,12 @@ namespace Martridge {
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        public void QuitApplication() {
+            Dispatcher.UIThread.Invoke(() => {
+                this._mainWindow?.Close();
+            });
         }
         
         #region CONFIG stuff

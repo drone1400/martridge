@@ -147,6 +147,18 @@ namespace Martridge.ViewModels.Configuration {
         }
         private string _launchCustomuserArguments = string.Empty;
 
+        public bool QuitMartridgeOnGameLaunch {
+            get => this._quitMartridgeOnGameLaunch;
+            set => this.RaiseAndSetIfChanged(ref this._quitMartridgeOnGameLaunch, value);
+        }
+        private bool _quitMartridgeOnGameLaunch = false;
+        
+        public bool QuitMartridgeOnEditorLaunch {
+            get => this._quitMartridgeOnEditorLaunch;
+            set => this.RaiseAndSetIfChanged(ref this._quitMartridgeOnEditorLaunch, value);
+        }
+        private bool _quitMartridgeOnEditorLaunch = false;
+
         //
         // Internal logic
         //
@@ -217,6 +229,8 @@ namespace Martridge.ViewModels.Configuration {
 
             this.LaunchRefDirPath = this.CfgLaunch.RefDirPath;
             this.LaunchCustomUserArguments = this.CfgLaunch.CustomUserArguments;
+            this.QuitMartridgeOnGameLaunch = this.CfgLaunch.QuitMartridgeOnGameLaunch;
+            this.QuitMartridgeOnEditorLaunch = this.CfgLaunch.QuitMartridgeOnEditorLaunch;
         }
 
         private void SaveToConfigLaunch() {
@@ -225,6 +239,8 @@ namespace Martridge.ViewModels.Configuration {
             this.CfgLaunch.UpdateProperties(new Dictionary<string, object?>() {
                 [nameof(ConfigLaunch.RefDirPath)] = this.LaunchRefDirPath,
                 [nameof(ConfigLaunch.CustomUserArguments)] = this.LaunchCustomUserArguments,
+                [nameof(ConfigLaunch.QuitMartridgeOnGameLaunch)] = this.QuitMartridgeOnGameLaunch,
+                [nameof(ConfigLaunch.QuitMartridgeOnEditorLaunch)] = this.QuitMartridgeOnEditorLaunch,
             });
         }
 

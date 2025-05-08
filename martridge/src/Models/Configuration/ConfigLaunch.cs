@@ -79,6 +79,19 @@ namespace Martridge.Models.Configuration {
         private string _refDirPath = string.Empty;
 
         
+        /// <summary>
+        /// If true, Martridge will exit after successfully launching the game
+        /// </summary>
+        public bool QuitMartridgeOnGameLaunch => this._quitMartridgeOnGameLaunch;
+        private bool _quitMartridgeOnGameLaunch = false;
+        
+        /// <summary>
+        /// If true, Martridge will exit after successfully launching the editor
+        /// </summary>
+        public bool QuitMartridgeOnEditorLaunch => this._quitMartridgeOnEditorLaunch;
+        private bool _quitMartridgeOnEditorLaunch = false;
+
+        
         public void UpdateProperties(Dictionary<string, object?> newValues) {
             List<string> updatedProperties = new List<string>();
 
@@ -103,6 +116,8 @@ namespace Martridge.Models.Configuration {
                     case nameof(this.Skip): TryUpdateGeneric(kvp, ref this._skip); break; 
                     case nameof(this.UseRefDir): TryUpdateGeneric(kvp, ref this._useRefDir); break; 
                     case nameof(this.RefDirPath): TryUpdateGeneric(kvp, ref this._refDirPath); break; 
+                    case nameof(this.QuitMartridgeOnGameLaunch): TryUpdateGeneric(kvp, ref this._quitMartridgeOnGameLaunch); break; 
+                    case nameof(this.QuitMartridgeOnEditorLaunch): TryUpdateGeneric(kvp, ref this._quitMartridgeOnEditorLaunch); break; 
                 }
             }
             
@@ -130,6 +145,8 @@ namespace Martridge.Models.Configuration {
                 Skip = this.Skip,
                 UseRefDir = this.UseRefDir,
                 RefDirPath = this.RefDirPath,
+                QuitMartridgeOnGameLaunch = this.QuitMartridgeOnGameLaunch,
+                QuitMartridgeOnEditorLaunch = this.QuitMartridgeOnEditorLaunch,
             };
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using Ignore;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using SharpCompress.Common;
@@ -14,7 +15,7 @@ namespace Martridge.Models.DmodPacker {
         public event EventHandler? ActivityStarted; 
         public event EventHandler? ActivityEnded;
 
-        public DmodPackerDirectoryNode? RootNode => this._rootNode;
+        public DmodPackerNode? RootNode => this._rootNode;
         public DirectoryInfo? SourceDirectory => this._sourceDirectory;
         public FileInfo? DestinationFile => this._destinationFile;
         public DmodPackerPhase PackPhase => this._packPhase;
@@ -23,7 +24,7 @@ namespace Martridge.Models.DmodPacker {
         public MyTrace CustomTrace => this._customTrace;
 
         
-        private DmodPackerDirectoryNode? _rootNode = null;
+        private DmodPackerNode? _rootNode = null;
         private DirectoryInfo? _sourceDirectory = null;
         private FileInfo? _destinationFile = null;
         private DmodPackerPhase _packPhase = DmodPackerPhase.Inactive;
@@ -36,7 +37,8 @@ namespace Martridge.Models.DmodPacker {
         private readonly object _syncRoot = new object();
         private readonly DinkTempFileHelper _temp = new DinkTempFileHelper();
 
-        private Ignore.Ignore _dmodIgnore = new Ignore.Ignore();
+        private List<DmodIgnoreRuleMetadata> _ignoreRules = new List<DmodIgnoreRuleMetadata>();
+        
         
         private void ReportProgressPrimary() {
             try
@@ -120,7 +122,8 @@ namespace Martridge.Models.DmodPacker {
         {
             lock (this._syncRoot)
             {
-                if (this._packPhase != DmodPackerPhase.Inactive || this._sourceDirectory != null)
+                if (this._packPhase != DmodPackerPhase.Inactive && this._packPhase != DmodPackerPhase.AwaitingUserInput || 
+                    this._sourceDirectory != null)
                     return;
 
                 this._packPhase = DmodPackerPhase.Initializing;
@@ -196,29 +199,62 @@ namespace Martridge.Models.DmodPacker {
         }
 
 
-        private void GenerateIgnore() {
-            this._dmodIgnore = new Ignore.Ignore();
-            this._dmodIgnore.Add(DEFAULT_DMOD_IGNORE);
+        private void GenerateDefaultIgnore() {
+            this._ignoreRules = new List<DmodIgnoreRuleMetadata>();
+            try {
+                
+                for (int lineIndex = 0; lineIndex < DEFAULT_DMOD_IGNORE.Length; lineIndex++) {
+                    string line = DEFAULT_DMOD_IGNORE[lineIndex];
+                    
+                    // ignore empty lines
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+                    // ignore comments
+                    if (line.StartsWith("#"))
+                        continue;
+                    
+                    this._ignoreRules.Add(new DmodIgnoreRuleMetadata() {
+                        IgnoreRule = new IgnoreRule(line),
+                        RuleDefinition = line,
+                        RuleIndex = this._ignoreRules.Count,
+                        RuleLineIndex = lineIndex-1,
+                    });
+                }
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+            }
         }
         
         private static string[] DEFAULT_DMOD_IGNORE = new string[] {
-            "DEBUG.TXT",
+            "# DinkHD debug log",
+            "debug.txt",
+            "",
+            "# WDED metadata and files",
             "sprite_report.txt",
             ".wded/**",
             ".wded_backup/**",
             ".martridge/**",
+            "",
+            "# the dmod ignore file",
             ".dmodignore",
+            "",
+            "# GIT files",
             ".git/**",
             ".gitignore",
         };
         
-        private bool CheckIsIgnored(DmodPackerFileNode node) {
-            return this._dmodIgnore.IsIgnored(node.RelativePath);
-        }
-        
-        private bool CheckIsIgnored(DmodPackerDirectoryNode node)
+        private void UpdateIsIgnored(DmodPackerNode node)
         {
-            return this._dmodIgnore.IsIgnored(node.RelativePath);
+            foreach (DmodIgnoreRuleMetadata metadata in this._ignoreRules) {
+                if (metadata.IgnoreRule.IsMatch(node.RelativePathLower)) {
+                    if (metadata.IgnoreRule.Negate) {
+                        node.NegateIgnore(metadata.RuleIndex);
+                    }
+                    else {
+                        node.Ignore(metadata.RuleIndex);
+                    }
+                }
+            }
         }
 
         private void InitializeDmodIgnore() {
@@ -228,10 +264,10 @@ namespace Martridge.Models.DmodPacker {
 
             string path = Path.Combine(this._sourceDirectory.FullName, ".dmodignore");
             this._dmodIgnoreFile = new FileInfo(path);
-            this._dmodIgnore = new Ignore.Ignore();
+            this._ignoreRules = new List<DmodIgnoreRuleMetadata>();
 
             if (this._dmodIgnoreFile.Exists == false) {
-                this.GenerateIgnore();
+                this.GenerateDefaultIgnore();
                 return;
             }
             
@@ -240,11 +276,26 @@ namespace Martridge.Models.DmodPacker {
                 using StreamReader sr = new StreamReader(fs);
 
                 string? line = null;
+                int lineIndex = 0;
                 while ((line = sr.ReadLine()) != null) {
-                    this._dmodIgnore.Add(line);
+                    lineIndex++;
+                    
+                    // ignore empty lines
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+                    // ignore comments
+                    if (line.StartsWith("#"))
+                        continue;
+                    
+                    this._ignoreRules.Add(new DmodIgnoreRuleMetadata() {
+                        IgnoreRule = new IgnoreRule(line),
+                        RuleDefinition = line,
+                        RuleIndex = this._ignoreRules.Count,
+                        RuleLineIndex = lineIndex-1,
+                    });
                 }
             } catch (Exception) {
-                this.GenerateIgnore();
+                this.GenerateDefaultIgnore();
             }
         }
 
@@ -255,9 +306,9 @@ namespace Martridge.Models.DmodPacker {
             if (this._sourceDirectory == null) 
                 return false;
             
-            this._rootNode = new DmodPackerDirectoryNode(this._sourceDirectory, this._sourceDirectory);
+            this._rootNode = new DmodPackerNode(this._sourceDirectory, this._sourceDirectory);
             
-            Queue<DmodPackerDirectoryNode> queue = new Queue<DmodPackerDirectoryNode>();
+            Queue<DmodPackerNode> queue = new Queue<DmodPackerNode>();
 
             queue.Enqueue(this._rootNode);
 
@@ -265,9 +316,16 @@ namespace Martridge.Models.DmodPacker {
 
             while (queue.Count > 0)
             {
-                DmodPackerDirectoryNode node = queue.Dequeue();
+                DmodPackerNode dirNode = queue.Dequeue();
                 
-                FileInfo[] files = node.Info.GetFiles();
+                if (dirNode.NodeType != DmodNodeType.Directory)
+                    continue;
+                
+                // TODO.. maybe index dirFF contents here too?...
+
+                DirectoryInfo dirInfo = new DirectoryInfo(dirNode.FullPath);
+
+                FileInfo[] files = dirInfo.GetFiles();
 
                 foreach (FileInfo file in files)
                 {
@@ -279,14 +337,14 @@ namespace Martridge.Models.DmodPacker {
                     }
 
                     // add to the node's children
-                    DmodPackerFileNode newNode = new DmodPackerFileNode(file, this._sourceDirectory);
-                    newNode.Ignore = this.CheckIsIgnored(newNode);
-                    node.AddChildNode(newNode);
+                    DmodPackerNode newNode = new DmodPackerNode(file, this._sourceDirectory);
+                    this.UpdateIsIgnored(newNode);
+                    dirNode.AddChildNode(newNode);
 
                     fileCount++;
                 }
                 
-                DirectoryInfo[] dirs = node.Info.GetDirectories();
+                DirectoryInfo[] dirs = dirInfo.GetDirectories();
 
                 foreach (DirectoryInfo dir in dirs)
                 {
@@ -298,9 +356,9 @@ namespace Martridge.Models.DmodPacker {
                     }
 
                     // add to the node's children
-                    DmodPackerDirectoryNode newNode = new DmodPackerDirectoryNode(dir, this._sourceDirectory);
-                    newNode.Ignore = this.CheckIsIgnored(newNode);
-                    node.AddChildNode(newNode);
+                    DmodPackerNode newNode = new DmodPackerNode(dir, this._sourceDirectory);
+                    this.UpdateIsIgnored(newNode);
+                    dirNode.AddChildNode(newNode);
                     // also queue up the directory to process
                     queue.Enqueue(newNode);
                 }
@@ -396,7 +454,7 @@ namespace Martridge.Models.DmodPacker {
                 throw new DinkInstallerCancelledByUserException();
             }
             
-            this.LogMessage(Localizer.Instance["DmodPacker/Log/Packing/Start"], $"    \"{this._rootNode.Info.FullName}\"", $"    \"{this._destinationFile.FullName}\"");
+            this.LogMessage(Localizer.Instance["DmodPacker/Log/Packing/Start"], $"    \"{this._rootNode.FullPath}\"", $"    \"{this._destinationFile.FullName}\"");
 
             DirectoryInfo? tempDir = this._temp.TryCreateTempDirectory();
             if (tempDir == null) return;
@@ -412,11 +470,11 @@ namespace Martridge.Models.DmodPacker {
             this.LogMessage(Localizer.Instance["DmodPacker/Log/Packing/CreatingTempTarFile"],
                 $"    \"{tempTarFileInfo.FullName}\"");
 
-            Queue<DmodPackerDirectoryNode> queue = new Queue<DmodPackerDirectoryNode>();
+            Queue<DmodPackerNode> queue = new Queue<DmodPackerNode>();
             queue.Enqueue(this._rootNode);
 
             string rootName = this._rootNode.Name;
-            string rootPath = this._rootNode.Info.FullName;
+            string rootPath = this._rootNode.FullPath;
 
             int fileCount = 0;
             
@@ -428,29 +486,26 @@ namespace Martridge.Models.DmodPacker {
                         throw new DinkInstallerCancelledByUserException();
                     }
                     
-                    DmodPackerDirectoryNode node = queue.Dequeue();
+                    DmodPackerNode node = queue.Dequeue();
 
-                    foreach (var kvp in node.Files)
+                    foreach (var kvp in node.Children)
                     {
-                        if (kvp.Value.Ignore)
+                        if (kvp.Value.IsIgnored)
                             continue;
+
+                        if (kvp.Value.NodeType == DmodNodeType.Directory) {
+                            queue.Enqueue(kvp.Value);
+                            continue;
+                        }
                         
                         string relativeFileName = Path.Combine(rootName,
-                            Path.GetRelativePath(rootPath, kvp.Value.Info.FullName));
+                            Path.GetRelativePath(rootPath, kvp.Value.FullPath));
                         
-                        using (FileStream fileStream = new FileStream(kvp.Value.Info.FullName, FileMode.Open, FileAccess.Read)) {
-                            writer.Write(relativeFileName, fileStream, kvp.Value.Info.LastWriteTime);
+                        using (FileStream fileStream = new FileStream(kvp.Value.FullPath, FileMode.Open, FileAccess.Read)) {
+                            writer.Write(relativeFileName, fileStream, kvp.Value.LastModified);
                         }
 
                         fileCount++;
-                    }
-
-                    foreach (var kvp in node.Directories)
-                    {
-                        if (kvp.Value.Ignore)
-                            continue;
-                        
-                        queue.Enqueue(kvp.Value);
                     }
                     
                     this.LogMessage(String.Format(Localizer.Instance["DmodPacker/Log/Packing/PackingDmodProgress"], fileCount));

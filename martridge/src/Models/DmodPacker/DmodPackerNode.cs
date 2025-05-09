@@ -1,73 +1,102 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 namespace Martridge.Models.DmodPacker
 {
-    public class DmodPackerDirectoryNode
+    public class DmodPackerNode
     {
-        public string NameLower { get; }
-        public string Name => this.Info.Name;
-        
-        public DirectoryInfo Info { get; }
+        public DmodNodeType NodeType { get; }
+        public string Name { get; }
+        public string FullPath { get; }
         public string RelativePath { get; }
+        public string RelativePathLower { get; }
+        public DateTime LastModified { get; }
+        public bool IsIgnored => this.IgnoreRuleMatchesList.Count > 0 && this.IgnoreNegateRuleMatchesList.Count == 0;
 
-        public bool Ignore { get; set; } = false;
+        public IReadOnlyList<int> IgnoreNegateRuleMatchesList => this._ignoreNegateRuleMatchesList;
+        private readonly List<int> _ignoreNegateRuleMatchesList = new List<int>();
         
-        public Dictionary<string, DmodPackerFileNode> Files { get; } = new Dictionary<string, DmodPackerFileNode>();
-        public Dictionary<string, DmodPackerDirectoryNode> Directories { get; } = new Dictionary<string, DmodPackerDirectoryNode>();
+        public IReadOnlyList<int> IgnoreRuleMatchesList => this._ignoreRuleMatchesList;
+        private readonly List<int> _ignoreRuleMatchesList = new List<int>();
 
-        public DmodPackerDirectoryNode(DirectoryInfo dirInfo, DirectoryInfo baseDirectory)
+        public IReadOnlyDictionary<string, DmodPackerNode> Children => this._children;
+        private readonly Dictionary<string, DmodPackerNode> _children = new Dictionary<string, DmodPackerNode>();
+
+        public DmodPackerNode(DirectoryInfo dirInfo, DirectoryInfo baseDirectory)
         {
-            this.Info = dirInfo;
-            this.NameLower = this.Name.ToLowerInvariant();
+            this.NodeType = DmodNodeType.Directory;
+            this.Name = dirInfo.Name;
+            this.FullPath = dirInfo.FullName;
             
             string relativePath = Path.GetRelativePath(baseDirectory.FullName, dirInfo.FullName);
             // NOTE: we need to use '/' as a separator for the gitignore parser to work correctly...
             this.RelativePath = Path.DirectorySeparatorChar != '/' ? relativePath.Replace(Path.DirectorySeparatorChar, '/') : relativePath;
-        }
-
-
-        public bool AddChildNode(DmodPackerFileNode node)
-        {
-            if (this.Files.ContainsKey(node.NameLower)) return false;
-            
-            this.Files[node.NameLower] = node;
-
-            return true;
+            this.RelativePathLower = this.RelativePath.ToLowerInvariant();
+            this.LastModified = dirInfo.LastWriteTime;
         }
         
-        public bool AddChildNode(DmodPackerDirectoryNode node)
+        public DmodPackerNode(FileInfo fileInfo, DirectoryInfo baseDirectory)
         {
-            if (this.Directories.ContainsKey(node.NameLower)) return false;
-            
-            this.Directories[node.NameLower] = node;
-
-            return true;
-        }
-    }
-    
-    public class DmodPackerFileNode
-    {
-        public string NameLower { get; }
-        public string Name => this.Info.Name;
-        
-        public FileInfo Info { get; }
-
-        
-        /// <summary>
-        /// NOTE: uses / for directory separator
-        /// </summary>
-        public string RelativePath { get; }
-
-        public bool Ignore { get; set; } = false;
-
-        public DmodPackerFileNode(FileInfo fileInfo, DirectoryInfo baseDirectory)
-        {
-            this.Info = fileInfo;
-            this.NameLower = this.Name.ToLowerInvariant();
+            this.NodeType = GetNodeTypeFromFileExtension(fileInfo.Extension);
+            this.Name = fileInfo.Name;
+            this.FullPath = fileInfo.FullName;
             
             string relativePath = Path.GetRelativePath(baseDirectory.FullName, fileInfo.FullName);
             // NOTE: we need to use '/' as a separator for the gitignore parser to work correctly...
             this.RelativePath = Path.DirectorySeparatorChar != '/' ? relativePath.Replace(Path.DirectorySeparatorChar, '/') : relativePath;
+            this.RelativePathLower = this.RelativePath.ToLowerInvariant();
+            this.LastModified = fileInfo.LastWriteTime;
+        }
+
+
+        public bool AddChildNode(DmodPackerNode node) {
+            if (this.NodeType != DmodNodeType.Directory)
+                return false;
+            
+            if (!this._children.TryAdd(node.RelativePathLower, node)) return false;
+
+            return true;
+        }
+
+        public void ResetIgnore() {
+            this._ignoreNegateRuleMatchesList.Clear();
+            this._ignoreRuleMatchesList.Clear();
+        }
+
+        public void Ignore(int ruleIndex) {
+            this._ignoreRuleMatchesList.Add(ruleIndex);
+        }
+
+        public void NegateIgnore(int ruleIndex) {
+            this._ignoreNegateRuleMatchesList.Remove(ruleIndex);
+        }
+        
+        public static DmodNodeType GetNodeTypeFromFileExtension(string ext) {
+            string extLow = ext.ToLowerInvariant();
+            return extLow switch  {
+                // TEXT
+                ".txt" => DmodNodeType.Text,
+                // AUDIO
+                ".mp3" => DmodNodeType.Audio,
+                ".flac" => DmodNodeType.Audio,
+                ".ogg" => DmodNodeType.Audio,
+                ".wav" => DmodNodeType.Audio,
+                ".mid" => DmodNodeType.Audio,
+                // DINKC
+                ".c" => DmodNodeType.DinkC,
+                // DINKD
+                ".d" => DmodNodeType.DinkD,
+                // DATA
+                ".dat" => DmodNodeType.Data,
+                // IMAGE
+                ".bmp" => DmodNodeType.Image,
+                ".png" => DmodNodeType.Image,
+                ".jpg" => DmodNodeType.Image,
+                // DIRFF IMAGE COLLECTION [LEGACY]
+                ".ff" => DmodNodeType.DirFF,
+                // UNKNOWN
+                _ => DmodNodeType.Other
+            };
         }
     }
 }

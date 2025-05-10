@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using Avalonia.Platform;
 using Ignore;
 using Martridge.Models.Localization;
 using Martridge.Trace;
@@ -74,6 +75,9 @@ namespace Martridge.Models.DmodPacker {
             }
         }
 
+        private void LogError(Exception ex) {
+            this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, ex);
+        }
         private void LogMessage(string line1)
         {
             this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, line1);
@@ -201,59 +205,6 @@ namespace Martridge.Models.DmodPacker {
             }
         }
 
-        private void GenerateDefaultIgnore() {
-            this._ignoreRules = new List<DmodIgnoreRuleMetadata>();
-            this._dmodIgnoreLines = new List<string>();
-            try {
-                
-                for (int lineIndex = 0; lineIndex < DEFAULT_DMOD_IGNORE.Length; lineIndex++) {
-                    string line = DEFAULT_DMOD_IGNORE[lineIndex];
-                    
-                    this._dmodIgnoreLines.Add(line);
-                    
-                    // ignore empty lines
-                    if (string.IsNullOrWhiteSpace(line))
-                        continue;
-                    // ignore comments
-                    if (line.StartsWith("#"))
-                        continue;
-                    
-                    this._ignoreRules.Add(new DmodIgnoreRuleMetadata() {
-                        IgnoreRule = new IgnoreRule(line),
-                        RuleDefinition = line,
-                        RuleIndex = this._ignoreRules.Count,
-                        RuleLineIndex = lineIndex-1,
-                    });
-                }
-            } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
-            }
-        }
-        
-        private static string[] DEFAULT_DMOD_IGNORE = new string[] {
-            "# DinkHD debug log",
-            "debug.txt",
-            "",
-            "# WDED metadata and files",
-            "sprite_report.txt",
-            ".wded",
-            ".wded_backup",
-            ".martridge",
-            "",
-            "# the dmod ignore file",
-            ".dmodignore",
-            "",
-            "# GIT files",
-            ".git",
-            ".gitignore",
-            "",
-            "# JBR metadata",
-            ".idea",
-            "",
-            "# VSCode metadata",
-            ".vscode",
-        };
-        
         private void UpdateIsIgnored(DmodPackerNode node)
         {
             foreach (DmodIgnoreRuleMetadata metadata in this._ignoreRules) {
@@ -268,24 +219,12 @@ namespace Martridge.Models.DmodPacker {
             }
         }
 
-        private void InitializeDmodIgnore() {
-            if (this._sourceDirectory == null) {
-                return;
-            }
-
-            string path = Path.Combine(this._sourceDirectory.FullName, ".dmodignore");
-            this._dmodIgnoreFile = new FileInfo(path);
+        private bool InitializeDmodIgnoreFromStream(Stream stream) {
             this._ignoreRules = new List<DmodIgnoreRuleMetadata>();
             this._dmodIgnoreLines = new List<string>();
-
-            if (this._dmodIgnoreFile.Exists == false) {
-                this.GenerateDefaultIgnore();
-                return;
-            }
             
             try {
-                using FileStream fs = new FileStream(path, FileMode.Open);
-                using StreamReader sr = new StreamReader(fs);
+                using StreamReader sr = new StreamReader(stream);
 
                 string? line = null;
                 int lineIndex = 0;
@@ -297,6 +236,7 @@ namespace Martridge.Models.DmodPacker {
                     // ignore empty lines
                     if (string.IsNullOrWhiteSpace(line))
                         continue;
+                    
                     // ignore comments
                     if (line.StartsWith("#"))
                         continue;
@@ -308,8 +248,37 @@ namespace Martridge.Models.DmodPacker {
                         RuleLineIndex = lineIndex-1,
                     });
                 }
-            } catch (Exception) {
-                this.GenerateDefaultIgnore();
+
+                return true;
+            } catch (Exception ex) {
+                this.LogError(ex);
+                return false;
+            }
+        }
+
+        private void InitializeDmodIgnore() {
+            if (this._sourceDirectory == null) {
+                return;
+            }
+
+            try {
+                string path = Path.Combine(this._sourceDirectory.FullName, ".dmodignore");
+                this._dmodIgnoreFile = new FileInfo(path);
+
+
+                if (this._dmodIgnoreFile.Exists) {
+                    using FileStream fs = new FileStream(path, FileMode.Open);
+                    this.InitializeDmodIgnoreFromStream(fs);
+                    return;
+                }
+
+                Stream stream = AssetLoader.Open(new Uri("avares://martridge/Assets/.dmodignore"));
+                this.InitializeDmodIgnoreFromStream(stream);
+            } catch (Exception ex) {
+                this.LogError(ex);
+                
+                this._ignoreRules = new List<DmodIgnoreRuleMetadata>();
+                this._dmodIgnoreLines = new List<string>();
             }
         }
 

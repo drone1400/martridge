@@ -14,6 +14,13 @@ namespace Martridge.Models.DmodPacker
         public bool IsIgnored => this._ignoreRuleMatchesList.Count > 0 && this._ignoreNegateRuleMatchesList.Count == 0;
         public bool IsUnignored => this._ignoreNegateRuleMatchesList.Count > 0;
 
+        public int TotalChildFileCount { get; private set; } = 0;
+        public int TotalIgnoredChildFileCount { get; private set; } = 0;
+        public int MyIgnoredChildFileCount { get; private set; } = 0;
+        public int MyChildFileCount { get; private set; } = 0;
+
+        public string NameMetadata => this.TotalChildFileCount == 0 ? this.Name : $"{this.Name} [{this.TotalChildFileCount - this.TotalIgnoredChildFileCount}/{this.TotalChildFileCount}]";
+
         public IReadOnlyList<int> IgnoreNegateRuleMatchesList => this._ignoreNegateRuleMatchesList;
         private readonly List<int> _ignoreNegateRuleMatchesList = new List<int>();
         
@@ -101,6 +108,40 @@ namespace Martridge.Models.DmodPacker
                 // UNKNOWN
                 _ => DmodNodeType.Other
             };
+        }
+
+        public void RefreshIgnoredChildrenMetadata() {
+            int myTotalChildFiles = 0;
+            int myIgnoredChildFiles = 0;
+            int totalIgnoredChildFiles = 0;
+            int totalChildFiles = 0;
+            
+            foreach (DmodPackerNode node in this._childrenList) {
+                node.RefreshIgnoredChildrenMetadata();
+
+                if (node.NodeType != DmodNodeType.Directory) {
+                    totalChildFiles++;
+                    myTotalChildFiles++;
+                    
+                    if (node.IsIgnored) {
+                        totalIgnoredChildFiles++;
+                        myIgnoredChildFiles++;
+                    }
+                    
+                    // note these should be 0.. except if i later make the dirff files also have children?
+                    totalChildFiles += node.TotalChildFileCount;
+                    totalIgnoredChildFiles += node.TotalIgnoredChildFileCount;
+                }
+                else {
+                    totalChildFiles += node.TotalChildFileCount;
+                    totalIgnoredChildFiles += node.TotalIgnoredChildFileCount;
+                }
+            }
+            
+            this.TotalChildFileCount = totalChildFiles;
+            this.TotalIgnoredChildFileCount = totalIgnoredChildFiles;
+            this.MyIgnoredChildFileCount = myIgnoredChildFiles;
+            this.MyChildFileCount = myTotalChildFiles;
         }
     }
 }

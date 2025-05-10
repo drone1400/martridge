@@ -320,9 +320,6 @@ namespace Martridge.Models.DmodPacker {
 
             queue.Enqueue(this._rootNode);
 
-            int fileCount = 0;
-            int fileCountIgnore = 0;
-
             while (queue.Count > 0)
             {
                 DmodPackerNode dirNode = queue.Dequeue();
@@ -348,9 +345,7 @@ namespace Martridge.Models.DmodPacker {
                     // add to the node's children
                     DmodPackerNode newNode = new DmodPackerNode(file, this._sourceDirectory);
                     this.UpdateIsIgnored(newNode);
-                    if (newNode.IsIgnored) fileCountIgnore++;
                     dirNode.AddChildNode(newNode);
-                    fileCount++;
                 }
                 
                 DirectoryInfo[] dirs = dirInfo.GetDirectories();
@@ -372,9 +367,11 @@ namespace Martridge.Models.DmodPacker {
                     queue.Enqueue(newNode);
                 }
             }
+
+            this._rootNode.RefreshIgnoredChildrenMetadata();
             
-            this.LogMessage(String.Format(Localizer.Instance["DmodPacker/Log/Initializing/FileCount"], fileCount));
-            this.LogMessage(String.Format(Localizer.Instance["DmodPacker/Log/Initializing/FileCountIgnore"], fileCountIgnore));
+            this.LogMessage(String.Format(Localizer.Instance["DmodPacker/Log/Initializing/FileCount"], this._rootNode.TotalChildFileCount));
+            this.LogMessage(String.Format(Localizer.Instance["DmodPacker/Log/Initializing/FileCountIgnore"], this._rootNode.TotalIgnoredChildFileCount));
 
             return true;
         }

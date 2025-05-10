@@ -143,7 +143,7 @@
                                            Source="{Binding NodeType, Converter={StaticResource DmodNodeImageConverter}}" 
                                            Height="20"
                                            Width="20"/>
-                                    <Label Grid.Column="1" Content="{Binding Name}"
+                                    <Label Grid.Column="1" Content="{Binding NameMetadata}"
                                            Classes.TreeViewItemIgnored="{Binding IsIgnored}"
                                            Classes.TreeViewItemUnignored="{Binding IsUnignored}"
                                            VerticalAlignment="Center"

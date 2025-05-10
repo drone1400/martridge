@@ -246,6 +246,12 @@ namespace Martridge.Models.DmodPacker {
             "# GIT files",
             ".git",
             ".gitignore",
+            "",
+            "# JBR metadata",
+            ".idea",
+            "",
+            "# VSCode metadata",
+            ".vscode",
         };
         
         private void UpdateIsIgnored(DmodPackerNode node)

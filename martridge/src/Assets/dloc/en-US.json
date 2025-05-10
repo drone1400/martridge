@@ -279,8 +279,8 @@
   "SettingsThemeView/CmdUseDefaultDarkTheme": "Load Dark theme",
   "SettingsThemeView/CmdUseDefaultSystemTheme": "Load default System theme (auto Light/Dark)",
   "SettingsThemeView/CmdUseSelectedTheme": "Load selected theme",
-  "SettingsThemeView/CmdUseSelectedThemeAsLight": "Load selected theme as the default Light theme",
-  "SettingsThemeView/CmdUseSelectedThemeAsDark": "Load selected theme as the default Dark theme",  
+  "SettingsThemeView/CmdUseSelectedThemeAsLight": "Set selected theme as the default Light theme",
+  "SettingsThemeView/CmdUseSelectedThemeAsDark": "Set selected theme as the default Dark theme",  
   "SettingsThemeView/DmodPreview": "DMOD list preview",  
   
   "DmodBrowser/BackToList" : "Go back to DMOD List",

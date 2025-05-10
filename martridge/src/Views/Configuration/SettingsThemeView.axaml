@@ -19,25 +19,27 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </UserControl.Styles>
     <UserControl.Resources>
-        <valueConverters:ThemeVariantNameConverter x:Key="ThemeVariantNameConverter"/>
+        <valueConverters:ThemeVariantNameConverter x:Key="ThemeVariantNameConverter" />
     </UserControl.Resources>
 
     <Border>
         <Grid ColumnDefinitions="Auto, *">
-            <ListBox
-                x:Name="listBox"
-                Grid.Column="0"
-                Width="200"
-                ItemsSource="{Binding AvailableThemes}"
-                SelectionMode="Single"
-                SelectedItem="{Binding SelectedPreviewTheme}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Label Content="{Binding Key,
+
+            <Border Grid.Column="0" Classes="MartridgeCard">
+                <ListBox
+                    x:Name="listBox"
+                    Width="200"
+                    ItemsSource="{Binding AvailableThemes}"
+                    SelectionMode="Single"
+                    SelectedItem="{Binding SelectedPreviewTheme}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding Key,
                             Converter={StaticResource ThemeVariantNameConverter} }" />
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
 
             <ThemeVariantScope
                 x:Name="themeVariantScope"
@@ -45,7 +47,7 @@
                 Grid.Column="1">
                 <Border Classes="MartridgeCard">
                     <Grid RowDefinitions="Auto,*">
-                        
+
                         <StackPanel Grid.Row="0" Orientation="Vertical" HorizontalAlignment="Stretch">
                             <StackPanel Orientation="Horizontal">
                                 <Label
@@ -57,9 +59,9 @@
                                         Converter={StaticResource ThemeVariantNameConverter},
                                         FallbackValue={}... }" />
                             </StackPanel>
-                            
-                            <Separator/>
-                            
+
+                            <Separator />
+
                             <StackPanel Orientation="Horizontal">
                                 <Label
                                     Classes="Heading2B"
@@ -68,46 +70,46 @@
                                     Classes="Heading2B"
                                     Content="{Binding CurrentTheme}" />
                             </StackPanel>
+
+                            <Button
+                                Width="NaN"
+                                HorizontalAlignment="Stretch"
+                                Content="{dloc:Localize SettingsThemeView/CmdUseSelectedTheme}"
+                                Command="{Binding CmdUseSelectedTheme}" />
                             
-                            <Separator/>
-                            <Button
-                                Width="NaN"
-                                HorizontalAlignment="Stretch"
-                                Content="{dloc:Localize SettingsThemeView/CmdUseDefaultLightTheme}" 
-                                Classes="Primary"
-                                Command="{Binding CmdUseDefaultLightTheme}"/>
-                            <Button
-                                Width="NaN"
-                                HorizontalAlignment="Stretch"
-                                Content="{dloc:Localize SettingsThemeView/CmdUseDefaultDarkTheme}"
-                                Classes="Primary"
-                                Command="{Binding CmdUseDefaultDarkTheme}"/>
+                            <Separator />
                             <Button
                                 Width="NaN"
                                 HorizontalAlignment="Stretch"
                                 Content="{dloc:Localize SettingsThemeView/CmdUseDefaultSystemTheme}"
                                 Classes="Primary"
-                                Command="{Binding CmdUseDefaultSystemTheme}"/>
-                            <Separator/>
+                                Command="{Binding CmdUseDefaultSystemTheme}" />
                             <Button
                                 Width="NaN"
                                 HorizontalAlignment="Stretch"
-                                Content="{dloc:Localize SettingsThemeView/CmdUseSelectedTheme}"
-                                Command="{Binding CmdUseSelectedTheme}"/>
-                            <Separator/>
+                                Content="{dloc:Localize SettingsThemeView/CmdUseDefaultLightTheme}"
+                                Classes="Primary"
+                                Command="{Binding CmdUseDefaultLightTheme}" />
                             <Button
                                 Width="NaN"
                                 HorizontalAlignment="Stretch"
-                                Content="{dloc:Localize SettingsThemeView/CmdUseSelectedThemeAsLight}" 
-                                Command="{Binding CmdUseSelectedThemeAsLight}"/>
+                                Content="{dloc:Localize SettingsThemeView/CmdUseDefaultDarkTheme}"
+                                Classes="Primary"
+                                Command="{Binding CmdUseDefaultDarkTheme}" />
+                            <Separator />
+                            <Button
+                                Width="NaN"
+                                HorizontalAlignment="Stretch"
+                                Content="{dloc:Localize SettingsThemeView/CmdUseSelectedThemeAsLight}"
+                                Command="{Binding CmdUseSelectedThemeAsLight}" />
                             <Button
                                 Width="NaN"
                                 HorizontalAlignment="Stretch"
                                 Content="{dloc:Localize SettingsThemeView/CmdUseSelectedThemeAsDark}"
-                                Command="{Binding CmdUseSelectedThemeAsDark}"/>
-                            <Separator/>
+                                Command="{Binding CmdUseSelectedThemeAsDark}" />
+                            <Separator />
                         </StackPanel>
-                        
+
                         <DataGrid Grid.Row="1"
                                   IsReadOnly="True"
                                   ItemsSource="{Binding SampleDmods}">

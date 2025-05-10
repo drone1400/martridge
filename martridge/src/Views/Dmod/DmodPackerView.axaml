@@ -111,13 +111,13 @@
                     <Label 
                         Grid.Row="0"
                         Grid.Column="0"
-                        Classes="Heading2"
+                        Classes="Heading2B"
                         Content="{dloc:Localize DmodPacker/View/Ignore/dmodignore}"/>
                     
                     <Label 
                         Grid.Row="0"
                         Grid.Column="1"
-                        Classes="Heading2"
+                        Classes="Heading2B"
                         Content="{dloc:Localize DmodPacker/View/Ignore/DmodFiles}"/>
                     
                     <!-- dmod ignore text -->

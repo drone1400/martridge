@@ -16,8 +16,10 @@ namespace Martridge.Models.DmodPacker {
         public event EventHandler? ActivityEnded;
 
         public DmodPackerNode? RootNode => this._rootNode;
+        public IReadOnlyList<string> DmodIgnoreLines => this._dmodIgnoreLines;
         public DirectoryInfo? SourceDirectory => this._sourceDirectory;
         public FileInfo? DestinationFile => this._destinationFile;
+        public FileInfo? DmodIgnoreFile => this._dmodIgnoreFile;
         public DmodPackerPhase PackPhase => this._packPhase;
         public DinkInstallerResult PackResult => this._packResult;
         public Exception? PackException => this._packException;
@@ -38,6 +40,7 @@ namespace Martridge.Models.DmodPacker {
         private readonly DinkTempFileHelper _temp = new DinkTempFileHelper();
 
         private List<DmodIgnoreRuleMetadata> _ignoreRules = new List<DmodIgnoreRuleMetadata>();
+        private List<string> _dmodIgnoreLines = new List<string>();
         
         
         private void ReportProgressPrimary() {
@@ -198,13 +201,15 @@ namespace Martridge.Models.DmodPacker {
             }
         }
 
-
         private void GenerateDefaultIgnore() {
             this._ignoreRules = new List<DmodIgnoreRuleMetadata>();
+            this._dmodIgnoreLines = new List<string>();
             try {
                 
                 for (int lineIndex = 0; lineIndex < DEFAULT_DMOD_IGNORE.Length; lineIndex++) {
                     string line = DEFAULT_DMOD_IGNORE[lineIndex];
+                    
+                    this._dmodIgnoreLines.Add(line);
                     
                     // ignore empty lines
                     if (string.IsNullOrWhiteSpace(line))
@@ -231,15 +236,15 @@ namespace Martridge.Models.DmodPacker {
             "",
             "# WDED metadata and files",
             "sprite_report.txt",
-            ".wded/**",
-            ".wded_backup/**",
-            ".martridge/**",
+            ".wded",
+            ".wded_backup",
+            ".martridge",
             "",
             "# the dmod ignore file",
             ".dmodignore",
             "",
             "# GIT files",
-            ".git/**",
+            ".git",
             ".gitignore",
         };
         
@@ -265,6 +270,7 @@ namespace Martridge.Models.DmodPacker {
             string path = Path.Combine(this._sourceDirectory.FullName, ".dmodignore");
             this._dmodIgnoreFile = new FileInfo(path);
             this._ignoreRules = new List<DmodIgnoreRuleMetadata>();
+            this._dmodIgnoreLines = new List<string>();
 
             if (this._dmodIgnoreFile.Exists == false) {
                 this.GenerateDefaultIgnore();
@@ -278,6 +284,8 @@ namespace Martridge.Models.DmodPacker {
                 string? line = null;
                 int lineIndex = 0;
                 while ((line = sr.ReadLine()) != null) {
+                    this._dmodIgnoreLines.Add(line);
+                    
                     lineIndex++;
                     
                     // ignore empty lines
@@ -313,6 +321,7 @@ namespace Martridge.Models.DmodPacker {
             queue.Enqueue(this._rootNode);
 
             int fileCount = 0;
+            int fileCountIgnore = 0;
 
             while (queue.Count > 0)
             {
@@ -339,8 +348,8 @@ namespace Martridge.Models.DmodPacker {
                     // add to the node's children
                     DmodPackerNode newNode = new DmodPackerNode(file, this._sourceDirectory);
                     this.UpdateIsIgnored(newNode);
+                    if (newNode.IsIgnored) fileCountIgnore++;
                     dirNode.AddChildNode(newNode);
-
                     fileCount++;
                 }
                 
@@ -365,6 +374,7 @@ namespace Martridge.Models.DmodPacker {
             }
             
             this.LogMessage(String.Format(Localizer.Instance["DmodPacker/Log/Initializing/FileCount"], fileCount));
+            this.LogMessage(String.Format(Localizer.Instance["DmodPacker/Log/Initializing/FileCountIgnore"], fileCountIgnore));
 
             return true;
         }
@@ -488,21 +498,21 @@ namespace Martridge.Models.DmodPacker {
                     
                     DmodPackerNode node = queue.Dequeue();
 
-                    foreach (var kvp in node.Children)
+                    foreach (var childNode in node.ChildrenList)
                     {
-                        if (kvp.Value.IsIgnored)
+                        if (childNode.IsIgnored)
                             continue;
 
-                        if (kvp.Value.NodeType == DmodNodeType.Directory) {
-                            queue.Enqueue(kvp.Value);
+                        if (childNode.NodeType == DmodNodeType.Directory) {
+                            queue.Enqueue(childNode);
                             continue;
                         }
                         
                         string relativeFileName = Path.Combine(rootName,
-                            Path.GetRelativePath(rootPath, kvp.Value.FullPath));
+                            Path.GetRelativePath(rootPath, childNode.FullPath));
                         
-                        using (FileStream fileStream = new FileStream(kvp.Value.FullPath, FileMode.Open, FileAccess.Read)) {
-                            writer.Write(relativeFileName, fileStream, kvp.Value.LastModified);
+                        using (FileStream fileStream = new FileStream(childNode.FullPath, FileMode.Open, FileAccess.Read)) {
+                            writer.Write(relativeFileName, fileStream, childNode.LastModified);
                         }
 
                         fileCount++;

@@ -110,6 +110,18 @@
         <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH3}" />
         <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
     </Style>
+    <Style Selector="Label.TreeViewItemNormal">
+    </Style>
+    <Style Selector="Label.TreeViewItemIgnored">
+        <Setter Property="FontStyle" Value="Italic" />
+        <Setter Property="Foreground" Value="{DynamicResource HighlightForegroundBrush}" />
+        <Setter Property="Background" Value="{DynamicResource NotificationCardErrorBackgroundBrush}" />
+    </Style>    
+    <Style Selector="Label.TreeViewItemUnignored">
+        <Setter Property="FontStyle" Value="Italic" />
+        <Setter Property="Foreground" Value="{DynamicResource HighlightForegroundBrush}" />
+        <Setter Property="Background" Value="{DynamicResource NotificationCardSuccessBackgroundBrush}" />
+    </Style>
 
     <!-- CheckBox -->
     <Style Selector="CheckBox.Heading2B">
@@ -155,6 +167,11 @@
     </Style>
     <Style Selector="DataGridColumnHeader">
         <Setter Property="MinHeight" Value="28" />
+        <Setter Property="FontSize" Value="13" />
+    </Style>
+    <Style Selector="TreeViewItem">
+        <Setter Property="Padding" Value="1"/>
+        <Setter Property="MinHeight" Value="22" />
         <Setter Property="FontSize" Value="13" />
     </Style>
 

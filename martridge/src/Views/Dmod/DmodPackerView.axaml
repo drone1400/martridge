@@ -22,6 +22,8 @@
     <UserControl.Resources>
         <valueConverters:GenericEqualsBoolConverter x:Key="GenericEqualsBoolConverter" />
         <valueConverters:GenericNotEqualsBoolConverter x:Key="GenericNotEqualsBoolConverter" />
+        <valueConverters:DmodNodeImageConverter x:Key="DmodNodeImageConverter" />
+        <valueConverters:BoolToGridSizeStarOrXConverter x:Key="BoolToGridSizeStarOrXConverter" />
     </UserControl.Resources>
 
 
@@ -67,7 +69,20 @@
             </StackPanel>
 
             <!-- main body stuff... -->
-            <Grid Grid.Row="1" RowDefinitions="Auto,*">
+            <Grid Grid.Row="1">
+                
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- set height to zero for row #1 if not showing dmod ignore stuff, otherwise height is equal to star -->
+                    <RowDefinition Height="{Binding ShowDmodIgnoreStuff,
+                        Converter={StaticResource BoolToGridSizeStarOrXConverter},
+                        ConverterParameter=0}"/>
+                    <!-- set height to 180 for row #2 if showing dmod ignore stuff, otherwise height is equal to star -->
+                    <RowDefinition 
+                        Height="{Binding !ShowDmodIgnoreStuff,
+                            Converter={StaticResource BoolToGridSizeStarOrXConverter},
+                            ConverterParameter=180}"/>
+                </Grid.RowDefinitions>
 
                 <!-- Destination selection -->
                 <StackPanel Grid.Row="0"
@@ -87,10 +102,71 @@
                     </Grid>
                     <TextBox Text="{Binding TemporaryDmodDestination}" />
                 </StackPanel>
+                
+                <Grid Grid.Row="1" 
+                      ColumnDefinitions="*,*"
+                      RowDefinitions="Auto,*,Auto"
+                      IsVisible="{Binding ShowDmodIgnoreStuff}">
+                    
+                    <Label 
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Classes="Heading2"
+                        Content="{dloc:Localize DmodPacker/View/Ignore/dmodignore}"/>
+                    
+                    <Label 
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Classes="Heading2"
+                        Content="{dloc:Localize DmodPacker/View/Ignore/DmodFiles}"/>
+                    
+                    <!-- dmod ignore text -->
+                    <TextBox 
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Margin="6,0"
+                        Classes="BigTextBox"
+                        Text="{Binding DmodIgnoreText}"
+                        AcceptsReturn="True"/>
+                    
+                    <!-- file tree view -->
+                    <TreeView
+                        Grid.Row="1" Grid.RowSpan="2"
+                        Grid.Column="1"
+                        ItemsSource="{Binding DmodNodes}"
+                        SelectedItem="{Binding SelectedDmodNode}"
+                        SelectionMode="Single">
+                        <TreeView.DataTemplates>
+                            <TreeDataTemplate DataType="dmodPacker:DmodPackerNode" ItemsSource="{Binding ChildrenList}" >
+                                <Grid ColumnDefinitions="Auto,*">
+                                    <Image Grid.Column="0" 
+                                           Source="{Binding NodeType, Converter={StaticResource DmodNodeImageConverter}}" 
+                                           Height="20"
+                                           Width="20"/>
+                                    <Label Grid.Column="1" Content="{Binding Name}"
+                                           Classes.TreeViewItemIgnored="{Binding IsIgnored}"
+                                           Classes.TreeViewItemUnignored="{Binding IsUnignored}"
+                                           VerticalAlignment="Center"
+                                           Margin="0" />
+                                </Grid>
+                            </TreeDataTemplate>
+                        </TreeView.DataTemplates>
+                    </TreeView>
+                    
+                    <Button 
+                        Grid.Row="2" 
+                        Grid.Column="0"
+                        Classes="Primary"
+                        HorizontalAlignment="Stretch"
+                        Width="NaN"
+                        Content="{dloc:Localize DmodPacker/View/Ignore/SaveAndReloadDmodIgnore}"
+                        Command="{Binding CmdReinitializeDmod}"/>
+                </Grid>
 
                 <!-- Install log... -->
-                <TextBox Grid.Row="1"
+                <TextBox Grid.Row="2"
                          Classes="BigTextBox"
+                         Margin="6,6"
                          Text="{Binding DmodPackerProgressLog}"
                          IsReadOnly="True"
                          CaretIndex="{Binding DmodPackerProgressLogCaretIndex, Mode=TwoWay}" />

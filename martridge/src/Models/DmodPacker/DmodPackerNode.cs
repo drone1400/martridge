@@ -11,7 +11,8 @@ namespace Martridge.Models.DmodPacker
         public string RelativePath { get; }
         public string RelativePathLower { get; }
         public DateTime LastModified { get; }
-        public bool IsIgnored => this.IgnoreRuleMatchesList.Count > 0 && this.IgnoreNegateRuleMatchesList.Count == 0;
+        public bool IsIgnored => this._ignoreRuleMatchesList.Count > 0 && this._ignoreNegateRuleMatchesList.Count == 0;
+        public bool IsUnignored => this._ignoreNegateRuleMatchesList.Count > 0;
 
         public IReadOnlyList<int> IgnoreNegateRuleMatchesList => this._ignoreNegateRuleMatchesList;
         private readonly List<int> _ignoreNegateRuleMatchesList = new List<int>();
@@ -19,8 +20,10 @@ namespace Martridge.Models.DmodPacker
         public IReadOnlyList<int> IgnoreRuleMatchesList => this._ignoreRuleMatchesList;
         private readonly List<int> _ignoreRuleMatchesList = new List<int>();
 
-        public IReadOnlyDictionary<string, DmodPackerNode> Children => this._children;
-        private readonly Dictionary<string, DmodPackerNode> _children = new Dictionary<string, DmodPackerNode>();
+        public IReadOnlyDictionary<string, DmodPackerNode> ChildrenDictionary => this._childrenDictionary;
+        private readonly Dictionary<string, DmodPackerNode> _childrenDictionary = new Dictionary<string, DmodPackerNode>();
+        public IReadOnlyList<DmodPackerNode> ChildrenList => this._childrenList;
+        private readonly List<DmodPackerNode> _childrenList = new List<DmodPackerNode>();
 
         public DmodPackerNode(DirectoryInfo dirInfo, DirectoryInfo baseDirectory)
         {
@@ -53,7 +56,8 @@ namespace Martridge.Models.DmodPacker
             if (this.NodeType != DmodNodeType.Directory)
                 return false;
             
-            if (!this._children.TryAdd(node.RelativePathLower, node)) return false;
+            if (!this._childrenDictionary.TryAdd(node.RelativePathLower, node)) return false;
+            this._childrenList.Add(node);
 
             return true;
         }
@@ -68,7 +72,7 @@ namespace Martridge.Models.DmodPacker
         }
 
         public void NegateIgnore(int ruleIndex) {
-            this._ignoreNegateRuleMatchesList.Remove(ruleIndex);
+            this._ignoreNegateRuleMatchesList.Add(ruleIndex);
         }
         
         public static DmodNodeType GetNodeTypeFromFileExtension(string ext) {

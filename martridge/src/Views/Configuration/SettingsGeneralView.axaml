@@ -24,7 +24,7 @@
     </UserControl.Styles>
     <UserControl.Resources>
         <valueConverters:DoubleCompareBoolConverter x:Key="DoubleCompareBoolConverter" />
-        <valueConverters:BoolToGridSizeZeroStarConverter x:Key="BoolToGridSizeZeroStarConverter" />
+        <valueConverters:BoolToGridSizeStarOrXConverter x:Key="BoolToGridSizeZeroStarConverter" />
         <system:Double x:Key="MinimumPathUiHeightThreshold">400</system:Double>
     </UserControl.Resources>
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Avalonia.Input;
 using Avalonia.Metadata;
@@ -116,6 +117,31 @@ namespace Martridge.ViewModels.Dmod {
         }
         private bool _isFileBrowserActive = false;
 
+
+        public bool ShowDmodIgnoreStuff {
+            get => this._showDmodIgnoreStuff;
+            private set => this.RaiseAndSetIfChanged( ref this._showDmodIgnoreStuff, value);
+        }
+        private bool _showDmodIgnoreStuff = false;
+
+        public IList<DmodPackerNode> DmodNodes {
+            get => this._dmodNodes;
+            private set => this.RaiseAndSetIfChanged( ref this._dmodNodes, value);
+        }
+        private IList<DmodPackerNode> _dmodNodes = new List<DmodPackerNode>();
+
+        public DmodPackerNode? SelectedDmodNode {
+            get => this._selectedDmodNode;
+            set => this.RaiseAndSetIfChanged( ref this._selectedDmodNode, value);
+        }
+        private DmodPackerNode? _selectedDmodNode = null;
+
+        public string DmodIgnoreText {
+            get => this._dmodIgnoreText;
+            set => this.RaiseAndSetIfChanged( ref this._dmodIgnoreText, value);
+        }
+        private string _dmodIgnoreText = string.Empty;
+
         // ------------------------------------------------------------------------------------------
         //      Installer logic 
         //
@@ -193,6 +219,27 @@ namespace Martridge.ViewModels.Dmod {
         //
 
         #region Commands
+
+        public async void CmdReinitializeDmod(object? parameter = null) {
+            if (this.PackerPhase != DmodPackerPhase.AwaitingUserInput)
+                return;
+            if (this._packerLogic is not DmodPacker packer || packer.DmodIgnoreFile == null) 
+                return;
+
+            try {
+                // first save the dmod ignore text...
+                await File.WriteAllTextAsync(packer.DmodIgnoreFile.FullName, this.DmodIgnoreText, Encoding.UTF8);
+                // then reinitialize the DMOD...
+                await this.StartInitializingDmod();
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+            }
+        }
+        
+        [DependsOn(nameof(PackerPhase))]
+        public bool CanCmdReinitializeDmod(object? parameter = null) {
+            return this.PackerPhase == DmodPackerPhase.AwaitingUserInput;
+        }
 
         public async void CmdInitializeDmod(object? parameter = null)
         {
@@ -509,13 +556,33 @@ namespace Martridge.ViewModels.Dmod {
                 {
                     this.DmodPackingInProgress = false;
                 }
+                
+                this.ShowDmodIgnoreStuff = false;
 
                 switch (args.Phase)
                 {
+                    case DmodPackerPhase.Initializing:
+                        this.ShowDmodIgnoreStuff = true;
+                        break;
                     case DmodPackerPhase.AwaitingUserInput:
                     {
+                        this.ShowDmodIgnoreStuff = true;
                         // just finished Initializing...
-                        // TODO... populate directory trees...
+                        if (packer.RootNode != null) {
+                            this.DmodNodes = new List<DmodPackerNode>() {
+                                packer.RootNode,
+                            };
+                        }
+                        else {
+                            this.DmodNodes = new List<DmodPackerNode>();
+                        }
+
+                        StringBuilder sb = new StringBuilder();
+                        foreach (string line in packer.DmodIgnoreLines) {
+                            sb.AppendLine(line);
+                        }
+                        this.DmodIgnoreText = sb.ToString();
+                        
                         break;
                     }
                     case DmodPackerPhase.Finished:

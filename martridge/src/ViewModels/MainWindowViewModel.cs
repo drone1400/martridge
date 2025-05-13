@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Avalonia.Platform.Storage;
 using Martridge.Models;
 using Martridge.Models.Configuration;
+using Martridge.ViewModels.DinkyAlerts;
 
 #if ENABLE_FEATURE_ONLINE
 using Martridge.Models.OnlineDmods;
@@ -76,6 +77,12 @@ namespace Martridge.ViewModels {
         
         
         private DmodBrowserViewModel? _dmodBrowserViewModel = null;
+
+        public DinkyAlertViewModel? AlertViewModel {
+            get => this._alertViewModel;
+            set => this.RaiseAndSetIfChanged(ref this._alertViewModel, value);
+        }
+        private DinkyAlertViewModel? _alertViewModel = null;
 
         
         // ------------------------------------------------------------------------------------------

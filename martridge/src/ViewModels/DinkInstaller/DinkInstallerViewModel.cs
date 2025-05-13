@@ -525,7 +525,7 @@ namespace Martridge.ViewModels.DinkInstaller
                         // make sure the correct new line characters are used
                         body = body.Replace("\n\r", Environment.NewLine);
 
-                        Task<AlertResults> taskDialog = DinkyAlert.ShowDialog(title, body, AlertResults.Yes | AlertResults.No | AlertResults.Cancel, AlertType.Warning);
+                        Task<AlertResults> taskDialog = DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Yes | AlertResults.No | AlertResults.Cancel, AlertType.Warning);
                         taskDialog.Wait();
                         
                         if (taskDialog.Result == AlertResults.Cancel)
@@ -540,7 +540,7 @@ namespace Martridge.ViewModels.DinkInstaller
                             body += Environment.NewLine;
                             body += destination.FullName;
 
-                            Task<AlertResults> taskDialog2 = DinkyAlert.ShowDialog(title, body, AlertResults.Yes | AlertResults.Cancel, AlertType.Warning);
+                            Task<AlertResults> taskDialog2 = DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Yes | AlertResults.Cancel, AlertType.Warning);
                             taskDialog2.Wait();
                             
                             if (taskDialog2.Result == AlertResults.Yes)
@@ -641,7 +641,7 @@ namespace Martridge.ViewModels.DinkInstaller
                 {
                     string title = Localizer.Instance[@"DinkInstallerView/MessageBox_Cancel_Title"];
                     string body = Localizer.Instance[@"DinkInstallerView/MessageBox_Cancel_Body"];
-                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Info);
+                    await DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Ok, AlertType.Info);
                 } catch (Exception ex)
                 {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
@@ -656,7 +656,7 @@ namespace Martridge.ViewModels.DinkInstaller
                 {
                     string title = Localizer.Instance[@"DinkInstallerView/MessageBox_Error_Title"];
                     string body = Localizer.Instance[@"DinkInstallerView/MessageBox_Error_Body"] + Environment.NewLine + MyTrace.GetExceptionMessages(exception);
-                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Error);
+                    await DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Ok, AlertType.Error);
                 } catch (Exception ex)
                 {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);

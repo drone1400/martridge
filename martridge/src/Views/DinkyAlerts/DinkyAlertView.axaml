@@ -1,0 +1,89 @@
+<UserControl x:Class="Martridge.Views.DinkyAlerts.DinkyAlertView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+
+             xmlns:vm="using:Martridge.ViewModels.DinkyAlerts"
+             xmlns:dloc="using:Martridge.ViewModels.Localization"
+
+             mc:Ignorable="d"
+             d:DesignWidth="800"
+             d:DesignHeight="450"
+
+             MinWidth="500" MinHeight="400"
+             Name="Alert"
+             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+
+    <Design.DataContext>
+        <vm:DinkyAlertViewModel />
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml" />
+    </UserControl.Styles>
+
+    <Grid ColumnDefinitions="*,Auto,*" RowDefinitions="*,Auto,*">
+        <Grid 
+            Grid.Row="0" Grid.RowSpan="3"
+            Grid.Column="0" Grid.ColumnSpan="3"
+            Background="{DynamicResource ThemeBackgroundBrush}" Opacity="0.5"/>
+
+        <Border
+            Margin="20"
+            Grid.Row="1" Grid.Column="1"
+            Classes="MartridgeCard">
+
+
+            <Grid RowDefinitions="Auto, Auto, Auto, Auto"
+                  ColumnDefinitions="128, *"
+                  Margin="10">
+
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                       Classes="HeadingTitle"
+                       HorizontalAlignment="Center"
+                       Content="{Binding Title}" />
+
+                <Image Grid.Row="1" Grid.Column="0"
+                       Source="{Binding AnimatedImage.Frame}" />
+
+                <Label Grid.Row="1" Grid.Column="1"
+                       Content="{Binding Message}"
+                       HorizontalAlignment="Center"
+                       TextBlock.TextWrapping="Wrap" />
+
+                <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                          Content="{dloc:Localize DinkyAlertWindow/CheckBoxRememberResult}"
+                          IsChecked="{Binding IsResultRemembered}"
+                          IsVisible="{Binding ShowRememberResultCheckbox}" />
+
+                <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                      ColumnDefinitions="*, Auto, Auto, Auto, Auto, *">
+                    <Button Grid.Column="1"
+                            Content="{Binding ButtonTextOk}"
+                            Command="{Binding CmdExitOk}"
+                            CommandParameter="{Binding ElementName=Alert}"
+                            IsVisible="{Binding ShowButtonOk}" />
+
+                    <Button Grid.Column="2"
+                            Content="{Binding ButtonTextYes}"
+                            Command="{Binding CmdExitYes}"
+                            CommandParameter="{Binding ElementName=Alert}"
+                            IsVisible="{Binding ShowButtonYes}" />
+
+                    <Button Grid.Column="3"
+                            Content="{Binding ButtonTextNo}"
+                            Command="{Binding CmdExitNo}"
+                            CommandParameter="{Binding ElementName=Alert}"
+                            IsVisible="{Binding ShowButtonNo}" />
+
+                    <Button Grid.Column="4"
+                            Content="{Binding ButtonTextCancel}"
+                            Command="{Binding CmdExitCancel}"
+                            CommandParameter="{Binding ElementName=Alert}"
+                            IsVisible="{Binding ShowButtonCancel}" />
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+    
+</UserControl>

@@ -7,6 +7,7 @@
         xmlns:martridge="clr-namespace:Martridge"
         xmlns:controls="clr-namespace:Martridge.Controls"
         xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
+        xmlns:dinkyAlerts="clr-namespace:Martridge.Views.DinkyAlerts"
 
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
 
@@ -19,7 +20,7 @@
         Title="{dloc:Localize MainWindow/Title}"
         Background="{DynamicResource ThemeBackgroundColor}"
         Name="TheMainWindow"
-        
+
         KeyDown="InputElement_OnKeyDown"
         XYFocus.NavigationModes="Enabled">
 
@@ -30,7 +31,9 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </Window.Styles>
     <Window.Resources>
-        <valueConverters:TypeCompareToBoolConverter x:Key="TypeCompareToBoolConverter"/>
+        <valueConverters:TypeCompareToBoolConverter x:Key="TypeCompareToBoolConverter" />
+        <valueConverters:IsNullCheckBoolConverter x:Key="IsNullCheckBoolConverter" />
+        <valueConverters:IsNotNullCheckBoolConverter x:Key="IsNotNullCheckBoolConverter" />
     </Window.Resources>
 
     <Border
@@ -39,98 +42,116 @@
         Background="Transparent"
         BorderBrush="Transparent"
         BorderThickness="0"
-        CornerRadius="0"
-        DragDrop.AllowDrop="True">
-        <Grid RowDefinitions="Auto,*" ColumnDefinitions="Auto,*">
-            <Grid Grid.Row="1" Grid.Column="0" RowDefinitions="*,Auto" Background="{DynamicResource ThemeAccentBrush2}">
-                <Grid.Styles>
-                    <Style Selector="controls|SelectableButton">
-                        <Setter Property="Width" Value="180"/>
-                    </Style>
-                </Grid.Styles>
-                
-                <Image Grid.Row="0" Grid.RowSpan="2"
-                       VerticalAlignment="Bottom"
-                       Width="180"
-                       Stretch="Uniform"
-                       Source="/Assets/dinkbw.png"
-                       BlendMode="Multiply"/>
+        CornerRadius="0">
 
-                <WrapPanel Grid.Row="0"
-                           Orientation="Vertical">
-                    <controls:SelectableButton
-                        Content="{dloc:Localize MainWindow/PageSelect/About}"
-                        IsSelected="{Binding CurrentViewModel,
+        <Grid>
+            
+            <!-- main content is only enabled if there is no active alert... -->
+            <Grid ColumnDefinitions="Auto,*"
+                  IsEnabled="{Binding AlertViewModel,
+                        Converter={StaticResource IsNullCheckBoolConverter}}"
+                  DragDrop.AllowDrop="True">
+                <Grid Grid.Column="0" RowDefinitions="*,Auto" Background="{DynamicResource ThemeAccentBrush2}">
+                    <Grid.Styles>
+                        <Style Selector="controls|SelectableButton">
+                            <Setter Property="Width" Value="180" />
+                        </Style>
+                    </Grid.Styles>
+
+                    <Image Grid.Row="0" Grid.RowSpan="2"
+                           VerticalAlignment="Bottom"
+                           Width="180"
+                           Stretch="Uniform"
+                           Source="/Assets/dinkbw.png"
+                           BlendMode="Multiply" />
+
+                    <WrapPanel Grid.Row="0"
+                               Orientation="Vertical">
+                        <controls:SelectableButton
+                            Content="{dloc:Localize MainWindow/PageSelect/About}"
+                            IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
                             ConverterParameter={}AboutViewModel,
                             Mode=OneWay}"
-                        Command="{Binding CmdShowPageAbout}" />
-                    
-                    <controls:SelectableButton
-                        Content="{dloc:Localize MainWindow/PageSelect/DmodBrwoser}" 
-                        Command="{Binding CmdShowPageMyDmods}" 
-                        IsSelected="{Binding CurrentViewModel,
+                            Command="{Binding CmdShowPageAbout}" />
+
+                        <controls:SelectableButton
+                            Content="{dloc:Localize MainWindow/PageSelect/DmodBrwoser}"
+                            Command="{Binding CmdShowPageMyDmods}"
+                            IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
                             ConverterParameter={}DmodBrowserViewModel,
                             Mode=OneWay}" />
-                    <controls:SelectableButton
-                        Content="{dloc:Localize MainWindow/PageSelect/OnlineDmodBrwoser}" 
-                        Command="{Binding CmdShowPageOnlineDmods}" 
-                        IsVisible="{Binding EnableOnlineFeatures}"
-                        IsSelected="{Binding CurrentViewModel,
+                        <controls:SelectableButton
+                            Content="{dloc:Localize MainWindow/PageSelect/OnlineDmodBrwoser}"
+                            Command="{Binding CmdShowPageOnlineDmods}"
+                            IsVisible="{Binding EnableOnlineFeatures}"
+                            IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
                             ConverterParameter={}OnlineDmodBrowserViewModel,
                             Mode=OneWay}" />
-                    <controls:SelectableButton
-                        Content="{dloc:Localize MainWindow/PageSelect/Settings}"
-                        IsSelected="{Binding CurrentViewModel,
+                        <controls:SelectableButton
+                            Content="{dloc:Localize MainWindow/PageSelect/Settings}"
+                            IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
                             ConverterParameter={}SettingsGeneralViewModel,
                             Mode=OneWay}"
-                        Command="{Binding CmdShowPageSettings}" />
-                    <controls:SelectableButton
-                        Content="{dloc:Localize MainWindow/PageSelect/Theme}"
-                        IsSelected="{Binding CurrentViewModel,
+                            Command="{Binding CmdShowPageSettings}" />
+                        <controls:SelectableButton
+                            Content="{dloc:Localize MainWindow/PageSelect/Theme}"
+                            IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
                             ConverterParameter={}SettingsThemeViewModel,
                             Mode=OneWay}"
-                        Command="{Binding CmdShowPageSettingsTheme}" />
-                    <controls:SelectableButton
-                        Content="{dloc:Localize MainWindow/PageSelect/DmodInstaller}"
-                        Command="{Binding CmdShowPageDmodInstallerAndBrowse}" 
-                        IsSelected="{Binding CurrentViewModel,
+                            Command="{Binding CmdShowPageSettingsTheme}" />
+                        <controls:SelectableButton
+                            Content="{dloc:Localize MainWindow/PageSelect/DmodInstaller}"
+                            Command="{Binding CmdShowPageDmodInstallerAndBrowse}"
+                            IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
                             ConverterParameter={}DmodInstallerViewModel,
                             Mode=OneWay}" />
-                    <controls:SelectableButton
-                        Content="{dloc:Localize MainWindow/PageSelect/DmodPacker}"
-                        Command="{Binding CmdShowPageDmodPackerAndBrowse}"
-                        IsSelected="{Binding CurrentViewModel,
+                        <controls:SelectableButton
+                            Content="{dloc:Localize MainWindow/PageSelect/DmodPacker}"
+                            Command="{Binding CmdShowPageDmodPackerAndBrowse}"
+                            IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
                             ConverterParameter={}DmodPackerViewModel,
                             Mode=OneWay}"
-                        IsVisible="{Binding EnableDmodDeveloperFeatures}"
-                        IsEnabled="{Binding EnableDmodDeveloperFeatures}" />
+                            IsVisible="{Binding EnableDmodDeveloperFeatures}"
+                            IsEnabled="{Binding EnableDmodDeveloperFeatures}" />
 
-                    <controls:SelectableButton
-                        Content="{dloc:Localize MainWindow/PageSelect/DinkInstaller}"
-                        Command="{Binding CmdShowPageDinkInstaller}"
-                        IsSelected="{Binding CurrentViewModel,
+                        <controls:SelectableButton
+                            Content="{dloc:Localize MainWindow/PageSelect/DinkInstaller}"
+                            Command="{Binding CmdShowPageDinkInstaller}"
+                            IsSelected="{Binding CurrentViewModel,
                             Converter={StaticResource TypeCompareToBoolConverter},
                             ConverterParameter={}DinkInstallerViewModel,
                             Mode=OneWay}"
-                        IsVisible="{Binding EnableDinkInstallerMenu}"
-                        IsEnabled="{Binding EnableDinkInstallerMenu}" />
-                </WrapPanel>
+                            IsVisible="{Binding EnableDinkInstallerMenu}"
+                            IsEnabled="{Binding EnableDinkInstallerMenu}" />
+                    </WrapPanel>
+                </Grid>
+
+                <Grid Grid.Column="1">
+                    <ContentControl Content="{Binding CurrentViewModel}">
+                        <ContentControl.DataTemplates>
+                            <martridge:MainViewLocator />
+                        </ContentControl.DataTemplates>
+                    </ContentControl>
+                </Grid>
+            </Grid>
+            
+            <Grid
+                IsEnabled="{Binding AlertViewModel,
+                    Converter={StaticResource IsNotNullCheckBoolConverter}}"
+                IsVisible="{Binding AlertViewModel,
+                    Converter={StaticResource IsNotNullCheckBoolConverter}}"
+                ZIndex="999">
+                <dinkyAlerts:DinkyAlertView 
+                    DataContext="{Binding AlertViewModel}"/>
             </Grid>
 
-            <Grid Grid.Row="1" Grid.Column="1">
-                <ContentControl Content="{Binding CurrentViewModel}">
-                    <ContentControl.DataTemplates>
-                        <martridge:MainViewLocator />
-                    </ContentControl.DataTemplates>
-                </ContentControl>
-            </Grid>
         </Grid>
     </Border>
 </Window>

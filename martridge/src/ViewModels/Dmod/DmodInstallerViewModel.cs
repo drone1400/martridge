@@ -589,7 +589,7 @@ namespace Martridge.ViewModels.Dmod {
                         body += Environment.NewLine;
                         body += this.FinalDmodDestination;
                     }
-                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Info);
+                    await DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Ok, AlertType.Info);
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                 }
@@ -609,7 +609,7 @@ namespace Martridge.ViewModels.Dmod {
                         body += Environment.NewLine;
                         body += this.FinalDmodDestination;
                     }
-                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Error);
+                    await DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Ok, AlertType.Error);
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                 }

@@ -5,8 +5,10 @@ using Martridge.Models.Configuration;
 using Martridge.ViewModels.DinkyGraphics;
 using Martridge.Views.DinkyAlerts;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
+using Martridge.Trace;
 
 namespace Martridge.ViewModels.DinkyAlerts {
     public static class DinkyAlert {
@@ -195,7 +197,45 @@ namespace Martridge.ViewModels.DinkyAlerts {
             
             return result;
         }
-        
+
+
+        private static readonly object _syncRoot_Alert = new object();
+
+        public static Task<AlertResults> ShowDinkyAlert(string title, string message, AlertResults resultButtons, AlertType type, Dictionary<AlertResults, string>? customButtonText = null, CancellationToken? cancellationToken = null) {
+            return Task.Run(() =>
+            {
+                if (Monitor.TryEnter(_syncRoot_Alert) == false) {
+                    return AlertResults.None;
+                }
+                
+                try {
+                    if (App.Instance is not App app)
+                        return AlertResults.None;
+
+                    DinkyAlertViewModel vm = new DinkyAlertViewModel(title, message, resultButtons, type, customButtonText);
+                    vm.ResultIsDone += (_, _) => {
+                        // clear active alert VM in App instance...
+                        app.ClearActiveAlertViewModel();
+                        Monitor.Pulse(_syncRoot_Alert);
+                    };
+                    
+                    // set active alert view model
+                    app.SetActiveAlertViewModel(vm);
+
+                    Monitor.Wait(_syncRoot_Alert);
+                    
+                    return vm.Result;
+                } catch (Exception ex) {
+                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                    return AlertResults.None;
+                }
+                finally {
+                    Monitor.Exit(_syncRoot_Alert);
+                }
+
+                
+            });
+        }
 
         public async static Task<AlertResults> ShowDialog(string title, string message, AlertResults resultButtons, AlertType type, Dictionary<AlertResults, string>? customButtonText = null, Window? parentWindow = null) {
             

@@ -141,6 +141,10 @@
         <AvaloniaXaml Remove="Views\DinkInstaller\*"/>
         <AvaloniaXaml Remove="Views\OnlineDmod\*"/>
         <AvaloniaXaml Remove="Views\Dmod\DualDmodBrowserView.axaml"/>
+        <Compile Update="Views\DinkyAlerts\DinkyAlertView.axaml.cs">
+          <DependentUpon>DinkyAlertView.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 
     <!-- remove DinkInstaller stuff if it is not enabled or we are not building for Windows -->

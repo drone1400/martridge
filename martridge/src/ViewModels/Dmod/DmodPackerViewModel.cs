@@ -608,7 +608,7 @@ namespace Martridge.ViewModels.Dmod {
                 try {
                     string title = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Cancel_Title"];
                     string body = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Cancel_Body"];
-                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Info);
+                    await DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Ok, AlertType.Info);
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                 }
@@ -620,7 +620,7 @@ namespace Martridge.ViewModels.Dmod {
                 try {
                     string title = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Error_Title"];
                     string body = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Error_Body"] + Environment.NewLine + MyTrace.GetExceptionMessages(exception);
-                    await DinkyAlert.ShowDialog(title, body, AlertResults.Ok, AlertType.Error);
+                    await DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Ok, AlertType.Error);
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                 }

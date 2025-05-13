@@ -15,6 +15,7 @@ using Martridge.Models.Configuration;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using Martridge.ViewModels;
+using Martridge.ViewModels.DinkyAlerts;
 using Martridge.Views;
 using Martridge.Views.Log;
 
@@ -439,6 +440,23 @@ namespace Martridge {
             this._config.Remember.UpdateProperties(values);
         }
 
+        #endregion
+        
+        #region ALERT stuff
+
+        public void SetActiveAlertViewModel(DinkyAlertViewModel vm) {
+            if (this._mainWindowViewModel == null) 
+                return;
+            
+            this._mainWindowViewModel.AlertViewModel = vm;
+        }
+
+        public void ClearActiveAlertViewModel() {
+            if (this._mainWindowViewModel == null) 
+                return;
+            this._mainWindowViewModel.AlertViewModel = null;
+        }
+        
         #endregion
     }
 }

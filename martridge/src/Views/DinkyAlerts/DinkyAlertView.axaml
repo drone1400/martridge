@@ -22,68 +22,75 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </UserControl.Styles>
 
-    <Grid ColumnDefinitions="*,Auto,*" RowDefinitions="*,Auto,*">
-        <Grid 
+    <Grid ColumnDefinitions="*,Auto,*" RowDefinitions="*,Auto,*"
+          x:Name="TheGrid">
+        <Grid
             Grid.Row="0" Grid.RowSpan="3"
             Grid.Column="0" Grid.ColumnSpan="3"
-            Background="{DynamicResource ThemeBackgroundBrush}" Opacity="0.5"/>
+            Background="{DynamicResource ThemeBackgroundBrush}" Opacity="0.5" />
 
-        <Border
-            Margin="20"
+        <!-- this may seem rather odd, but if we don't do this max width binding here, the Label below that binds to the message
+            will stretch endlessly instead of wrapping -->
+        <Grid
             Grid.Row="1" Grid.Column="1"
-            Classes="MartridgeCard">
+            MaxWidth="{Binding Bounds.Width, ElementName=TheGrid}">
+            
+            <Border Classes="MartridgeCard" 
+                    Margin="40,10">
+                <Grid
+                    RowDefinitions="Auto, Auto, Auto, Auto"
+                    ColumnDefinitions="128, *"
+                    Margin="5,10">
 
+                    <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                           Classes="HeadingTitle"
+                           HorizontalAlignment="Center"
+                           Content="{Binding Title}" />
 
-            <Grid RowDefinitions="Auto, Auto, Auto, Auto"
-                  ColumnDefinitions="128, *"
-                  Margin="10">
+                    <Image Grid.Row="1" Grid.Column="0"
+                           Margin="2,2,16,2"
+                           Source="{Binding AnimatedImage.Frame}" 
+                           Stretch="Uniform"/>
 
-                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                       Classes="HeadingTitle"
-                       HorizontalAlignment="Center"
-                       Content="{Binding Title}" />
+                    <Label Grid.Row="1" Grid.Column="1"
+                           Content="{Binding Message}"
+                           HorizontalAlignment="Center"
+                           TextBlock.TextWrapping="Wrap" />
 
-                <Image Grid.Row="1" Grid.Column="0"
-                       Source="{Binding AnimatedImage.Frame}" />
+                    <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                              Content="{dloc:Localize DinkyAlertWindow/CheckBoxRememberResult}"
+                              IsChecked="{Binding IsResultRemembered}"
+                              IsVisible="{Binding ShowRememberResultCheckbox}" />
 
-                <Label Grid.Row="1" Grid.Column="1"
-                       Content="{Binding Message}"
-                       HorizontalAlignment="Center"
-                       TextBlock.TextWrapping="Wrap" />
+                    <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                          ColumnDefinitions="*, Auto, Auto, Auto, Auto, *">
+                        <Button Grid.Column="1"
+                                Content="{Binding ButtonTextOk}"
+                                Command="{Binding CmdExitOk}"
+                                CommandParameter="{Binding ElementName=Alert}"
+                                IsVisible="{Binding ShowButtonOk}" />
 
-                <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                          Content="{dloc:Localize DinkyAlertWindow/CheckBoxRememberResult}"
-                          IsChecked="{Binding IsResultRemembered}"
-                          IsVisible="{Binding ShowRememberResultCheckbox}" />
+                        <Button Grid.Column="2"
+                                Content="{Binding ButtonTextYes}"
+                                Command="{Binding CmdExitYes}"
+                                CommandParameter="{Binding ElementName=Alert}"
+                                IsVisible="{Binding ShowButtonYes}" />
 
-                <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
-                      ColumnDefinitions="*, Auto, Auto, Auto, Auto, *">
-                    <Button Grid.Column="1"
-                            Content="{Binding ButtonTextOk}"
-                            Command="{Binding CmdExitOk}"
-                            CommandParameter="{Binding ElementName=Alert}"
-                            IsVisible="{Binding ShowButtonOk}" />
+                        <Button Grid.Column="3"
+                                Content="{Binding ButtonTextNo}"
+                                Command="{Binding CmdExitNo}"
+                                CommandParameter="{Binding ElementName=Alert}"
+                                IsVisible="{Binding ShowButtonNo}" />
 
-                    <Button Grid.Column="2"
-                            Content="{Binding ButtonTextYes}"
-                            Command="{Binding CmdExitYes}"
-                            CommandParameter="{Binding ElementName=Alert}"
-                            IsVisible="{Binding ShowButtonYes}" />
-
-                    <Button Grid.Column="3"
-                            Content="{Binding ButtonTextNo}"
-                            Command="{Binding CmdExitNo}"
-                            CommandParameter="{Binding ElementName=Alert}"
-                            IsVisible="{Binding ShowButtonNo}" />
-
-                    <Button Grid.Column="4"
-                            Content="{Binding ButtonTextCancel}"
-                            Command="{Binding CmdExitCancel}"
-                            CommandParameter="{Binding ElementName=Alert}"
-                            IsVisible="{Binding ShowButtonCancel}" />
+                        <Button Grid.Column="4"
+                                Content="{Binding ButtonTextCancel}"
+                                Command="{Binding CmdExitCancel}"
+                                CommandParameter="{Binding ElementName=Alert}"
+                                IsVisible="{Binding ShowButtonCancel}" />
+                    </Grid>
                 </Grid>
-            </Grid>
-        </Border>
+            </Border>
+        </Grid>
     </Grid>
-    
+
 </UserControl>

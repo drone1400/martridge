@@ -723,10 +723,6 @@ namespace Martridge.ViewModels {
                     this.CmdShowPageDinkInstaller();
 #endif
                     return true;
-                case Key.F8: {
-                    DinkyAlert.ShowDinkyAlert("Test", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.", AlertResults.Yes | AlertResults.No | AlertResults.Cancel | AlertResults.Ok, AlertType.Warning);
-                    return true;
-                }
             }
             // let the current view model process the key input...
             return this._currentViewModel?.ProcessKeyDown(key, modifiers) ?? false;

@@ -134,13 +134,10 @@
         <Compile Remove="Models\OnlineDmods\*"/>
         <Compile Remove="ViewModels\DinkInstaller\*"/>
         <Compile Remove="ViewModels\OnlineDmod\*"/>
-        <Compile Remove="ViewModels\Dmod\DualDmodBrowserViewModel.cs"/>
         <Compile Remove="Views\DinkInstaller\*"/>
         <Compile Remove="Views\OnlineDmod\*"/>
-        <Compile Remove="Views\Dmod\DualDmodBrowserView.axaml.cs"/>
         <AvaloniaXaml Remove="Views\DinkInstaller\*"/>
         <AvaloniaXaml Remove="Views\OnlineDmod\*"/>
-        <AvaloniaXaml Remove="Views\Dmod\DualDmodBrowserView.axaml"/>
         <Compile Update="Views\DinkyAlerts\DinkyAlertView.axaml.cs">
           <DependentUpon>DinkyAlertView.axaml</DependentUpon>
           <SubType>Code</SubType>

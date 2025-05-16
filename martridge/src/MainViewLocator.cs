@@ -29,7 +29,6 @@ namespace Martridge
             {
 #if ENABLE_FEATURE_ONLINE
                 case nameof(OnlineDmodBrowserViewModel): return new OnlineDmodBrowserView();
-                case nameof(DualDmodBrowserViewModel): return new DualDmodBrowserView();
 #endif
 #if ENABLE_FEATURE_DINK_INSTALLER && ENABLE_FEATURE_ONLINE
                 case nameof(DinkInstallerViewModel): return new DinkInstallerView();

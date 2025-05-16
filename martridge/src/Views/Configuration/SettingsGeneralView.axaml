@@ -29,20 +29,22 @@
     </UserControl.Resources>
 
     <Border Classes="MartridgeCard">
-        <Grid RowDefinitions="Auto, *, Auto">
+        <Grid RowDefinitions="Auto, *">
             <StackPanel Grid.Row="0">
 
                 <!-- Localization -->
-                <Grid ColumnDefinitions="Auto,*"
+                <Grid ColumnDefinitions="*, Auto"
                       RowDefinitions="Auto,Auto">
                     <Label Grid.Row="0" Grid.Column="0 " Classes="Heading2B"
                            Content="{dloc:Localize SettingsGeneral/Localization}" />
-                    <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Localizations}"
-                              HorizontalAlignment="Left"
-                              SelectedItem="{Binding SelectedLocalization}"
-                              Width="360"
-                              Height="40"
-                              Padding="0">
+                    <ComboBox 
+                        Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
+                        ItemsSource="{Binding Localizations}"
+                        HorizontalAlignment="Left"
+                        SelectedItem="{Binding SelectedLocalization}"
+                        Width="360"
+                        Height="40"
+                        Padding="0">
                         <ComboBox.DataTemplates>
                             <DataTemplate DataType="globalization:CultureInfo">
                                 <Label Classes="Heading2I"
@@ -50,7 +52,17 @@
                             </DataTemplate>
                         </ComboBox.DataTemplates>
                     </ComboBox>
+                    
+                                    
+                    <Button 
+                        Grid.Row="0" Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        Width="240"
+                        Content="{dloc:Localize SettingsGeneral/ShowLogWindow}"
+                        Classes="Primary"
+                        Command="{Binding CmdShowLogWindow}" />
                 </Grid>
+
 
                 <!-- Online Features -->
                 <Grid ColumnDefinitions="*,*"
@@ -306,21 +318,6 @@
                         </martridge:GenericTemplateSelector>
                     </ContentPresenter.ContentTemplate>
                 </ContentPresenter>
-            </Grid>
-
-            <!-- Ok / Cancel buttons -->
-            <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto,Auto">
-                                    
-                <Button Grid.Row="0" Grid.Column="0"
-                        Content="{dloc:Localize SettingsGeneral/ShowLogWindow}"
-                        Classes="Primary"
-                        Command="{Binding CmdShowLogWindow}" />
-                
-                <Button Grid.Column="2" Content="{dloc:Localize Generic/ButtonOk}"
-                        Classes="Primary"
-                        Command="{Binding CmdSettingsOk}" />
-                <Button Grid.Column="3" Content="{dloc:Localize Generic/ButtonCancel}"
-                        Command="{Binding CmdSettingsCancel}" />
             </Grid>
         </Grid>
     </Border>

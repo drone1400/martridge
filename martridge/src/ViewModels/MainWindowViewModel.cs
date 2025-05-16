@@ -271,6 +271,11 @@ namespace Martridge.ViewModels {
                 }
                 else
 #endif
+                if (this._currentViewModel is SettingsGeneralViewModel settings) {
+                    // apply settings...
+                    settings.CmdSettingsOk();
+                    settings.Dispose();
+                } else
                 {
                     // dispose current view model
                     this._currentViewModel?.Dispose();
@@ -356,6 +361,7 @@ namespace Martridge.ViewModels {
                 case nameof(NoDinkyViewModel):
                 case nameof(NoDinkyLinuxViewModel):
                 case nameof(DmodBrowserViewModel):
+                case nameof(SettingsGeneralViewModel):
                 case nameof(SettingsThemeViewModel):
                 case nameof(AboutViewModel):
                     return true;
@@ -426,12 +432,6 @@ namespace Martridge.ViewModels {
                 SettingsGeneralViewModel vm = new SettingsGeneralViewModel();
                 vm.CfgGeneral = this._config?.General;
                 vm.CfgLaunch = this._config?.Launch;
-                vm.SettingsDone += (_, _) => {
-                    // return to previous view model...
-                    // NOTE: this should also clean up the current view model...
-                    this.SwapToDefaultViewModel();
-                };
-
                 this.SwapCurrentViewModel(vm);
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);

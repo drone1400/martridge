@@ -327,7 +327,7 @@
   "DmodBrowser/ErrorMissingDirectory" : "Directory not found at path!",
   "DmodBrowser/Refresh" : "Refresh",
   "DmodBrowser/RefreshTooltip" : "Refreshes the dmod list and clears the search",
-  "DmodBrowser/Search" : "Search",
+  "DmodBrowser/Filter" : "Type to filter DMODs by name",
   "DmodBrowser/NoDmodsFound" : "No DMODs found!",
   "DmodBrowser/OrderBy" : "Order By",
   "DmodBrowser/DataGrid/ColumnHeader/Thumbnail" : "Thumbnail",

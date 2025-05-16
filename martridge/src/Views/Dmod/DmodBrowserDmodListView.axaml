@@ -23,16 +23,9 @@
     
     <Grid RowDefinitions="Auto,*" ColumnDefinitions="*">
         <Grid Grid.Row="0" 
-              ColumnDefinitions="Auto, *" 
-              RowDefinitions="Auto, Auto">
-            <Label Grid.Row="0" Grid.Column="0"
-                   Classes="Heading2B"
-                   Content="{dloc:Localize DmodBrowser/Refresh}" />
-            <Label Grid.Row="0" Grid.Column="1"
-                   Classes="Heading2B"
-                   Content="{dloc:Localize DmodBrowser/Search}" />
-            
-            <Button Grid.Row="1" Grid.Column="0" Width="48" Height="48"
+              ColumnDefinitions="Auto, *" >
+           
+            <Button Grid.Row="0" Grid.Column="0" Width="48" Height="48"
                     HorizontalAlignment="Center"
                     Command="{Binding CmdRefreshDmods}"
                     ToolTip.Tip="{dloc:Localize DmodBrowser/RefreshTooltip}">
@@ -41,7 +34,8 @@
                        VerticalAlignment="Stretch"
                        Margin="6"/>
             </Button>
-            <TextBox Grid.Row="1" Grid.Column="1" 
+            <TextBox Grid.Row="0" Grid.Column="1" 
+                     Watermark="{dloc:Localize DmodBrowser/Filter}"
                      HorizontalAlignment="Stretch"
                      VerticalContentAlignment="Center"
                      Text="{Binding DmodSearchString}"/>

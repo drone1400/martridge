@@ -5,87 +5,120 @@
              xmlns:aboutVm="clr-namespace:Martridge.ViewModels.About"
              xmlns:dloc="clr-namespace:Martridge.ViewModels.Localization"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Martridge.Views.About.AboutView">
+             x:Class="Martridge.Views.About.AboutView"
+             x:Name="TheAboutView">
     <Design.DataContext>
         <aboutVm:AboutViewModel />
     </Design.DataContext>
     <UserControl.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </UserControl.Styles>
-    
+
     <Grid RowDefinitions="Auto,*">
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*">
             <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto">
                 <Label Grid.Row="0"
                        Classes="HeadingTitle"
                        Content="{dloc:Localize AboutWindow/AppName}"
-                       HorizontalAlignment="Center"/>
+                       HorizontalAlignment="Center" />
 
                 <Label Grid.Row="1"
-                           Classes="Heading2"
-                           Content="{dloc:Localize AboutWindow/Version2}"
-                           HorizontalAlignment="Center"/>
+                       Classes="Heading2"
+                       Content="{dloc:Localize AboutWindow/Version2}"
+                       HorizontalAlignment="Center" />
 
-                <StackPanel 
+                <StackPanel
                     Grid.Row="2"
                     Margin="10,5"
                     Orientation="Horizontal"
                     HorizontalAlignment="Center">
 
-                    <Label  
+                    <Label
                         Content="{dloc:Localize AboutWindow/Version}"
-                        HorizontalAlignment="Center"/>
-                    <Label  
+                        HorizontalAlignment="Center" />
+                    <Label
                         Content=" - "
-                        HorizontalAlignment="Center"/>
-                    <Label  
+                        HorizontalAlignment="Center" />
+                    <Label
                         Content="{Binding Version}"
-                        HorizontalAlignment="Center"/>
+                        HorizontalAlignment="Center" />
                 </StackPanel>
-      
-                <Label 
+
+                <Label
                     Grid.Row="3"
                     Margin="20,10"
                     Content="{dloc:Localize AboutWindow/Description}"
-                    TextBlock.TextWrapping="Wrap"/>
-                
-      
+                    TextBlock.TextWrapping="Wrap" />
+
+
             </Grid>
-            
+
             <Image Grid.Row="0" Grid.Column="2"
                    Source="{Binding AnimatedMartridgeLeft.Frame}"
-                   Height="80"/>
+                   Height="80" />
             <Image Grid.Row="0" Grid.Column="0"
                    Source="{Binding AnimatedMartridgeRight.Frame}"
-                   Height="80"/>
+                   Height="80" />
         </Grid>
-      
+
 
         <Grid Grid.Row="1" RowDefinitions="Auto,*">
             <Label
                 Grid.Row="0"
                 Margin="20,5"
-                Content="{dloc:Localize AboutWindow/ResourceCredits}"
-            />
+                Content="{dloc:Localize AboutWindow/ResourceCredits}" />
 
             <ScrollViewer Grid.Row="1">
-                <ItemsRepeater 
+                <ItemsRepeater
+                    Grid.IsSharedSizeScope="True"
                     Margin="6"
                     ItemsSource="{Binding UsedPackages}">
                     <ItemsRepeater.Layout>
-                        <StackLayout Spacing="4" Orientation="Vertical"/>
+                        <StackLayout Spacing="4" Orientation="Vertical" />
                     </ItemsRepeater.Layout>
                     <ItemsRepeater.ItemTemplate>
                         <DataTemplate DataType="aboutVm:AboutUsedPackageViewModel">
-                            <Border BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
-                                <Grid Margin="2"
-                                      RowDefinitions="Auto,Auto">
-                                    <Label Grid.Row="0" Classes="Heading2B"
-                                           Content="{Binding PackageName}"/>
-                                    <TextBox Grid.Row="1" 
-                                             Text="{Binding PackageInfo}" 
-                                             TextWrapping="Wrap"
-                                             IsReadOnly="True"/>
+                            <Border Classes="MartridgeCard"
+                                    Margin="2"
+                                    Padding="4">
+                                <Grid RowDefinitions="Auto,Auto,Auto">
+                                    <Label Grid.Row="0"
+                                           Margin="3,2"
+                                           Classes="Heading1B"
+                                           Content="{Binding Name}" />
+                                    <Label Grid.Row="1"
+                                           Classes="Heading2IWrapping"
+                                           Content="{Binding Description}" />
+                                    <ItemsRepeater Grid.Row="2"
+                                                   ItemsSource="{Binding Links}">
+                                        <ItemsRepeater.Layout>
+                                            <StackLayout Spacing="4" Orientation="Vertical" />
+                                        </ItemsRepeater.Layout>
+                                        <ItemsRepeater.ItemTemplate>
+                                            <DataTemplate DataType="aboutVm:UsedPackageLinkViewModel">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="LinkPrefix"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Label Grid.Column="0"
+                                                           Margin="3,2"
+                                                           Classes="Heading2B"
+                                                           Content="{Binding LinkType}" />
+
+                                                    <Button Grid.Column="1"
+                                                            Classes="Invisibutton"
+                                                            HorizontalAlignment="Left"
+                                                            Command="{Binding #TheAboutView.DataContext.CmdOpenHyperlink}"
+                                                            CommandParameter="{Binding Link}">
+                                                        <Label Margin="10,0"
+                                                               Classes="HyperlinkWrapping"
+                                                               Content="{Binding Link}" />
+                                                    </Button>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsRepeater.ItemTemplate>
+                                    </ItemsRepeater>
                                 </Grid>
                             </Border>
                         </DataTemplate>

@@ -423,6 +423,19 @@
   "AboutWindow/Package/LinkType/OriginalSource": "Original Source Code",
   "AboutWindow/Package/LinkType/ModifiedSource": "Modified Source Code",
   
+  "AboutWindow/Hotkeys/Title": "Hotkeys",
+  "AboutWindow/Hotkeys/KeyF1": "F1 - About page",
+  "AboutWindow/Hotkeys/KeyF2": "F2 - Toggle between DMOD browser and Online DMOD Browser (if enabled)",
+  "AboutWindow/Hotkeys/KeyF3": "F3 - General settings",
+  "AboutWindow/Hotkeys/KeyF4": "F4 - Theme settings",
+  "AboutWindow/Hotkeys/KeyF5": "F5 - DMOD Installer page",
+  "AboutWindow/Hotkeys/KeyF6": "F6 - DMOD Packer page (if DMOD Developer features are enabled)",
+  "AboutWindow/Hotkeys/KeyF7": "F7 - DINK Installer page",
+  "AboutWindow/Hotkeys/KeyEsc": "ESC - cancels some operations / returns to DMOD Browser on some pages",
+  "AboutWindow/Hotkeys/KeyPlayDmod": "CTRL+D - in the DMOD browser, launches selected DMOD using currently selected game engine",
+  "AboutWindow/Hotkeys/KeyEditDmod": "CTRL+E - in the DMOD browser, launches the currently selected editor for the currently selected DMOD",
+  
+  
   
 
   "HelloWorld": "Hello World!"

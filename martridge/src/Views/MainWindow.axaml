@@ -18,7 +18,7 @@
 
         Icon="/Assets/martridge_new.ico"
         Title="{dloc:Localize MainWindow/Title}"
-        Background="{DynamicResource ThemeBackgroundColor}"
+        Background="{DynamicResource ThemeBackgroundBrush}"
         Name="TheMainWindow"
 
         KeyDown="InputElement_OnKeyDown"

@@ -14,60 +14,64 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </UserControl.Styles>
 
-    <Grid RowDefinitions="Auto,*">
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,*">
-            <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto">
-                <Label Grid.Row="0"
-                       Classes="HeadingTitle"
-                       Content="{dloc:Localize AboutWindow/AppName}"
-                       HorizontalAlignment="Center" />
+    <Grid RowDefinitions="Auto,Auto,*">
+        <Border Grid.Row="0" Classes="MartridgeCard">
+            <Grid ColumnDefinitions="*,Auto,*">
+                <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto">
+                    <Label Grid.Row="0"
+                           Classes="HeadingTitle"
+                           Content="{dloc:Localize AboutWindow/AppName}"
+                           HorizontalAlignment="Center" />
 
-                <Label Grid.Row="1"
-                       Classes="Heading2"
-                       Content="{dloc:Localize AboutWindow/Version2}"
-                       HorizontalAlignment="Center" />
+                    <Label Grid.Row="1"
+                           Classes="Heading2"
+                           Content="{dloc:Localize AboutWindow/Version2}"
+                           HorizontalAlignment="Center" />
 
-                <StackPanel
-                    Grid.Row="2"
-                    Margin="10,5"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Center">
+                    <StackPanel
+                        Grid.Row="2"
+                        Margin="10,5"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center">
+
+                        <Label
+                            Content="{dloc:Localize AboutWindow/Version}"
+                            HorizontalAlignment="Center" />
+                        <Label
+                            Content=" - "
+                            HorizontalAlignment="Center" />
+                        <Label
+                            Content="{Binding Version}"
+                            HorizontalAlignment="Center" />
+                    </StackPanel>
 
                     <Label
-                        Content="{dloc:Localize AboutWindow/Version}"
-                        HorizontalAlignment="Center" />
-                    <Label
-                        Content=" - "
-                        HorizontalAlignment="Center" />
-                    <Label
-                        Content="{Binding Version}"
-                        HorizontalAlignment="Center" />
-                </StackPanel>
-
-                <Label
-                    Grid.Row="3"
-                    Margin="20,10"
-                    Content="{dloc:Localize AboutWindow/Description}"
-                    TextBlock.TextWrapping="Wrap" />
+                        Grid.Row="3"
+                        Margin="20,10"
+                        Content="{dloc:Localize AboutWindow/Description}"
+                        TextBlock.TextWrapping="Wrap" />
 
 
+                </Grid>
+
+                <Image Grid.Row="0" Grid.Column="2"
+                       Source="{Binding AnimatedMartridgeLeft.Frame}"
+                       Height="80" />
+                <Image Grid.Row="0" Grid.Column="0"
+                       Source="{Binding AnimatedMartridgeRight.Frame}"
+                       Height="80" />
             </Grid>
+        </Border>
+        <Border Grid.Row="1" Classes="MartridgeCard">
+            <StackPanel Orientation="Vertical">
+                <Label
+                    Classes="Heading2B"
+                    Content="{dloc:Localize AboutWindow/ResourceCredits}" />
+            </StackPanel>
+        </Border>
 
-            <Image Grid.Row="0" Grid.Column="2"
-                   Source="{Binding AnimatedMartridgeLeft.Frame}"
-                   Height="80" />
-            <Image Grid.Row="0" Grid.Column="0"
-                   Source="{Binding AnimatedMartridgeRight.Frame}"
-                   Height="80" />
-        </Grid>
 
-
-        <Grid Grid.Row="1" RowDefinitions="Auto,*">
-            <Label
-                Grid.Row="0"
-                Margin="20,5"
-                Content="{dloc:Localize AboutWindow/ResourceCredits}" />
-
+        <Grid Grid.Row="2" RowDefinitions="Auto,*">
             <ScrollViewer Grid.Row="1">
                 <ItemsRepeater
                     Grid.IsSharedSizeScope="True"
@@ -98,8 +102,8 @@
                                             <DataTemplate DataType="aboutVm:UsedPackageLinkViewModel">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="LinkPrefix"/>
-                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto" SharedSizeGroup="LinkPrefix" />
+                                                        <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
                                                     <Label Grid.Column="0"
                                                            Margin="3,2"

@@ -33,7 +33,12 @@
             LeftPanelMinWidth="375"
             RightPanelMinWidth="560"
             IsOnePageShowingRightContent="{Binding SelectedDmodDefinition, 
-                Converter={StaticResource ConverterIsNotNullCheck}}">
+                Converter={StaticResource ConverterIsNotNullCheck}}"
+            LeftPanelolumnLengthInitialized="{Binding DmodBrowserLeftPanelColumnWidthSet, Mode=TwoWay}"
+            RightPanelolumnLengthInitialized="{Binding DmodBrowserRightPanelColumnWidthSet, Mode=TwoWay}"
+            LeftPanelLastSetColumnLength="{Binding DmodBrowserLeftPanelColumnWidth, Mode=TwoWay}"
+            RightPanelLastSetColumnLength="{Binding DmodBrowserRightPanelColumnWidth, Mode=TwoWay}">
+            
 
             <vw:MagicSplitPresenterView.LeftPanelContent>
                 <vw:DmodBrowserDmodListView

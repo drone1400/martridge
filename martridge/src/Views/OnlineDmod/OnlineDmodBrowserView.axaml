@@ -28,10 +28,14 @@
     <Border Classes="MartridgeCard">
         <vw:MagicSplitPresenterView
             Name="MagicSplit"
-            LeftPanelMinWidth="450"
-            RightPanelMinWidth="540"
+            LeftPanelMinWidth="600"
+            RightPanelMinWidth="500"
             IsOnePageShowingRightContent="{Binding SelectedDmodDefinition, 
-                Converter={StaticResource ConverterIsNotNullCheck}}">
+                Converter={StaticResource ConverterIsNotNullCheck}}"
+            LeftPanelolumnLengthInitialized="{Binding OnlineDmodBrowserLeftPanelColumnWidthSet, Mode=TwoWay}"
+            RightPanelolumnLengthInitialized="{Binding OnlineDmodBrowserRightPanelColumnWidthSet, Mode=TwoWay}"
+            LeftPanelLastSetColumnLength="{Binding OnlineDmodBrowserLeftPanelColumnWidth, Mode=TwoWay}"
+            RightPanelLastSetColumnLength="{Binding OnlineDmodBrowserRightPanelColumnWidth, Mode=TwoWay}">
 
             <vw:MagicSplitPresenterView.LeftPanelContent>
                 <onlineDmod1:OnlineDmodBrowserDmodListView DataContext="{Binding }" />

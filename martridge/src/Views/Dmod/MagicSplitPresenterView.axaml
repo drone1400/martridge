@@ -18,10 +18,12 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"
-                              MinWidth="580" />
+                              MinWidth="580" 
+                              PropertyChanged="LeftColumnPropertyChanged"/>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*"
-                              MinWidth="480" />
+                              MinWidth="480" 
+                              PropertyChanged="RightColumnPropertyChanged"/>
         </Grid.ColumnDefinitions>
 
         <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch"

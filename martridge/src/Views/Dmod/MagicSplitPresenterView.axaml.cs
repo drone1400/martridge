@@ -41,6 +41,21 @@ namespace Martridge.Views.Dmod {
         // Left Panel
         // -----------------------------------------------------------------------------------------------------------------------------------
         
+        public static readonly AvaloniaProperty<bool> LeftPanelolumnLengthInitializedProperty =
+            AvaloniaProperty.Register<MagicSplitPresenterView, bool>(nameof(LeftPanelolumnLengthInitialized), false);
+        public bool LeftPanelolumnLengthInitialized {
+            get => (bool)(this.GetValue(LeftPanelolumnLengthInitializedProperty) ?? false);
+            set => this.SetValue(LeftPanelolumnLengthInitializedProperty,value);
+        }
+        
+        
+        public static readonly AvaloniaProperty<GridLength> LeftPanelLastSetColumnLengthProperty =
+            AvaloniaProperty.Register<MagicSplitPresenterView, GridLength>(nameof(LeftPanelLastSetColumnLength), new GridLength(1, GridUnitType.Star));
+        public GridLength LeftPanelLastSetColumnLength {
+            get => (GridLength)(this.GetValue(LeftPanelLastSetColumnLengthProperty) ?? new GridLength(1, GridUnitType.Star));
+            set => this.SetValue(LeftPanelLastSetColumnLengthProperty,value);
+        }
+        
         public static readonly AvaloniaProperty<object?> LeftPanelContentProperty =
             AvaloniaProperty.Register<MagicSplitPresenterView, object?>(nameof(LeftPanelContent), null);
         public object? LeftPanelContent {
@@ -72,6 +87,20 @@ namespace Martridge.Views.Dmod {
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Right Panel
         // -----------------------------------------------------------------------------------------------------------------------------------
+        
+        public static readonly AvaloniaProperty<bool> RightPanelolumnLengthInitializedProperty =
+            AvaloniaProperty.Register<MagicSplitPresenterView, bool>(nameof(RightPanelolumnLengthInitialized), false);
+        public bool RightPanelolumnLengthInitialized {
+            get => (bool)(this.GetValue(RightPanelolumnLengthInitializedProperty) ?? false);
+            set => this.SetValue(RightPanelolumnLengthInitializedProperty,value);
+        }
+        
+        public static readonly AvaloniaProperty<GridLength> RightPanelLastSetColumnLengthProperty =
+            AvaloniaProperty.Register<MagicSplitPresenterView, GridLength>(nameof(RightPanelLastSetColumnLength), new GridLength(1, GridUnitType.Star));
+        public GridLength RightPanelLastSetColumnLength {
+            get => (GridLength)(this.GetValue(RightPanelLastSetColumnLengthProperty) ?? new GridLength(1, GridUnitType.Star));
+            set => this.SetValue(RightPanelLastSetColumnLengthProperty,value);
+        }
         
         public static readonly AvaloniaProperty<object?> RightPanelContentProperty =
             AvaloniaProperty.Register<MagicSplitPresenterView, object?>(nameof(RightPanelContent), null);
@@ -112,7 +141,7 @@ namespace Martridge.Views.Dmod {
 
             this._theGrid = this.Content as Grid;
 
-            this.PropertyChanged += ( sender,  args) => {
+            this.PropertyChanged += ( _,  args) => {
                 if (args.Property.Name == nameof(this.Bounds)) {
                     this.ResizeMagic();
                 }
@@ -120,6 +149,19 @@ namespace Martridge.Views.Dmod {
                 if (args.Property.Name == nameof(this.LeftPanelMinWidth) ||
                     args.Property.Name == nameof(this.RightPanelMinWidth)) {
                     this.RefreshMagicProperties();
+                }
+
+                if (this.LeftPanelolumnLengthInitialized == false && args.Property.Name == nameof(this.LeftPanelLastSetColumnLength)) {
+                    if (this._theGrid != null) {
+                        this.LeftPanelolumnLengthInitialized = true;
+                        this._theGrid.ColumnDefinitions[0].Width = this.LeftPanelLastSetColumnLength;
+                    }
+                }
+                if (this.RightPanelolumnLengthInitialized == false && args.Property.Name == nameof(this.RightPanelLastSetColumnLength)) {
+                    if (this._theGrid != null) {
+                        this.RightPanelolumnLengthInitialized = true;
+                        this._theGrid.ColumnDefinitions[2].Width = this.RightPanelLastSetColumnLength;
+                    }
                 }
             };
         }
@@ -162,6 +204,17 @@ namespace Martridge.Views.Dmod {
                        this.Bounds.Width < this.OnePageSwitchThreshold - this.OnePageSwitchHysteresis) {
                 this.IsViewOnePageMode = true;
                 this.RefreshMagicProperties();
+            }
+        }
+        
+        private void LeftColumnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e) {
+            if (e.Property.Name == "Width" && e.NewValue is GridLength gridLength) {
+                this.LeftPanelLastSetColumnLength = gridLength;
+            }
+        }
+        private void RightColumnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e) {
+            if (e.Property.Name == "Width" && e.NewValue is GridLength gridLength) {
+                this.RightPanelLastSetColumnLength = gridLength;
             }
         }
     }

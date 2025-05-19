@@ -342,6 +342,7 @@ namespace Martridge.ViewModels {
             if (this._onlineDmodBrowserViewModel == null) {
                 this._onlineDmodBrowserViewModel = new OnlineDmodBrowserViewModel();
                 this._onlineDmodBrowserViewModel.DmodCrawler = this._dmodCrawler;
+                this._onlineDmodBrowserViewModel.CfgRemember = this._config?.Remember;
                 this._onlineDmodBrowserViewModel.InstallDmodRequested += (_, args) => {
                     this.CmdShowPageDmodInstaller(args.Path);
                 };

@@ -8,8 +8,10 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Collections;
+using Avalonia.Controls;
 using Avalonia.Metadata;
 using Avalonia.Threading;
+using Martridge.Models.Configuration;
 using Martridge.Models.Dmod;
 using Martridge.Models.Localization;
 using Martridge.Models.OnlineDmods;
@@ -34,7 +36,7 @@ namespace Martridge.ViewModels.OnlineDmod {
         }
     }
     
-    public class OnlineDmodBrowserViewModel : ViewModelAppPage {
+    public class OnlineDmodBrowserViewModel : ViewModelAppPageWithCfg {
 
         public event EventHandler<InstallOnlineDmodEventArgs>? InstallDmodRequested; 
 
@@ -76,6 +78,58 @@ namespace Martridge.ViewModels.OnlineDmod {
             };
         }
         
+        protected override void OnConfigRememberChanged() {
+            if (this.CfgRemember == null)
+                return;
+
+            // reset flags so the values get updated in the UI...
+            this.OnlineDmodBrowserLeftPanelColumnWidthSet = false;
+            this.OnlineDmodBrowserRightPanelColumnWidthSet = false;
+            // write actual values
+            this.OnlineDmodBrowserLeftPanelColumnWidth = new GridLength(this.CfgRemember.OnlineDmodBrowserLeftPanelColumnWidth, GridUnitType.Star);
+            this.OnlineDmodBrowserRightPanelColumnWidth = new GridLength(this.CfgRemember.OnlineDmodBrowserRightPanelColumnWidth, GridUnitType.Star);
+        }
+        
+        #region CONFIGURATION - remembered layout
+
+        public bool OnlineDmodBrowserLeftPanelColumnWidthSet {
+            get => this._onlineDmodBrowserLeftPanelColumnWidthSet;
+            set => this.RaiseAndSetIfChanged(ref this._onlineDmodBrowserLeftPanelColumnWidthSet, value);
+        }
+        private bool _onlineDmodBrowserLeftPanelColumnWidthSet = false;
+
+        public GridLength OnlineDmodBrowserLeftPanelColumnWidth {
+            get => this._onlineDmodBrowserLeftPanelColumnWidth;
+            set {
+                this.RaiseAndSetIfChanged(ref this._onlineDmodBrowserLeftPanelColumnWidth, value);
+                Dictionary<string, object?> values = new Dictionary<string, object?>() {
+                    [nameof(ConfigRemember.OnlineDmodBrowserLeftPanelColumnWidth)] = value.Value,
+                };
+                this.CfgRemember?.UpdateProperties(values);
+            }
+        }
+        private GridLength _onlineDmodBrowserLeftPanelColumnWidth = new GridLength(1.0, GridUnitType.Star); 
+        
+        public bool OnlineDmodBrowserRightPanelColumnWidthSet {
+            get => this._onlineDmodBrowserRightPanelColumnWidthSet;
+            set => this.RaiseAndSetIfChanged(ref this._onlineDmodBrowserRightPanelColumnWidthSet, value);
+        }
+        private bool _onlineDmodBrowserRightPanelColumnWidthSet = false;
+        
+        public GridLength OnlineDmodBrowserRightPanelColumnWidth {
+            get => this._onlineDmodBrowserRightPanelColumnWidth;
+            set {
+                this.RaiseAndSetIfChanged(ref this._onlineDmodBrowserRightPanelColumnWidth, value);
+                Dictionary<string, object?> values = new Dictionary<string, object?>() {
+                    [nameof(ConfigRemember.OnlineDmodBrowserRightPanelColumnWidth)] = value.Value,
+                };
+                this.CfgRemember?.UpdateProperties(values);
+            }
+        }
+        private GridLength _onlineDmodBrowserRightPanelColumnWidth = new GridLength(1.0, GridUnitType.Star);
+        
+        
+        #endregion
         
         #region DMOD List - Properties and methods related to the DMOD list are here
 

@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using Avalonia.Collections;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
@@ -99,6 +100,16 @@ namespace Martridge.ViewModels.Dmod {
 
         protected override void OnConfigRememberChanged() {
             this.InitializeSelectedDmodFromRemembered();
+
+            if (this.CfgRemember == null)
+                return;
+
+            // reset flags so the values get updated in the UI...
+            this.DmodBrowserLeftPanelColumnWidthSet = false;
+            this.DmodBrowserRightPanelColumnWidthSet = false;
+            // write actual values
+            this.DmodBrowserLeftPanelColumnWidth = new GridLength(this.CfgRemember.DmodBrowserLeftPanelColumnWidth, GridUnitType.Star);
+            this.DmodBrowserRightPanelColumnWidth = new GridLength(this.CfgRemember.DmodBrowserRightPanelColumnWidth, GridUnitType.Star);
         }
 
         protected override void OnCfgRememberUpdated(object? sender, ConfigUpdateEventArgs e) {
@@ -121,6 +132,47 @@ namespace Martridge.ViewModels.Dmod {
             this.SelectDmodByPath(this.CfgRemember.DmodBrowserSelectedDmodPath);
         }
 
+        #endregion
+        
+        #region CONFIGURATION - remembered layout
+
+        public bool DmodBrowserLeftPanelColumnWidthSet {
+            get => this._dmodBrowserLeftPanelColumnWidthSet;
+            set => this.RaiseAndSetIfChanged(ref this._dmodBrowserLeftPanelColumnWidthSet, value);
+        }
+        private bool _dmodBrowserLeftPanelColumnWidthSet = false;
+
+        public GridLength DmodBrowserLeftPanelColumnWidth {
+            get => this._dmodBrowserLeftPanelColumnWidth;
+            set {
+                this.RaiseAndSetIfChanged(ref this._dmodBrowserLeftPanelColumnWidth, value);
+                Dictionary<string, object?> values = new Dictionary<string, object?>() {
+                    [nameof(ConfigRemember.DmodBrowserLeftPanelColumnWidth)] = value.Value,
+                };
+                this.CfgRemember?.UpdateProperties(values);
+            }
+        }
+        private GridLength _dmodBrowserLeftPanelColumnWidth = new GridLength(1.0, GridUnitType.Star); 
+        
+        public bool DmodBrowserRightPanelColumnWidthSet {
+            get => this._dmodBrowserRightPanelColumnWidthSet;
+            set => this.RaiseAndSetIfChanged(ref this._dmodBrowserRightPanelColumnWidthSet, value);
+        }
+        private bool _dmodBrowserRightPanelColumnWidthSet = false;
+        
+        public GridLength DmodBrowserRightPanelColumnWidth {
+            get => this._dmodBrowserRightPanelColumnWidth;
+            set {
+                this.RaiseAndSetIfChanged(ref this._dmodBrowserRightPanelColumnWidth, value);
+                Dictionary<string, object?> values = new Dictionary<string, object?>() {
+                    [nameof(ConfigRemember.DmodBrowserRightPanelColumnWidth)] = value.Value,
+                };
+                this.CfgRemember?.UpdateProperties(values);
+            }
+        }
+        private GridLength _dmodBrowserRightPanelColumnWidth = new GridLength(1.0, GridUnitType.Star);
+        
+        
         #endregion
         
 

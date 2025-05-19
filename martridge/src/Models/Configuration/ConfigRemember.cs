@@ -36,6 +36,31 @@ namespace Martridge.Models.Configuration {
         /// </summary>
         public string DmodBrowserSelectedDmodPath => this._dmodBrowserSelectedDmodPath;
         private string _dmodBrowserSelectedDmodPath = string.Empty;
+        
+        
+        /// <summary>
+        /// Last set left panel column width in star units for the DMOD Browser 
+        /// </summary>
+        public double DmodBrowserLeftPanelColumnWidth => this._dmodBrowserLeftPanelColumnWidth;
+        private double _dmodBrowserLeftPanelColumnWidth = 1.0;
+        
+        /// <summary>
+        /// Last set right panel column width in star units for the DMOD Browser 
+        /// </summary>
+        public double DmodBrowserRightPanelColumnWidth => this._dmodBrowserRightPanelColumnWidth;
+        private double _dmodBrowserRightPanelColumnWidth = 1.0;
+        
+        /// <summary>
+        /// Last set left panel column width in star units for the DMOD Online Browser 
+        /// </summary>
+        public double OnlineDmodBrowserLeftPanelColumnWidth => this._onlineDmodBrowserLeftPanelColumnWidth;
+        private double _onlineDmodBrowserLeftPanelColumnWidth = 1.0;
+        
+        /// <summary>
+        /// Last set right panel column width in star units for the DMOD Online Browser 
+        /// </summary>
+        public double OnlineDmodBrowserRightPanelColumnWidth => this._onlineDmodBrowserRightPanelColumnWidth;
+        private double _onlineDmodBrowserRightPanelColumnWidth = 1.0;
 
         //
         // Main window state
@@ -95,6 +120,10 @@ namespace Martridge.Models.Configuration {
                     case nameof(this.PackDmodSourcePath): TryUpdateGeneric(kvp, ref this._packDmodSourcePath); break;
                     case nameof(this.PackDmodDestinationPath): TryUpdateGeneric(kvp, ref this._packDmodDestinationPath); break;
                     case nameof(this.DmodBrowserSelectedDmodPath): TryUpdateGeneric(kvp, ref this._dmodBrowserSelectedDmodPath); break;
+                    case nameof(this.DmodBrowserLeftPanelColumnWidth): TryUpdateGeneric(kvp, ref this._dmodBrowserLeftPanelColumnWidth); break;
+                    case nameof(this.DmodBrowserRightPanelColumnWidth): TryUpdateGeneric(kvp, ref this._dmodBrowserRightPanelColumnWidth); break;
+                    case nameof(this.OnlineDmodBrowserLeftPanelColumnWidth): TryUpdateGeneric(kvp, ref this._onlineDmodBrowserLeftPanelColumnWidth); break;
+                    case nameof(this.OnlineDmodBrowserRightPanelColumnWidth): TryUpdateGeneric(kvp, ref this._onlineDmodBrowserRightPanelColumnWidth); break;
                     // main window
                     case nameof(this.MainWindowState): TryUpdateGeneric(kvp, ref this._mainWindowState); break;
                     case nameof(this.MainWindowWidth): TryUpdateGeneric(kvp, ref this._mainWindowWidth); break;
@@ -127,6 +156,10 @@ namespace Martridge.Models.Configuration {
                 PackDmodSourcePath = this.PackDmodSourcePath,
                 PackDmodDestinationPath = this.PackDmodDestinationPath,
                 DmodBrowserSelectedDmodPath = this.DmodBrowserSelectedDmodPath,
+                DmodBrowserLeftPanelColumnWidth = this.DmodBrowserLeftPanelColumnWidth,
+                DmodBrowserRightPanelColumnWidth = this.DmodBrowserRightPanelColumnWidth,
+                OnlineDmodBrowserLeftPanelColumnWidth = this.OnlineDmodBrowserLeftPanelColumnWidth,
+                OnlineDmodBrowserRightPanelColumnWidth = this.OnlineDmodBrowserRightPanelColumnWidth,
                 
                 MainWindowState = this.MainWindowState.ToString(),
                 MainWindowWidth = this.MainWindowWidth,

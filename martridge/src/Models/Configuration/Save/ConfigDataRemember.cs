@@ -28,6 +28,26 @@ namespace Martridge.Models.Configuration.Save {
         /// </summary>
         public string? DmodBrowserSelectedDmodPath { get; set; }
         
+        /// <summary>
+        /// Last set left panel column width in star units for the DMOD Browser 
+        /// </summary>
+        public double DmodBrowserLeftPanelColumnWidth { get; set; }
+        
+        /// <summary>
+        /// Last set right panel column width in star units for the DMOD Browser 
+        /// </summary>
+        public double DmodBrowserRightPanelColumnWidth { get; set; }
+        
+        /// <summary>
+        /// Last set left panel column width in star units for the DMOD Online Browser 
+        /// </summary>
+        public double OnlineDmodBrowserLeftPanelColumnWidth { get; set; }
+        
+        /// <summary>
+        /// Last set right panel column width in star units for the DMOD Online Browser 
+        /// </summary>
+        public double OnlineDmodBrowserRightPanelColumnWidth { get; set; }
+        
         //
         // Main window state
         //
@@ -60,6 +80,10 @@ namespace Martridge.Models.Configuration.Save {
                 [nameof(ConfigRemember.PackDmodSourcePath)] = this.PackDmodSourcePath,
                 [nameof(ConfigRemember.PackDmodDestinationPath)] = this.PackDmodDestinationPath,
                 [nameof(ConfigRemember.DmodBrowserSelectedDmodPath)] = this.DmodBrowserSelectedDmodPath,
+                [nameof(ConfigRemember.DmodBrowserLeftPanelColumnWidth)] = this.DmodBrowserLeftPanelColumnWidth,
+                [nameof(ConfigRemember.DmodBrowserRightPanelColumnWidth)] = this.DmodBrowserRightPanelColumnWidth,
+                [nameof(ConfigRemember.OnlineDmodBrowserLeftPanelColumnWidth)] = this.OnlineDmodBrowserLeftPanelColumnWidth,
+                [nameof(ConfigRemember.OnlineDmodBrowserRightPanelColumnWidth)] = this.OnlineDmodBrowserRightPanelColumnWidth,
                 // Main Window
                 [nameof(ConfigRemember.MainWindowState)] = mainWindowState,
                 [nameof(ConfigRemember.MainWindowWidth)] = this.MainWindowWidth,

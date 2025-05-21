@@ -75,6 +75,9 @@ namespace Martridge.ViewModels.Dmod {
                             this._dmodSearchTimer.Start();
                         }
                         break;
+                    case nameof(this.ActiveGameExePath):
+                        this.RefreshIsLauncherFreeDink();
+                        break;
                 }
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.General, ex);

@@ -514,7 +514,9 @@ namespace Martridge.ViewModels.Dmod {
 
             string path = this.ActiveGameExePath.Path;
             FileInfo finfo = new FileInfo(path);
-            if (finfo.Name.ToLowerInvariant().Contains("freedink") == false) {
+            string nameLower = finfo.Name.ToLowerInvariant();
+            if (nameLower.Contains("freedink") == false &&
+                nameLower.Contains("yeoldedink") == false) {
                 this.IsLauncherFreeDink = false;
                 return;
             }

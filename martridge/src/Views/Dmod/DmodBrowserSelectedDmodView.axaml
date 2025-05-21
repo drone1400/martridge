@@ -179,7 +179,7 @@
                             </TextBox>
                         </Grid>
 
-                        <Grid>
+                        <Grid IsVisible="{Binding ShowFreeDinkLocalizations}" >
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="{StaticResource LeftColumnWidth}" />
                                 <ColumnDefinition Width="*" />
@@ -187,13 +187,11 @@
 
                             <Label Grid.Row="0" Grid.Column="0"
                                    Content="{dloc:Localize DmodBrowser/FreeDinkLocalization}"
-                                   Classes="Heading2B"
-                                   IsVisible="{Binding IsLauncherFreeDink}" />
+                                   Classes="Heading2B"/>
                             <ComboBox Grid.Row="0" Grid.Column="1"
                                       HorizontalAlignment="Stretch"
                                       SelectedItem="{Binding SelectedLocalization}"
-                                      ItemsSource="{Binding  SelectedDmodDefinition.Localizations }"
-                                      IsVisible="{Binding IsLauncherFreeDink}">
+                                      ItemsSource="{Binding  SelectedDmodDefinition.Localizations }">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate DataType="vm:DmodLocalizationDefinition">
                                         <Grid>

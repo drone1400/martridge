@@ -76,7 +76,10 @@ namespace Martridge.ViewModels.Dmod {
                         }
                         break;
                     case nameof(this.ActiveGameExePath):
-                        this.RefreshIsLauncherFreeDink();
+                        this.RefreshShowFreedinkLocalizations();
+                        break;
+                    case nameof(this.SelectedDmodDefinition):
+                        this.RefreshShowFreedinkLocalizations();
                         break;
                 }
             } catch (Exception ex) {
@@ -394,17 +397,17 @@ namespace Martridge.ViewModels.Dmod {
                     this.GameExePaths = listGameExe;
                     if (cfg.ActiveGameExeIndex >= 0 && cfg.ActiveGameExeIndex < cfg.GameExePaths.Count) {
                         this.ActiveGameExePath = this.GameExePaths[cfg.ActiveGameExeIndex];
-                        this.RefreshIsLauncherFreeDink();
+                        this.RefreshShowFreedinkLocalizations();
                     } else {
                         this.ActiveGameExePath = null;
-                        this.RefreshIsLauncherFreeDink();
+                        this.RefreshShowFreedinkLocalizations();
                     }
                 }
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
                 this.GameExePaths = listGameExe;
                 this.ActiveGameExePath = null;
-                this.RefreshIsLauncherFreeDink();
+                this.RefreshShowFreedinkLocalizations();
             }
 
 
@@ -494,12 +497,12 @@ namespace Martridge.ViewModels.Dmod {
 
         public string LaunchEditorParameter => "editor";
         
-        public bool IsLauncherFreeDink {
-            get => this._isLauncherFreeDink;
-            protected set => this.RaiseAndSetIfChanged(ref this._isLauncherFreeDink, value);
+        public bool ShowFreeDinkLocalizations {
+            get => this._showFreeDinkLocalizations;
+            protected set => this.RaiseAndSetIfChanged(ref this._showFreeDinkLocalizations, value);
         }
 
-        private bool _isLauncherFreeDink = false;
+        private bool _showFreeDinkLocalizations = false;
         
         public bool DmodLauncherWaitingForDelay {
             get => this._dmodLauncherWaitingForDelay;
@@ -511,9 +514,19 @@ namespace Martridge.ViewModels.Dmod {
         // Methods
         // -----------------------------------------------------------------------------------------------------------------------------------
 
-        private void RefreshIsLauncherFreeDink() {
+        private void RefreshShowFreedinkLocalizations() {
             if (this.ActiveGameExePath == null || this.ActiveGameExePath?.PathExists != true) {
-                this.IsLauncherFreeDink = false;
+                this.ShowFreeDinkLocalizations = false;
+                return;
+            }
+
+            if (this.SelectedDmodDefinition == null) {
+                this.ShowFreeDinkLocalizations = false;
+                return;
+            }
+
+            if (this.SelectedDmodDefinition.Localizations.Count <= 1) {
+                this.ShowFreeDinkLocalizations = false;
                 return;
             }
 
@@ -522,11 +535,11 @@ namespace Martridge.ViewModels.Dmod {
             string nameLower = finfo.Name.ToLowerInvariant();
             if (nameLower.Contains("freedink") == false &&
                 nameLower.Contains("yeoldedink") == false) {
-                this.IsLauncherFreeDink = false;
+                this.ShowFreeDinkLocalizations = false;
                 return;
             }
             
-            this.IsLauncherFreeDink = true;
+            this.ShowFreeDinkLocalizations = true;
         }
 
         #endregion

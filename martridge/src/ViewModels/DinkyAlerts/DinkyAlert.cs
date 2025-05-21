@@ -214,9 +214,17 @@ namespace Martridge.ViewModels.DinkyAlerts {
 
                     DinkyAlertViewModel vm = new DinkyAlertViewModel(title, message, resultButtons, type, customButtonText);
                     vm.ResultIsDone += (_, _) => {
+                        
                         // clear active alert VM in App instance...
                         app.ClearActiveAlertViewModel();
-                        Monitor.Pulse(_syncRoot_Alert);
+                        if (Monitor.TryEnter(_syncRoot_Alert)) {
+                            try {
+                                Monitor.Pulse(_syncRoot_Alert);
+                            }
+                            finally {
+                                Monitor.Exit(_syncRoot_Alert);
+                            }
+                        }
                     };
                     
                     // set active alert view model

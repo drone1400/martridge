@@ -292,6 +292,7 @@
   "DmodBrowser/LaunchDmod": "Play DMOD",
   "DmodBrowser/EditDmod": "Edit DMOD",
   "DmodBrowser/FreeDinkLocalization": "FreeDink Localization",
+  "DmodBrowser/LaunchArguments": "Launcher Options",
   "DmodBrowser/LaunchSkip": "Skip",
   "DmodBrowser/LaunchSkip/Tooltip": "If enabled, uses '-skip' parameter to skip update checks in DinkHD. \n\rNOTE: this causes FreeDink to crash, so this parameter is ignored when launching FreeDink!",
   "DmodBrowser/LaunchUseRefDir": "Use --refdir",

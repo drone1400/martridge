@@ -6,10 +6,12 @@
 
              xmlns:dloc="using:Martridge.ViewModels.Localization"
              xmlns:vm="using:Martridge.ViewModels.Dmod"
+             xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
 
              mc:Ignorable="d"
              d:DesignWidth="800"
-             d:DesignHeight="450">
+             d:DesignHeight="450"
+             x:Name="TheDmodBrowserSelectedDmodView">
 
     <Design.DataContext>
         <vm:DmodBrowserViewModel />
@@ -20,9 +22,14 @@
     <UserControl.Resources>
         <x:String x:Key="DataNotAvailable">N/A</x:String>
         <GridLength x:Key="LeftColumnWidth">160</GridLength>
+        <valueConverters:DoubleCompareToBoolConverter x:Key="DoubleGreaterThanToBoolConverter" Mode="GreaterOrEqualTo" />
+        <valueConverters:DoubleCompareToBoolConverter x:Key="DoubleLessThanToBoolConverter" Mode="LessThan" />
+        <x:Double x:Key="ImageToggleWidthThreshold">800</x:Double>
+        <x:Double x:Key="ImageWidth">300</x:Double>
     </UserControl.Resources>
 
     <Grid>
+
         <StackPanel
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
@@ -39,228 +46,243 @@
                    Content="{dloc:Localize DmodBrowser/NoDmodSelectedBody}" />
         </StackPanel>
 
-        <Grid RowDefinitions="Auto,*"
-              IsVisible="{Binding SelectedDmodDefinition,
+        <ScrollViewer>
+            <Grid RowDefinitions="Auto,*"
+                  IsVisible="{Binding SelectedDmodDefinition,
                       Converter={x:Static ObjectConverters.IsNotNull}}">
 
-            <StackPanel Grid.Row="0">
-                <Label Classes="Heading2B"
-                       Content="{Binding SelectedDmodDefinition.Name, 
+                <StackPanel Grid.Row="0">
+                    <Label Classes="Heading2B"
+                           Content="{Binding SelectedDmodDefinition.Name, 
                             FallbackValue={StaticResource DataNotAvailable},
                             TargetNullValue={StaticResource DataNotAvailable} }" />
-                <Label Classes="Heading3IWrapping"
-                       Content="{Binding SelectedDmodDefinition.DmodDirectory, 
+                    <Label Classes="Heading3IWrapping"
+                           Content="{Binding SelectedDmodDefinition.DmodDirectory, 
                             FallbackValue={StaticResource DataNotAvailable},
                             TargetNullValue={StaticResource DataNotAvailable} }"
-                       ToolTip.Tip="{Binding SelectedDmodDefinition.DmodDirectory, 
+                           ToolTip.Tip="{Binding SelectedDmodDefinition.DmodDirectory, 
                             FallbackValue={StaticResource DataNotAvailable},
                             TargetNullValue={StaticResource DataNotAvailable} }" />
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{StaticResource LeftColumnWidth}" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Orientation="Vertical">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="{StaticResource LeftColumnWidth}" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                    <Button Grid.Row="0" Grid.Column="0"
-                            Content="{dloc:Localize DmodBrowser/LaunchDmod}"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            Width="NaN"
-                            Height="NaN"
-                            Command="{Binding CmdLaunchDmod}" />
-                    <ComboBox Grid.Row="0" Grid.Column="1"
-                              HorizontalAlignment="Stretch"
-                              ItemsSource="{Binding GameExePaths}"
-                              SelectedItem="{Binding ActiveGameExePath, Mode=TwoWay}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate DataType="vm:DmodLauncherSelectionViewModel">
-                                <Label Classes="Heading2B" Content="{Binding DisplayName}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                </Grid>
+                                <Button Grid.Row="0" Grid.Column="0"
+                                        Content="{dloc:Localize DmodBrowser/LaunchDmod}"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        Width="NaN"
+                                        Height="NaN"
+                                        Command="{Binding CmdLaunchDmod}" />
+                                <ComboBox Grid.Row="0" Grid.Column="1"
+                                          HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding GameExePaths}"
+                                          SelectedItem="{Binding ActiveGameExePath, Mode=TwoWay}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate DataType="vm:DmodLauncherSelectionViewModel">
+                                            <Label Classes="Heading2B" Content="{Binding DisplayName}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
 
-                <Grid RowDefinitions="Auto,Auto">
-                    <Label Grid.Row="0" Classes="Heading2B"
-                           Content="{dloc:Localize DmodBrowser/ExeNotFound}"
-                           IsVisible="{Binding !ActiveGameExePath.PathExists, FallbackValue=False}" />
-                    <Label Grid.Row="1" Classes="Heading3IWrapping"
-                           Content="{Binding ActiveGameExePath.Path, 
+                            <Grid RowDefinitions="Auto,Auto">
+                                <Label Grid.Row="0" Classes="Heading2B"
+                                       Content="{dloc:Localize DmodBrowser/ExeNotFound}"
+                                       IsVisible="{Binding !ActiveGameExePath.PathExists, FallbackValue=False}" />
+                                <Label Grid.Row="1" Classes="Heading3IWrapping"
+                                       Content="{Binding ActiveGameExePath.Path, 
                                   FallbackValue={StaticResource DataNotAvailable},
                                   TargetNullValue={StaticResource DataNotAvailable} }"
-                           ToolTip.Tip="{Binding ActiveGameExePath.Path, 
+                                       ToolTip.Tip="{Binding ActiveGameExePath.Path, 
                                   FallbackValue={StaticResource DataNotAvailable},
                                   TargetNullValue={StaticResource DataNotAvailable} }" />
-                </Grid>
+                            </Grid>
 
-                <Grid RowDefinitions="Auto,Auto"
-                      ColumnDefinitions="*, *, *, *, *">
 
-                    <CheckBox Grid.Row="0" Grid.Column="0"
-                              Content="{dloc:Localize DmodBrowser/LaunchSkip}"
-                              ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchSkip/Tooltip}"
-                              IsChecked="{Binding LaunchSkip}" />
-                    <CheckBox Grid.Row="1" Grid.Column="0"
-                              Content="{dloc:Localize DmodBrowser/LaunchUseRefDir}"
-                              ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchUseRefDir/Tooltip}"
-                              IsChecked="{Binding LaunchUseRefDir}" />
-                    <CheckBox Grid.Row="0" Grid.Column="1"
-                              Content="{dloc:Localize DmodBrowser/LaunchTrueColor}"
-                              ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchTrueColor/Tooltip}"
-                              IsChecked="{Binding LaunchTrueColor}" />
-                    <CheckBox Grid.Row="1" Grid.Column="1"
-                              Content="{dloc:Localize DmodBrowser/LaunchWindowed}"
-                              ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchWindowed/Tooltip}"
-                              IsChecked="{Binding LaunchWindowed}" />
-                    <CheckBox Grid.Row="0" Grid.Column="2"
-                              Content="{dloc:Localize DmodBrowser/LaunchSound}"
-                              ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchSound/Tooltip}"
-                              IsChecked="{Binding LaunchSound}" />
-                    <CheckBox Grid.Row="1" Grid.Column="2"
-                              Content="{dloc:Localize DmodBrowser/LaunchJoystick}"
-                              ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchJoystick/Tooltip}"
-                              IsChecked="{Binding LaunchJoystick}" />
-                    <CheckBox Grid.Row="0" Grid.Column="3"
-                              Content="{dloc:Localize DmodBrowser/LaunchDebug}"
-                              ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchDebug/Tooltip}"
-                              IsChecked="{Binding LaunchDebug}" />
-                    <CheckBox Grid.Row="1" Grid.Column="3"
-                              Content="{dloc:Localize DmodBrowser/LaunchV107Mode}"
-                              ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchV107Mode/Tooltip}"
-                              IsChecked="{Binding LaunchV107Mode}" />
-                    <CheckBox Grid.Row="0" Grid.Column="4"
-                              Content="{dloc:Localize DmodBrowser/LaunchUsePathRelativeToGame}"
-                              ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchUsePathRelativeToGame/Tooltip}"
-                              IsChecked="{Binding LaunchUsePathRelativeToGame}" />
-                    <CheckBox Grid.Row="1" Grid.Column="4"
-                              Content="{dloc:Localize DmodBrowser/LaunchUsePathQuotationMarks}"
-                              ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchUsePathQuotationMarks/Tooltip}"
-                              IsChecked="{Binding LaunchUsePathQuotationMarks}" />
-                </Grid>
+                            <Grid IsVisible="{Binding ShowDmodDevFeatures}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="{StaticResource LeftColumnWidth}" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                <Grid IsVisible="{Binding ShowLaunchRefDirPathInMainWindow}">
-                    <Grid IsVisible="{Binding LaunchUseRefDir}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="{StaticResource LeftColumnWidth}" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                                <Button Grid.Row="0" Grid.Column="0"
+                                        Content="{dloc:Localize DmodBrowser/EditDmod}"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        Width="NaN" Height="NaN"
+                                        Command="{Binding CmdLaunchDmod}"
+                                        CommandParameter="{Binding LaunchEditorParameter}" />
+                                <ComboBox Grid.Row="0" Grid.Column="1"
+                                          HorizontalAlignment="Stretch"
+                                          ItemsSource="{Binding EditorExePaths}"
+                                          SelectedItem="{Binding ActiveEditorExePath, Mode=TwoWay}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate DataType="vm:DmodLauncherSelectionViewModel">
+                                            <Label Classes="Heading2B" Content="{Binding DisplayName}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
 
-                        <Button Grid.Row="0" Grid.Column="0"
-                                Classes="Primary"
-                                Width="NaN"
-                                Height="NaN"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                Content="{dloc:Localize DmodBrowser/LaunchRefDirPath/Browse}"
-                                Command="{Binding CmdLaunchRefDirBrowse}" />
-                        <TextBox Grid.Row="0" Grid.Column="1"
-                                 HorizontalAlignment="Stretch"
-                                 Text="{Binding  LaunchRefDirPath}">
-                        </TextBox>
-                    </Grid>
-                </Grid>
-                
-                <Grid IsVisible="{Binding ShowLaunchCustomArgsInMainWindow}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{StaticResource LeftColumnWidth}" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Label Grid.Row="0" Grid.Column="0" Content="{dloc:Localize DmodBrowser/LaunchCustomUserArguments}" Classes="Heading2B" />
-                    <TextBox Grid.Row="0" Grid.Column="1"
-                             HorizontalAlignment="Stretch"
-                             Text="{Binding  LaunchCustomUserArguments}">
-                    </TextBox>
-                </Grid>
-
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{StaticResource LeftColumnWidth}" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Label Grid.Row="0" Grid.Column="0"
-                           Content="{dloc:Localize DmodBrowser/FreeDinkLocalization}"
-                           Classes="Heading2B"
-                           IsVisible="{Binding IsLauncherFreeDink}" />
-                    <ComboBox Grid.Row="0" Grid.Column="1"
-                              HorizontalAlignment="Stretch"
-                              SelectedItem="{Binding SelectedLocalization}"
-                              ItemsSource="{Binding  SelectedDmodDefinition.Localizations }"
-                              IsVisible="{Binding IsLauncherFreeDink}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate DataType="vm:DmodLocalizationDefinition">
-                                <Grid>
-                                    <Label Content="{Binding Header}" />
-                                </Grid>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                </Grid>
-                
-
-                <Grid IsVisible="{Binding ShowDmodDevFeatures}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="{StaticResource LeftColumnWidth}" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Button Grid.Row="0" Grid.Column="0"
-                            Content="{dloc:Localize DmodBrowser/EditDmod}"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            Width="NaN" Height="NaN"
-                            Command="{Binding CmdLaunchDmod}"
-                            CommandParameter="{Binding LaunchEditorParameter}" />
-                    <ComboBox Grid.Row="0" Grid.Column="1"
-                              HorizontalAlignment="Stretch"
-                              ItemsSource="{Binding EditorExePaths}"
-                              SelectedItem="{Binding ActiveEditorExePath, Mode=TwoWay}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate DataType="vm:DmodLauncherSelectionViewModel">
-                                <Label Classes="Heading2B" Content="{Binding DisplayName}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                </Grid>
-
-                <Grid RowDefinitions="Auto,Auto"
-                      IsVisible="{Binding ShowDmodDevFeatures}">
-                    <Label Grid.Row="0" Classes="Heading2B"
-                           Content="{dloc:Localize DmodBrowser/ExeNotFound}"
-                           IsVisible="{Binding !ActiveEditorExePath.PathExists, FallbackValue=False}" />
-                    <Label Grid.Row="1" Classes="Heading3IWrapping"
-                           Content="{Binding ActiveEditorExePath.Path, 
+                            <Grid RowDefinitions="Auto,Auto"
+                                  IsVisible="{Binding ShowDmodDevFeatures}">
+                                <Label Grid.Row="0" Classes="Heading2B"
+                                       Content="{dloc:Localize DmodBrowser/ExeNotFound}"
+                                       IsVisible="{Binding !ActiveEditorExePath.PathExists, FallbackValue=False}" />
+                                <Label Grid.Row="1" Classes="Heading3IWrapping"
+                                       Content="{Binding ActiveEditorExePath.Path, 
                                       FallbackValue={StaticResource DataNotAvailable},
                                       TargetNullValue={StaticResource DataNotAvailable} }"
-                           ToolTip.Tip="{Binding ActiveEditorExePath.Path, 
+                                       ToolTip.Tip="{Binding ActiveEditorExePath.Path, 
                                       FallbackValue={StaticResource DataNotAvailable},
                                       TargetNullValue={StaticResource DataNotAvailable} }" />
+                            </Grid>
+
+                            <Grid IsVisible="{Binding ShowLaunchRefDirPathInMainWindow}">
+                                <Grid IsVisible="{Binding LaunchUseRefDir}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="{StaticResource LeftColumnWidth}" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button Grid.Row="0" Grid.Column="0"
+                                            Classes="Primary"
+                                            Width="NaN"
+                                            Height="NaN"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"
+                                            Content="{dloc:Localize DmodBrowser/LaunchRefDirPath/Browse}"
+                                            Command="{Binding CmdLaunchRefDirBrowse}" />
+                                    <TextBox Grid.Row="0" Grid.Column="1"
+                                             HorizontalAlignment="Stretch"
+                                             Text="{Binding  LaunchRefDirPath}">
+                                    </TextBox>
+                                </Grid>
+                            </Grid>
+
+                            <Grid IsVisible="{Binding ShowLaunchCustomArgsInMainWindow}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="{StaticResource LeftColumnWidth}" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Grid.Row="0" Grid.Column="0" Content="{dloc:Localize DmodBrowser/LaunchCustomUserArguments}" Classes="Heading2B" />
+                                <TextBox Grid.Row="0" Grid.Column="1"
+                                         HorizontalAlignment="Stretch"
+                                         Text="{Binding  LaunchCustomUserArguments}">
+                                </TextBox>
+                            </Grid>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="{StaticResource LeftColumnWidth}" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Content="{dloc:Localize DmodBrowser/FreeDinkLocalization}"
+                                       Classes="Heading2B"
+                                       IsVisible="{Binding IsLauncherFreeDink}" />
+                                <ComboBox Grid.Row="0" Grid.Column="1"
+                                          HorizontalAlignment="Stretch"
+                                          SelectedItem="{Binding SelectedLocalization}"
+                                          ItemsSource="{Binding  SelectedDmodDefinition.Localizations }"
+                                          IsVisible="{Binding IsLauncherFreeDink}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate DataType="vm:DmodLocalizationDefinition">
+                                            <Grid>
+                                                <Label Content="{Binding Header}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+                        </StackPanel>
+                        
+                        <Image Grid.Column="1" Source="{Binding SelectedDmodDefinition.Thumbnail}"
+                               Margin="2"
+                               Width="{StaticResource ImageWidth}" Height="NaN"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Stretch="Uniform"
+                               IsVisible="{Binding #TheDmodBrowserSelectedDmodView.Bounds.Width,
+                                    Converter={StaticResource DoubleGreaterThanToBoolConverter},
+                                    ConverterParameter={StaticResource ImageToggleWidthThreshold} }" />
+                    </Grid>
+                </StackPanel>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{StaticResource LeftColumnWidth}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <Label Classes="Heading2B"
+                               Content="{dloc:Localize DmodBrowser/LaunchArguments}" />
+
+                        <CheckBox Content="{dloc:Localize DmodBrowser/LaunchSkip}"
+                                  ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchSkip/Tooltip}"
+                                  IsChecked="{Binding LaunchSkip}" />
+                        <CheckBox Content="{dloc:Localize DmodBrowser/LaunchUseRefDir}"
+                                  ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchUseRefDir/Tooltip}"
+                                  IsChecked="{Binding LaunchUseRefDir}" />
+                        <CheckBox Content="{dloc:Localize DmodBrowser/LaunchTrueColor}"
+                                  ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchTrueColor/Tooltip}"
+                                  IsChecked="{Binding LaunchTrueColor}" />
+                        <CheckBox Content="{dloc:Localize DmodBrowser/LaunchWindowed}"
+                                  ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchWindowed/Tooltip}"
+                                  IsChecked="{Binding LaunchWindowed}" />
+                        <CheckBox Content="{dloc:Localize DmodBrowser/LaunchSound}"
+                                  ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchSound/Tooltip}"
+                                  IsChecked="{Binding LaunchSound}" />
+                        <CheckBox Content="{dloc:Localize DmodBrowser/LaunchJoystick}"
+                                  ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchJoystick/Tooltip}"
+                                  IsChecked="{Binding LaunchJoystick}" />
+                        <CheckBox Content="{dloc:Localize DmodBrowser/LaunchDebug}"
+                                  ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchDebug/Tooltip}"
+                                  IsChecked="{Binding LaunchDebug}" />
+                        <CheckBox Content="{dloc:Localize DmodBrowser/LaunchV107Mode}"
+                                  ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchV107Mode/Tooltip}"
+                                  IsChecked="{Binding LaunchV107Mode}" />
+                        <CheckBox Content="{dloc:Localize DmodBrowser/LaunchUsePathRelativeToGame}"
+                                  ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchUsePathRelativeToGame/Tooltip}"
+                                  IsChecked="{Binding LaunchUsePathRelativeToGame}" />
+                        <CheckBox Content="{dloc:Localize DmodBrowser/LaunchUsePathQuotationMarks}"
+                                  ToolTip.Tip="{dloc:Localize DmodBrowser/LaunchUsePathQuotationMarks/Tooltip}"
+                                  IsChecked="{Binding LaunchUsePathQuotationMarks}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Vertical">
+                        <Image Source="{Binding SelectedDmodDefinition.Thumbnail}"
+                               Margin="2"
+                               Width="{StaticResource ImageWidth}" Height="NaN"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Stretch="Uniform"
+                               IsVisible="{Binding #TheDmodBrowserSelectedDmodView.Bounds.Width,
+                                    Converter={StaticResource DoubleLessThanToBoolConverter},
+                                    ConverterParameter={StaticResource ImageToggleWidthThreshold} }" />
+
+                        <TextBox
+                            Text="{Binding SelectedDmodDefinition.Description, 
+                             FallbackValue={StaticResource DataNotAvailable},
+                             TargetNullValue={StaticResource DataNotAvailable}  }"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            TextWrapping="Wrap"
+                            ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                            IsReadOnly="True" />
+                    </StackPanel>
+
                 </Grid>
-            </StackPanel>
-
-            <Grid Grid.Row="1"
-                  ColumnDefinitions="Auto, *">
-
-                <Image Grid.Column="0"
-                       Source="{Binding SelectedDmodDefinition.Thumbnail}"
-                       Margin="2"
-                       Width="260" Height="NaN"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       Stretch="Uniform" />
-
-                <TextBox Grid.Column="1"
-                         Text="{Binding SelectedDmodDefinition.Description, 
-                            FallbackValue={StaticResource DataNotAvailable},
-                            TargetNullValue={StaticResource DataNotAvailable}  }"
-                         HorizontalAlignment="Stretch"
-                         VerticalAlignment="Stretch"
-                         TextWrapping="Wrap"
-                         ScrollViewer.VerticalScrollBarVisibility="Visible"
-                         IsReadOnly="True" />
             </Grid>
-        </Grid>
+        </ScrollViewer>
     </Grid>
 </UserControl>

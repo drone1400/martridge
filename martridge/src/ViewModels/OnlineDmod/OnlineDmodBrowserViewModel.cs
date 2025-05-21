@@ -273,16 +273,22 @@ namespace Martridge.ViewModels.OnlineDmod {
         }
         
         private void SelectDmodByName(string dmodName) {
-            if (string.IsNullOrWhiteSpace(dmodName))
-                return;
-            
-            foreach (var dmod in this._dmodDefinitionsFiltered) {
-                if (dmod.Name.Equals(dmodName)) {
-                    Dispatcher.UIThread.InvokeAsync(() => {
-                        this.DmodDefinitionsCollection?.MoveCurrentTo(dmod);
-                    });
-                    return;
+            if (string.IsNullOrWhiteSpace(dmodName) == false) {
+                foreach (var dmod in this._dmodDefinitionsFiltered) {
+                    if (dmod.Name.Equals(dmodName)) {
+                        Dispatcher.UIThread.InvokeAsync(() => {
+                            this.DmodDefinitionsCollection?.MoveCurrentTo(dmod);
+                        });
+                        return;
+                    }
                 }
+            }
+
+            // as a fallback, make sure the current item is selected
+            if (this.DmodDefinitionsCollection != null) {
+                this.SelectedDmodDefinition = this.DmodDefinitionsCollection.CurrentItem as OnlineDmodInfoViewModel;
+            } else {
+                this.SelectedDmodDefinition = null;
             }
         }
 

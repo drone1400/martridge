@@ -121,14 +121,19 @@ namespace Martridge.ViewModels.Dmod {
 
 
         public void SelectDmodByPath(string dmodPath) {
-            foreach (var dmod in this._dmodDefinitionsFiltered) {
-                if (LocationHelper.PathIsEqual(dmod.DmodDirectory, dmodPath, LocationHelperPathCompareFlags.IgnoreDirectorySeparator)) {
-                    Dispatcher.UIThread.InvokeAsync(() => {
-                        this.DmodDefinitionsCollection?.MoveCurrentTo(dmod);
-                    });
-                    return;
+            if (string.IsNullOrWhiteSpace(dmodPath) == false) {
+                foreach (var dmod in this._dmodDefinitionsFiltered) {
+                    if (LocationHelper.PathIsEqual(dmod.DmodDirectory, dmodPath, LocationHelperPathCompareFlags.IgnoreDirectorySeparator)) {
+                        Dispatcher.UIThread.InvokeAsync(() => {
+                            this.DmodDefinitionsCollection?.MoveCurrentTo(dmod);
+                        });
+                        return;
+                    }
                 }
             }
+            
+            // as a fallback, make sure the current item is selected
+            this.SelectDmodFromCollectionViewCurentItem();
         }
         private void InitializeSelectedDmodFromRemembered() {
             if (this.CfgRemember == null) return;
@@ -637,7 +642,13 @@ namespace Martridge.ViewModels.Dmod {
             }
         }
         private void DmodDefinitionsCollectionOnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
-            if (sender is IDataGridCollectionView dgcv && e.PropertyName == nameof (DataGridCollectionView.CurrentItem)) {
+            if (e.PropertyName == nameof (DataGridCollectionView.CurrentItem)) {
+                this.SelectDmodFromCollectionViewCurentItem();
+            }
+        }
+
+        private void SelectDmodFromCollectionViewCurentItem() {
+            if (this.DmodDefinitionsCollection is IDataGridCollectionView dgcv) {
                 this.SelectedDmodDefinition = dgcv.CurrentItem as DmodDefinition;
 
                 if (this.SelectedDmodDefinition != null && this.CfgRemember != null) {
@@ -646,6 +657,9 @@ namespace Martridge.ViewModels.Dmod {
                     };
                     this.CfgRemember.UpdateProperties(values);
                 }
+            }
+            else {
+                this.SelectedDmodDefinition = null;
             }
         }
 

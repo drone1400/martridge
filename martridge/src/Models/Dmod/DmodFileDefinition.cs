@@ -7,9 +7,9 @@ using System.IO;
 
 namespace Martridge.Models.Dmod {
     public class DmodFileDefinition {
-
+        
         private static List<string> KnownThumbnailFileNames { get; } = new List<string>() {
-            "preview", "title-01", "misc-01", "dinkl-01", 
+            "preview", "title-01", "dinkl-01", "misc-01",
         };
 
         private const string FILE_NAME_DINK_INI = "dink.ini";
@@ -167,17 +167,21 @@ namespace Martridge.Models.Dmod {
             if (file.Directory == null) return null;
             
             List<DirFfBmpMetaData>  meta = DirFf.LoadMetaDataFromDirectory(file.Directory.FullName);
+            Dictionary<string, DirFfBmpMetaData> dictionary = new Dictionary<string, DirFfBmpMetaData>();
             foreach (DirFfBmpMetaData metaData in meta) {
                 string fileLower = metaData.FileName.ToLowerInvariant();
                 string fileLowerNoExt = Path.GetFileNameWithoutExtension(fileLower);
-                foreach (string str in KnownThumbnailFileNames) {
-                    if (str == fileLowerNoExt) {
-                        MemoryStream? stream = DirFf.LoadImageStream(file, fileLower);
-                        if (stream == null) return null;
-                        return new Bitmap(stream); 
-                    }
+                dictionary[fileLowerNoExt] = metaData;
+            }
+            
+            foreach (string str in KnownThumbnailFileNames) {
+                if (dictionary.TryGetValue(str, out DirFfBmpMetaData value)) {
+                    MemoryStream? stream = DirFf.LoadImageStream(file, value.FileName.ToLowerInvariant());
+                    if (stream == null) return null;
+                    return new Bitmap(stream);
                 }
             }
+            
             return null;
         }
 
@@ -188,16 +192,15 @@ namespace Martridge.Models.Dmod {
 
             DirectoryInfo[] subDirs = dirInfo.GetDirectories();
             FileInfo[] files = dirInfo.GetFiles();
+            
+            Dictionary<string, FileInfo> dictionary = new Dictionary<string, FileInfo>();
 
             foreach (FileInfo file in files) {
                 // scan known image files..
                 string fileLower = file.Name.ToLowerInvariant();
                 string fileLowerNoExt = Path.GetFileNameWithoutExtension(fileLower);
-                foreach (string str in KnownThumbnailFileNames) {
-                    if (str == fileLowerNoExt) {
-                        return new Bitmap(file.FullName);
-                    }
-                }
+                
+                dictionary[fileLowerNoExt] = file;
 
                 // scan dir.ff
                 if (fileLower == FILE_NAME_DIRFF) {
@@ -205,6 +208,12 @@ namespace Martridge.Models.Dmod {
                     if (bmp != null) {
                         return bmp;
                     }
+                }
+            }
+            
+            foreach (string str in KnownThumbnailFileNames) {
+                if (dictionary.TryGetValue(str, out FileInfo? value)) {
+                    return new Bitmap(value.FullName);
                 }
             }
 
@@ -218,7 +227,6 @@ namespace Martridge.Models.Dmod {
 
             return null;
         }
-
 
         public Bitmap? GetThumbnail() {
             try {

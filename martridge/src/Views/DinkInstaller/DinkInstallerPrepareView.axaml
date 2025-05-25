@@ -10,8 +10,7 @@
 
              mc:Ignorable="d" 
              d:DesignWidth="800" 
-             d:DesignHeight="450"
->
+             d:DesignHeight="450">
 
     <Design.DataContext>
         <dinkInstaller:DinkInstallerViewModel />
@@ -36,11 +35,30 @@
                            Content="{dloc:Localize DinkInstallerView/InstallableInitializing_Body}"/>
             </Grid>
         </Grid>
-        <Grid IsVisible="{Binding !IsInstallableInitializing}">
-            <Grid VerticalAlignment="Center"
-                  HorizontalAlignment="Center"
-                  RowDefinitions="Auto,Auto"
-                  IsVisible="{Binding !IsInstallableInitialized}">
+        <Grid IsVisible="{Binding !IsInstallableInitializing}"
+              RowDefinitions="Auto,*">
+            
+            <Border Grid.Row="0" Classes="MartridgeCard">
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                    <TextBox Grid.Column="0"
+                             Text="{Binding DinkInstallerConfigFileSource}" 
+                             UseFloatingWatermark="True"
+                             Watermark="{dloc:Localize DinkInstallerView/InstallerSource}"/>
+                    <Button Grid.Column="1"
+                            Content="{dloc:Localize DinkInstallerView/BrowseInstallerSourceLocalFile}" 
+                            Command="{Binding CmdBrowseInstallerConfigSource}"/>
+                    <Button Grid.Column="2"
+                            Content="{dloc:Localize DinkInstallerView/ResetInstallerSourceToDefault}" 
+                            Command="{Binding CmdResetInstallerConfigSource}"/>
+                </Grid>
+            </Border>
+            
+            <Grid
+                Grid.Row="1"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                RowDefinitions="Auto,Auto"
+                IsVisible="{Binding !IsInstallableInitialized}">
 
                 <Label Grid.Row="0" Grid.Column="0" Classes="HeadingTitle"
                            HorizontalAlignment="Center"
@@ -51,61 +69,88 @@
                            MaxWidth="400"
                            Content="{dloc:Localize DinkInstallerView/InstallableNotInitialized_Body}"/>
             </Grid>
-            <Grid Name="GridInstaller_Versions"
-                  IsVisible="{Binding IsInstallableInitialized}"
-                  RowDefinitions="*,Auto">
+            
+            <Grid
+                Grid.Row="1"
+                IsVisible="{Binding IsInstallableInitialized}"
+                ColumnDefinitions="Auto,*">
                 
-                <Grid Grid.Row="0" RowDefinitions="Auto,Auto,*" ColumnDefinitions="Auto,*">
-                    <Label Grid.Row="0" Grid.Column="0" Classes="Heading2B"
-                           Content="{dloc:Localize DinkInstallerView/SelectVersion}" />
+                <Border Grid.Column="0" Classes="MartridgeCard">
+                    <Grid RowDefinitions="Auto,Auto,Auto,*">
+                        <Button Grid.Row="0"
+                                Content="{dloc:Localize DinkInstallerView/RefreshInstallerLists}" 
+                                Command="{Binding CmdRefreshInstallerList}"
+                                HorizontalAlignment="Stretch"
+                                Width="NaN"/>
+                        
+                        <Label Grid.Row="1" 
+                               Classes="Heading2B"
+                               Content="{dloc:Localize DinkInstallerView/SelectVersion}" />
 
-                    <ComboBox Grid.Row="1" Grid.Column="0"
-                              ItemsSource="{Binding InstallableCategories}"
-                              SelectedItem="{Binding SelectedInstallableCategory, Mode=TwoWay}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="2">
-                                    <Label Classes="Heading2"
-                                           Content="{Binding CategoryName}" />
-                                </Grid>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+                        <ComboBox Grid.Row="2"
+                                  ItemsSource="{Binding InstallableCategories}"
+                                  SelectedItem="{Binding SelectedInstallableCategory, Mode=TwoWay}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="2">
+                                        <Label Classes="Heading2"
+                                               Content="{Binding CategoryName}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
 
-                    <ListBox Grid.Row="2" Grid.Column="0"
-                             ItemsSource="{Binding SelectedInstallableCategory.InstallerEntries}"
-                             SelectionMode="Single"
-                             SelectedItem="{Binding SelectedInstallable, Mode=TwoWay}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="2">
-                                    <Label Classes="Heading2"
-                                           Content="{Binding DisplayName }" />
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-
-                    <dinkInstaller1:DinkInstallerVersionInfoView 
-                        Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" 
-                        IsVisible="{Binding SelectedInstallable,
+                        <ListBox Grid.Row="3"
+                                 ItemsSource="{Binding SelectedInstallableCategory.InstallerEntries}"
+                                 SelectionMode="Single"
+                                 SelectedItem="{Binding SelectedInstallable, Mode=TwoWay}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="2">
+                                        <Label Classes="Heading2"
+                                               Content="{Binding DisplayName }" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
+                
+                <Border Grid.Column="1" Classes="MartridgeCard">
+                    <Grid RowDefinitions="*,Auto">
+                        
+                        <dinkInstaller1:DinkInstallerVersionInfoView 
+                            Grid.Row="0" 
+                            IsVisible="{Binding SelectedInstallable,
                             Converter={x:Static ObjectConverters.IsNotNull}}"/>
                     
-                    <Grid 
-                        Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" 
-                        RowDefinitions="Auto,Auto"
-                        IsVisible="{Binding SelectedInstallable,
+                        <Grid 
+                            Grid.Row="0" 
+                            RowDefinitions="Auto,Auto"
+                            IsVisible="{Binding SelectedInstallable,
                             Converter={x:Static ObjectConverters.IsNull}}">
 
-                        <Label Grid.Row="0" Grid.Column="0" Classes="HeadingTitle"
+                            <Label Grid.Row="0" Grid.Column="0" Classes="HeadingTitle"
                                    HorizontalAlignment="Left"
                                    Content="{dloc:Localize DinkInstallerView/InstallableNotSelected_Title}"/>
 
-                        <Label Grid.Row="1" Grid.Column="0" Classes="Heading2BWrapping"
+                            <Label Grid.Row="1" Grid.Column="0" Classes="Heading2BWrapping"
                                    HorizontalAlignment="Left"
                                    Content="{dloc:Localize DinkInstallerView/InstallableNotSelected_Body}"/>
+                        </Grid>
+                        
+                        <Grid Grid.Row="1"
+                              ColumnDefinitions="*,Auto,Auto">
+                            <Button Grid.Column="1"
+                                    Content="{dloc:Localize DinkInstallerView/StartInstall}"
+                                    Classes="Primary"
+                                    Command="{Binding CmdStartInstall}"/>
+                            <Button Grid.Column="2"
+                                    Content="{dloc:Localize Generic/ButtonCancel}"
+                                    Command="{Binding CmdExit}"/>
+                        </Grid>
                     </Grid>
-                </Grid>
+                </Border>
             </Grid>
         </Grid>
     </Grid>

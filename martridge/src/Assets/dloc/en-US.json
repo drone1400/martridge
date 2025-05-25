@@ -52,6 +52,14 @@
   
   "DinkInstaller/BrowseDinkDestination": "Select dink installer destination",
   
+  
+  "DinkInstallerViewModel/Validation/InstallerSourceEmpty": "Dink Installer config source can not be empty",
+  "DinkInstallerViewModel/Validation/InstallerSourceInvalid": "Dink Installer config source must be a local file or a https link",
+  "DinkInstallerViewModel/BrowseInstallerSource": "Select Dink Installer config json file",
+  "DinkInstallerView/BrowseInstallerSourceLocalFile": "Browse Local File",
+  "DinkInstallerView/ResetInstallerSourceToDefault": "Reset Default",
+  "DinkInstallerView/InstallerSource": "Installer list source JSON file",
+  "DinkInstallerView/RefreshInstallerLists": "Refresh lists",
   "DinkInstallerView/Title": "Martridge - Dink Installer",
   "DinkInstallerView/HeadingNotSupported": "Dink Installer Not Supported",
   "DinkInstallerView/HeadingNotSupportedDetails": "Automated Dink Installer is only available on Windows right now.\n\r Visit the link below and follow the instructions for your distribution to install FreeDink.\n\r\n\rhttps://www.gnu.org/software/freedink/get-distros",

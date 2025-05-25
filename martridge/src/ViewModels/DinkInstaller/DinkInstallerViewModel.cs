@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using Avalonia.Input;
 using Avalonia.Metadata;
 using Avalonia.Platform.Storage;
@@ -15,9 +16,10 @@ using Martridge.Models.Localization;
 using Martridge.Trace;
 using Martridge.ViewModels.DinkyAlerts;
 using ReactiveUI;
+using ReactiveUI.Validation.Extensions;
 namespace Martridge.ViewModels.DinkInstaller
 {
-    public class DinkInstallerViewModel : ViewModelAppPage
+    public class DinkInstallerViewModel : ViewModelAppPageWithCfg
     {
         // ------------------------------------------------------------------------------------------
         //      Progress reporting 
@@ -220,6 +222,21 @@ namespace Martridge.ViewModels.DinkInstaller
         private string _installerDestination = "";
         private string _installerDestinationAuto = "";
         private string _installerDestinationAutoPreviousName = "";
+        
+        // ------------------------------------------------------------------------------------------
+        //      Config
+        //
+
+        public string DinkInstallerConfigFileSource {
+            get => this._dinkInstallerConfigFileSource;
+            set {
+                this.RaiseAndSetIfChanged(ref this._dinkInstallerConfigFileSource, value);
+                this._dinkInstallerConfigFileSourceUpdateTimer.Stop();
+                this._dinkInstallerConfigFileSourceUpdateTimer.Start();
+            }
+        }
+        private string _dinkInstallerConfigFileSource = string.Empty;
+        private readonly Timer _dinkInstallerConfigFileSourceUpdateTimer;
 
         // ------------------------------------------------------------------------------------------
         //      Constructor 
@@ -228,6 +245,68 @@ namespace Martridge.ViewModels.DinkInstaller
         {
             //this.SelectedInstallableVersionIndex = 0;
             this.PropertyChanged += this.DinkInstallerViewModel_PropertyChanged;
+            
+            this.ValidationRule(x => x.DinkInstallerConfigFileSource,
+                configSource => {
+                    try
+                    {
+                        return (string.IsNullOrWhiteSpace(configSource) == false);
+                    } catch (Exception)
+                    {
+                        return false;
+                    }
+                },
+                Localizer.Instance["DinkInstallerViewModel/Validation/InstallerSourceEmpty"]);
+            
+            this.ValidationRule(x => x.DinkInstallerConfigFileSource,
+                configSource => {
+                    // this case is handled by the other rule
+                    if (configSource == null)
+                        return true;
+                    
+                    try {
+                        Uri uri = new Uri(configSource);
+                        return DinkInstallerOnlineListHelper.IsValidUri(uri);
+                        
+                    } catch (Exception)
+                    {
+                        // try to see if a relative path resolves correctly...
+                        string combinedPath = Path.Combine(LocationHelper.AppBaseDirectory, configSource);
+                        if (File.Exists(combinedPath))
+                            return true;
+                        return false;
+                    }
+                },
+                Localizer.Instance["DinkInstallerViewModel/Validation/InstallerSourceInvalid"]);
+
+            this._dinkInstallerConfigFileSourceUpdateTimer = new Timer() {
+                Interval = 1000,
+                AutoReset = true,
+            };
+            this._dinkInstallerConfigFileSourceUpdateTimer.Elapsed += ( _,  _) => {
+                this._dinkInstallerConfigFileSourceUpdateTimer.Stop();
+                if (this.CfgGeneral == null)
+                    return;
+                this.CfgGeneral.UpdateProperties(new Dictionary<string, object?>() {
+                    [nameof(ConfigGeneral.DinkInstallerConfigFileSource)] = this.DinkInstallerConfigFileSource,
+                });
+            };
+        }
+        
+        protected override void OnConfigGeneralChanged() {
+            if (this.CfgGeneral == null) 
+                return;
+            this.DinkInstallerConfigFileSource = this.CfgGeneral.DinkInstallerConfigFileSource;
+            if (string.IsNullOrWhiteSpace(this.DinkInstallerConfigFileSource)) {
+                this.DinkInstallerConfigFileSource = DinkInstallerOnlineListHelper.DefaultConfigInstallerListUrl;
+            }
+        }
+        protected override void OnCfgGeneralUpdated(object? sender, ConfigUpdateEventArgs e) {
+            if (this.CfgGeneral == null) 
+                return;
+            if (e.UpdatedProperties.Contains(nameof(ConfigGeneral.DinkInstallerConfigFileSource)) == false)
+                return;
+            this.DinkInstallerConfigFileSource = this.CfgGeneral.DinkInstallerConfigFileSource;
         }
 
         private void DinkInstallerViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -271,7 +350,7 @@ namespace Martridge.ViewModels.DinkInstaller
             }
         }
 
-        public async void InitializeInstallerList(bool updateDefaultsIfFileExists)
+        public async Task InitializeInstallerList(bool forceRecache)
         {
             try
             {
@@ -285,7 +364,26 @@ namespace Martridge.ViewModels.DinkInstaller
 
                 this._installerOnlineHelper = new DinkInstallerOnlineListHelper();
 
-                ConfigInstallerList? cfgInst = await this._installerOnlineHelper.GetConfigInstallerList();
+                if (string.IsNullOrWhiteSpace(this.DinkInstallerConfigFileSource)) {
+                    this.DinkInstallerConfigFileSource = DinkInstallerOnlineListHelper.DefaultConfigInstallerListUrl;
+                }
+
+                Uri uri;
+                try {
+                    uri = new Uri(this.DinkInstallerConfigFileSource);
+                } catch (Exception) {
+                    // try to see if a relative path resolves correctly...
+                    string combinedPath = Path.Combine(LocationHelper.AppBaseDirectory, this.DinkInstallerConfigFileSource);
+                    if (File.Exists(combinedPath))
+                        uri = new Uri(combinedPath);
+                    else 
+                        return;
+                }
+
+                if (DinkInstallerOnlineListHelper.IsValidUri(uri) == false)
+                    return;
+
+                ConfigInstallerList? cfgInst = await this._installerOnlineHelper.GetConfigInstallerList(uri, forceRecache);
 
                 if (cfgInst == null) return;
 
@@ -483,6 +581,106 @@ namespace Martridge.ViewModels.DinkInstaller
                     this.IsFileBrowserActive = false;
                 }
             });
+        }
+        
+        public async void CmdResetInstallerConfigSource(object? parameter = null) {
+            this.DinkInstallerConfigFileSource = DinkInstallerOnlineListHelper.DefaultConfigInstallerListUrl;
+            
+            await this.InitializeInstallerList(true);
+        }
+
+        [DependsOn(nameof(IsFileBrowserActive))]
+        [DependsOn(nameof(IsInstallableInitializing))]
+        [DependsOn(nameof(IsInstallerStarted))]
+        public bool CanCmdResetInstallerConfigSource(object? parameter = null)
+        {
+            return 
+                this.IsFileBrowserActive == false &&
+                this.IsInstallableInitializing == false &&
+                this.IsInstallerStarted == false;
+        }
+        
+        public async void CmdBrowseInstallerConfigSource(object? parameter = null)
+        {
+            await this.BrowseInstallerConfigSource();
+        }
+
+        [DependsOn(nameof(IsFileBrowserActive))]
+        [DependsOn(nameof(IsInstallableInitializing))]
+        [DependsOn(nameof(IsInstallerStarted))]
+        public bool CanCmdBrowseInstallerConfigSource(object? parameter = null)
+        {
+            return 
+                this.IsFileBrowserActive == false &&
+                this.IsInstallableInitializing == false &&
+                this.IsInstallerStarted == false;
+        }
+
+        private Task BrowseInstallerConfigSource()
+        {
+            if (this.IsFileBrowserActive)
+                return Task.CompletedTask;
+            
+            this.IsFileBrowserActive = true;
+
+            return Task.Run( () => {
+
+                try {
+                    string initialDir = string.Empty;
+                    if (string.IsNullOrWhiteSpace(this.DinkInstallerConfigFileSource) == false) {
+                        Uri uri = new Uri(this.DinkInstallerConfigFileSource);
+                        if (uri.AbsoluteUri.StartsWith("file://")) {
+                            DirectoryInfo? dirInfo = Directory.GetParent(uri.LocalPath);
+                            if (dirInfo?.Exists == true) {
+                                initialDir = dirInfo.FullName;
+                            }
+                        }
+                    }
+
+                    if (string.IsNullOrWhiteSpace(initialDir)) {
+                        initialDir = LocationHelper.AppBaseDirectory;
+                    }
+                    
+                    IStorageFile? storageFolder = LocationHelper.BrowseFileOpen(
+                        Localizer.Instance["DinkInstallerViewModel/BrowseInstallerSource"],
+                        new List<FilePickerFileType>() {
+                            new FilePickerFileType("JSON") {
+                                Patterns = new [] { "*.json", },
+                            }
+                        },
+                        initialDir);
+                    
+                    if (storageFolder != null)
+                    {
+                        this.DinkInstallerConfigFileSource = storageFolder.Path.LocalPath;
+                        
+                        this.InitializeInstallerList(true).Wait();
+                    }
+                } catch (Exception ex)
+                {
+                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                }
+                finally
+                {
+                    this.IsFileBrowserActive = false;
+                }
+            });
+        }
+        
+        public async void CmdRefreshInstallerList(object? parameter = null)
+        {
+            await this.InitializeInstallerList(true);
+        }
+
+        [DependsOn(nameof(IsFileBrowserActive))]
+        [DependsOn(nameof(IsInstallableInitializing))]
+        [DependsOn(nameof(IsInstallerStarted))]
+        public bool CanCmdRefreshInstallerList(object? parameter = null)
+        {
+            return 
+                this.IsFileBrowserActive == false &&
+                this.IsInstallableInitializing == false &&
+                this.IsInstallerStarted == false;
         }
 
         #endregion

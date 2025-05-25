@@ -95,6 +95,8 @@ namespace Martridge.Models.Configuration.Save {
         /// List of additional directories to scan for DMODS
         /// </summary>
         public List<string>? AdditionalDmodLocations { get; set; }
+        
+        public string? DinkInstallerConfigFileSource { get; set; }
 
         public Dictionary<string, object?> GetValues() {
             return new Dictionary<string, object?>() {
@@ -115,6 +117,7 @@ namespace Martridge.Models.Configuration.Save {
                 [nameof(ConfigGeneral.EditorExePaths)] = this.EditorExePaths,
                 [nameof(ConfigGeneral.DefaultDmodLocation)] = this.DefaultDmodLocation,
                 [nameof(ConfigGeneral.AdditionalDmodLocations)] = this.AdditionalDmodLocations,
+                [nameof(ConfigGeneral.DinkInstallerConfigFileSource)] = this.DinkInstallerConfigFileSource,
             };
         }
 

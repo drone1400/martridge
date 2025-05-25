@@ -462,7 +462,8 @@ namespace Martridge.ViewModels {
             
             try {
                 DinkInstallerViewModel vm = new DinkInstallerViewModel();
-                vm.InitializeInstallerList(this._config!.General.AutoUpdateInstallerList);
+                vm.CfgGeneral = this._config?.General;
+                vm.InitializeInstallerList(forceRecache:true);
                 vm.InstallerDone += (_, args) => {
                     this.SwapToDefaultViewModel();
                     

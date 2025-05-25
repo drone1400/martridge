@@ -123,6 +123,9 @@ namespace Martridge.Models.Configuration {
         public ReadOnlyCollection<string> AdditionalDmodLocations { get; }
         private readonly List<string> _additionalDmodLocations = new List<string>();
 
+        public string DinkInstallerConfigFileSource { get => this._dinkInstallerConfigFileSource; }
+        private string _dinkInstallerConfigFileSource = string.Empty;
+
         public ConfigGeneral() {
             this.GameExePaths = new ReadOnlyCollection<string>(this._gameExePaths);
             this.EditorExePaths = new ReadOnlyCollection<string>(this._editorExePaths);
@@ -222,6 +225,7 @@ namespace Martridge.Models.Configuration {
                     case nameof(this.ActiveGameExeIndex): TryUpdateGeneric(kvp, ref this._activeGameExeIndex); break;
                     case nameof(this.ActiveEditorExeIndex): TryUpdateGeneric(kvp, ref this._activeEditorExeIndex); break;
                     case nameof(this.DefaultDmodLocation): TryUpdateGeneric(kvp, ref this._defaultDmodLocation); break;
+                    case nameof(this.DinkInstallerConfigFileSource): TryUpdateGeneric(kvp, ref this._dinkInstallerConfigFileSource); break;
                     
                     case nameof(this.GameExePaths): TryUpdatePathList(kvp, this._gameExePaths); break;
                     case nameof(this.EditorExePaths): TryUpdatePathList(kvp, this._editorExePaths); break;
@@ -269,6 +273,7 @@ namespace Martridge.Models.Configuration {
                     EditorExePaths = editorExePaths,
                     DefaultDmodLocation = this.DefaultDmodLocation,
                     AdditionalDmodLocations = additionalDmodLocations,
+                    DinkInstallerConfigFileSource = this.DinkInstallerConfigFileSource,
                 };
 
                 if (this.UseRelativePathForSubfolders) {

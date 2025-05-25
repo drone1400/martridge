@@ -4,7 +4,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              
-             xmlns:dloc="using:Martridge.ViewModels.Localization"
              xmlns:dinkInstaller="clr-namespace:Martridge.ViewModels.DinkInstaller"
              xmlns:dinkInstaller1="clr-namespace:Martridge.Views.DinkInstaller"
 
@@ -32,35 +31,13 @@
                 <dinkInstaller1:DinkInstallerPrepareView
                     Grid.Row="0"
                     DataContext="{Binding DataContext, ElementName=DinkInstallerUserControl}"/>
-                
-                <Grid Grid.Row="1"
-                      ColumnDefinitions="*,Auto,Auto">
-                    <Button Grid.Column="2"
-                            Content="{dloc:Localize Generic/ButtonCancel}"
-                            Command="{Binding CmdExit}"/>
-                    <Button Grid.Column="1"
-                            Content="{dloc:Localize DinkInstallerView/StartInstall}"
-                            Classes="Primary"
-                            Command="{Binding CmdStartInstall}"/>
-                </Grid>
             </Grid>
                 
             <Grid RowDefinitions="*, Auto" IsVisible="{Binding Path=IsInstallerStarted}">
                 <dinkInstaller1:InstallerProgressView 
                     Grid.Row="0"
                     DataContext="{Binding DataContext, ElementName=DinkInstallerUserControl}"/>
-                
-                <Grid Grid.Row="1"
-                      ColumnDefinitions="*,Auto,Auto">
-                    <Button Grid.Column="2"
-                            Content="{dloc:Localize Generic/ButtonCancel}"
-                            Command="{Binding CmdCancel}"/>
-                    <Button Grid.Column="1"
-                            Content="{dloc:Localize Generic/ButtonFinish}"
-                            Command="{Binding CmdExit}"/>
-                </Grid>
             </Grid>
-                
         </Grid>
     </Grid>
 </UserControl>

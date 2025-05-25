@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:dinkInstaller="clr-namespace:Martridge.ViewModels.DinkInstaller"
+             xmlns:dloc="clr-namespace:Martridge.ViewModels.Localization"
 
              mc:Ignorable="d" 
              d:DesignWidth="800" 
@@ -17,7 +18,7 @@
     </UserControl.Styles>
 
     <Border Classes="MartridgeCard">
-        <Grid RowDefinitions="Auto,*">
+        <Grid RowDefinitions="Auto,*,Auto">
             <StackPanel Grid.Row="0">
                 <Label Classes="HeadingTitle"
                        Content="{Binding DinkInstallerTitle}" />
@@ -44,6 +45,17 @@
                      Classes="BigTextBox"
                      Text="{Binding InstallerLogText}"
                      CaretIndex="{Binding InstallerLogCaretIndex, Mode=TwoWay}" />
+            
+            <Grid Grid.Row="2"
+                  ColumnDefinitions="*,Auto,Auto">
+                <Button Grid.Column="1"
+                        Classes="Primary"
+                        Content="{dloc:Localize Generic/ButtonFinish}"
+                        Command="{Binding CmdExit}"/>
+                <Button Grid.Column="2"
+                        Content="{dloc:Localize Generic/ButtonCancel}"
+                        Command="{Binding CmdCancel}"/>
+            </Grid>
         </Grid>
     </Border>
 </UserControl>

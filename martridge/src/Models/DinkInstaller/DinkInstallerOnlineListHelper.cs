@@ -34,29 +34,53 @@ namespace Martridge.Models.DinkInstaller {
             return null;
         }
 
-        public async Task<ConfigInstallerList?> GetConfigInstallerList() {
+        public static bool IsValidUri(Uri uri) {
+            if (uri.AbsoluteUri.StartsWith("file://")) return true;
+            if (uri.AbsoluteUri.StartsWith("https://")) return true;
+            if (uri.AbsoluteUri.StartsWith("http://")) return true;
+            return false;
+        }
+
+        public async Task<ConfigInstallerList?> GetConfigInstallerList(Uri uri, bool ignoreCache) {
             try {
                 MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Trying to get configInstallerList.json");
 
-                OnlineGenericCachedResource resourceTemp = OnlineGenericCachedResource.FromManualInput(
-                    "tempConfigInstallerList.json", DefaultConfigInstallerListUrl);
+                if (uri.AbsoluteUri.StartsWith("file://")) {
+                    // loading from local path
+                    
+                    ConfigInstallerList? list = ConfigInstallerList.LoadFromFile(uri.LocalPath);
 
-                ConfigInstallerList? list = this.TryGetListFromLocalCachedFile(resourceTemp.Local, true);
-                if (list != null) {
-                    MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Trying to get configInstallerList.json... done!");
-                    return list;
-                }
+                    if (list != null && list.Installables.Count > 0) {
+                        return list;
+                    }
+                } else if (uri.AbsoluteUri.StartsWith("https://") || uri.AbsoluteUri.StartsWith("http://")) {
+                    // loading from online resource or cached online resource
+                    
+                    OnlineGenericCachedResource resourceTemp = OnlineGenericCachedResource.FromManualInput(
+                        "tempConfigInstallerList.json", DefaultConfigInstallerListUrl);
 
-                if (this.CancelToken.IsCancellationRequested) throw new TaskCanceledException();
+                    ConfigInstallerList? list = null;
 
-                HttpStatusCode result = await this.DownloadWebContent(resourceTemp);
+                    if (ignoreCache == false) {
+                        list = this.TryGetListFromLocalCachedFile(resourceTemp.Local, true);
+                    }
+                    
+                    if (list != null) {
+                        MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Trying to get configInstallerList.json... done!");
+                        return list;
+                    }
 
-                if (this.CancelToken.IsCancellationRequested) throw new TaskCanceledException();
+                    if (this.CancelToken.IsCancellationRequested) throw new TaskCanceledException();
 
-                ConfigInstallerList? list2 = this.TryGetListFromLocalCachedFile(resourceTemp.Local, false);
-                if (list2 != null) {
-                    MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Trying to get configInstallerList.json... done!");
-                    return list2;
+                    HttpStatusCode result = await this.DownloadWebContent(resourceTemp);
+
+                    if (this.CancelToken.IsCancellationRequested) throw new TaskCanceledException();
+
+                    ConfigInstallerList? list2 = this.TryGetListFromLocalCachedFile(resourceTemp.Local, false);
+                    if (list2 != null) {
+                        MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Trying to get configInstallerList.json... done!");
+                        return list2;
+                    }
                 }
 
                 MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Trying to get configInstallerList.json... failed!");

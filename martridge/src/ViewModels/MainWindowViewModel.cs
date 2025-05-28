@@ -463,30 +463,35 @@ namespace Martridge.ViewModels {
             try {
                 DinkInstallerViewModel vm = new DinkInstallerViewModel();
                 vm.CfgGeneral = this._config?.General;
-                vm.InitializeInstallerList(forceRecache:true);
+                _ = vm.InitializeInstallerList(forceRecache:true); // do not await
                 vm.InstallerDone += (_, args) => {
-                    this.SwapToDefaultViewModel();
-                    
-                    // if DINK installed successfully, update things...
-                    // try to update exe path in settings...
-                    if (args.Result == DinkInstallerResult.Success && 
-                        args.UsedInstaller != null && 
-                        args.Destination != null) {
-                        // update game exe paths
-                        if (string.IsNullOrWhiteSpace(args.UsedInstaller.GameFileName) == false) {
-                            string pathGame = Path.Combine(args.Destination.FullName, args.UsedInstaller.GameFileName);
-                            if (File.Exists(pathGame)) {
-                                this._config!.General.AddGameExePath(pathGame);
+                    try {
+                        // if DINK installed successfully, update things...
+                        // try to update exe path in settings...
+                        if (args.Result == DinkInstallerResult.Success &&
+                            args.UsedInstaller != null &&
+                            args.Destination != null) {
+                            // update game exe paths
+                            if (string.IsNullOrWhiteSpace(args.UsedInstaller.GameFileName) == false) {
+                                string pathGame = Path.Combine(args.Destination.FullName, args.UsedInstaller.GameFileName);
+                                if (File.Exists(pathGame)) {
+                                    this._config!.General.AddGameExePath(pathGame);
+                                }
+                            }
+                            // update editor exe paths
+                            if (string.IsNullOrWhiteSpace(args.UsedInstaller.EditorFileName) == false) {
+                                string pathGame = Path.Combine(args.Destination.FullName, args.UsedInstaller.EditorFileName);
+                                if (File.Exists(pathGame)) {
+                                    this._config!.General.AddEditorExePath(pathGame);
+                                }
                             }
                         }
-                        // update editor exe paths
-                        if (string.IsNullOrWhiteSpace(args.UsedInstaller.EditorFileName) == false) {
-                            string pathGame = Path.Combine(args.Destination.FullName, args.UsedInstaller.EditorFileName);
-                            if (File.Exists(pathGame)) {
-                                this._config!.General.AddEditorExePath(pathGame);
-                            }
-                        }
+
+                    } catch (Exception ex) {
+                        MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
                     }
+                    
+                    this.SwapToDefaultViewModel();
                 };
 
                 this.SwapCurrentViewModel(vm);

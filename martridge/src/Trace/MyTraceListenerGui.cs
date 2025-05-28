@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using Avalonia.Controls;
 
 namespace Martridge.Trace {
     public class MyTraceListenerGui : MyTraceListener, INotifyPropertyChanged {
@@ -12,15 +13,17 @@ namespace Martridge.Trace {
         protected void FirePropertyChanged([CallerMemberName] string? name = null) {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
-
-        private StringBuilder _stringBuilder = new StringBuilder();
-        public string Text { get => this._stringBuilder.ToString(); }
+        
+        public string Text { get; private set; }
 
         private readonly object _notifyThreadLock = new object();
         private bool _notifyThreadStop = false;
         private bool _notifyThreadHasChanges = false;
 
         public MyTraceListenerGui(string name) : base(name) {
+
+            this.Levels = MyTraceLevel.Critical | MyTraceLevel.Error | MyTraceLevel.Warning | MyTraceLevel.Information;
+            
             Thread notifyThread = new Thread(this.NotifyThreadLoop) {
                 Name = "MyTraceListenerGui - Notify Thread",
             };
@@ -66,9 +69,9 @@ namespace Martridge.Trace {
         }
         public override void WriteMessage(DateTime timestamp, string category, string message, MyTraceLevel level) {
             if (this.ShowLevels) {
-                this._stringBuilder.AppendLine(MyTrace.FormatLine(timestamp, category, message, level));
+                this.Text += MyTrace.FormatLine(timestamp, category, message, level) + Environment.NewLine;
             } else {
-                this._stringBuilder.AppendLine(MyTrace.FormatLine(timestamp, category, message));
+                this.Text += MyTrace.FormatLine(timestamp, category, message) + Environment.NewLine;
             }
 
             lock (this._notifyThreadLock) {
@@ -79,9 +82,9 @@ namespace Martridge.Trace {
         public override void WriteMessage(DateTime timestamp, string category, List<string> messages, MyTraceLevel level) {
             foreach (string message in messages) {
                 if (this.ShowLevels) {
-                    this._stringBuilder.AppendLine(MyTrace.FormatLine(timestamp, category, message, level));
+                    this.Text += MyTrace.FormatLine(timestamp, category, message, level) + Environment.NewLine;
                 } else {
-                    this._stringBuilder.AppendLine(MyTrace.FormatLine(timestamp, category, message));
+                    this.Text += MyTrace.FormatLine(timestamp, category, message) + Environment.NewLine;
                 }
             }
             lock (this._notifyThreadLock) {

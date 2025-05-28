@@ -29,6 +29,8 @@ namespace Martridge {
         public IStorageProvider? StorageProvider => this.MainWindow?.StorageProvider;
 
         public event EventHandler? OnThemePaletteChange;
+        
+        private readonly MyTraceListenerLogger _logger = new MyTraceListenerLogger("martridge");
 
         public override void Initialize()
         {
@@ -45,8 +47,7 @@ namespace Martridge {
                 
                 
                 // add text logger listener to trace...
-                MyTraceListenerLogger traceLogger = new MyTraceListenerLogger("martridge");
-                MyTrace.Global.Listeners.Add(traceLogger);
+                MyTrace.Global.Listeners.Add(this._logger);
                     
                 MyTrace.Global.WriteMessage($"App Path = \"{LocationHelper.AppBaseDirectory}\"");
                 
@@ -398,9 +399,12 @@ namespace Martridge {
             
             // save config when closing in order to save ConfigRemember
             this._config.SaveToFile(this._defaultConfigFile);
+            
+            this._logger.Close();
         }
 
         private void MainWindow_Closed(object? sender, EventArgs e) {
+            this._logger.Close();
             this._mainWindow = null;
             this._logWindow?.Close();
         }

@@ -43,6 +43,11 @@ namespace Martridge {
                     this.ShowLogWindow();
                 }
                 
+                
+                // add text logger listener to trace...
+                MyTraceListenerLogger traceLogger = new MyTraceListenerLogger("martridge");
+                MyTrace.Global.Listeners.Add(traceLogger);
+                    
                 MyTrace.Global.WriteMessage($"App Path = \"{LocationHelper.AppBaseDirectory}\"");
                 
                 this.InitializeMainWindow(desktop.Args);

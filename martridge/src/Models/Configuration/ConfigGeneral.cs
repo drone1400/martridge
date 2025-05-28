@@ -120,6 +120,12 @@ namespace Martridge.Models.Configuration {
         public string DinkInstallerConfigFileSource { get => this._dinkInstallerConfigFileSource; }
         private string _dinkInstallerConfigFileSource = string.Empty;
 
+        /// <summary>
+        /// Maximum number of logs to keep, oldest will be deleted on startup
+        /// </summary>
+        public int MaxLogsToKeep { get => this._maxLogsToKeep; }
+        private int _maxLogsToKeep = 25;
+
         public ConfigGeneral() {
             this.GameExePaths = new ReadOnlyCollection<string>(this._gameExePaths);
             this.EditorExePaths = new ReadOnlyCollection<string>(this._editorExePaths);
@@ -219,6 +225,7 @@ namespace Martridge.Models.Configuration {
                     case nameof(this.ActiveEditorExeIndex): TryUpdateGeneric(kvp, ref this._activeEditorExeIndex); break;
                     case nameof(this.DefaultDmodLocation): TryUpdateGeneric(kvp, ref this._defaultDmodLocation); break;
                     case nameof(this.DinkInstallerConfigFileSource): TryUpdateGeneric(kvp, ref this._dinkInstallerConfigFileSource); break;
+                    case nameof(this.MaxLogsToKeep): TryUpdateGeneric(kvp, ref this._maxLogsToKeep); break;
                     
                     case nameof(this.GameExePaths): TryUpdatePathList(kvp, this._gameExePaths); break;
                     case nameof(this.EditorExePaths): TryUpdatePathList(kvp, this._editorExePaths); break;
@@ -266,6 +273,7 @@ namespace Martridge.Models.Configuration {
                     DefaultDmodLocation = this.DefaultDmodLocation,
                     AdditionalDmodLocations = additionalDmodLocations,
                     DinkInstallerConfigFileSource = this.DinkInstallerConfigFileSource,
+                    MaxLogsToKeep = this.MaxLogsToKeep,
                 };
 
                 if (this.UseRelativePathForSubfolders) {

@@ -92,6 +92,11 @@ namespace Martridge.Models.Configuration.Save {
         public List<string>? AdditionalDmodLocations { get; set; }
         
         public string? DinkInstallerConfigFileSource { get; set; }
+        
+        /// <summary>
+        /// Maximum number of logs to keep, oldest will be deleted on startup
+        /// </summary>
+        public int? MaxLogsToKeep { get; set; }
 
         public Dictionary<string, object?> GetValues() {
             return new Dictionary<string, object?>() {
@@ -112,6 +117,7 @@ namespace Martridge.Models.Configuration.Save {
                 [nameof(ConfigGeneral.DefaultDmodLocation)] = this.DefaultDmodLocation,
                 [nameof(ConfigGeneral.AdditionalDmodLocations)] = this.AdditionalDmodLocations,
                 [nameof(ConfigGeneral.DinkInstallerConfigFileSource)] = this.DinkInstallerConfigFileSource,
+                [nameof(ConfigGeneral.MaxLogsToKeep)] = this.MaxLogsToKeep,
             };
         }
 

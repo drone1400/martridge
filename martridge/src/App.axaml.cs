@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -29,8 +30,6 @@ namespace Martridge {
         public IStorageProvider? StorageProvider => this.MainWindow?.StorageProvider;
 
         public event EventHandler? OnThemePaletteChange;
-        
-        private readonly MyTraceListenerLogger _logger = new MyTraceListenerLogger("martridge");
 
         public override void Initialize()
         {
@@ -50,6 +49,8 @@ namespace Martridge {
                 MyTrace.Global.Listeners.Add(this._logger);
                     
                 MyTrace.Global.WriteMessage($"App Path = \"{LocationHelper.AppBaseDirectory}\"");
+
+                this.PurgeOldLogs();
                 
                 this.InitializeMainWindow(desktop.Args);
                 desktop.MainWindow = this._mainWindow;
@@ -63,6 +64,36 @@ namespace Martridge {
                 this._mainWindow?.Close();
             });
         }
+        
+        #region LOGGING stuff
+        
+        private readonly MyTraceListenerLogger _logger = new MyTraceListenerLogger("martridge");
+
+        private void PurgeOldLogs() {
+            try {
+                if (this._config.General.MaxLogsToKeep <= 0)
+                    return;
+
+                DirectoryInfo dirInfo = new DirectoryInfo(LocationHelper.LogsDirectory);
+                FileInfo[] files = dirInfo.GetFiles("martridge*.log");
+                
+                int delCount = files.Length - this._config.General.MaxLogsToKeep;
+                if (delCount <= 0)
+                    return;
+                
+                var orderedFiles = files.OrderBy(f => f.CreationTime);
+                foreach (var file in orderedFiles) {
+                    file.Delete();
+                    delCount--;
+                    if (delCount == 0)
+                        return;
+                }
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(ex);
+            }
+        }
+        
+        #endregion
         
         #region CONFIG stuff
         

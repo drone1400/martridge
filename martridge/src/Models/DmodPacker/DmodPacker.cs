@@ -93,7 +93,10 @@ namespace Martridge.Models.DmodPacker {
 
         public DmodPacker()
         {
-            this._customTrace = new MyTrace(this.GetType().ToString());
+            this._customTrace = new MyTrace(this.GetType().ToString()) {
+                MirrorToGlobalTrace = true,
+            };
+            
             this._temp.SetLogCallback(this.LogMessage);
         }
         

@@ -102,7 +102,9 @@ namespace Martridge.Models.DmodInstaller {
         }
         
         public DmodInstaller() {
-            this.CustomTrace = new MyTrace(this.GetType().ToString());
+            this.CustomTrace = new MyTrace(this.GetType().ToString()) {
+                MirrorToGlobalTrace = true,
+            };
             
             this._temp.SetLogCallback(this.LogMessage);
             

@@ -32,11 +32,13 @@ namespace Martridge.Models.DinkInstaller {
         private DinkTempFileHelper _temp = new DinkTempFileHelper();
 
         public DinkInstaller() {
-            this.CustomTrace = new MyTrace(this.GetType().ToString());
+            this.CustomTrace = new MyTrace(this.GetType().ToString()) {
+                MirrorToGlobalTrace = true,
+            };
 
             // add text logger listener to trace...
-            MyTraceListenerLogger traceLogger = new MyTraceListenerLogger(this.GetType().ToString());
-            this.CustomTrace.Listeners.Add(traceLogger);
+            // MyTraceListenerLogger traceLogger = new MyTraceListenerLogger(this.GetType().ToString());
+            // this.CustomTrace.Listeners.Add(traceLogger);
             
             this._temp.SetLogCallback(this.LogMessage);
         }

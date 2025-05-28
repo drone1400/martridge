@@ -117,6 +117,9 @@ namespace Martridge.Models.Configuration {
         public ReadOnlyCollection<string> AdditionalDmodLocations { get; }
         private readonly List<string> _additionalDmodLocations = new List<string>();
 
+        /// <summary>
+        /// The source URL or file for the DinkInstaller config json file
+        /// </summary>
         public string DinkInstallerConfigFileSource { get => this._dinkInstallerConfigFileSource; }
         private string _dinkInstallerConfigFileSource = string.Empty;
 

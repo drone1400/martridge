@@ -51,11 +51,6 @@ namespace Martridge.Models.Configuration.Save {
         public bool? ShowLaunchCustomArgsInMainWindow { get; set; }
         
         /// <summary>
-        /// Indicates if the application should show the info/error log window when starting
-        /// </summary>
-        // public bool? ShowLogWindowOnStartup { get; set; }
-        
-        /// <summary>
         /// Indicates if the application should use relative paths for paths related to its subfolders.
         /// This helps with keeping the application portable...
         /// </summary>

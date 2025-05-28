@@ -154,12 +154,14 @@ namespace Martridge.Views.Dmod {
                 if (this.LeftPanelolumnLengthInitialized == false && args.Property.Name == nameof(this.LeftPanelLastSetColumnLength)) {
                     if (this._theGrid != null) {
                         this.LeftPanelolumnLengthInitialized = true;
+                        if (this.LeftPanelLastSetColumnLength.Value < 1.0) this.LeftPanelLastSetColumnLength = new GridLength(1, GridUnitType.Star);
                         this._theGrid.ColumnDefinitions[0].Width = this.LeftPanelLastSetColumnLength;
                     }
                 }
                 if (this.RightPanelolumnLengthInitialized == false && args.Property.Name == nameof(this.RightPanelLastSetColumnLength)) {
                     if (this._theGrid != null) {
                         this.RightPanelolumnLengthInitialized = true;
+                        if (this.RightPanelLastSetColumnLength.Value < 1.0) this.RightPanelLastSetColumnLength = new GridLength(1, GridUnitType.Star);
                         this._theGrid.ColumnDefinitions[2].Width = this.RightPanelLastSetColumnLength;
                     }
                 }

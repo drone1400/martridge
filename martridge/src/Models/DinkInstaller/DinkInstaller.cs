@@ -54,19 +54,19 @@ namespace Martridge.Models.DinkInstaller {
         
         private void LogMessage(string line1)
         {
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, line1);
+            this.CustomTrace.WriteMessage(line1);
         }
         private void LogMessage(string line1, string line2)
         {
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, [line1, line2]);
+            this.CustomTrace.WriteMessage([line1, line2]);
         }
         private void LogMessage(string line1, string line2, string line3)
         {
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, [line1, line2, line3]);
+            this.CustomTrace.WriteMessage([line1, line2, line3]);
         }
         private void LogMessage(string line1, string line2, string line3, string line4)
         {
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, [line1, line2, line3, line4]);
+            this.CustomTrace.WriteMessage([line1, line2, line3, line4]);
         }
         
         public void Cancel()
@@ -140,8 +140,8 @@ namespace Martridge.Models.DinkInstaller {
                 this.LogMessage(Localizer.Instance["DinkInstaller/Heading/CancelledByUser"]);
             } catch (Exception ex) {
                 exception = ex;
-                this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, exception);
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, exception);
+                this.CustomTrace.WriteException(exception);
+                MyTrace.Global.WriteException(exception);
             } finally {
                 DinkInstallerResult result;
 
@@ -463,9 +463,7 @@ namespace Martridge.Models.DinkInstaller {
                 
 
                 if (bannedDict == null || bannedDict.ContainsKey(relativePath) == false) {
-                    this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller,
-                        new List<string>() { indentStr + relativePath },
-                        MyTraceLevel.Verbose);
+                    this.CustomTrace.WriteMessage(indentStr + relativePath, MyTraceLevel.Verbose);
 
                     newFile.Directory?.Refresh();
                     if (newFile.Directory?.Exists == false) {
@@ -554,7 +552,7 @@ namespace Martridge.Models.DinkInstaller {
             try {
                 string sha256;
 
-                this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
+                this.CustomTrace.WriteMessage(new List<string>() {
                     Localizer.Instance["DinkInstaller/DownloadingResources/Prepare"],
                     $"    Name         = \"{res.Name}\"",
                     $"    Source       = \"{res.Uri}\"",
@@ -588,7 +586,7 @@ namespace Martridge.Models.DinkInstaller {
                         if (Math.Floor(age.TotalDays) <= 3.0)
                         {
                             // TODO maybe check file length against web resource?...
-                            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
+                            this.CustomTrace.WriteMessage(new List<string>() {
                                 Localizer.Instance["DinkInstaller/DownloadingResources/UseExistingFile"],
                             });
                             return;
@@ -646,7 +644,7 @@ namespace Martridge.Models.DinkInstaller {
                             // check if need to report progress...
                             if (DateTime.Now > nextReport) {
                                 this.ReportSecondaryProgress(res.Name, res.Uri, progress);
-                                this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
+                                this.CustomTrace.WriteMessage(new List<string>() {
                                         $"    ({(int)Math.Ceiling((double)downloaded/1024)}kB/{(int)Math.Ceiling(totalsize/1024.0)}kB)"
                                     });
                                 nextReport = DateTime.Now + this._downloadProgressReportInterval;
@@ -660,7 +658,7 @@ namespace Martridge.Models.DinkInstaller {
                 
                 // send a final progress report 
                 this.ReportSecondaryProgress(res.Name, res.Uri, 1.0);
-                this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, new List<string>() {
+                this.CustomTrace.WriteMessage(new List<string>() {
                     $"    ({(int)Math.Ceiling((double)downloaded/1024)}kB/{(int)Math.Ceiling((double)downloaded/1024)}kB)"
                 });
 

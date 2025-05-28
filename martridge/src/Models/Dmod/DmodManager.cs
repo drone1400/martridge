@@ -41,7 +41,7 @@ namespace Martridge.Models.Dmod {
 
                     this._dmodList = dmodList;
                 } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
+                    MyTrace.Global.WriteException(ex);
                 } finally {
                     this.DmodListInitialized?.Invoke(this, EventArgs.Empty);
                 }

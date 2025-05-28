@@ -301,7 +301,7 @@ namespace Martridge.Models.Configuration {
                             dict.Add(defaultDmods.FullName, defaultDmods);
                         }
                     } catch (Exception ex) {
-                        MyTrace.Global.WriteException(MyTraceCategory.General, ex, MyTraceLevel.Warning);
+                        MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
                     }
                 }
 
@@ -312,8 +312,8 @@ namespace Martridge.Models.Configuration {
                             dict.Add(dirInfo.FullName, dirInfo);
                         }
                     } catch (Exception ex) {
-                        MyTrace.Global.WriteMessage(MyTraceCategory.General, $"Error evaluating possible DMOD location... \"{location}\"");
-                        MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                        MyTrace.Global.WriteMessage($"Error evaluating possible DMOD location... \"{location}\"");
+                        MyTrace.Global.WriteException(ex);
                     }
                 }
 
@@ -324,8 +324,8 @@ namespace Martridge.Models.Configuration {
                             dict.Add(fileInfo.Directory.FullName, fileInfo.Directory);
                         }
                     } catch (Exception ex) {
-                        MyTrace.Global.WriteMessage(MyTraceCategory.General, $"Error evaluating possible DMOD location... \"{file}\"");
-                        MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                        MyTrace.Global.WriteMessage($"Error evaluating possible DMOD location... \"{file}\"");
+                        MyTrace.Global.WriteException(ex);
                     }
                 }
 

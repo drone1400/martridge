@@ -117,7 +117,7 @@ namespace Martridge.ViewModels {
             
                     this.IsInitialized = true;
                 } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
             });
             
@@ -190,8 +190,8 @@ namespace Martridge.ViewModels {
                     }
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, $"Error initializing arguments");
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteMessage("Error initializing arguments");
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -233,12 +233,12 @@ namespace Martridge.ViewModels {
                             }
 
                         } catch (Exception ex) {
-                            MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                            MyTrace.Global.WriteException(ex);
                         }
                     });
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -389,7 +389,7 @@ namespace Martridge.ViewModels {
 
                 this.SwapCurrentViewModel(vm);
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         // ----------------------------------------------------------------------------------------------------------------------------
@@ -411,7 +411,7 @@ namespace Martridge.ViewModels {
 
                 this.SwapCurrentViewModel(vm);
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         
@@ -435,7 +435,7 @@ namespace Martridge.ViewModels {
                 vm.CfgLaunch = this._config?.Launch;
                 this.SwapCurrentViewModel(vm);
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         // ----------------------------------------------------------------------------------------------------------------------------
@@ -488,7 +488,7 @@ namespace Martridge.ViewModels {
                         }
 
                     } catch (Exception ex) {
-                        MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                        MyTrace.Global.WriteException(ex);
                     }
                     
                     this.SwapToDefaultViewModel();
@@ -496,7 +496,7 @@ namespace Martridge.ViewModels {
 
                 this.SwapCurrentViewModel(vm);
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
 #endif
         }
@@ -553,7 +553,7 @@ namespace Martridge.ViewModels {
                     vm.CmdBrowseDmod();
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         // ----------------------------------------------------------------------------------------------------------------------------
@@ -598,7 +598,7 @@ namespace Martridge.ViewModels {
                     vm.CmdBrowseDmodSource();
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         // ----------------------------------------------------------------------------------------------------------------------------
@@ -618,7 +618,7 @@ namespace Martridge.ViewModels {
             try {
                 this.SwapToDefaultViewModel();
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         // ----------------------------------------------------------------------------------------------------------------------------
@@ -642,7 +642,7 @@ namespace Martridge.ViewModels {
                 this.EnsureInitializedOnlineDmodBrowser();
                 this.SwapCurrentViewModel(this._onlineDmodBrowserViewModel);
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 #endif

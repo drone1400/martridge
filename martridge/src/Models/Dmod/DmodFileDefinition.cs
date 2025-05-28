@@ -132,7 +132,7 @@ namespace Martridge.Models.Dmod {
 
                 return desc;
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex, MyTraceLevel.Warning);
+                MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
                 return null;
             }
         }
@@ -145,7 +145,7 @@ namespace Martridge.Models.Dmod {
                     try {
                         lines = File.ReadAllLines(this.DmodDiz!.FullName);
                     } catch (Exception ex) {
-                        MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex, MyTraceLevel.Warning);
+                        MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
                     }
                 }
 
@@ -156,7 +156,7 @@ namespace Martridge.Models.Dmod {
                     return lines[0];
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex, MyTraceLevel.Warning);
+                MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
                 return null;
             }
         }
@@ -243,7 +243,7 @@ namespace Martridge.Models.Dmod {
 
                 return bitmap;
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex, MyTraceLevel.Warning);
+                MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
                 return null;
             }
         }

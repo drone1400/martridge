@@ -412,8 +412,8 @@ namespace Martridge.ViewModels.DinkInstaller
                 this.IsInstallableInitialized = true;
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Error initializing installables from configInstallerList.json");
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteMessage("Error initializing installables from configInstallerList.json");
+                MyTrace.Global.WriteException(ex);
             }
             finally
             {
@@ -574,7 +574,7 @@ namespace Martridge.ViewModels.DinkInstaller
                     }
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
                 finally
                 {
@@ -658,7 +658,7 @@ namespace Martridge.ViewModels.DinkInstaller
                     }
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
                 finally
                 {
@@ -764,7 +764,7 @@ namespace Martridge.ViewModels.DinkInstaller
                     this._installerLogic.InstallDink(destination, removeOldFiles,  this.SelectedInstallable!.InstallerData);
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
             });
         }
@@ -800,7 +800,7 @@ namespace Martridge.ViewModels.DinkInstaller
                 this.ProgressPrimaryPercent = args.ProgressPercent;
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -824,7 +824,7 @@ namespace Martridge.ViewModels.DinkInstaller
                 }
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -842,7 +842,7 @@ namespace Martridge.ViewModels.DinkInstaller
                     await DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Ok, AlertType.Info);
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
             });
         }
@@ -857,7 +857,7 @@ namespace Martridge.ViewModels.DinkInstaller
                     await DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Ok, AlertType.Error);
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
             });
         }

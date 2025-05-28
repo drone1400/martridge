@@ -232,7 +232,7 @@ namespace Martridge.ViewModels.Dmod {
                 // then reinitialize the DMOD...
                 await this.StartInitializingDmod();
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         
@@ -378,7 +378,7 @@ namespace Martridge.ViewModels.Dmod {
 
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
                 finally
                 {
@@ -412,7 +412,7 @@ namespace Martridge.ViewModels.Dmod {
 
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
                 finally
                 {
@@ -450,7 +450,7 @@ namespace Martridge.ViewModels.Dmod {
                     this._packerLogic.ActivityEnded += this.PackerOnActivityEnded;
                     this._packerLogic.Initialize(dirInfo);
                 } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
             });
         }
@@ -468,7 +468,7 @@ namespace Martridge.ViewModels.Dmod {
                     this._packerLogic.PackDmod(fileInfo);
                     
                 } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
             });
 
@@ -510,7 +510,7 @@ namespace Martridge.ViewModels.Dmod {
                 }
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -521,7 +521,7 @@ namespace Martridge.ViewModels.Dmod {
                 this.PackerDone?.Invoke(this, this._packerDoneEventArgs);
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         
@@ -595,7 +595,7 @@ namespace Martridge.ViewModels.Dmod {
                     }
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -610,7 +610,7 @@ namespace Martridge.ViewModels.Dmod {
                     string body = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Cancel_Body"];
                     await DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Ok, AlertType.Info);
                 } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
             });
         }
@@ -622,7 +622,7 @@ namespace Martridge.ViewModels.Dmod {
                     string body = Localizer.Instance["DmodPacker/ViewModel/MessageBox_Error_Body"] + Environment.NewLine + MyTrace.GetExceptionMessages(exception);
                     await DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Ok, AlertType.Error);
                 } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
             });
         }

@@ -235,7 +235,7 @@ namespace Martridge.ViewModels.OnlineDmod {
                 // restore selected dmod!
                 this.SelectDmodByName(oldSelPath);
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         
@@ -438,7 +438,7 @@ namespace Martridge.ViewModels.OnlineDmod {
 
                     this.ProgressIsVisible = false;
                 } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                    MyTrace.Global.WriteException(ex);
                     this.ProgressIsVisible = false;
                 }
             }
@@ -451,7 +451,7 @@ namespace Martridge.ViewModels.OnlineDmod {
             try {
                 this.SelectedDmodScreenshotVm?.ReloadScreenshotFile(false);
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -546,7 +546,7 @@ namespace Martridge.ViewModels.OnlineDmod {
                     try {
                         this.InstallDmodRequested?.Invoke(this, new InstallOnlineDmodEventArgs(resource.Local));
                     } catch (Exception ex) {
-                        MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                        MyTrace.Global.WriteException(ex);
                     }
                 }
             }

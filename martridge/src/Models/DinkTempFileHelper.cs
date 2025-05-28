@@ -105,7 +105,7 @@ namespace Martridge.Models {
                         this._logCallback?.Invoke(deleteFileMsg + x.FullName);
                         x.Delete();
                     } catch (Exception ex) {
-                        MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                        MyTrace.Global.WriteException(ex);
                     }
                 }
                 foreach (var x in this._tempDirectories) {
@@ -113,11 +113,11 @@ namespace Martridge.Models {
                         this._logCallback?.Invoke(deleteDirectoryMsg + x.FullName);
                         x.Delete();
                     } catch (Exception ex) {
-                        MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                        MyTrace.Global.WriteException(ex);
                     }
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
 
             this._disposed = true;

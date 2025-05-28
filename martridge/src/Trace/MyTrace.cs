@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Martridge.Trace {
@@ -33,11 +35,14 @@ namespace Martridge.Trace {
             }
         }
 
-        public void WriteMessage(MyTraceCategory category, string message, MyTraceLevel level = MyTraceLevel.Information) {
+        public void WriteMessage(string message, MyTraceLevel level = MyTraceLevel.Information, [CallerFilePath] string? callerFilePath = null) {
             DateTime now = DateTime.Now;
+            string category = callerFilePath == null
+                ? "generic"
+                : Path.GetFileNameWithoutExtension(callerFilePath);
             foreach (MyTraceListener listener in this.Listeners) {
                 if (!listener.IsClosed && listener.Levels.HasFlag(level)) {
-                    listener.WriteMessage(now, category.ToString(), message, level);
+                    listener.WriteMessage(now, category, message, level);
                 }
             }
         }
@@ -51,11 +56,14 @@ namespace Martridge.Trace {
             }
         }
 
-        public void WriteMessage(MyTraceCategory category, List<string> messages, MyTraceLevel level = MyTraceLevel.Information) {
+        public void WriteMessage(List<string> messages, MyTraceLevel level = MyTraceLevel.Information, [CallerFilePath] string? callerFilePath = null) {
             DateTime now = DateTime.Now;
+            string category = callerFilePath == null
+                ? "generic"
+                : Path.GetFileNameWithoutExtension(callerFilePath);
             foreach (MyTraceListener listener in this.Listeners) {
                 if (!listener.IsClosed && listener.Levels.HasFlag(level)) {
-                    listener.WriteMessage(now, category.ToString(), messages, level);
+                    listener.WriteMessage(now, category, messages, level);
                 }
             }
         }
@@ -69,8 +77,11 @@ namespace Martridge.Trace {
             }
         }
 
-        public void WriteException(MyTraceCategory category, Exception ex, MyTraceLevel level = MyTraceLevel.Error) {
-            this.WriteMessage(category, GetExceptionStringAsList(ex), level);
+        public void WriteException(Exception ex, MyTraceLevel level = MyTraceLevel.Error, [CallerFilePath] string? callerFilePath = null) {
+            string category = callerFilePath == null
+                ? "generic"
+                : Path.GetFileNameWithoutExtension(callerFilePath);
+            this.WriteMessage(category,GetExceptionStringAsList(ex), level);
         }
 
         public void WriteException(string category, Exception ex, MyTraceLevel level = MyTraceLevel.Error) {

@@ -98,8 +98,8 @@ namespace Martridge.Models.Localization {
                 this.Invalidate();
                 return true;
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, $"Error loading localization {language}", MyTraceLevel.Critical);
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteMessage($"Error loading localization {language}", MyTraceLevel.Critical);
+                MyTrace.Global.WriteException(ex);
                 this.LoadLanguageFromInternalAssets();
                 return false;
             }
@@ -115,7 +115,7 @@ namespace Martridge.Models.Localization {
                 this.Invalidate();
             } else {
                 Exception ex = new NullReferenceException("Could not load default localization! This should be impossible?...");
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex, MyTraceLevel.Critical);
+                MyTrace.Global.WriteException(ex, MyTraceLevel.Critical);
                 throw ex;
             }
         }

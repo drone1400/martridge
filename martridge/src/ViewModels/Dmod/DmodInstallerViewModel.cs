@@ -405,7 +405,7 @@ namespace Martridge.ViewModels.Dmod {
 
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
                 finally
                 {
@@ -443,7 +443,7 @@ namespace Martridge.ViewModels.Dmod {
                     this._installerLogic.DmodInstallerActivityEnded += this.InstallerLogicOnDmodInstallerActivityEnded;
                     this._installerLogic.Initialize(fileInfo, DmodInstallPreprocessingMode.QuickPeek);
                 } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
             });
         }
@@ -459,7 +459,7 @@ namespace Martridge.ViewModels.Dmod {
                     this._installerLogic.InstallDmod(this.SelectedBaseDestination, this.DesiredDmodDirectory, this.IsEnabledDesiredDmodDirectoryOverwrite);
                     
                 } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
             });
 
@@ -502,7 +502,7 @@ namespace Martridge.ViewModels.Dmod {
                 }
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -511,7 +511,7 @@ namespace Martridge.ViewModels.Dmod {
                 this.InstallerDone?.Invoke(this, this._installerDoneEventArgs);
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         
@@ -568,7 +568,7 @@ namespace Martridge.ViewModels.Dmod {
                     }
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -591,7 +591,7 @@ namespace Martridge.ViewModels.Dmod {
                     }
                     await DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Ok, AlertType.Info);
                 } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
             });
         }
@@ -611,7 +611,7 @@ namespace Martridge.ViewModels.Dmod {
                     }
                     await DinkyAlert.ShowDinkyAlert(title, body, AlertResults.Ok, AlertType.Error);
                 } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
             });
         }

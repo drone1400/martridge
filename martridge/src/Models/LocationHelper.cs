@@ -30,7 +30,7 @@ namespace Martridge.Models {
             
             if (processFile == null) {
                 NullReferenceException ex = new NullReferenceException("Could not determine current process start location...");
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
                 throw ex;
             }
             
@@ -38,7 +38,7 @@ namespace Martridge.Models {
 
             if (finfo.DirectoryName == null) {
                 NullReferenceException ex = new NullReferenceException("Could not determine current process start location...");
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
                 throw ex;
             }
             _appBaseDirectory = finfo.DirectoryName;

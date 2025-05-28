@@ -59,8 +59,8 @@ namespace Martridge.Models.OnlineDmods {
                 this._dmodList = dmodEntries;
                 this.DmodListInitialized?.Invoke(this, EventArgs.Empty);
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Error parsing dmod lists #{dmodPageIdx}...");
-                MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                MyTrace.Global.WriteMessage($"Error parsing dmod lists #{dmodPageIdx}...", MyTraceLevel.Error);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -129,12 +129,12 @@ namespace Martridge.Models.OnlineDmods {
                 fileInfo.Directory.Create();
             }
             
-            MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Sending HTTP Request to URL: \"{res.Url}\"");
+            MyTrace.Global.WriteMessage($"Sending HTTP Request to URL: \"{res.Url}\"");
             using (HttpResponseMessage response = await this._httpClient.GetAsync(res.Url, HttpCompletionOption.ResponseContentRead))
             using (FileStream fstream = new FileStream(res.Local, FileMode.Create, FileAccess.Write, FileShare.Read)) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"    HTTP Response Status = {response.StatusCode}");
+                MyTrace.Global.WriteMessage($"    HTTP Response Status = {response.StatusCode}");
                 await response.Content.CopyToAsync(fstream);
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"    Content saved to = {res.Local}");
+                MyTrace.Global.WriteMessage($"    Content saved to = {res.Local}");
 
                 return response.StatusCode;
             }
@@ -154,8 +154,8 @@ namespace Martridge.Models.OnlineDmods {
 
                 return description?.InnerText;
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, "Error parsing Online Dmod Description");
-                MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                MyTrace.Global.WriteMessage("Error parsing Online Dmod Description", MyTraceLevel.Error);
+                MyTrace.Global.WriteException(ex);
                 return null;
             }
         }
@@ -202,8 +202,8 @@ namespace Martridge.Models.OnlineDmods {
 
                 return screenshots;
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, "Error parsing Online Dmod Screenshots", MyTraceLevel.Error);
-                MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                MyTrace.Global.WriteMessage("Error parsing Online Dmod Screenshots", MyTraceLevel.Error);
+                MyTrace.Global.WriteException(ex);
                 return new List<OnlineDmodScreenshot>();
             }
         }
@@ -241,8 +241,8 @@ namespace Martridge.Models.OnlineDmods {
                         try {
                             reviewScore = int.Parse(rScoreDigit1Str) + 0.1 * int.Parse(rScoreDigit2Str);
                         } catch (Exception ex) {
-                            MyTrace.Global.WriteMessage(MyTraceCategory.Online, "Error parsing Online Dmod Review Score", MyTraceLevel.Error);
-                            MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                            MyTrace.Global.WriteMessage("Error parsing Online Dmod Review Score", MyTraceLevel.Error);
+                            MyTrace.Global.WriteException(ex);
                         }
 
 
@@ -280,8 +280,8 @@ namespace Martridge.Models.OnlineDmods {
 
                 return reviews.OrderByDescending(x => x.ReviewDate).ThenByDescending(x => x.User.Name).ToList();
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, "Error parsing Online Dmod Reviews", MyTraceLevel.Error);
-                MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                MyTrace.Global.WriteMessage("Error parsing Online Dmod Reviews", MyTraceLevel.Error);
+                MyTrace.Global.WriteException(ex);
                 return new List<OnlineDmodReview>();
             }
         }
@@ -309,7 +309,7 @@ namespace Martridge.Models.OnlineDmods {
                         DateTime date = ShittyParseDateTime(dateStr);
 
                         if (!int.TryParse(downloadsStr, out int downloads)) {
-                            MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Error parsing dmod version downloads...", MyTraceLevel.Warning);
+                            MyTrace.Global.WriteMessage("Error parsing dmod version downloads...", MyTraceLevel.Warning);
                         }
                         string downloadUrl = "";
 
@@ -330,8 +330,8 @@ namespace Martridge.Models.OnlineDmods {
 
                 return versions.OrderByDescending(x => x.Released).ThenByDescending(x => x.Name).ToList();
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, "Error parsing Online Dmod Versions", MyTraceLevel.Error);
-                MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                MyTrace.Global.WriteMessage("Error parsing Online Dmod Versions", MyTraceLevel.Error);
+                MyTrace.Global.WriteException(ex);
                 return new List<OnlineDmodVersion>();
             }
         }
@@ -352,8 +352,8 @@ namespace Martridge.Models.OnlineDmods {
         private int ParseDmodsPage(string localCache, List<OnlineDmodInfo> entries) {
             // make sure html doc exists
             if (File.Exists(localCache) == false) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Tried parsing file that does not exist, this should be impossible?!...", MyTraceLevel.Error);
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"    Path=\"{localCache}\"");
+                MyTrace.Global.WriteMessage("Tried parsing file that does not exist, this should be impossible?!...", MyTraceLevel.Error);
+                MyTrace.Global.WriteMessage($"    Path=\"{localCache}\"");
                 return 0;
             }
             
@@ -382,7 +382,7 @@ namespace Martridge.Models.OnlineDmods {
                             string dmodDownloadsText = cells[3].InnerText;
                             DateTime dmodUpdated = DateTime.Parse(dmodUpdatedText);
                             if (!int.TryParse(dmodDownloadsText, out int dmodDownloads)) {
-                                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Error parsing dmod downloads number for dmod #{rowCount}, {dmodName}...", MyTraceLevel.Warning);
+                                MyTrace.Global.WriteMessage($"Error parsing dmod downloads number for dmod #{rowCount}, {dmodName}...", MyTraceLevel.Warning);
                             }
                             double dmodScore = double.NaN;
                             
@@ -405,8 +405,8 @@ namespace Martridge.Models.OnlineDmods {
                             entries.Add(dmod);
                         }
                     } catch (Exception ex) {
-                        MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Error parsing dmod entry #{rowCount}...", MyTraceLevel.Error);
-                        MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                        MyTrace.Global.WriteMessage($"Error parsing dmod entry #{rowCount}...", MyTraceLevel.Error);
+                        MyTrace.Global.WriteException(ex);
                     }
 
                     rowCount++;
@@ -425,7 +425,7 @@ namespace Martridge.Models.OnlineDmods {
             dateStr = Regex.Replace(dateStr, @"([0-9]+)(st|nd|rd|th)", "$1", RegexOptions.IgnoreCase );
 
             if (!DateTime.TryParse(dateStr, out DateTime date)) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Error parsing dmod version release date...", MyTraceLevel.Warning);
+                MyTrace.Global.WriteMessage("Error parsing dmod version release date...", MyTraceLevel.Warning);
                 date = DateTime.MinValue;
             }
 

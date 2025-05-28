@@ -69,7 +69,7 @@ namespace Martridge.ViewModels {
                     
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -99,7 +99,7 @@ namespace Martridge.ViewModels {
                     }
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 

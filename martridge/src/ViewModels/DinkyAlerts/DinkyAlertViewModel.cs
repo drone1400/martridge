@@ -23,7 +23,7 @@ public class DinkyAlertViewModel : ViewModelBase {
         try {
             this.ResultIsDone?.Invoke(this, new AlertResultDoneEventArgs(this._result));
         } catch (Exception ex) {
-            MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+            MyTrace.Global.WriteException(ex);
         }
     }
 

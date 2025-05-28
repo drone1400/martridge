@@ -80,12 +80,12 @@ namespace Martridge.Models.DirFastFile {
                             dirffReader.BaseStream.Position = targetOffset;
                             byte[] data = dirffReader.ReadBytes(targetSize);
                             if (data.Length != targetSize) {
-                                MyTrace.Global.WriteMessage(MyTraceCategory.DirFf, $"Target File {file} could not be extracted from \"dir.ff\"...", MyTraceLevel.Error);
+                                MyTrace.Global.WriteMessage($"Target File {file} could not be extracted from \"dir.ff\"...", MyTraceLevel.Error);
                                 return null;
                             }
                             return new MemoryStream(data);
                         } else {
-                            MyTrace.Global.WriteMessage(MyTraceCategory.DirFf, $"Target File {file} not found in \"dir.ff\"...", MyTraceLevel.Error);
+                            MyTrace.Global.WriteMessage($"Target File {file} not found in \"dir.ff\"...", MyTraceLevel.Error);
                             return null;
                         }
                     }
@@ -101,14 +101,14 @@ namespace Martridge.Models.DirFastFile {
             string filePath = Path.Combine(directory, "dir.ff");
             // check file exists
             if (Directory.Exists(directory) == false || File.Exists(filePath) == false) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.DirFf, $"Could not find \"dir.ff\" at: \"{ filePath }\"", MyTraceLevel.Error);
+                MyTrace.Global.WriteMessage($"Could not find \"dir.ff\" at: \"{ filePath }\"", MyTraceLevel.Error);
                 return false;
             }
 
             // check file min length
             FileInfo fileInfo = new FileInfo(filePath);
             if (fileInfo.Length < 2 * DirFfBmpMetaData.HeaderLength + 4) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.DirFf, $"File too small to be processed... \"{ filePath }\"", MyTraceLevel.Error);
+                MyTrace.Global.WriteMessage($"File too small to be processed... \"{ filePath }\"", MyTraceLevel.Error);
                 return false;
             }
 
@@ -117,7 +117,7 @@ namespace Martridge.Models.DirFastFile {
 
         public static void CreateDirFf(string directory) {
             if (Directory.Exists(directory) == false) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.DirFf, $"Could not find directory to create \"dir.ff\"...", MyTraceLevel.Error);
+                MyTrace.Global.WriteMessage("Could not find directory to create \"dir.ff\"...", MyTraceLevel.Error);
                 return;
             }
 
@@ -135,7 +135,7 @@ namespace Martridge.Models.DirFastFile {
                         legitBmps.Add(files[i]);
                     } else {
                         invalidBmps.Add(files[i]);
-                        MyTrace.Global.WriteMessage(MyTraceCategory.DirFf, $"BMP name exceeds max length for \"dir.ff\", ignoring: \"{ files[i].FullName}\"", MyTraceLevel.Warning);
+                        MyTrace.Global.WriteMessage($"BMP name exceeds max length for \"dir.ff\", ignoring: \"{ files[i].FullName}\"", MyTraceLevel.Warning);
                     }
                 }
             }

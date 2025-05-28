@@ -65,7 +65,7 @@ namespace Martridge.Models.DmodInstaller {
                 this.ProgressReport?.Invoke(this, new DmodInstallerProgressEventArgs(this._installPhase,  this._installResult, (int)this._installPhase / 5.0));
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         private void ReportActivityStart() {
@@ -74,7 +74,7 @@ namespace Martridge.Models.DmodInstaller {
                 this.DmodInstallerActivityStarted?.Invoke(this, EventArgs.Empty);
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         
@@ -84,21 +84,21 @@ namespace Martridge.Models.DmodInstaller {
                 this.DmodInstallerActivityEnded?.Invoke(this, EventArgs.Empty);
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
         private void LogMessage(string line1)
         {
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, line1);
+            this.CustomTrace.WriteMessage(line1);
         }
         private void LogMessage(string line1, string line2)
         {
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, [line1, line2]);
+            this.CustomTrace.WriteMessage([line1, line2]);
         }
         private void LogMessage(string line1, string line2, string line3)
         {
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, [line1, line2, line3]);
+            this.CustomTrace.WriteMessage([line1, line2, line3]);
         }
         
         public DmodInstaller() {
@@ -262,8 +262,8 @@ namespace Martridge.Models.DmodInstaller {
             }  catch (Exception ex)
             {
                 this._installException = ex;
-                this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, this._installException);
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, this._installException);
+                this.CustomTrace.WriteException(this._installException);
+                MyTrace.Global.WriteException(this._installException);
                 
                 this.CleanUp();
                 
@@ -312,7 +312,7 @@ namespace Martridge.Models.DmodInstaller {
                     }
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
                 return false;
             }
 
@@ -381,7 +381,7 @@ namespace Martridge.Models.DmodInstaller {
                     this._archiveTopLevelEntries.Add(kvp.Key);
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
                 return false;
             }
 
@@ -428,7 +428,7 @@ namespace Martridge.Models.DmodInstaller {
                     this._archiveTopLevelEntries.Add(kvp.Key);
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
                 return false;
             }
 
@@ -480,8 +480,8 @@ namespace Martridge.Models.DmodInstaller {
                 this.LogMessage(Localizer.Instance["DmodInstaller/Log/CancelledByUser"]);
             } catch (Exception ex) {
                 this._installException = ex;
-                this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, this._installException);
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, this._installException);
+                this.CustomTrace.WriteException(this._installException);
+                MyTrace.Global.WriteException(this._installException);
             } finally {
                 this.ReportActivityEnd();
                 

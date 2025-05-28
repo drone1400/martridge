@@ -234,7 +234,7 @@ namespace Martridge.ViewModels.DinkyAlerts {
                     
                     return vm.Result;
                 } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                    MyTrace.Global.WriteException(ex);
                     return AlertResults.None;
                 }
                 finally {

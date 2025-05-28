@@ -35,11 +35,11 @@ namespace Martridge.Models.Configuration.Save {
                     File.Move(pathTemp, path, true);
                 }
 
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationSaved"]);
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, $"    \"{path}\"");
+                MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationSaved"]);
+                MyTrace.Global.WriteMessage($"    \"{path}\"");
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationSaveFailure"]);
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationSaveFailure"]);
+                MyTrace.Global.WriteException(ex);
 
                 // remove temporary file if it was partially created...
                 if (File.Exists(pathTemp)) {
@@ -58,14 +58,14 @@ namespace Martridge.Models.Configuration.Save {
                     fs.Close();
                 }
 
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationLoaded"]);
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, $"    \"{path}\"");
+                MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationLoaded"]);
+                MyTrace.Global.WriteMessage($"    \"{path}\"");
 
                 return cfg;
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, "Could not load config file...");
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, $"    \"{path}\"");
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex, MyTraceLevel.Warning);
+                MyTrace.Global.WriteMessage("Could not load config file...");
+                MyTrace.Global.WriteMessage($"    \"{path}\"");
+                MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
                 return null;
             }
         }

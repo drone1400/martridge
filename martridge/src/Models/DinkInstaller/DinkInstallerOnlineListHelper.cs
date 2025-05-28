@@ -43,7 +43,7 @@ namespace Martridge.Models.DinkInstaller {
 
         public async Task<ConfigInstallerList?> GetConfigInstallerList(Uri uri, bool ignoreCache) {
             try {
-                MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Trying to get configInstallerList.json");
+                MyTrace.Global.WriteMessage("Trying to get configInstallerList.json");
 
                 if (uri.AbsoluteUri.StartsWith("file://")) {
                     // loading from local path
@@ -66,7 +66,7 @@ namespace Martridge.Models.DinkInstaller {
                     }
                     
                     if (list != null) {
-                        MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Trying to get configInstallerList.json... done!");
+                        MyTrace.Global.WriteMessage("Trying to get configInstallerList.json... done!");
                         return list;
                     }
 
@@ -78,19 +78,19 @@ namespace Martridge.Models.DinkInstaller {
 
                     ConfigInstallerList? list2 = this.TryGetListFromLocalCachedFile(resourceTemp.Local, false);
                     if (list2 != null) {
-                        MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Trying to get configInstallerList.json... done!");
+                        MyTrace.Global.WriteMessage("Trying to get configInstallerList.json... done!");
                         return list2;
                     }
                 }
 
-                MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Trying to get configInstallerList.json... failed!");
+                MyTrace.Global.WriteMessage("Trying to get configInstallerList.json... failed!");
                 return null;
             } catch (TaskCanceledException) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Trying to get configInstallerList.json... cancelled by user!");
+                MyTrace.Global.WriteMessage("Trying to get configInstallerList.json... cancelled by user!");
                 return null;
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.DinkInstaller, $"Trying to get configInstallerList.json... ERROR!");
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteMessage("Trying to get configInstallerList.json... ERROR!");
+                MyTrace.Global.WriteException(ex);
                 return null;
             }
         }
@@ -102,13 +102,13 @@ namespace Martridge.Models.DinkInstaller {
                 fileInfo.Directory.Create();
             }
             
-            MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Sending HTTP Request to URL: \"{res.Url}\"");
+            MyTrace.Global.WriteMessage($"Sending HTTP Request to URL: \"{res.Url}\"");
             using HttpResponseMessage response = await this._httpClient.GetAsync(res.Url, HttpCompletionOption.ResponseContentRead, this.CancelToken);
             using FileStream fstream = new FileStream(res.Local, FileMode.Create, FileAccess.Write, FileShare.Read);
             
-            MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"    HTTP Response Status = {response.StatusCode}");
+            MyTrace.Global.WriteMessage($"    HTTP Response Status = {response.StatusCode}");
             await response.Content.CopyToAsync(fstream);
-            MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"    Content saved to = {res.Local}");
+            MyTrace.Global.WriteMessage($"    Content saved to = {res.Local}");
 
             return response.StatusCode;
             

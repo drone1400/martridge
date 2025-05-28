@@ -10,7 +10,7 @@ namespace Martridge.ViewModels {
         public LogConsoleViewModel() {
             MyTrace.Global.Listeners.Add(this._traceListener);
             this._traceListener.PropertyChanged += this._traceListener_PropertyChanged;
-            MyTrace.Global.WriteMessage(MyTraceCategory.General, "<Initialized Log Console...>");
+            MyTrace.Global.WriteMessage("<Initialized Log Console...>");
         }
 
         public void CloseTraceListener() {

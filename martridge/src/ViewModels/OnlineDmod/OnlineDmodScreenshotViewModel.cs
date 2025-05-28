@@ -56,7 +56,7 @@ namespace Martridge.ViewModels.OnlineDmod {
                     this.ScreenshotPreview = null;
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                MyTrace.Global.WriteException(ex);
                 this.ScreenshotPreview = null;
             }
         }
@@ -80,7 +80,7 @@ namespace Martridge.ViewModels.OnlineDmod {
                     this.Screenshot = null;
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                MyTrace.Global.WriteException(ex);
                 this.Screenshot = null;
             }
         }

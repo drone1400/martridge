@@ -42,11 +42,11 @@ namespace Martridge.Models.Configuration {
                     File.Move(pathTemp, path, true);
                 }
 
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationInstallerSaved"]);
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, $"    \"{path}\"");
+                MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationInstallerSaved"]);
+                MyTrace.Global.WriteMessage($"    \"{path}\"");
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationInstallerSaveFailure"]);
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationInstallerSaveFailure"]);
+                MyTrace.Global.WriteException(ex);
                 
                 // remove temporary file if it was partially created...
                 if (File.Exists(pathTemp)) {
@@ -69,8 +69,8 @@ namespace Martridge.Models.Configuration {
                 }
 
                 if (cfgJ == null || cfgJ.InstallerDefinitions == null) {
-                    MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationInstallerLoad/Failure"]);
-                    MyTrace.Global.WriteMessage(MyTraceCategory.General, $"    \"{path}\"");
+                    MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationInstallerLoad/Failure"]);
+                    MyTrace.Global.WriteMessage($"    \"{path}\"");
                     return null;
                 }
 
@@ -80,8 +80,8 @@ namespace Martridge.Models.Configuration {
                 foreach (ConfigDataInstaller installerJ in cfgJ.InstallerDefinitions) {
                     ConfigInstaller? installer = ConfigInstaller.FromJsonData(installerJ);
                     if (installer == null) {
-                        MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationInstallerLoad/FailureComponent"]);
-                        MyTrace.Global.WriteMessage(MyTraceCategory.General, "    " + (installerJ.Name ?? "???"));
+                        MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationInstallerLoad/FailureComponent"]);
+                        MyTrace.Global.WriteMessage("    " + (installerJ.Name ?? "???"));
                         hasErrors = true;
                         
                     } else {
@@ -90,8 +90,8 @@ namespace Martridge.Models.Configuration {
                         }
 
                         if (cfg.Installables[installer.Category].ContainsKey(installer.Name)) {
-                            MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationInstallerLoad/FailureDuplicateComponent"]);
-                            MyTrace.Global.WriteMessage(MyTraceCategory.General, "    " + installer.Name);
+                            MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationInstallerLoad/FailureDuplicateComponent"]);
+                            MyTrace.Global.WriteMessage("    " + installer.Name);
                             hasErrors = true;
                         } else {
                             cfg.Installables[installer.Category].Add(installer.Name, installer);
@@ -100,18 +100,18 @@ namespace Martridge.Models.Configuration {
                 }
 
                 if (hasErrors) {
-                    MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationInstallerLoad/FailurePartial"]);
-                    MyTrace.Global.WriteMessage(MyTraceCategory.General, $"    \"{path}\"");
+                    MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationInstallerLoad/FailurePartial"]);
+                    MyTrace.Global.WriteMessage($"    \"{path}\"");
                 } else {
-                    MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationInstallerLoad/Success"]);
-                    MyTrace.Global.WriteMessage(MyTraceCategory.General, $"    \"{path}\"");
+                    MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationInstallerLoad/Success"]);
+                    MyTrace.Global.WriteMessage($"    \"{path}\"");
                 }
 
                 return cfg;
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance[@"General/ConfigurationInstallerLoad/Failure"]);
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, $"    \"{path}\"");
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationInstallerLoad/Failure"]);
+                MyTrace.Global.WriteMessage($"    \"{path}\"");
+                MyTrace.Global.WriteException(ex);
                 return null;
             }
         }

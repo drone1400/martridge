@@ -43,7 +43,7 @@ namespace Martridge {
                     this.ShowLogWindow();
                 }
                 
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, $"App Path = \"{LocationHelper.AppBaseDirectory}\"");
+                MyTrace.Global.WriteMessage($"App Path = \"{LocationHelper.AppBaseDirectory}\"");
                 
                 this.InitializeMainWindow(desktop.Args);
                 desktop.MainWindow = this._mainWindow;
@@ -78,12 +78,12 @@ namespace Martridge {
         }
         
         private void LaunchOnUpdated(object? sender, EventArgs e) {
-            MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance["General/ConfigurationChanged"]);
+            MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationChanged"]);
             this._config.SaveToFile(this._defaultConfigFile);
         }
 
         private void GeneralOnUpdated(object? sender, ConfigUpdateEventArgs e) {
-            MyTrace.Global.WriteMessage(MyTraceCategory.General, Localizer.Instance["General/ConfigurationChanged"]);
+            MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationChanged"]);
             this._config.SaveToFile(this._defaultConfigFile);
         }
         
@@ -163,12 +163,12 @@ namespace Martridge {
                                 continue;
                             this._customThemeVariantDefinitions.Add(key, file);
                         } catch (Exception ex) {
-                            MyTrace.Global.WriteMessage(MyTraceCategory.General, ex.ToString(), MyTraceLevel.Warning);
+                            MyTrace.Global.WriteMessage(ex.ToString(), MyTraceLevel.Warning);
                         }
                     }
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, ex.ToString(), MyTraceLevel.Critical);
+                MyTrace.Global.WriteMessage(ex.ToString(), MyTraceLevel.Critical);
             }
 
             this._themeVariants = this._citrusTheme.GetRegisteredThemeVariants();
@@ -199,7 +199,7 @@ namespace Martridge {
                 CitrusThemeVariantData paletteData = new CitrusThemeVariantData(name, resDic);
                 return paletteData;
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, ex.ToString(), MyTraceLevel.Warning);
+                MyTrace.Global.WriteMessage(ex.ToString(), MyTraceLevel.Warning);
                 return null;
             }
         }
@@ -214,7 +214,7 @@ namespace Martridge {
                 }
                 return null;
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, ex.ToString(), MyTraceLevel.Warning);
+                MyTrace.Global.WriteMessage(ex.ToString(), MyTraceLevel.Warning);
                 return null;
             }
         }
@@ -255,7 +255,7 @@ namespace Martridge {
             try {
                 this.OnThemePaletteChange?.Invoke(this, EventArgs.Empty);
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 

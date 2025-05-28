@@ -52,7 +52,7 @@ namespace Martridge.Models.DmodPacker {
                 this.ProgressReport?.Invoke(this, new DmodPackerProgressEventArgs(this._packPhase,  this._packResult, (int)this._packPhase / 5.0));
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         private void ReportActivityStart() {
@@ -61,7 +61,7 @@ namespace Martridge.Models.DmodPacker {
                 this.ActivityStarted?.Invoke(this, EventArgs.Empty);
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         
@@ -71,24 +71,24 @@ namespace Martridge.Models.DmodPacker {
                 this.ActivityEnded?.Invoke(this, EventArgs.Empty);
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
         private void LogError(Exception ex) {
-            this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, ex);
+            this.CustomTrace.WriteException(ex);
         }
         private void LogMessage(string line1)
         {
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, line1);
+            this.CustomTrace.WriteMessage(line1);
         }
         private void LogMessage(string line1, string line2)
         {
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, [line1, line2]);
+            this.CustomTrace.WriteMessage([line1, line2]);
         }
         private void LogMessage(string line1, string line2, string line3)
         {
-            this.CustomTrace.WriteMessage(MyTraceCategory.DinkInstaller, [line1, line2, line3]);
+            this.CustomTrace.WriteMessage([line1, line2, line3]);
         }
 
         public DmodPacker()
@@ -188,8 +188,8 @@ namespace Martridge.Models.DmodPacker {
             }  catch (Exception ex)
             {
                 this._packException = ex;
-                this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, this._packException);
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, this._packException);
+                this.CustomTrace.WriteException(this._packException);
+                MyTrace.Global.WriteException(this._packException);
                 
                 this.CleanUp();
                 
@@ -391,8 +391,8 @@ namespace Martridge.Models.DmodPacker {
                 this.LogMessage(Localizer.Instance["DmodPacker/Log/CancelledByUser"]);
             } catch (Exception ex) {
                 this._packException = ex;
-                this.CustomTrace.WriteException(MyTraceCategory.DinkInstaller, this._packException);
-                MyTrace.Global.WriteException(MyTraceCategory.DinkInstaller, this._packException);
+                this.CustomTrace.WriteException(this._packException);
+                MyTrace.Global.WriteException(this._packException);
             } finally {
                 this.ReportActivityEnd();
                 

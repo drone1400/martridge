@@ -183,13 +183,13 @@ namespace Martridge.ViewModels.Configuration {
                         CultureInfo ci = CultureInfo.GetCultureInfo(langId);
                         this._localizations.Add(ci);
                     } catch (Exception ex) {
-                        MyTrace.Global.WriteMessage(MyTraceCategory.General, $"Could not initialize application localization for \"{langId}\"", MyTraceLevel.Error);
-                        MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                        MyTrace.Global.WriteMessage($"Could not initialize application localization for \"{langId}\"", MyTraceLevel.Error);
+                        MyTrace.Global.WriteException(ex);
                     }
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.General, "Error initializing application localizations in settings view...", MyTraceLevel.Error);
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteMessage("Error initializing application localizations in settings view...", MyTraceLevel.Error);
+                MyTrace.Global.WriteException(ex);
             }
             
             this.PropertyChanged += OnPropertyChanged;
@@ -401,7 +401,7 @@ namespace Martridge.ViewModels.Configuration {
                     }
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
                 finally
                 {
@@ -453,7 +453,7 @@ namespace Martridge.ViewModels.Configuration {
                     }
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
                 finally
                 {
@@ -513,7 +513,7 @@ namespace Martridge.ViewModels.Configuration {
                     }
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
                 finally
                 {
@@ -585,7 +585,7 @@ namespace Martridge.ViewModels.Configuration {
                     }
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
                 finally
                 {
@@ -657,7 +657,7 @@ namespace Martridge.ViewModels.Configuration {
                     }
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
                 finally
                 {

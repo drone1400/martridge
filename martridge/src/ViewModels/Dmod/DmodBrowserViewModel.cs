@@ -83,7 +83,7 @@ namespace Martridge.ViewModels.Dmod {
                         break;
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -404,7 +404,7 @@ namespace Martridge.ViewModels.Dmod {
                     }
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
+                MyTrace.Global.WriteException(ex);
                 this.GameExePaths = listGameExe;
                 this.ActiveGameExePath = null;
                 this.RefreshShowFreedinkLocalizations();
@@ -444,7 +444,7 @@ namespace Martridge.ViewModels.Dmod {
                     }
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
+                MyTrace.Global.WriteException(ex);
                 this.EditorExePaths = listGameExe;
                 this.ActiveEditorExePath = null;
             }
@@ -625,7 +625,7 @@ namespace Martridge.ViewModels.Dmod {
                 // restore selected dmod!
                 this.SelectDmodByPath(oldSelPath);
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -763,7 +763,7 @@ namespace Martridge.ViewModels.Dmod {
                 });
                 this._dmodLauncherDelay.Start();
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
 
@@ -798,7 +798,7 @@ namespace Martridge.ViewModels.Dmod {
                 DirectoryInfo dinfo = new DirectoryInfo(dmodPath);
                 if (finfo.Exists == false || dinfo.Exists == false) { return false; }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
+                MyTrace.Global.WriteException(ex);
                 return false;
             }
 
@@ -843,7 +843,7 @@ namespace Martridge.ViewModels.Dmod {
                     }
                 } catch (Exception ex)
                 {
-                    MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
                 finally
                 {

@@ -53,7 +53,7 @@ namespace Martridge.ViewModels.OnlineDmod {
                     this.PfpImageBackground = null;
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                MyTrace.Global.WriteException(ex);
                 this.PfpImageBackground = null;
             }
 
@@ -64,7 +64,7 @@ namespace Martridge.ViewModels.OnlineDmod {
                     this.PfpImageForeground = null;
                 }
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                MyTrace.Global.WriteException(ex);
                 this.PfpImageForeground = null;
             }
 
@@ -77,7 +77,7 @@ namespace Martridge.ViewModels.OnlineDmod {
                         badges.Add(image);
                     }
                 } catch (Exception ex) {
-                    MyTrace.Global.WriteException(MyTraceCategory.Online, ex);
+                    MyTrace.Global.WriteException(ex);
                 }
             }
             this.BadgeImages = badges;

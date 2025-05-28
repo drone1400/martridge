@@ -25,7 +25,7 @@ namespace Martridge.ViewModels.Dmod
                 this.ShowDinkInstallerPageRequested?.Invoke(this, EventArgs.Empty);
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
         
@@ -36,7 +36,7 @@ namespace Martridge.ViewModels.Dmod
                 this.ShowConfigurationPageRequested?.Invoke(this, EventArgs.Empty);
             } catch (Exception ex)
             {
-                MyTrace.Global.WriteException(MyTraceCategory.General, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
     }

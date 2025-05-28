@@ -20,13 +20,13 @@ namespace Martridge.Models.OnlineDmods {
         public static OnlineDmodCachedResource? FromRelativeFileUrl(string relativeUrl) {
             if (relativeUrl.StartsWith('/') == false ||
                 relativeUrl.EndsWith('/')) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
+                MyTrace.Global.WriteMessage($"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
                 return null;
             }
 
             string? local = GetLocalPathFromRelativeUrl(relativeUrl);
             if (local == null) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
+                MyTrace.Global.WriteMessage($"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
                 return null;
             }
             
@@ -39,13 +39,13 @@ namespace Martridge.Models.OnlineDmods {
         public static OnlineDmodCachedResource? FromRelativeScreenshotPageUrl(string relativeUrl) {
             if (relativeUrl.StartsWith('/') == false ||
                 relativeUrl.EndsWith('/') == false) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
+                MyTrace.Global.WriteMessage($"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
                 return null;
             }
 
             string? local = GetLocalPathFromRelativeUrl(relativeUrl);
             if (local == null) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
+                MyTrace.Global.WriteMessage($"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
                 return null;
             }
             
@@ -59,7 +59,7 @@ namespace Martridge.Models.OnlineDmods {
 
         public static string? GetLocalPathFromRelativeUrl(string relativeUrl) {
             if (relativeUrl.StartsWith('/') == false) {
-                MyTrace.Global.WriteMessage(MyTraceCategory.Online, $"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
+                MyTrace.Global.WriteMessage($"Invalid Relative DinkNetwork url: \"{relativeUrl}\"");
                 return null;
             }
             

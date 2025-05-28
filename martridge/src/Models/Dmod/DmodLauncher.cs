@@ -93,7 +93,7 @@ namespace Martridge.Models.Dmod
                     arguments += launch.CustomUserArguments;
                 }
 
-                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
+                MyTrace.Global.WriteMessage(new List<string>() {
                     "<Attempting to start dmod>",
                     $"    Dink = \"{exePath}\"",
                     $"    Args = {arguments}",
@@ -133,7 +133,7 @@ namespace Martridge.Models.Dmod
                 }
                 
                 proc?.WaitForExit();
-                MyTrace.Global.WriteMessage(MyTraceCategory.DmodBrowser, new List<string>() {
+                MyTrace.Global.WriteMessage(new List<string>() {
                     "<Dmod process ended>",
                     $"    Dink      = \"{exePath}\"",
                     $"    Args      = {arguments}",
@@ -141,7 +141,7 @@ namespace Martridge.Models.Dmod
                 });
 
             } catch (Exception ex) {
-                MyTrace.Global.WriteException(MyTraceCategory.DmodBrowser, ex);
+                MyTrace.Global.WriteException(ex);
             }
         }
     }

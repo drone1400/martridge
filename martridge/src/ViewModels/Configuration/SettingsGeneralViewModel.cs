@@ -34,13 +34,6 @@ namespace Martridge.ViewModels.Configuration {
         //
         // General Configuration properties
         //
-        
-        public bool AutoUpdateInstallerList {
-            get => this._autoUpdateInstallerList;
-            set => this.RaiseAndSetIfChanged(ref this._autoUpdateInstallerList, value);
-        }
-        private bool _autoUpdateInstallerList = false;
-        
         public bool ShowDmodDevFeatures {
             get => this._showDmodDevFeatures;
             set => this.RaiseAndSetIfChanged(ref this._showDmodDevFeatures, value);
@@ -269,7 +262,6 @@ namespace Martridge.ViewModels.Configuration {
             this.ShowLaunchRefDirPathInMainWindow = this.CfgGeneral.ShowLaunchRefDirPathInMainWindow;
             this.ShowLaunchCustomArgsInMainWindow = this.CfgGeneral.ShowLaunchCustomArgsInMainWindow;
             this.UseRelativePathForSubfolders = this.CfgGeneral.UseRelativePathForSubfolders;
-            this.AutoUpdateInstallerList = this.CfgGeneral.AutoUpdateInstallerList;
             this.AdditionalDmodLocationsIndex = -1;
             this.AdditionalDmodLocations = listDmod;
             this.AdditionalDmodLocationsIndex = 0;
@@ -321,7 +313,6 @@ namespace Martridge.ViewModels.Configuration {
 
             this.CfgGeneral.UpdateProperties(new Dictionary<string, object?>() {
                 [nameof(ConfigGeneral.LocalizationName)] = this._savedLocalization ?? "en-US",
-                [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
                 [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
                 [nameof(ConfigGeneral.EnableOnlineFeatures)] = this.EnableOnlineFeatures,
                 [nameof(ConfigGeneral.ShowLaunchRefDirPathInMainWindow)] = this.ShowLaunchRefDirPathInMainWindow,

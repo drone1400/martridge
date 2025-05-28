@@ -28,11 +28,6 @@ namespace Martridge.Models.Configuration.Save {
         /// Override the default Citrus Light theme with this
         /// </summary>
         public string? LightThemeOverride { get; set; }
-        
-        /// <summary>
-        /// Indicates if the application should automatically update the existing 'configInstallerList.json' file
-        /// </summary>
-        public bool? AutoUpdateInstallerList { get; set; }
 
         /// <summary>
         /// Indicates if the application should enable certain advanced features...
@@ -104,7 +99,6 @@ namespace Martridge.Models.Configuration.Save {
                 [nameof(ConfigGeneral.DarkThemeOverride)] = this.DarkThemeOverride,
                 [nameof(ConfigGeneral.LightThemeOverride)] = this.LightThemeOverride,
                 [nameof(ConfigGeneral.LocalizationName)] = this.LocalizationName,
-                [nameof(ConfigGeneral.AutoUpdateInstallerList)] = this.AutoUpdateInstallerList,
                 [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
                 [nameof(ConfigGeneral.EnableOnlineFeatures)] = this.EnableOnlineFeatures,
                 [nameof(ConfigGeneral.ShowLaunchRefDirPathInMainWindow)] = this.ShowLaunchRefDirPathInMainWindow,

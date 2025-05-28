@@ -36,12 +36,6 @@ namespace Martridge.Models.Configuration {
         public string LightThemeOverride => this._lightThemeOverride;
         private string _lightThemeOverride = string.Empty;
 
-        /// <summary>
-        /// Indicates if the application should automatically update the existing 'configInstallerList.json' file
-        /// </summary>
-        public bool AutoUpdateInstallerList { get => this._autoUpdateInstallerList; }
-        private bool _autoUpdateInstallerList = true;
-
 
         /// <summary>
         /// Indicates if the application should enable certain advanced features...
@@ -215,7 +209,6 @@ namespace Martridge.Models.Configuration {
                     case nameof(this.DarkThemeOverride): TryUpdateGeneric(kvp, ref this._darkThemeOverride); break;
                     case nameof(this.LightThemeOverride): TryUpdateGeneric(kvp, ref this._lightThemeOverride); break;
                     case nameof(this.LocalizationName): TryUpdateGeneric(kvp, ref this._localizationName); break;
-                    case nameof(this.AutoUpdateInstallerList): TryUpdateGeneric(kvp, ref this._autoUpdateInstallerList); break;
                     case nameof(this.ShowDmodDevFeatures): TryUpdateGeneric(kvp, ref this._ShowDmodDevFeatures); break;
                     case nameof(this.EnableOnlineFeatures): TryUpdateGeneric(kvp, ref this._EnableOnlineFeatures); break;
                     case nameof(this.ShowLaunchRefDirPathInMainWindow): TryUpdateGeneric(kvp, ref this._showLaunchRefDirPathInMainWindow); break;
@@ -260,7 +253,6 @@ namespace Martridge.Models.Configuration {
                     DarkThemeOverride = this.DarkThemeOverride,
                     LightThemeOverride = this.LightThemeOverride,
                     LocalizationName = this.LocalizationName,
-                    AutoUpdateInstallerList = this.AutoUpdateInstallerList,
                     ShowDmodDevFeatures = this.ShowDmodDevFeatures,
                     EnableOnlineFeatures = this.EnableOnlineFeatures,
                     ShowLaunchRefDirPathInMainWindow = this.ShowLaunchRefDirPathInMainWindow,

@@ -69,9 +69,6 @@
                       IsVisible="{Binding ShowOnlineSettings}">
                     <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding EnableOnlineFeatures}"
                               Content="{dloc:Localize SettingsGeneral/EnableOnlineFeatures}" />
-                    <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding AutoUpdateInstallerList}"
-                              Content="{dloc:Localize SettingsGeneral/AutoUpdateInstallerList}"
-                              IsVisible="{Binding ShowDinkInstallerSettings}" />
                 </Grid>
 
                 <!-- Other Checkboxes -->

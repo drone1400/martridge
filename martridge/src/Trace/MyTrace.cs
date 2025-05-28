@@ -16,6 +16,8 @@ namespace Martridge.Trace {
 
         public string Name { get; private set; }
 
+        public bool MirrorToGlobalTrace { get; set; } = false;
+
         public MyTrace(string name) {
             this.Name = name;
 
@@ -45,6 +47,10 @@ namespace Martridge.Trace {
                     listener.WriteMessage(now, category, message, level);
                 }
             }
+
+            if (ReferenceEquals(this, MyTrace.Global) == false && this.MirrorToGlobalTrace) {
+                MyTrace.Global.WriteMessage(category, message, level);
+            }
         }
 
         public void WriteMessage(string category, string message, MyTraceLevel level = MyTraceLevel.Information) {
@@ -53,6 +59,10 @@ namespace Martridge.Trace {
                 if (!listener.IsClosed && listener.Levels.HasFlag(level)) {
                     listener.WriteMessage(now, category, message, level);
                 }
+            }
+            
+            if (ReferenceEquals(this, MyTrace.Global) == false && this.MirrorToGlobalTrace) {
+                MyTrace.Global.WriteMessage(category, message, level);
             }
         }
 
@@ -66,6 +76,10 @@ namespace Martridge.Trace {
                     listener.WriteMessage(now, category, messages, level);
                 }
             }
+            
+            if (ReferenceEquals(this, MyTrace.Global) == false && this.MirrorToGlobalTrace) {
+                MyTrace.Global.WriteMessage(category, messages, level);
+            }
         }
 
         public void WriteMessage(string category, List<string> messages, MyTraceLevel level = MyTraceLevel.Information) {
@@ -74,6 +88,10 @@ namespace Martridge.Trace {
                 if (!listener.IsClosed && listener.Levels.HasFlag(level)) {
                     listener.WriteMessage(now, category, messages, level);
                 }
+            }
+            
+            if (ReferenceEquals(this, MyTrace.Global) == false && this.MirrorToGlobalTrace) {
+                MyTrace.Global.WriteMessage(category, messages, level);
             }
         }
 

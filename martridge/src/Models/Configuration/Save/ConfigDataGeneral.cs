@@ -62,6 +62,16 @@ namespace Martridge.Models.Configuration.Save {
         public bool? UseRelativePathForSubfolders { get; set; }
         
         /// <summary>
+        /// The source URL or file for the DinkInstaller config json file
+        /// </summary>
+        public string? DinkInstallerConfigFileSource { get; set; }
+        
+        /// <summary>
+        /// Maximum number of logs to keep, oldest will be deleted on startup
+        /// </summary>
+        public int? MaxLogsToKeep { get; set; }
+        
+        /// <summary>
         /// Last selected game executable for launching Dink
         /// </summary>
         public int? ActiveGameExeIndex { get; set; }
@@ -90,13 +100,6 @@ namespace Martridge.Models.Configuration.Save {
         /// List of additional directories to scan for DMODS
         /// </summary>
         public List<string>? AdditionalDmodLocations { get; set; }
-        
-        public string? DinkInstallerConfigFileSource { get; set; }
-        
-        /// <summary>
-        /// Maximum number of logs to keep, oldest will be deleted on startup
-        /// </summary>
-        public int? MaxLogsToKeep { get; set; }
 
         public Dictionary<string, object?> GetValues() {
             return new Dictionary<string, object?>() {

@@ -186,7 +186,7 @@ namespace Martridge {
             
             // initialize custom themes
             try {
-                string path = Path.Combine(LocationHelper.AppBaseDirectory, "CustomThemes");
+                string path = LocationHelper.CustomThemesDirectory;
                 if (Directory.Exists(path)) {
                     DirectoryInfo di = new DirectoryInfo(path);
                     FileInfo[] files = di.GetFiles();
@@ -339,6 +339,11 @@ namespace Martridge {
                 customThemes.Add(key);
             }
             return customThemes;
+        }
+
+        public bool TryGetThemeResource(string key, out object? obj) {
+            obj = null;
+            return this._citrusTheme?.TryGetResource(key, this.RequestedThemeVariant, out obj) ?? false;
         }
         
         #endregion

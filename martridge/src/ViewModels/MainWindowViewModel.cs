@@ -14,6 +14,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Martridge.Models;
 using Martridge.Models.Configuration;
@@ -31,6 +33,28 @@ using Martridge.ViewModels.DinkInstaller;
 namespace Martridge.ViewModels {
     public class MainWindowViewModel : ViewModelBase
     {
+        public MainWindowViewModel() {
+            if (Application.Current is App app) {
+                app.OnThemePaletteChange += this.AppOnThemePaletteChanged;
+            }
+
+            this.RefreshSidePanelImage();
+        }
+        
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+
+            if (disposing) {
+                if (Application.Current is not App app) return;
+
+                app.OnThemePaletteChange -= this.AppOnThemePaletteChanged;
+            }
+        }
+
+        private void AppOnThemePaletteChanged(object? sender, EventArgs e) {
+            this.RefreshSidePanelImage();
+        }
+
 
         private Config? _config = null;
         private DmodManager? _dmodManager = null;
@@ -194,6 +218,51 @@ namespace Martridge.ViewModels {
                 MyTrace.Global.WriteException(ex);
             }
         }
+        
+        #region Theme Image stuff
+
+        public Bitmap? SidePanelImage {
+            get => this._sidePanelImage;
+            private set => this.RaiseAndSetIfChanged(ref this._sidePanelImage, value);
+        }
+        private Bitmap? _sidePanelImage = null;
+
+        public BitmapBlendingMode SidePanelImageBlendMode {
+            get => this._sidePanelImageBlendMode;
+            private set => this.RaiseAndSetIfChanged(ref this._sidePanelImageBlendMode, value);
+        }
+        private BitmapBlendingMode _sidePanelImageBlendMode = BitmapBlendingMode.Multiply;
+
+        private void RefreshSidePanelImage() {
+            Bitmap? newBitmap = null;
+            BitmapBlendingMode blendMode = BitmapBlendingMode.Multiply;
+
+            if (App.Instance?.TryGetThemeResource("MartridgeSidePanelImageBlendMode", out object? imgBlend) == true && imgBlend is string strImgBlend) {
+                if (Enum.TryParse(strImgBlend, out blendMode) == false) 
+                    blendMode = BitmapBlendingMode.Multiply;
+            }
+
+            if (App.Instance?.TryGetThemeResource("MartridgeSidePanelImageSource", out object? imgSource) == true && imgSource is string strImgSoruce) {
+                try {
+                    string imgPath = Path.Combine(LocationHelper.CustomThemesDirectory, strImgSoruce);
+                    newBitmap = new Bitmap(imgPath);
+                } catch (Exception ex) {
+                    MyTrace.Global.WriteException(ex);
+                }
+            }
+
+            if (newBitmap == null) {
+                Uri fallbackUri = new Uri("avares://martridge/Assets/dinkbw.png");
+                this.SidePanelImage = ImageHelper.GetImage(fallbackUri);
+                this.SidePanelImageBlendMode = BitmapBlendingMode.Multiply;
+            }
+            else {
+                this.SidePanelImage = newBitmap;
+                this.SidePanelImageBlendMode = blendMode;
+            }
+        }
+        
+        #endregion
 
 
         #region Drag and drop

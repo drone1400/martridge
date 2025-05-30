@@ -44,4 +44,7 @@
     <SolidColorBrush x:Key="NotificationCardErrorBackgroundBrush" Color="#BD202C" Opacity="0.75" />
 
     <SolidColorBrush x:Key="ThemeControlTransparentBrush" Color="Transparent" />
+    
+    <x:String x:Key="MartridgeSidePanelImageBlendMode">SourceAtop</x:String>
+    <x:String x:Key="MartridgeSidePanelImageSource">DinkColor1.png</x:String>
 </ResourceDictionary>

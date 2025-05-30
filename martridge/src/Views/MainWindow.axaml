@@ -62,8 +62,8 @@
                            VerticalAlignment="Bottom"
                            Width="180"
                            Stretch="Uniform"
-                           Source="/Assets/dinkbw.png"
-                           BlendMode="Multiply" />
+                           Source="{Binding SidePanelImage}"
+                           BlendMode="{Binding SidePanelImageBlendMode}" />
 
                     <WrapPanel Grid.Row="0"
                                Orientation="Vertical">

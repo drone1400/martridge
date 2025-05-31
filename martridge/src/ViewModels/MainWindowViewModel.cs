@@ -799,6 +799,12 @@ namespace Martridge.ViewModels {
                     this.CmdShowPageDinkInstaller();
 #endif
                     return true;
+                case Key.L:
+                    if ((modifiers & KeyModifiers.Control) != 0) {
+                        App.Instance?.ShowLogWindow();
+                        return true;
+                    }
+                    return false;
             }
             // let the current view model process the key input...
             return this._currentViewModel?.ProcessKeyDown(key, modifiers) ?? false;

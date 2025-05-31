@@ -231,7 +231,7 @@
                                                         <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
                                                                Content="{dloc:Localize SettingsGeneral/DefaultDmodLocation}" />
                                                         <Button Grid.Row="1" Grid.Column="1"
-                                                                Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
+                                                                Content="{dloc:Localize SettingsGeneral/DefaultDmodLocation/Browse}"
                                                                 Classes="Primary"
                                                                 Command="{Binding CmdDefaultDmodsBrowse}" />
 

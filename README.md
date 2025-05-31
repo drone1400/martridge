@@ -39,6 +39,7 @@ Martridge now has a few hotkeys for quickly jumping between the main pages. Thes
 - `F7` - The Dink Installer page (only on Windows if Online Features are enabled)
 
 - `ESC` - Exits certain pages returning to the installed DMOD browser
+- `CTRL+L` - Shows/focuses Log Window
 
 Only on the **DMOD Browser** page:
 - `CTRL+D` - Launches selected DMOD with currently selected game engine
@@ -66,8 +67,6 @@ If you prefer, you can use your own custom URL or a local config file instead.
 The Settings page looks like this:
 ![](doc/images/img4.png)
 
-These can also be manually edited in `config/config.json` file
-
 You can configure a number of things here:
 - The **Enable online features** checkbox controls if the Online DMOD browser and Dink Installer components are enabled or not
 - The **Try to use relative paths in config files** checkbox will make it so Martridge tries to save the known DMOD and engine paths as relative, this may help if you want to keep a portable installation of Martridge
@@ -78,6 +77,8 @@ You can configure a number of things here:
 - The **Show also in DMOD view** checkboxes control if the previous options are also displayed in the DMOD browser page or only the Settings page
 
 Below, you can configure the DMOD folder paths, also the Game and Editor executables
+
+NOTE: Some additional settings can be tweaked manually in the `config/config.json` file
 
 ### Theme
 The Theme page lets you select and preview a different theme color set for Martridge

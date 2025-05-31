@@ -13,8 +13,8 @@ namespace Martridge.Trace {
         protected void FirePropertyChanged([CallerMemberName] string? name = null) {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
-        
-        public string Text { get; private set; }
+
+        public string Text { get; private set; } = string.Empty;
 
         private readonly object _notifyThreadLock = new object();
         private bool _notifyThreadStop = false;

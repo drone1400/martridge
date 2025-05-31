@@ -116,6 +116,25 @@
         <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH3}" />
         <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
     </Style>
+    
+    
+    <Style Selector="TextBlock.Heading2IWrapping">
+        <Setter Property="Foreground" Value="{Binding ThemeForegroundBrush}" />
+        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}" />
+        <Setter Property="FontStyle" Value="Italic" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBlock.Heading3IWrapping">
+        <Setter Property="Foreground" Value="{Binding ThemeForegroundBrush}" />
+        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}" />
+        <Setter Property="FontStyle" Value="Italic" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH3}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    
     <Style Selector="Label.TreeViewItemNormal">
     </Style>
     <Style Selector="Label.TreeViewItemIgnored">
@@ -236,24 +255,19 @@
     <Style Selector="Button.Invisibutton:pressed /template/ ContentPresenter">
         <Setter Property="Background" Value="Transparent" />
     </Style>
-    <Style Selector="TextBlock.Hyperlink">
-        <Setter Property="FontStyle" Value="Italic" />
-        <Setter Property="Margin" Value="10,3" />
-        <Setter Property="TextDecorations" Value="Underline" />
-        <Setter Property="Foreground" Value="{DynamicResource HighlightBrush}" />
-    </Style>
-    <Style Selector="Label.Hyperlink">
-        <Setter Property="FontStyle" Value="Italic" />
-        <Setter Property="Margin" Value="10,3" />
-        <Setter Property="Foreground" Value="{DynamicResource HighlightBrush}" />
-        <Setter Property="TextBlock.TextDecorations" Value="Underline" />
-    </Style>
     <Style Selector="Label.HyperlinkWrapping">
         <Setter Property="FontStyle" Value="Italic" />
         <Setter Property="Margin" Value="10,3" />
         <Setter Property="Foreground" Value="{DynamicResource HighlightBrush}" />
         <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
         <Setter Property="TextBlock.TextDecorations" Value="Underline" />
+    </Style>
+    <Style Selector="TextBlock.HyperlinkWrapping">
+        <Setter Property="FontStyle" Value="Italic" />
+        <Setter Property="Margin" Value="10,3" />
+        <Setter Property="Foreground" Value="{DynamicResource HighlightBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="TextDecorations" Value="Underline" />
     </Style>
 
 </Styles>

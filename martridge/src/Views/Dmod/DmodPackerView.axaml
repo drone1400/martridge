@@ -57,8 +57,8 @@
                                 Converter={StaticResource GenericNotEqualsBoolConverter}, 
                                 ConverterParameter={x:Static dmodPacker:DmodPackerPhase.Inactive} }">
 
-                    <Label Classes="Heading2I"
-                           Content="{Binding FinalDmodSourceDirectory}" />
+                    <TextBlock Classes="Heading2IWrapping"
+                           Text="{Binding FinalDmodSourceDirectory}" />
                     <ProgressBar Minimum="0" Maximum="1"
                                  IsVisible="{Binding !DmodPackingInProgress}"
                                  Value="{Binding DmodPackerPhaseProgressPercent}" />

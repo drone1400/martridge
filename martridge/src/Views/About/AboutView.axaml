@@ -131,9 +131,9 @@
                                                             HorizontalAlignment="Left"
                                                             Command="{Binding #TheAboutView.DataContext.CmdOpenHyperlink}"
                                                             CommandParameter="{Binding Link}">
-                                                        <Label Margin="10,0"
+                                                        <TextBlock Margin="10,0"
                                                                Classes="HyperlinkWrapping"
-                                                               Content="{Binding Link}" />
+                                                               Text="{Binding Link}" />
                                                     </Button>
                                                 </Grid>
                                             </DataTemplate>

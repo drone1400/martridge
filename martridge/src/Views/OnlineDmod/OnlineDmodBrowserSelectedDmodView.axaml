@@ -116,10 +116,10 @@
                         Classes="Invisibutton"
                         HorizontalAlignment="Left"
                         Command="{Binding SelectedDmodDefinition.CmdOpenDmodHyperlink}">
-                    <Label Classes="HyperlinkWrapping"
-                           Content="{Binding SelectedDmodDefinition.UrlMain, 
-                          FallbackValue={StaticResource DataNotAvailable},
-                          TargetNullValue={StaticResource DataNotAvailable} }" />
+                    <TextBlock Classes="HyperlinkWrapping"
+                               Text="{Binding SelectedDmodDefinition.UrlMain, 
+                                    FallbackValue={StaticResource DataNotAvailable},
+                                    TargetNullValue={StaticResource DataNotAvailable} }" />
                 </Button>
             </Grid>
 

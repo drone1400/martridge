@@ -58,13 +58,13 @@
                                Content="{Binding SelectedDmodDefinition.Name, 
                             FallbackValue={StaticResource DataNotAvailable},
                             TargetNullValue={StaticResource DataNotAvailable} }" />
-                        <Label Classes="Heading3IWrapping"
-                               Content="{Binding SelectedDmodDefinition.DmodDirectory, 
-                            FallbackValue={StaticResource DataNotAvailable},
-                            TargetNullValue={StaticResource DataNotAvailable} }"
+                        <TextBlock Classes="Heading3IWrapping"
+                               Text="{Binding SelectedDmodDefinition.DmodDirectory, 
+                                    FallbackValue={StaticResource DataNotAvailable},
+                                    TargetNullValue={StaticResource DataNotAvailable} }"
                                ToolTip.Tip="{Binding SelectedDmodDefinition.DmodDirectory, 
-                            FallbackValue={StaticResource DataNotAvailable},
-                            TargetNullValue={StaticResource DataNotAvailable} }" />
+                                    FallbackValue={StaticResource DataNotAvailable},
+                                    TargetNullValue={StaticResource DataNotAvailable} }" />
 
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -95,13 +95,13 @@
                             <Label Grid.Row="0" Classes="Heading2B"
                                    Content="{dloc:Localize DmodBrowser/ExeNotFound}"
                                    IsVisible="{Binding !ActiveGameExePath.PathExists, FallbackValue=False}" />
-                            <Label Grid.Row="1" Classes="Heading3IWrapping"
-                                   Content="{Binding ActiveGameExePath.Path, 
-                                  FallbackValue={StaticResource DataNotAvailable},
-                                  TargetNullValue={StaticResource DataNotAvailable} }"
+                            <TextBlock Grid.Row="1" Classes="Heading3IWrapping"
+                                   Text="{Binding ActiveGameExePath.Path, 
+                                        FallbackValue={StaticResource DataNotAvailable},
+                                        TargetNullValue={StaticResource DataNotAvailable} }"
                                    ToolTip.Tip="{Binding ActiveGameExePath.Path, 
-                                  FallbackValue={StaticResource DataNotAvailable},
-                                  TargetNullValue={StaticResource DataNotAvailable} }" />
+                                        FallbackValue={StaticResource DataNotAvailable},
+                                        TargetNullValue={StaticResource DataNotAvailable} }" />
                         </Grid>
 
 
@@ -135,8 +135,8 @@
                             <Label Grid.Row="0" Classes="Heading2B"
                                    Content="{dloc:Localize DmodBrowser/ExeNotFound}"
                                    IsVisible="{Binding !ActiveEditorExePath.PathExists, FallbackValue=False}" />
-                            <Label Grid.Row="1" Classes="Heading3IWrapping"
-                                   Content="{Binding ActiveEditorExePath.Path, 
+                            <TextBlock Grid.Row="1" Classes="Heading3IWrapping"
+                                   Text="{Binding ActiveEditorExePath.Path, 
                                       FallbackValue={StaticResource DataNotAvailable},
                                       TargetNullValue={StaticResource DataNotAvailable} }"
                                    ToolTip.Tip="{Binding ActiveEditorExePath.Path, 

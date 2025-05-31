@@ -18,6 +18,24 @@ This application is a DMOD manager/launcher for Dink Smallwood.
 - You can customize theme colors
 - Is localizable using .json files
 
+## What's new in V0.9
+If you used V0.8.x before, here's what you can expect to be different:
+
+- Big UI redesign
+- Custom theme support
+- Vastly improved DMOD Installer and DMOD packer
+- Fixed a major memory leak issue when switching between DMOD browser and online DMOD browser
+- Fixed numerous other annoying bugs and issues
+- Added configurable launch option for `--refdir`
+- Window size/positions get saved between sessions
+- Selected DMOD and a few other things also get saved between sessions
+- Keyboard navigation with TAB / Arrow Keys / Enter should be working now
+- Added some useful hotkeys
+- Probably other things I am forgetting about!
+
+PS: Big thanks to Seseler and YeOldeToast for pestering me to fix and improve various things, without them I would've probably still been lazing about and not updating Martridge to this degree. Kept you waiting huh?
+
+
 ## Overview
 
 ### First time?
@@ -123,6 +141,27 @@ Online data gets cached in the local subfolder "webcache".
 
 You can view DMOD reviews, screenshots and all the released versions straight from the application. NOTE that this is NOT a browser webview, but rather parses the HTML data and renders it using native AvaloniaUI controls!
 ![](doc/images/img2.png)
+
+### DMOD Installer
+
+The DMOD installer page lets you install DMODs. You can navigate here manually or drag and drop a DMOD file over the application to launch the installer (this may only work on Windows...?)
+
+![](doc/images/img7.png)
+
+Unlike the previous versions of Martridge, the DMOD installer now checks for existing folders with the same name when installing a DMOD and you can even change the root DMOD folder name before installing it.
+
+### DMOD Packer
+
+The DMOD packer is a useful tool for DMOD developers when publishing their DMOD, and it is now better than ever! 
+
+![](doc/images/img8.png)
+
+The new DMOD packer now features an automated file filter for what files to exclude when packing a DMOD. This functions similarly to a `.gitignore` file. The DMOD packer looks for a file called `.dmodignore` that uses the same syntax as a classic `.gitignore` to exclude files from packing. 
+
+If no such file is detected, Martridge uses a default `.dmodignore` configuration. Thanks to YeOldeToast for helping me with this btw!
+
+You can edit the `.dmodignore` file directly from Martridge and save it to disk if you want to exclude other custom files from packing.
+
 
 ## Building
 Assuming that you're somewhat familiar with dotnet applications...

@@ -18,7 +18,7 @@
         <StackPanel Orientation="Vertical">
             <Border Classes="MartridgeCard">
                     <Grid ColumnDefinitions="*,Auto,*">
-                        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto">
+                        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
                             <Label Grid.Row="0"
                                    Classes="HeadingTitle"
                                    Content="{dloc:Localize AboutWindow/AppName}"
@@ -51,6 +51,17 @@
                                 Margin="20,10"
                                 Content="{dloc:Localize AboutWindow/Description}"
                                 TextBlock.TextWrapping="Wrap" />
+                            
+                            <Button Grid.Row="4"
+                                    Classes="Invisibutton"
+                                    HorizontalAlignment="Center"
+                                    Command="{Binding #TheAboutView.DataContext.CmdOpenHyperlink}"
+                                    CommandParameter="https://github.com/drone1400/martridge">
+                                <TextBlock Margin="10,0"
+                                           Classes="HyperlinkWrapping"
+                                           Text="https://github.com/drone1400/martridge" />
+                            </Button>
+                            
                         </Grid>
 
                         <Image Grid.Row="0" Grid.Column="2"

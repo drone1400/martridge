@@ -400,7 +400,7 @@
   "AboutWindow/Title": "Martridge - About",
   "AboutWindow/AppName": "Martridge",
   "AboutWindow/Version": "Version",
-  "AboutWindow/Version2": "<\"Early access edition\">",
+  "AboutWindow/Version2": "",
   "AboutWindow/Description": "A Launcher / Installer / Manager for various Dink Smallwood source ports and DMODs...",
   "AboutWindow/ResourceCredits": "Resources and open source projects used in this application:",  
   "AboutWindow/Package/DinkNetwork/Name": "The Dink Network",

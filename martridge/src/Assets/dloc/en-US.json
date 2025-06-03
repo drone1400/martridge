@@ -401,7 +401,7 @@
   "AboutWindow/AppName": "Martridge",
   "AboutWindow/Version": "Version",
   "AboutWindow/Version2": "",
-  "AboutWindow/Description": "A Launcher / Installer / Manager for various Dink Smallwood source ports and DMODs...",
+  "AboutWindow/Description": "A Dink Smallwood DMOD manager application for launching, installing or packing DMODs",
   "AboutWindow/ResourceCredits": "Resources and open source projects used in this application:",  
   "AboutWindow/Package/DinkNetwork/Name": "The Dink Network",
   "AboutWindow/Package/DinkNetwork/Description": "Dink's home for the last couple of decades! The place to visit to get DMODs or learn to make them.",

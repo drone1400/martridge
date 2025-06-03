@@ -68,7 +68,7 @@ namespace Martridge.Models {
             }
         }
 
-        public static string CustomThemesDirectory => Path.Combine(LocationHelper.AppBaseDirectory, "CustomThemes");
+        public static string CustomThemesDirectory => Path.Combine(LocationHelper.AppBaseDirectory, "custom-themes");
 
 
         public static string TryGetRelativeSubdirectory(string path) {

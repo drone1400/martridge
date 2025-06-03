@@ -67,7 +67,7 @@
         <None Remove="Assets\dloc\en-US.json"/>
         <Folder Include="Assets\graphics"/>
         
-        <Content  Include="CustomThemes\*">
+        <Content  Include="custom-themes\*">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>

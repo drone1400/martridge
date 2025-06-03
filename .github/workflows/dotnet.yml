@@ -40,8 +40,14 @@ jobs:
         run: dotnet restore ./martridge/src/martridge.csproj
       
 # ---- Publish and archive - net8.0 win-x86
-      - name: Clean before publish
-        run: dotnet clean ./martridge/martridge.sln --configuration Release -p:Platform="x86" --framework net8.0
+      - name: Clean Citrus.Avalonia
+        run: dotnet clean ./citrus/src/Citrus.Avalonia/Citrus.Avalonia.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean Citrus.Avalonia.DataGrid
+        run: dotnet clean ./citrus/src/Citrus.Avalonia.DataGrid/Citrus.Avalonia.DataGrid.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean SharpCompress
+        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean martridge
+        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net8.0
       - name: Publish net8.0 win-x86
         run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net8.0_win-x86/martridge/ --configuration Release -p:Platform="x86" --framework net8.0 --runtime win-x86 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
       - name: Archive published net8.0 win-x86
@@ -53,8 +59,14 @@ jobs:
 
 
 # ---- Publish and archive - net8.0 win-x64
-      - name: Clean before publish
-        run: dotnet clean ./martridge/martridge.sln --configuration Release -p:Platform="x64" --framework net8.0
+      - name: Clean Citrus.Avalonia
+        run: dotnet clean ./citrus/src/Citrus.Avalonia/Citrus.Avalonia.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean Citrus.Avalonia.DataGrid
+        run: dotnet clean ./citrus/src/Citrus.Avalonia.DataGrid/Citrus.Avalonia.DataGrid.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean SharpCompress
+        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean martridge
+        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net8.0
       - name: Publish net8.0 win-x64
         run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net8.0_win-x64/martridge/ --configuration Release -p:Platform="x64" --framework net8.0 --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
       - name: Archive published net8.0 win-x64
@@ -65,8 +77,14 @@ jobs:
 
 
 # ---- Publish and archive - net8.0 linux-x64
-      - name: Clean before publish
-        run: dotnet clean ./martridge/martridge.sln --configuration Release -p:Platform="Any CPU" --framework net8.0
+      - name: Clean Citrus.Avalonia
+        run: dotnet clean ./citrus/src/Citrus.Avalonia/Citrus.Avalonia.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean Citrus.Avalonia.DataGrid
+        run: dotnet clean ./citrus/src/Citrus.Avalonia.DataGrid/Citrus.Avalonia.DataGrid.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean SharpCompress
+        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean martridge
+        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net8.0
       - name: Publish net8.0 linux-x64
         run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net8.0_linux-x64/martridge/ --configuration Release -p:Platform="Any CPU" --framework net8.0 --runtime linux-x64 --self-contained true -p:PublishSingleFile=true
       - name: Archive published net8.0 linux-x64
@@ -74,33 +92,41 @@ jobs:
         with:
           root_dir: "./publish/net8.0_linux-x64/"
           file_path: "./publish/martridge_V${{steps.get-version.outputs.version}}_net8.0_linux-x64.tar.gz"
-      
-      
-# for now, i added osx publish configs but i'm not using them
 
 # ---- Publish and archive - net8.0 osx-x64
-#      - name: Clean before publish
-#        run: dotnet clean ./martridge/martridge.sln --configuration Release -p:Platform="Any CPU" --framework net8.0
-#      - name: Publish net8.0 osx-x64
-#        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net8.0_osx-x64/martridge/ --configuration Release -p:Platform="Any CPU" --framework net8.0 --runtime osx-x64 --self-contained true -p:PublishSingleFile=true
-#      - name: Archive published net8.0 osx-x64
-#        uses: ihiroky/archive-action@v1
-#        with:
-#          root_dir: "./publish/net8.0_osx-x64/"
-#          file_path: "./publish/martridge_V${{steps.get-version.outputs.version}}_net8.0_osx-x64.tar.gz"
+      - name: Clean Citrus.Avalonia
+        run: dotnet clean ./citrus/src/Citrus.Avalonia/Citrus.Avalonia.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean Citrus.Avalonia.DataGrid
+        run: dotnet clean ./citrus/src/Citrus.Avalonia.DataGrid/Citrus.Avalonia.DataGrid.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean SharpCompress
+        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean martridge
+        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net8.0
+      - name: Publish net8.0 linux-x64
+        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net8.0_osx-x64/martridge/ --configuration Release -p:Platform="Any CPU" --framework net8.0 --runtime osx-x64 --self-contained true -p:PublishSingleFile=true
+      - name: Archive published net8.0 osx-x64
+        uses: ihiroky/archive-action@v1
+        with:
+          root_dir: "./publish/net8.0_osx-x64/"
+          file_path: "./publish/martridge_V${{steps.get-version.outputs.version}}_net8.0_osx-x64.tar.gz"
 
 
 # ---- Publish and archive - net8.0 osx-arm64
-#      - name: Clean before publish
-#        run: dotnet clean ./martridge/martridge.sln --configuration Release -p:Platform="Any CPU" --framework net8.0
-#      - name: Publish net8.0 osx-arm64
-#        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net8.0_osx-arm64/martridge/ --configuration Release -p:Platform="Any CPU" --framework net8.0 --runtime osx-arm64 --self-contained true -p:PublishSingleFile=true
-#      - name: Archive published net8.0 osx-arm64
-#        uses: ihiroky/archive-action@v1
-#        with:
-#          root_dir: "./publish/net8.0_osx-arm64/"
-#          file_path: "./publish/martridge_V${{steps.get-version.outputs.version}}_net8.0_osx-arm64.tar.gz"
-
+      - name: Clean Citrus.Avalonia
+        run: dotnet clean ./citrus/src/Citrus.Avalonia/Citrus.Avalonia.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean Citrus.Avalonia.DataGrid
+        run: dotnet clean ./citrus/src/Citrus.Avalonia.DataGrid/Citrus.Avalonia.DataGrid.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean SharpCompress
+        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+      - name: Clean martridge
+        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net8.0
+      - name: Publish net8.0 linux-x64
+        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net8.0_osx-arm64/martridge/ --configuration Release -p:Platform="Any CPU" --framework net8.0 --runtime osx-arm64 --self-contained true -p:PublishSingleFile=true
+      - name: Archive published net8.0 osx-arm64
+        uses: ihiroky/archive-action@v1
+        with:
+          root_dir: "./publish/net8.0_osx-arm64/"
+          file_path: "./publish/martridge_V${{steps.get-version.outputs.version}}_net8.0_osx-arm64.tar.gz"
 
 # ---- Creating github Release
 
@@ -115,6 +141,5 @@ jobs:
             ./publish/martridge_V${{steps.get-version.outputs.version}}_net8.0_win-x86.zip
             ./publish/martridge_V${{steps.get-version.outputs.version}}_net8.0_win-x64.zip
             ./publish/martridge_V${{steps.get-version.outputs.version}}_net8.0_linux-x64.tar.gz
-# for now, do not publish osx builds...
-#            ./publish/martridge_V${{steps.get-version.outputs.version}}_net8.0_osx-x64.tar.gz
-#            ./publish/martridge_V${{steps.get-version.outputs.version}}_net8.0_osx-arm64.tar.gz
+            ./publish/martridge_V${{steps.get-version.outputs.version}}_net8.0_osx-x64.tar.gz
+            ./publish/martridge_V${{steps.get-version.outputs.version}}_net8.0_osx-arm64.tar.gz

@@ -100,7 +100,13 @@ namespace Martridge.Models {
                 return path;
             }
 
-            return Path.Combine(AppBaseDirectory, path);
+            // only make path absolute if it is explicitly relative to the <current directory>
+            // this is to prevent interpreting something like a Steam URI or flatpak command or other things as file paths
+            if (path.StartsWith(".\\") || path.StartsWith("./")) {
+                return Path.Combine(AppBaseDirectory, path);
+            }
+
+            return path;
         }
 
         public static List<string> TryGetAbsoluteFromSubdirectoryRelative(List<string> paths) {

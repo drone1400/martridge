@@ -1,0 +1,51 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dloc="using:Martridge.ViewModels.Localization"
+             xmlns:vm="using:Martridge.ViewModels.Configuration"
+
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             
+             x:Class="Martridge.Views.Configuration.SettingsGeneralAddEditorExeUserControl"
+                          
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+    
+    <Design.DataContext>
+        <vm:SettingsGeneralViewModel />
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml" />
+    </UserControl.Styles>
+    
+    
+    <Border BorderThickness="1"
+            BorderBrush="{DynamicResource ThemeBorderHighBrush}"
+            Margin="6,3">
+        <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,*,Auto">
+            <Label Grid.Row="0" Grid.Column="0" Classes="Heading2B"
+                   Content="{dloc:Localize SettingsGeneral/EditorExePaths}" />
+            
+            <Button Grid.Row="0" Grid.Column="2"
+                    Content="{dloc:Localize SettingsGeneral/EditorExePaths_Remove}"
+                    Command="{Binding CmdEditorExeRemoveSelected}" />
+            
+            <TextBox Grid.Row="2" Grid.Column="0" 
+                     Text="{Binding EditorExeAddNewManualValue}"/>
+            
+            <Button Grid.Row="2" Grid.Column="1"
+                    Content="{dloc:Localize SettingsGeneral/EditorExePaths_AddManual}"
+                    Classes="Primary"
+                    Command="{Binding CmdEditorExeAddNewManual}" />
+            <Button Grid.Row="2" Grid.Column="2"
+                    Content="{dloc:Localize SettingsGeneral/EditorExePaths_AddBrowse}"
+                    Classes="Primary"
+                    Command="{Binding CmdEditorExeAddNew}" />
+
+            <ListBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                     ItemsSource="{Binding EditorExePaths}"
+                     SelectedIndex="{Binding ActiveEditorExeIndex}" />
+        </Grid>
+    </Border>
+</UserControl>

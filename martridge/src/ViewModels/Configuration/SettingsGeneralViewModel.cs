@@ -484,6 +484,44 @@ namespace Martridge.ViewModels.Configuration {
             return this.AdditionalDmodLocationsIndex >= 0 && this.AdditionalDmodLocationsIndex < this.AdditionalDmodLocations.Count;
         }
 
+        
+        public string AdditionalDmodLocationsAddNewManualValue {
+            get => this._AdditionalDmodLocationsAddNewManualValue;
+            set => this.RaiseAndSetIfChanged(ref  this._AdditionalDmodLocationsAddNewManualValue, value);
+        }
+        private string _AdditionalDmodLocationsAddNewManualValue = string.Empty;
+        
+        
+        public void CmdAdditionalDmodLocationsAddNewManual(object? parameter = null) {
+            if (this.IsBusy) return;
+            if (string.IsNullOrWhiteSpace(this.AdditionalDmodLocationsAddNewManualValue)) return;
+            
+            try
+            {
+                this.IsBusy = true;
+                
+                if (this.IsDuplicatePath(this.AdditionalDmodLocations, this.AdditionalDmodLocationsAddNewManualValue) == false)
+                {
+                    this.AdditionalDmodLocations.Add(this.AdditionalDmodLocationsAddNewManualValue);
+                }
+            } catch (Exception ex)
+            {
+                MyTrace.Global.WriteException(ex);
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+        
+        [DependsOn(nameof(IsBusy))]
+        [DependsOn(nameof(AdditionalDmodLocationsAddNewManualValue))]
+        public bool CanCmdAdditionalDmodLocationsAddNewManual(object? parameter = null) {
+            if (this.IsBusy) return false;
+            if (string.IsNullOrWhiteSpace(this.AdditionalDmodLocationsAddNewManualValue)) return false;
+            return true;
+        }
+        
         public async void CmdAdditionalDmodsAddNew(object? parameter = null) {
             if (this.IsBusy ) return;
 
@@ -546,6 +584,42 @@ namespace Martridge.ViewModels.Configuration {
             return this.ActiveGameExeIndex >= 0 && this.ActiveGameExeIndex < this.GameExePaths.Count;
         }
 
+        public string GameExeAddNewManualValue {
+            get => this._gameExeAddNewManualValue;
+            set => this.RaiseAndSetIfChanged(ref  this._gameExeAddNewManualValue, value);
+        }
+        private string _gameExeAddNewManualValue = string.Empty;
+        
+        
+        public void CmdGameExeAddNewManual(object? parameter = null) {
+            if (this.IsBusy) return;
+            if (string.IsNullOrWhiteSpace(this.GameExeAddNewManualValue)) return;
+            
+            try
+            {
+                this.IsBusy = true;
+                
+                if (this.IsDuplicatePath(this.GameExePaths, this.GameExeAddNewManualValue) == false)
+                {
+                    this.GameExePaths.Add(this.GameExeAddNewManualValue);
+                }
+            } catch (Exception ex)
+            {
+                MyTrace.Global.WriteException(ex);
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+        
+        [DependsOn(nameof(IsBusy))]
+        [DependsOn(nameof(GameExeAddNewManualValue))]
+        public bool CanCmdGameExeAddNewManual(object? parameter = null) {
+            if (this.IsBusy) return false;
+            if (string.IsNullOrWhiteSpace(this.GameExeAddNewManualValue)) return false;
+            return true;
+        }
 
         public async void CmdGameExeAddNew(object? parameter = null) {
             if (this.IsBusy ) return;
@@ -618,6 +692,42 @@ namespace Martridge.ViewModels.Configuration {
             return this.ActiveEditorExeIndex >= 0 && this.ActiveEditorExeIndex < this.EditorExePaths.Count;
         }
 
+        public string EditorExeAddNewManualValue {
+            get => this._editorExeAddNewManualValue;
+            set => this.RaiseAndSetIfChanged(ref  this._editorExeAddNewManualValue, value);
+        }
+        private string _editorExeAddNewManualValue = string.Empty;
+        
+        
+        public void CmdEditorExeAddNewManual(object? parameter = null) {
+            if (this.IsBusy) return;
+            if (string.IsNullOrWhiteSpace(this.EditorExeAddNewManualValue)) return;
+            
+            try
+            {
+                this.IsBusy = true;
+                
+                if (this.IsDuplicatePath(this.EditorExePaths, this.EditorExeAddNewManualValue) == false)
+                {
+                    this.EditorExePaths.Add(this.EditorExeAddNewManualValue);
+                }
+            } catch (Exception ex)
+            {
+                MyTrace.Global.WriteException(ex);
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+        
+        [DependsOn(nameof(IsBusy))]
+        [DependsOn(nameof(EditorExeAddNewManualValue))]
+        public bool CanCmdEditorExeAddNewManual(object? parameter = null) {
+            if (this.IsBusy) return false;
+            if (string.IsNullOrWhiteSpace(this.EditorExeAddNewManualValue)) return false;
+            return true;
+        }
 
         public async void CmdEditorExeAddNew(object? parameter = null) {
             if (this.IsBusy ) return;

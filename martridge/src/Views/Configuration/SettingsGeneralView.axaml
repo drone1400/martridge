@@ -126,94 +126,21 @@
                                     x:Name="gridPathSettingsMain"
                                     DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=configuration:SettingsGeneralView}}">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="{Binding ShowDmodDevFeatures,
                                                 Converter={StaticResource BoolToGridSizeZeroStarConverter}}"/>
                                     </Grid.RowDefinitions>
-                                    <Border Grid.Row="0"
-                                            BorderThickness="1"
-                                            BorderBrush="{DynamicResource ThemeBorderHighBrush}"
-                                            Margin="6">
-                                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,*">
-                                            <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
-                                                   Content="{dloc:Localize SettingsGeneral/DefaultDmodLocation}" />
-                                            <Button Grid.Row="1" Grid.Column="1"
-                                                    Content="{dloc:Localize SettingsGeneral/DefaultDmodLocation/Browse}"
-                                                    Classes="Primary"
-                                                    Command="{Binding CmdDefaultDmodsBrowse}" />
+                                    
+                                    <configuration:SettingsGeneralAdditionalDmodLocationsUserControl 
+                                        Grid.Row="0"/>
 
-                                            <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                                                     Text="{Binding DefaultDmodLocation}" />
-                                        </Grid>
-                                    </Border>
-
-                                    <Border Grid.Row="1"
-                                            BorderThickness="1"
-                                            BorderBrush="{DynamicResource ThemeBorderHighBrush}"
-                                            Margin="6,3">
-                                        <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,*">
-                                            <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
-                                                   Content="{dloc:Localize SettingsGeneral/AdditionalDmodLocations}" />
-                                            <Button Grid.Row="1" Grid.Column="1"
-                                                    Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
-                                                    Classes="Primary"
-                                                    Command="{Binding CmdAdditionalDmodsAddNew}" />
-                                            <Button Grid.Row="1" Grid.Column="2"
-                                                    Content="{dloc:Localize SettingsGeneral/GameExePaths_Remove}"
-                                                    Command="{Binding CmdAdditionalDmodsRemoveSelected}" />
-
-                                            <ListBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                                                     ItemsSource="{Binding AdditionalDmodLocations}"
-                                                     SelectedIndex="{Binding AdditionalDmodLocationsIndex}" />
-                                        </Grid>
-                                    </Border>
-
-                                    <Border Grid.Row="2"
-                                            BorderThickness="1"
-                                            BorderBrush="{DynamicResource ThemeBorderHighBrush}"
-                                            Margin="6,3">
-                                        <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,*">
-                                            <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
-                                                   Content="{dloc:Localize SettingsGeneral/GameExePaths}" />
-
-                                            <Button Grid.Row="1" Grid.Column="1"
-                                                    Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
-                                                    Classes="Primary"
-                                                    Command="{Binding CmdGameExeAddNew}" />
-                                            <Button Grid.Row="1" Grid.Column="2"
-                                                    Content="{dloc:Localize SettingsGeneral/GameExePaths_Remove}"
-                                                    Command="{Binding CmdGameExeRemoveSelected}" />
-
-                                            <ListBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                                                     ItemsSource="{Binding GameExePaths}"
-                                                     SelectedIndex="{Binding ActiveGameExeIndex}" />
-                                        </Grid>
-                                    </Border>
-
-                                    <Border Grid.Row="3"
-                                            IsVisible="{Binding ShowDmodDevFeatures}"
-                                            BorderThickness="1"
-                                            BorderBrush="{DynamicResource ThemeBorderHighBrush}"
-                                            Margin="6,3">
-                                        <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,*">
-                                            <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
-                                                   Content="{dloc:Localize SettingsGeneral/EditorExePaths}" />
-
-                                            <Button Grid.Row="1" Grid.Column="1"
-                                                    Content="{dloc:Localize SettingsGeneral/EditorExePaths_Add}"
-                                                    Classes="Primary"
-                                                    Command="{Binding CmdEditorExeAddNew}" />
-                                            <Button Grid.Row="1" Grid.Column="2"
-                                                    Content="{dloc:Localize SettingsGeneral/EditorExePaths_Remove}"
-                                                    Command="{Binding CmdEditorExeRemoveSelected}" />
-
-                                            <ListBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                                                     ItemsSource="{Binding EditorExePaths}"
-                                                     SelectedIndex="{Binding ActiveEditorExeIndex}" />
-                                        </Grid>
-                                    </Border>
+                                    <configuration:SettingsGeneralAddGameExeUserControl 
+                                        Grid.Row="1"/>
+                                    
+                                    <configuration:SettingsGeneralAddEditorExeUserControl 
+                                        Grid.Row="2" 
+                                        IsVisible="{Binding ShowDmodDevFeatures}"/>
                                 </Grid>
                             </DataTemplate>
                             <DataTemplate x:Key="false">
@@ -222,92 +149,16 @@
                                     <TabControl>
                                         <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathDmod}"
                                                  Classes="SmallTab">
-                                            <Grid RowDefinitions="Auto,*">
-                                                <Border Grid.Row="0"
-                                                        BorderThickness="1"
-                                                        BorderBrush="{DynamicResource ThemeBorderHighBrush}"
-                                                        Margin="6">
-                                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,*">
-                                                        <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
-                                                               Content="{dloc:Localize SettingsGeneral/DefaultDmodLocation}" />
-                                                        <Button Grid.Row="1" Grid.Column="1"
-                                                                Content="{dloc:Localize SettingsGeneral/DefaultDmodLocation/Browse}"
-                                                                Classes="Primary"
-                                                                Command="{Binding CmdDefaultDmodsBrowse}" />
-
-                                                        <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                                                                 Text="{Binding DefaultDmodLocation}" />
-                                                    </Grid>
-                                                </Border>
-
-                                                <Border Grid.Row="1"
-                                                        BorderThickness="1"
-                                                        BorderBrush="{DynamicResource ThemeBorderHighBrush}"
-                                                        Margin="6,3">
-                                                    <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,*">
-                                                        <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
-                                                               Content="{dloc:Localize SettingsGeneral/AdditionalDmodLocations}" />
-                                                        <Button Grid.Row="1" Grid.Column="1"
-                                                                Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
-                                                                Classes="Primary"
-                                                                Command="{Binding CmdAdditionalDmodsAddNew}" />
-                                                        <Button Grid.Row="1" Grid.Column="2"
-                                                                Content="{dloc:Localize SettingsGeneral/GameExePaths_Remove}"
-                                                                Command="{Binding CmdAdditionalDmodsRemoveSelected}" />
-
-                                                        <ListBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                                                                 ItemsSource="{Binding AdditionalDmodLocations}"
-                                                                 SelectedIndex="{Binding AdditionalDmodLocationsIndex}" />
-                                                    </Grid>
-                                                </Border>
-                                            </Grid>
+                                            <configuration:SettingsGeneralAdditionalDmodLocationsUserControl/>
                                         </TabItem>
                                         <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathGame}"
                                                  Classes="SmallTab">
-                                            <Border BorderThickness="1"
-                                                    BorderBrush="{DynamicResource ThemeBorderHighBrush}"
-                                                    Margin="6,3">
-                                                <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,*">
-                                                    <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
-                                                           Content="{dloc:Localize SettingsGeneral/GameExePaths}" />
-
-                                                    <Button Grid.Row="1" Grid.Column="1"
-                                                            Content="{dloc:Localize SettingsGeneral/GameExePaths_Add}"
-                                                            Classes="Primary"
-                                                            Command="{Binding CmdGameExeAddNew}" />
-                                                    <Button Grid.Row="1" Grid.Column="2"
-                                                            Content="{dloc:Localize SettingsGeneral/GameExePaths_Remove}"
-                                                            Command="{Binding CmdGameExeRemoveSelected}" />
-
-                                                    <ListBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                                                             ItemsSource="{Binding GameExePaths}"
-                                                             SelectedIndex="{Binding ActiveGameExeIndex}" />
-                                                </Grid>
-                                            </Border>
+                                            <configuration:SettingsGeneralAddGameExeUserControl />
                                         </TabItem>
                                         <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathEditor}"
                                                  Classes="SmallTab"
                                                  IsVisible="{Binding ShowDmodDevFeatures}">
-                                            <Border BorderThickness="1"
-                                                    BorderBrush="{DynamicResource ThemeBorderHighBrush}"
-                                                    Margin="6,3">
-                                                <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,*">
-                                                    <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
-                                                           Content="{dloc:Localize SettingsGeneral/EditorExePaths}" />
-
-                                                    <Button Grid.Row="1" Grid.Column="1"
-                                                            Content="{dloc:Localize SettingsGeneral/EditorExePaths_Add}"
-                                                            Classes="Primary"
-                                                            Command="{Binding CmdEditorExeAddNew}" />
-                                                    <Button Grid.Row="1" Grid.Column="2"
-                                                            Content="{dloc:Localize SettingsGeneral/EditorExePaths_Remove}"
-                                                            Command="{Binding CmdEditorExeRemoveSelected}" />
-
-                                                    <ListBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                                                             ItemsSource="{Binding EditorExePaths}"
-                                                             SelectedIndex="{Binding ActiveEditorExeIndex}" />
-                                                </Grid>
-                                            </Border>
+                                            <configuration:SettingsGeneralAddEditorExeUserControl />
                                         </TabItem>
                                     </TabControl>
                                 </Grid>

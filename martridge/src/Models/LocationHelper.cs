@@ -71,30 +71,24 @@ namespace Martridge.Models {
         public static string CustomThemesDirectory => Path.Combine(LocationHelper.AppBaseDirectory, "custom-themes");
 
 
-        public static string TryGetRelativeSubdirectory(string path) {
-            string newPath = path;
+        public static string TryMakePathRelativeToMartridge(string path) {
+            if (Path.IsPathRooted(path) == false)
+                return path;
 
-            if (Path.IsPathRooted(path)) {
-                newPath = Path.GetRelativePath(AppBaseDirectory, path);
+            if (Path.GetPathRoot(AppBaseDirectory) != Path.GetPathRoot(path))
+                return path;
+            
+            string newPath = Path.GetRelativePath(AppBaseDirectory, path);
+            
+            if (newPath.StartsWith("..")) {
+                // if this is not a subdirectory, return back the original path
+                return path;
             }
-
-            if (newPath.StartsWith(".")) {
-                // if this is not a subdirectory, return back an absolute path
-                newPath = Path.GetFullPath(Path.Combine(AppBaseDirectory, newPath));
-            }
-
-            return newPath;
+            
+            return "." + Path.DirectorySeparatorChar + newPath;
         }
 
-        public static List<string> TryGetRelativeSubdirectory(List<string> paths) {
-            List<string> newPaths = new List<string>();
-            foreach (string path in paths) {
-                newPaths.Add(TryGetRelativeSubdirectory(path));
-            }
-            return newPaths;
-        }
-
-        public static string TryGetAbsoluteFromSubdirectoryRelative(string path) {
+        public static string TryMakePathAbsoluteBasedOnMartridge(string path) {
             if (Path.IsPathRooted(path)) {
                 // path already rooted...
                 return path;
@@ -102,17 +96,17 @@ namespace Martridge.Models {
 
             // only make path absolute if it is explicitly relative to the <current directory>
             // this is to prevent interpreting something like a Steam URI or flatpak command or other things as file paths
-            if (path.StartsWith(".\\") || path.StartsWith("./")) {
+            if (path.StartsWith("." + Path.DirectorySeparatorChar) || path.StartsWith("." + Path.AltDirectorySeparatorChar)) {
                 return Path.Combine(AppBaseDirectory, path);
             }
 
             return path;
         }
 
-        public static List<string> TryGetAbsoluteFromSubdirectoryRelative(List<string> paths) {
+        public static List<string> TryMakePathAbsoluteBasedOnMartridge(List<string> paths) {
             List<string> newPaths = new List<string>();
             foreach (string path in paths) {
-                newPaths.Add(TryGetAbsoluteFromSubdirectoryRelative(path));
+                newPaths.Add(TryMakePathAbsoluteBasedOnMartridge(path));
             }
             return newPaths;
         }

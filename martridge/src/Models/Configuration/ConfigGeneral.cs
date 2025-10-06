@@ -109,7 +109,7 @@ namespace Martridge.Models.Configuration {
         /// The default location where DMODS should get installed by the application
         /// </summary>
         public string DefaultDmodLocation { get => this._defaultDmodLocation; }
-        private string _defaultDmodLocation = LocationHelper.TryGetAbsoluteFromSubdirectoryRelative("DMODS");
+        private string _defaultDmodLocation = LocationHelper.TryMakePathAbsoluteBasedOnMartridge("DMODS");
 
         /// <summary>
         /// List of additional directories to scan for DMODS
@@ -197,7 +197,7 @@ namespace Martridge.Models.Configuration {
 
             void TryUpdatePathList(KeyValuePair<string, object?> kvp, List<string> myValues) {
                 if (kvp.Value is List<string> list) {
-                    List<string> listAbs = LocationHelper.TryGetAbsoluteFromSubdirectoryRelative(list);
+                    List<string> listAbs = LocationHelper.TryMakePathAbsoluteBasedOnMartridge(list);
                     if (ListsAreDifferent(myValues, listAbs)) {
                         myValues.Clear();
                         foreach (string s in listAbs) {
@@ -242,20 +242,40 @@ namespace Martridge.Models.Configuration {
         }
 
         public ConfigDataGeneral GetData() {
+                string defaultDmodLocation;
                 List<string> gameExePaths = new List<string>();
                 List<string> editorExePaths = new List<string>();
                 List<string> additionalDmodLocations = new List<string>();
 
-                foreach (string s in this._gameExePaths) {
-                    gameExePaths.Add(s);
-                }
+                if (this.UseRelativePathForSubfolders) {
+                    defaultDmodLocation = LocationHelper.TryMakePathRelativeToMartridge(this._defaultDmodLocation);
+                    
+                    foreach (string s in this._gameExePaths) {
+                        gameExePaths.Add(LocationHelper.TryMakePathRelativeToMartridge(s));
+                    }
 
-                foreach (string s in this._editorExePaths) {
-                    editorExePaths.Add(s);
-                }
+                    foreach (string s in this._editorExePaths) {
+                        editorExePaths.Add(LocationHelper.TryMakePathRelativeToMartridge(s));
+                    }
 
-                foreach (string s in this._additionalDmodLocations) {
-                    additionalDmodLocations.Add(s);
+                    foreach (string s in this._additionalDmodLocations) {
+                        additionalDmodLocations.Add(LocationHelper.TryMakePathRelativeToMartridge(s));
+                    }
+                }
+                else {
+                    defaultDmodLocation = this._defaultDmodLocation;
+                    
+                    foreach (string s in this._gameExePaths) {
+                        gameExePaths.Add(s);
+                    }
+
+                    foreach (string s in this._editorExePaths) {
+                        editorExePaths.Add(s);
+                    }
+
+                    foreach (string s in this._additionalDmodLocations) {
+                        additionalDmodLocations.Add(s);
+                    }
                 }
 
                 ConfigDataGeneral data = new ConfigDataGeneral()  {
@@ -270,18 +290,14 @@ namespace Martridge.Models.Configuration {
                     //ShowLogWindowOnStartup = this.ShowLogWindowOnStartup,
                     UseRelativePathForSubfolders = this.UseRelativePathForSubfolders,
                     ActiveGameExeIndex = this.ActiveGameExeIndex,
-                    GameExePaths = gameExePaths,
                     ActiveEditorExeIndex = this.ActiveEditorExeIndex,
+                    GameExePaths = gameExePaths,
                     EditorExePaths = editorExePaths,
-                    DefaultDmodLocation = this.DefaultDmodLocation,
+                    DefaultDmodLocation = defaultDmodLocation,
                     AdditionalDmodLocations = additionalDmodLocations,
                     DinkInstallerConfigFileSource = this.DinkInstallerConfigFileSource,
                     MaxLogsToKeep = this.MaxLogsToKeep,
                 };
-
-                if (this.UseRelativePathForSubfolders) {
-                    data.ConvertPathsToRelative();
-                }
 
                 return data;
             }

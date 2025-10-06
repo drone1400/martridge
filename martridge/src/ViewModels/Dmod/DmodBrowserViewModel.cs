@@ -734,7 +734,7 @@ namespace Martridge.ViewModels.Dmod {
 
                 if (this.CfgLaunch == null) return;
                 if (this.DmodManager is not DmodManager dmodMan) return;
-                if (!this.GameExeFound) return;
+                //if (!this.GameExeFound) return;
                 if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.DmodDirectory)) return;
 
                 string exePath;
@@ -781,7 +781,7 @@ namespace Martridge.ViewModels.Dmod {
                 
                 if (this.CfgLaunch == null) return false;
                 if (this.DmodManager == null) return false;
-                if (!this.GameExeFound) return false;
+                //if (!this.GameExeFound) return false;
                 if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.DmodDirectory)) return false;
 
                 string exePath;
@@ -794,9 +794,10 @@ namespace Martridge.ViewModels.Dmod {
                     exePath = this.ActiveGameExePath.Path;
                 }
                 string dmodPath = this.SelectedDmodDefinition.DmodDirectory;
-                FileInfo finfo = new FileInfo(exePath);
+                //FileInfo finfo = new FileInfo(exePath);
                 DirectoryInfo dinfo = new DirectoryInfo(dmodPath);
-                if (finfo.Exists == false || dinfo.Exists == false) { return false; }
+                //if (finfo.Exists == false || dinfo.Exists == false) { return false; }
+                if (dinfo.Exists == false) { return false; }
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
                 return false;

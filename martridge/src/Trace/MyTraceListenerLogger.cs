@@ -21,7 +21,7 @@ namespace Martridge.Trace {
         public MyTraceListenerLogger(string name, bool autoFlush = true) : base(name){
             string fileName = name + "_" + DateTime.Now.ToString(MyTrace.FileTimestamp) + ".log";
 
-            string path = Path.Combine(LocationHelper.LogsDirectory, fileName);
+            string path = Path.Combine(LocationHelper.GetPathLogs(), fileName);
             FileInfo finfo = new FileInfo(path);
             this._logStream = new FileStream(finfo.FullName, FileMode.Create, FileAccess.Write, FileShare.Read);
             this._streamWriter = new StreamWriter(this._logStream);

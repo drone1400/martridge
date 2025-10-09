@@ -114,7 +114,7 @@ namespace Martridge.Models.DinkInstaller {
                 // starting...
                 this._progPhaseCurrent = 0;
                 this._progPhaseTotal = 2 + 2 * (config.InstallerComponents.Count + 1);
-                DirectoryInfo webCacheDir = new DirectoryInfo(LocationHelper.WebCache);
+                DirectoryInfo webCacheDir = new DirectoryInfo(LocationHelper.GetPathWebCache());
                 // log start of installation
                 this.LogMessage(
                     Localizer.Instance["DinkInstaller/StartInstalling"],

@@ -383,7 +383,7 @@ namespace Martridge.ViewModels.Configuration {
                     IStorageFolder? storageFolder = LocationHelper.BrowseFolderPicker(
                         Localizer.Instance["SettingsGeneral/BrowseRefDirDirectory"],
                         string.IsNullOrWhiteSpace(this.LaunchRefDirPath) 
-                            ? LocationHelper.AppBaseDirectory
+                            ? LocationHelper.GetPathDefaultFileBrowser()
                             : this.LaunchRefDirPath );
                     
                     if (storageFolder != null)
@@ -435,7 +435,7 @@ namespace Martridge.ViewModels.Configuration {
                     IStorageFolder? storageFolder = LocationHelper.BrowseFolderPicker(
                         Localizer.Instance["SettingsGeneral/BrowseDefaultDmodDirectory"],
                         string.IsNullOrWhiteSpace(this.DefaultDmodLocation) 
-                            ? LocationHelper.AppBaseDirectory
+                            ? LocationHelper.GetPathDefaultFileBrowser()
                             : this.DefaultDmodLocation );
                     
                     if (storageFolder != null)
@@ -533,7 +533,7 @@ namespace Martridge.ViewModels.Configuration {
                     IStorageFolder? storageFolder = LocationHelper.BrowseFolderPicker(
                         Localizer.Instance["SettingsGeneral/BrowseAddDmodDirectory"],
                         string.IsNullOrWhiteSpace(this.DefaultDmodLocation) 
-                            ? LocationHelper.AppBaseDirectory
+                            ? LocationHelper.GetPathDefaultFileBrowser()
                             : this.DefaultDmodLocation );
 
                     if (storageFolder != null && this.IsDuplicatePath(this.AdditionalDmodLocations, storageFolder.Path.LocalPath) == false)
@@ -642,7 +642,7 @@ namespace Martridge.ViewModels.Configuration {
                         // on other platforms, browse for everything?
                         null,
 #endif
-                        LocationHelper.AppBaseDirectory);
+                        LocationHelper.GetPathDefaultFileBrowser());
 
                     if (storageFile != null && this.IsDuplicatePath(this.GameExePaths, storageFile.Path.LocalPath) == false)
                     {
@@ -751,7 +751,7 @@ namespace Martridge.ViewModels.Configuration {
                         // on other platforms, browse for everything?
                         null,
 #endif
-                        LocationHelper.AppBaseDirectory);
+                        LocationHelper.GetPathDefaultFileBrowser());
 
                     if (storageFile != null && this.IsDuplicatePath(this.EditorExePaths, storageFile.Path.LocalPath) == false) {
                         this.EditorExePaths.Add(storageFile.Path.LocalPath);

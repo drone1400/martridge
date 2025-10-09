@@ -11,7 +11,7 @@ namespace Martridge.Models.OnlineDmods {
         public static OnlineDmodCachedResource FromDmodListPageNumber(int pageNumber) {
             return new OnlineDmodCachedResource() {
                 Local = Path.Combine(new [] {
-                    LocationHelper.WebCache, "dinknetwork", "file", ".dmodlist", $"page{pageNumber}.html",
+                    LocationHelper.GetPathWebCache(), "dinknetwork", "file", ".dmodlist", $"page{pageNumber}.html",
                 }),
                 Url = $"{DinkNetworkUrlBase}/files/category_dmod/sort_title-asc/page_{pageNumber}/",
             };
@@ -66,7 +66,7 @@ namespace Martridge.Models.OnlineDmods {
             string[] split = relativeUrl.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
             string local = Path.Combine(new [] {
-                LocationHelper.WebCache, "dinknetwork",
+                LocationHelper.GetPathWebCache(), "dinknetwork",
             });
 
             for (int i = 0; i < split.Length; i++) {

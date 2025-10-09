@@ -244,7 +244,7 @@ namespace Martridge.ViewModels {
 
             if (App.Instance?.TryGetThemeResource("MartridgeSidePanelImageSource", out object? imgSource) == true && imgSource is string strImgSoruce) {
                 try {
-                    string imgPath = Path.Combine(LocationHelper.CustomThemesDirectory, strImgSoruce);
+                    string imgPath = Path.Combine(LocationHelper.GetPathCustomThemes(), strImgSoruce);
                     newBitmap = new Bitmap(imgPath);
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(ex);

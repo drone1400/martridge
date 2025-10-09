@@ -19,56 +19,190 @@ namespace Martridge.Models {
     }
 
     public static class LocationHelper {
-        public static string AppBaseDirectory { get => _appBaseDirectory; }
-        private static readonly string _appBaseDirectory;
+
+        /// <summary>
+        /// Get the path where Martridge resides
+        /// </summary>
+        /// <returns>Path string</returns>
+        public static string GetPathMartridge() => AppBaseDirectory;
+
+        /// <summary>
+        /// Get the path where Martridge should point opened File Browser windows to by default
+        /// </summary>
+        /// <returns>Path string</returns>
+        public static string GetPathDefaultFileBrowser() => PathMartridgeDefaultFileBrowser;
+
+        /// <summary>
+        /// Get the path where Martridge should try to install Dink by default (only used for Windows for now...)
+        /// </summary>
+        /// <returns>Path string</returns>
+        public static string GetPathDefaultDinkInstall() => PathMartridgeDefaultDinkInstall;
+
+        /// <summary>
+        /// Get the path where Martridge should write/read config files. Also tries to create the directory if it does not exist.
+        /// </summary>
+        /// <returns>Path string</returns>
+        public static string GetPathConfig() {
+            if (Directory.Exists(PathMartridgeConfig) == false) {
+                Directory.CreateDirectory(PathMartridgeConfig);
+            }
+            return PathMartridgeConfig;
+        }
+
+        /// <summary>
+        /// Get the path where Martridge should read external localization files
+        /// </summary>
+        /// <returns>Path string</returns>
+        public static string GetPathLocalization() => PathMartridgeLocalization;
+
+        /// <summary>
+        /// Get the path where Martridge should read external custom theme files
+        /// </summary>
+        /// <returns>Path string</returns>
+        public static string GetPathCustomThemes() => PathMartridgeCustomThemes;
+
+        
+        /// <summary>
+        /// Get the path where Martridge should write/read log files. Also tries to create the directory if it does not exist.
+        /// </summary>
+        /// <returns>Path string</returns>
+        public static string GetPathLogs() {
+            if (Directory.Exists(PathMartridgeLogs) == false) {
+                Directory.CreateDirectory(PathMartridgeLogs);
+            }
+            return PathMartridgeLogs;
+        }
+
+        /// <summary>
+        /// Get the path where Martridge should write/read webcache stuff. Also tries to create the directory if it does not exist.
+        /// </summary>
+        /// <returns>Path string</returns>
+        public static string GetPathWebCache() {
+            if (Directory.Exists(PathMartridgeWebCache) == false) {
+                Directory.CreateDirectory(PathMartridgeWebCache);
+            }
+            return PathMartridgeWebCache;
+        }
+
+        /// <summary>
+        /// Get the path where Martridge should write/read application state config files. Also tries to create the directory if it does not exist.
+        /// </summary>
+        /// <returns>Path string</returns>
+        public static string GetPathMartridgeState() {
+            if (Directory.Exists(PathMartridgeState) == false) {
+                Directory.CreateDirectory(PathMartridgeState);
+            }
+            return PathMartridgeState;
+        }
+
+
+        private static string AppBaseDirectory { get; }
+
+        private static string PathMartridgeState { get; } = string.Empty;
+        private static string PathMartridgeConfig { get; } = string.Empty;
+        private static string PathMartridgeLogs { get; } = string.Empty;
+        private static string PathMartridgeWebCache { get; } = string.Empty;
+        private static string PathMartridgeLocalization { get; } = string.Empty;
+        private static string PathMartridgeCustomThemes { get; } = string.Empty;
+        private static string PathMartridgeDefaultDinkInstall { get; } = string.Empty;
+        private static string PathMartridgeDefaultFileBrowser { get; } = string.Empty;
 
         static LocationHelper() {
+            bool arePathsInitialzied = false;
+            
+            bool tryLinuxDefaultPaths = false;
+            
+            #if PLATF_LINUX
+            
+            tryLinuxDefaultPaths = true;
+
+            #endif
+
+            if (tryLinuxDefaultPaths) {
+                string home = Environment.ExpandEnvironmentVariables("%HOME%");
+                bool canFallback = string.IsNullOrWhiteSpace(home) == false;
+                
+                string homeConfig = Environment.ExpandEnvironmentVariables("%XDG_CONFIG_HOME%");
+                if (canFallback && string.IsNullOrWhiteSpace(homeConfig)) homeConfig = Path.Combine(home, ".config");
+
+                string homeData = Environment.ExpandEnvironmentVariables("%XDG_DATA_HOME%");
+                if (canFallback && string.IsNullOrWhiteSpace(homeData)) homeData = Path.Combine(home, ".local","share");
+                
+                string homeState = Environment.ExpandEnvironmentVariables("%XDG_STATE_HOME%");
+                if (canFallback && string.IsNullOrWhiteSpace(homeState)) homeState = Path.Combine(home, ".local","state");
+
+                string homeCache = Environment.ExpandEnvironmentVariables("%XDG_CACHE_HOME%");
+                if (canFallback && string.IsNullOrWhiteSpace(homeCache)) homeCache = Path.Combine(home, ".cache");
+
+                if (string.IsNullOrWhiteSpace(home) == false &&
+                    string.IsNullOrWhiteSpace(homeConfig) == false &&
+                    string.IsNullOrWhiteSpace(homeData) == false &&
+                    string.IsNullOrWhiteSpace(homeState) == false &&
+                    string.IsNullOrWhiteSpace(homeCache) == false ) {
+                    // can initialize all the paths...
+
+                    PathMartridgeState = Path.Combine(homeState, "martridge");
+                    PathMartridgeConfig = Path.Combine(homeConfig, "martridge");
+                    //PathMartridgeWebCache = Path.Combine(homeCache, "martridge", "webcache");
+                    PathMartridgeWebCache = Path.Combine(homeData, "martridge", "webcache"); // the webcache data seems important enough to actually store in data instead... 
+                    PathMartridgeLogs = Path.Combine(homeState, "martridge", "logs");
+                    PathMartridgeLocalization = Path.Combine(homeData, "martridge", "localization");
+                    PathMartridgeCustomThemes = Path.Combine(homeData, "martridge", "custom-themes");
+                    PathMartridgeDefaultDinkInstall = Path.Combine(homeData, "martridge");
+                    PathMartridgeDefaultFileBrowser = home;
+
+                    arePathsInitialzied = true;
+                }
+            }
+            
             // initialize base directory somehow...
             //_AppBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
             //_AppBaseDirectory = AppContext.BaseDirectory;
+
+            AppBaseDirectory = "";
+            
             string? processFile = Process.GetCurrentProcess().MainModule?.FileName;
 
             if (processFile == null) {
                 NullReferenceException ex = new NullReferenceException("Could not determine current process start location...");
                 MyTrace.Global.WriteException(ex);
-                throw ex;
+            }
+            else {
+
+                FileInfo finfo = new FileInfo(processFile);
+
+                if (finfo.DirectoryName == null) {
+                    NullReferenceException ex = new NullReferenceException("Could not determine current process start location...");
+                    MyTrace.Global.WriteException(ex);
+                } else {
+                    AppBaseDirectory = finfo.DirectoryName;
+                }
             }
 
-            FileInfo finfo = new FileInfo(processFile);
+            if (string.IsNullOrWhiteSpace(AppBaseDirectory)) {
+                AppBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            }
+            
 
-            if (finfo.DirectoryName == null) {
-                NullReferenceException ex = new NullReferenceException("Could not determine current process start location...");
+            if (arePathsInitialzied == false && string.IsNullOrWhiteSpace(AppBaseDirectory) == false) {
+                PathMartridgeState = Path.Combine(AppBaseDirectory, "config");
+                PathMartridgeConfig = Path.Combine(AppBaseDirectory, "config");
+                PathMartridgeWebCache = Path.Combine(AppBaseDirectory, "webcache");
+                PathMartridgeLogs = Path.Combine(AppBaseDirectory, "logs");
+                PathMartridgeLocalization = Path.Combine(AppBaseDirectory, "localization");
+                PathMartridgeCustomThemes = Path.Combine(AppBaseDirectory, "custom-themes");
+                PathMartridgeDefaultDinkInstall = AppBaseDirectory;
+                PathMartridgeDefaultFileBrowser = AppBaseDirectory;
+
+                arePathsInitialzied = true;
+            }
+
+            if (arePathsInitialzied == false) {
+                IOException ex = new IOException("Could not initialize Martridge critical file paths...");
                 MyTrace.Global.WriteException(ex);
                 throw ex;
             }
-            _appBaseDirectory = finfo.DirectoryName;
         }
-
-        public static string WebCache {
-            get {
-                string path = Path.Combine(AppBaseDirectory, "webcache");
-                if (Directory.Exists(path) == false) {
-                    Directory.CreateDirectory(path);
-                }
-                return path;
-            }
-        }
-
-        public static string LocalizationDirectory {
-            get => Path.Combine(AppBaseDirectory, "localization");
-        }
-
-        public static string LogsDirectory {
-            get {
-                string path = Path.Combine(AppBaseDirectory, "logs");
-                if (Directory.Exists(path) == false) {
-                    Directory.CreateDirectory(path);
-                }
-                return path;
-            }
-        }
-
-        public static string CustomThemesDirectory => Path.Combine(LocationHelper.AppBaseDirectory, "custom-themes");
 
 
         public static string TryMakePathRelativeToMartridge(string path) {

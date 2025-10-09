@@ -48,7 +48,7 @@ namespace Martridge {
                 // add text logger listener to trace...
                 MyTrace.Global.Listeners.Add(this._logger);
                     
-                MyTrace.Global.WriteMessage($"App Path = \"{LocationHelper.AppBaseDirectory}\"");
+                MyTrace.Global.WriteMessage($"App Path = \"{LocationHelper.GetPathMartridge()}\"");
 
                 this.PurgeOldLogs();
                 
@@ -74,7 +74,7 @@ namespace Martridge {
                 if (this._config.General.MaxLogsToKeep <= 0)
                     return;
 
-                DirectoryInfo dirInfo = new DirectoryInfo(LocationHelper.LogsDirectory);
+                DirectoryInfo dirInfo = new DirectoryInfo(LocationHelper.GetPathLogs());
                 FileInfo[] files = dirInfo.GetFiles("martridge*.log");
                 
                 int delCount = files.Length - this._config.General.MaxLogsToKeep;
@@ -103,7 +103,7 @@ namespace Martridge {
         
         private void InitializeConfiguration()
         {
-            this._defaultConfigFile = Path.Combine(LocationHelper.AppBaseDirectory, "config", "config.json");
+            this._defaultConfigFile = Path.Combine(LocationHelper.GetPathConfig(), "config.json");
             this._config.LoadFromFile(this._defaultConfigFile);
             
             #if PLATF_LINUX
@@ -186,7 +186,7 @@ namespace Martridge {
             
             // initialize custom themes
             try {
-                string path = LocationHelper.CustomThemesDirectory;
+                string path = LocationHelper.GetPathCustomThemes();
                 if (Directory.Exists(path)) {
                     DirectoryInfo di = new DirectoryInfo(path);
                     FileInfo[] files = di.GetFiles();

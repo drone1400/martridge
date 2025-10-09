@@ -34,7 +34,7 @@ namespace Martridge.Models.Localization {
             
             _availableLocalizationFiles.Clear();
 
-            DirectoryInfo dirInfo = new DirectoryInfo(LocationHelper.LocalizationDirectory);
+            DirectoryInfo dirInfo = new DirectoryInfo(LocationHelper.GetPathLocalization());
             if (!dirInfo.Exists) {
                 return;
             }

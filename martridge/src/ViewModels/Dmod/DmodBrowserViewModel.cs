@@ -835,7 +835,7 @@ namespace Martridge.ViewModels.Dmod {
                     IStorageFolder? storageFolder = LocationHelper.BrowseFolderPicker(
                         Localizer.Instance["SettingsGeneral/BrowseRefDirDirectory"],
                         string.IsNullOrWhiteSpace(this.LaunchRefDirPath) 
-                            ? LocationHelper.AppBaseDirectory
+                            ? LocationHelper.GetPathDefaultFileBrowser()
                             : this.LaunchRefDirPath );
                     
                     if (storageFolder != null)

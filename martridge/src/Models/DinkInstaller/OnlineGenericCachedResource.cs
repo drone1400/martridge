@@ -7,7 +7,7 @@ namespace Martridge.Models.DinkInstaller {
 
         public static OnlineGenericCachedResource FromManualInput(string localFile, string url) {
             return new OnlineGenericCachedResource() {
-                Local = Path.Combine(LocationHelper.WebCache, localFile),
+                Local = Path.Combine(LocationHelper.GetPathWebCache(), localFile),
                 Url = url,
             };
         }

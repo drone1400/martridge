@@ -271,7 +271,7 @@ namespace Martridge.ViewModels.DinkInstaller
                     } catch (Exception)
                     {
                         // try to see if a relative path resolves correctly...
-                        string combinedPath = Path.Combine(LocationHelper.AppBaseDirectory, configSource);
+                        string combinedPath = Path.Combine(LocationHelper.GetPathConfig(), configSource);
                         if (File.Exists(combinedPath))
                             return true;
                         return false;
@@ -328,7 +328,7 @@ namespace Martridge.ViewModels.DinkInstaller
                     }
                     else
                     {
-                        this._installerDestinationAuto = Path.Combine(LocationHelper.AppBaseDirectory, name);
+                        this._installerDestinationAuto = Path.Combine(LocationHelper.GetPathDefaultDinkInstall(), name);
                     }
 
 
@@ -373,7 +373,7 @@ namespace Martridge.ViewModels.DinkInstaller
                     uri = new Uri(this.DinkInstallerConfigFileSource);
                 } catch (Exception) {
                     // try to see if a relative path resolves correctly...
-                    string combinedPath = Path.Combine(LocationHelper.AppBaseDirectory, this.DinkInstallerConfigFileSource);
+                    string combinedPath = Path.Combine(LocationHelper.GetPathConfig(), this.DinkInstallerConfigFileSource);
                     if (File.Exists(combinedPath))
                         uri = new Uri(combinedPath);
                     else 
@@ -519,7 +519,7 @@ namespace Martridge.ViewModels.DinkInstaller
 
                 try
                 {
-                    string baseDirectory = LocationHelper.AppBaseDirectory;
+                    string baseDirectory = LocationHelper.GetPathDefaultFileBrowser();
                     if (this._installerDestinationAuto == this._installerDestination)
                     {
                         DirectoryInfo dirInfo = new DirectoryInfo(this._installerDestination);
@@ -638,7 +638,7 @@ namespace Martridge.ViewModels.DinkInstaller
                     }
 
                     if (string.IsNullOrWhiteSpace(initialDir)) {
-                        initialDir = LocationHelper.AppBaseDirectory;
+                        initialDir = LocationHelper.GetPathDefaultFileBrowser();
                     }
                     
                     IStorageFile? storageFolder = LocationHelper.BrowseFileOpen(

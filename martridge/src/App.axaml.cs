@@ -40,6 +40,8 @@ namespace Martridge {
 
         public override void OnFrameworkInitializationCompleted() {
             if (this.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
+                MyTrace.Global.Listeners.Add(this._console);
+                
                 if (this._config.Remember.LogWindowShowOnStartup) {
                     this.ShowLogWindow();
                 }
@@ -68,6 +70,7 @@ namespace Martridge {
         #region LOGGING stuff
         
         private readonly MyTraceListenerLogger _logger = new MyTraceListenerLogger("martridge");
+        private readonly MyTraceListenerConsole _console = new MyTraceListenerConsole("martridgeConsoleLogger");
 
         private void PurgeOldLogs() {
             try {

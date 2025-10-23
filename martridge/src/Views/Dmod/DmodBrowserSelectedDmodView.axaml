@@ -92,9 +92,6 @@
                         </Grid>
 
                         <Grid RowDefinitions="Auto,Auto">
-                            <Label Grid.Row="0" Classes="Heading2B"
-                                   Content="{dloc:Localize DmodBrowser/ExeNotFound}"
-                                   IsVisible="{Binding !ActiveGameExePath.PathExists, FallbackValue=False}" />
                             <TextBlock Grid.Row="1" Classes="Heading3IWrapping"
                                    Text="{Binding ActiveGameExePath.Path, 
                                         FallbackValue={StaticResource DataNotAvailable},
@@ -132,9 +129,6 @@
 
                         <Grid RowDefinitions="Auto,Auto"
                               IsVisible="{Binding ShowDmodDevFeatures}">
-                            <Label Grid.Row="0" Classes="Heading2B"
-                                   Content="{dloc:Localize DmodBrowser/ExeNotFound}"
-                                   IsVisible="{Binding !ActiveEditorExePath.PathExists, FallbackValue=False}" />
                             <TextBlock Grid.Row="1" Classes="Heading3IWrapping"
                                    Text="{Binding ActiveEditorExePath.Path, 
                                       FallbackValue={StaticResource DataNotAvailable},

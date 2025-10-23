@@ -75,7 +75,7 @@ namespace Martridge.Models.Configuration {
         /// This helps with keeping the application portable...
         /// </summary>
         public bool UseRelativePathForSubfolders { get => this._useRelativePathForSubfolders; }
-        private bool _useRelativePathForSubfolders = true;
+        private bool _useRelativePathForSubfolders = false;
 
         /// <summary>
         /// Last selected game executable for launching Dink
@@ -109,7 +109,7 @@ namespace Martridge.Models.Configuration {
         /// The default location where DMODS should get installed by the application
         /// </summary>
         public string DefaultDmodLocation { get => this._defaultDmodLocation; }
-        private string _defaultDmodLocation = LocationHelper.TryMakePathAbsoluteBasedOnMartridge("DMODS");
+        private string _defaultDmodLocation = "./DMODS";
 
         /// <summary>
         /// List of additional directories to scan for DMODS
@@ -156,31 +156,34 @@ namespace Martridge.Models.Configuration {
 
             return false;
         }
+        
 
-        private bool CheckDuplicate(List<string> list, string path) {
-            foreach (string s in list) {
-                if (LocationHelper.PathIsEqual(s, path)) return true;
-            }
-            return false;
-        }
-
-        public void AddGameExePath(string path) {
+        public void TryAddGameExePath(string? path) {
             if (string.IsNullOrWhiteSpace(path)) return;
-            if (this.CheckDuplicate(this._gameExePaths, path)) return;
+            if (LocationHelper.PathIsDuplicate(this._gameExePaths, path)) return;
+            if (this.UseRelativePathForSubfolders) {
+                path = LocationHelper.TryMakePathRelativeToMartridge(path);
+            }
             this._gameExePaths.Add(path);
             this.FireUpdatedEvent(nameof(this.GameExePaths));
         }
         
-        public void AddEditorExePath(string path) {
+        public void TryAddEditorExePath(string? path) {
             if (string.IsNullOrWhiteSpace(path)) return;
-            if (this.CheckDuplicate(this._editorExePaths, path)) return;
+            if (LocationHelper.PathIsDuplicate(this._editorExePaths, path)) return;
+            if (this.UseRelativePathForSubfolders) {
+                path = LocationHelper.TryMakePathRelativeToMartridge(path);
+            }
             this._editorExePaths.Add(path);
             this.FireUpdatedEvent(nameof(this.EditorExePaths));
         }
 
-        public void AddAdditionalDmodPath(string path) {
+        public void TryAddAdditionalDmodPath(string? path) {
             if (string.IsNullOrWhiteSpace(path)) return;
-            if (this.CheckDuplicate(this._additionalDmodLocations, path)) return;
+            if (LocationHelper.PathIsDuplicate(this._additionalDmodLocations, path)) return;
+            if (this.UseRelativePathForSubfolders) {
+                path = LocationHelper.TryMakePathRelativeToMartridge(path);
+            }
             this._additionalDmodLocations.Add(path);
             this.FireUpdatedEvent(nameof(this.AdditionalDmodLocations));
         }
@@ -195,23 +198,36 @@ namespace Martridge.Models.Configuration {
                 }
             }
 
-            void TryUpdatePathList(KeyValuePair<string, object?> kvp, List<string> myValues) {
-                if (kvp.Value is List<string> list) {
-                    List<string> listAbs = LocationHelper.TryMakePathAbsoluteBasedOnMartridge(list);
-                    if (ListsAreDifferent(myValues, listAbs)) {
-                        myValues.Clear();
-                        foreach (string s in listAbs) {
-                            if (string.IsNullOrWhiteSpace(s) == false &&
-                                // make sure to also check not to add duplicate paths...
-                                this.CheckDuplicate(myValues, s) == false) {
-                                myValues.Add(s);
-                            }
-                        }
-                        updatedProperties.Add(kvp.Key);
+            void TryUpdatePathList(KeyValuePair<string, object?> kvp, List<string> myValues, bool relative) {
+                if (kvp.Value is not List<string> list)
+                    return;
+
+                List<string> newList = new List<string>();
+
+                foreach (string value in list) {
+                    if (string.IsNullOrWhiteSpace(value) == false &&
+                        LocationHelper.PathIsDuplicate(newList, value) == false) {
+                        newList.Add(relative
+                            ? LocationHelper.TryMakePathRelativeToMartridge(value)
+                            : value
+                        );
                     }
+                }
+                
+                if (ListsAreDifferent(myValues, newList)) {
+                    myValues.Clear();
+                    foreach (string s in newList) {
+                        myValues.Add(s);
+                    }
+                    updatedProperties.Add(kvp.Key);
                 }
             }
 
+            if (newValues.TryGetValue(nameof(this.UseRelativePathForSubfolders), out object? value) && value is bool boolValue) {
+                this._useRelativePathForSubfolders = boolValue;
+                updatedProperties.Add(nameof(this.UseRelativePathForSubfolders));
+            }
+            
             foreach (var kvp in newValues) {
                 switch (kvp.Key) {
                     case nameof(this.ThemeName): TryUpdateGeneric(kvp, ref this._themeName); break;
@@ -223,16 +239,26 @@ namespace Martridge.Models.Configuration {
                     case nameof(this.ShowLaunchRefDirPathInMainWindow): TryUpdateGeneric(kvp, ref this._showLaunchRefDirPathInMainWindow); break;
                     case nameof(this.ShowLaunchCustomArgsInMainWindow): TryUpdateGeneric(kvp, ref this._showLaunchCustomArgsInMainWindow); break;
                     case nameof(this.ShowLogWindowOnStartup): TryUpdateGeneric(kvp, ref this._showLogWindowOnStartup); break;
-                    case nameof(this.UseRelativePathForSubfolders): TryUpdateGeneric(kvp, ref this._useRelativePathForSubfolders); break;
+                    // case nameof(this.UseRelativePathForSubfolders): TryUpdateGeneric(kvp, ref this._useRelativePathForSubfolders); break; // already handled...
                     case nameof(this.ActiveGameExeIndex): TryUpdateGeneric(kvp, ref this._activeGameExeIndex); break;
                     case nameof(this.ActiveEditorExeIndex): TryUpdateGeneric(kvp, ref this._activeEditorExeIndex); break;
-                    case nameof(this.DefaultDmodLocation): TryUpdateGeneric(kvp, ref this._defaultDmodLocation); break;
                     case nameof(this.DinkInstallerConfigFileSource): TryUpdateGeneric(kvp, ref this._dinkInstallerConfigFileSource); break;
                     case nameof(this.MaxLogsToKeep): TryUpdateGeneric(kvp, ref this._maxLogsToKeep); break;
                     
-                    case nameof(this.GameExePaths): TryUpdatePathList(kvp, this._gameExePaths); break;
-                    case nameof(this.EditorExePaths): TryUpdatePathList(kvp, this._editorExePaths); break;
-                    case nameof(this.AdditionalDmodLocations): TryUpdatePathList(kvp, this._additionalDmodLocations); break;
+                    case nameof(this.DefaultDmodLocation): {
+                        if (kvp.Value is string path) {
+                            if (this._useRelativePathForSubfolders) {
+                                path = LocationHelper.TryMakePathRelativeToMartridge(path);
+                            }
+                            this._defaultDmodLocation = path;
+                            updatedProperties.Add(kvp.Key);
+                        }
+                        break;
+                    }
+                    
+                    case nameof(this.GameExePaths): TryUpdatePathList(kvp, this._gameExePaths, this._useRelativePathForSubfolders); break;
+                    case nameof(this.EditorExePaths): TryUpdatePathList(kvp, this._editorExePaths, this._useRelativePathForSubfolders); break;
+                    case nameof(this.AdditionalDmodLocations): TryUpdatePathList(kvp, this._additionalDmodLocations, this._useRelativePathForSubfolders); break;
                 }
             }
             
@@ -246,36 +272,17 @@ namespace Martridge.Models.Configuration {
                 List<string> gameExePaths = new List<string>();
                 List<string> editorExePaths = new List<string>();
                 List<string> additionalDmodLocations = new List<string>();
-
-                if (this.UseRelativePathForSubfolders) {
-                    defaultDmodLocation = LocationHelper.TryMakePathRelativeToMartridge(this._defaultDmodLocation);
+                
+                defaultDmodLocation = this._defaultDmodLocation;
                     
-                    foreach (string s in this._gameExePaths) {
-                        gameExePaths.Add(LocationHelper.TryMakePathRelativeToMartridge(s));
-                    }
-
-                    foreach (string s in this._editorExePaths) {
-                        editorExePaths.Add(LocationHelper.TryMakePathRelativeToMartridge(s));
-                    }
-
-                    foreach (string s in this._additionalDmodLocations) {
-                        additionalDmodLocations.Add(LocationHelper.TryMakePathRelativeToMartridge(s));
-                    }
+                foreach (string s in this._gameExePaths) {
+                    gameExePaths.Add(s);
                 }
-                else {
-                    defaultDmodLocation = this._defaultDmodLocation;
-                    
-                    foreach (string s in this._gameExePaths) {
-                        gameExePaths.Add(s);
-                    }
-
-                    foreach (string s in this._editorExePaths) {
-                        editorExePaths.Add(s);
-                    }
-
-                    foreach (string s in this._additionalDmodLocations) {
-                        additionalDmodLocations.Add(s);
-                    }
+                foreach (string s in this._editorExePaths) {
+                    editorExePaths.Add(s);
+                }
+                foreach (string s in this._additionalDmodLocations) {
+                    additionalDmodLocations.Add(s);
                 }
 
                 ConfigDataGeneral data = new ConfigDataGeneral()  {
@@ -287,8 +294,6 @@ namespace Martridge.Models.Configuration {
                     EnableOnlineFeatures = this.EnableOnlineFeatures,
                     ShowLaunchRefDirPathInMainWindow = this.ShowLaunchRefDirPathInMainWindow,
                     ShowLaunchCustomArgsInMainWindow = this.ShowLaunchCustomArgsInMainWindow,
-                    //ShowLogWindowOnStartup = this.ShowLogWindowOnStartup,
-                    UseRelativePathForSubfolders = this.UseRelativePathForSubfolders,
                     ActiveGameExeIndex = this.ActiveGameExeIndex,
                     ActiveEditorExeIndex = this.ActiveEditorExeIndex,
                     GameExePaths = gameExePaths,
@@ -309,29 +314,37 @@ namespace Martridge.Models.Configuration {
             public List<DirectoryInfo> GetRealDmodDirectories() {
                 Dictionary<string, DirectoryInfo> dict = new Dictionary<string, DirectoryInfo>();
 
-                DirectoryInfo defaultDmods = new DirectoryInfo(this.DefaultDmodLocation);
-                if (defaultDmods.Exists) {
-                    dict.Add(defaultDmods.FullName, defaultDmods);
-                } else {
-                    try {
-                        defaultDmods.Create();
-                        defaultDmods.Refresh();
-                        if (defaultDmods.Exists) {
-                            dict.Add(defaultDmods.FullName, defaultDmods);
-                        }
-                    } catch (Exception ex) {
-                        MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
+                string defaultDmodLocation = LocationHelper.TryMakePathAbsoluteBasedOnMartridge(this.DefaultDmodLocation);
+
+                try {
+                    DirectoryInfo defaultDmods = new DirectoryInfo(defaultDmodLocation);
+                    if (defaultDmods.Exists) {
+                        dict.Add(defaultDmods.FullName, defaultDmods);
                     }
+                    else {
+                        try {
+                            defaultDmods.Create();
+                            defaultDmods.Refresh();
+                            if (defaultDmods.Exists) {
+                                dict.Add(defaultDmods.FullName, defaultDmods);
+                            }
+                        } catch (Exception ex) {
+                            MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
+                        }
+                    }
+                } catch (Exception ex) {
+                    MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
                 }
 
-                foreach (string location in this.AdditionalDmodLocations) {
+                foreach (string locationRaw in this.AdditionalDmodLocations) {
                     try {
+                        string location = LocationHelper.TryMakePathAbsoluteBasedOnMartridge(locationRaw);
                         DirectoryInfo dirInfo = new DirectoryInfo(location);
-                        if (dirInfo.Exists && dict.ContainsKey(dirInfo.FullName) == false) {
-                            dict.Add(dirInfo.FullName, dirInfo);
+                        if (dirInfo.Exists) {
+                            dict.TryAdd(dirInfo.FullName, dirInfo);
                         }
                     } catch (Exception ex) {
-                        MyTrace.Global.WriteMessage($"Error evaluating possible DMOD location... \"{location}\"");
+                        MyTrace.Global.WriteMessage($"Error evaluating possible DMOD location... \"{locationRaw}\"");
                         MyTrace.Global.WriteException(ex);
                     }
                 }

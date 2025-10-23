@@ -106,7 +106,6 @@ namespace Martridge.Models.Configuration.Save {
                 [nameof(ConfigGeneral.EnableOnlineFeatures)] = this.EnableOnlineFeatures,
                 [nameof(ConfigGeneral.ShowLaunchRefDirPathInMainWindow)] = this.ShowLaunchRefDirPathInMainWindow,
                 [nameof(ConfigGeneral.ShowLaunchCustomArgsInMainWindow)] = this.ShowLaunchCustomArgsInMainWindow,
-                //[nameof(ConfigGeneral.ShowLogWindowOnStartup)] = this.ShowLogWindowOnStartup,
                 [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,
                 [nameof(ConfigGeneral.ActiveGameExeIndex)] = this.ActiveGameExeIndex,
                 [nameof(ConfigGeneral.ActiveEditorExeIndex)] = this.ActiveEditorExeIndex,

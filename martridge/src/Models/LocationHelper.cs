@@ -206,6 +206,11 @@ namespace Martridge.Models {
 
 
         public static string TryMakePathRelativeToMartridge(string path) {
+            // check if we know where Martridge's base directory is
+            if (string.IsNullOrWhiteSpace(AppBaseDirectory))
+                return path;
+            
+            // check if the path is rooted
             if (Path.IsPathRooted(path) == false)
                 return path;
 
@@ -223,35 +228,33 @@ namespace Martridge.Models {
         }
 
         public static string TryMakePathAbsoluteBasedOnMartridge(string path) {
-            if (Path.IsPathRooted(path)) {
-                // path already rooted...
-                return path;
-            }
-
             // only make path absolute if it is explicitly relative to the <current directory>
             // this is to prevent interpreting something like a Steam URI or flatpak command or other things as file paths
-            if (path.StartsWith("." + Path.DirectorySeparatorChar) || path.StartsWith("." + Path.AltDirectorySeparatorChar)) {
-                return Path.Combine(AppBaseDirectory, path);
-            }
-
-            return path;
-        }
-
-        public static List<string> TryMakePathAbsoluteBasedOnMartridge(List<string> paths) {
-            List<string> newPaths = new List<string>();
-            foreach (string path in paths) {
-                newPaths.Add(TryMakePathAbsoluteBasedOnMartridge(path));
-            }
-            return newPaths;
+            if (path.StartsWith("." + Path.DirectorySeparatorChar) == false &&
+                path.StartsWith("." + Path.AltDirectorySeparatorChar) == false)
+                return path;
+            
+            // check if we know where Martridge's base directory is
+            if (string.IsNullOrWhiteSpace(AppBaseDirectory))
+                return path;
+            
+            // check if path already rooted...
+            if (Path.IsPathRooted(path))
+                return path;
+            
+            return Path.Combine(AppBaseDirectory, path);
         }
 
         public static bool PathIsEqual(string? path1, string? path2, LocationHelperPathCompareFlags flags = LocationHelperPathCompareFlags.None) {
             if (path1 == null || path2 == null) return false;
-
             if (flags.HasFlag(LocationHelperPathCompareFlags.IgnoreDirectorySeparator)) {
                 path1 = Path.TrimEndingDirectorySeparator(path1);
                 path2 = Path.TrimEndingDirectorySeparator(path2);
             }
+            
+            // this should resolve any \ / issues on Windows...
+            path1 = Path.GetFullPath(path1);
+            path2 = Path.GetFullPath(path2);
 
             if (flags.HasFlag(LocationHelperPathCompareFlags.IgnoreCaseAlways)) {
                 return path1.Equals(path2, StringComparison.InvariantCultureIgnoreCase);
@@ -264,6 +267,14 @@ namespace Martridge.Models {
 #else
             return path1.Equals(path2, StringComparison.InvariantCulture);
 #endif
+        }
+        
+        
+        public static bool PathIsDuplicate(IEnumerable<string> list, string path) {
+            foreach (string s in list) {
+                if (LocationHelper.PathIsEqual(s, path)) return true;
+            }
+            return false;
         }
 
         #region FilePicker stuff

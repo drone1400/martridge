@@ -544,14 +544,14 @@ namespace Martridge.ViewModels {
                             if (string.IsNullOrWhiteSpace(args.UsedInstaller.GameFileName) == false) {
                                 string pathGame = Path.Combine(args.Destination.FullName, args.UsedInstaller.GameFileName);
                                 if (File.Exists(pathGame)) {
-                                    this._config!.General.AddGameExePath(pathGame);
+                                    this._config!.General.TryAddGameExePath(pathGame);
                                 }
                             }
                             // update editor exe paths
                             if (string.IsNullOrWhiteSpace(args.UsedInstaller.EditorFileName) == false) {
                                 string pathGame = Path.Combine(args.Destination.FullName, args.UsedInstaller.EditorFileName);
                                 if (File.Exists(pathGame)) {
-                                    this._config!.General.AddEditorExePath(pathGame);
+                                    this._config!.General.TryAddEditorExePath(pathGame);
                                 }
                             }
                         }

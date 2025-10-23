@@ -377,22 +377,17 @@ namespace Martridge.ViewModels.Dmod {
                     gamePathsChanged = true;
                 } else {
                     for (int i = 0; i < cfg.GameExePaths.Count; i++) {
-                        if (cfg.GameExePaths[i] != this.GameExePaths[i].Path) {
+                        if (cfg.GameExePaths[i] != this.GameExePaths[i].PathRaw) {
                             gamePathsChanged = true;
                             break;
                         }
                     }
                 }
-
+                
                 if (gamePathsChanged) {
                     // update game exe paths
                     for (int i = 0; i < cfg.GameExePaths.Count; i++) {
-                        FileInfo finfo = new FileInfo(cfg.GameExePaths[i]);
-                        string? dirName = finfo.Directory?.Name; 
-                        listGameExe.Add(new DmodLauncherSelectionViewModel() {
-                            Path = cfg.GameExePaths[i],
-                            DisplayName = dirName != null ? Path.Combine(dirName,finfo.Name) : finfo.Name,
-                        });
+                        listGameExe.Add(new DmodLauncherSelectionViewModel(cfg.GameExePaths[i]));
                     }
                     this.GameExePaths = listGameExe;
                     if (cfg.ActiveGameExeIndex >= 0 && cfg.ActiveGameExeIndex < cfg.GameExePaths.Count) {
@@ -420,7 +415,7 @@ namespace Martridge.ViewModels.Dmod {
                     editorPathsChanged = true;
                 } else {
                     for (int i = 0; i < cfg.EditorExePaths.Count; i++) {
-                        if (cfg.EditorExePaths[i] != this.EditorExePaths[i].Path) {
+                        if (cfg.EditorExePaths[i] != this.EditorExePaths[i].PathRaw) {
                             editorPathsChanged = true;
                             break;
                         }
@@ -429,12 +424,7 @@ namespace Martridge.ViewModels.Dmod {
                 if (editorPathsChanged) {
                     // update editor exe paths
                     for (int i = 0; i < cfg.EditorExePaths.Count; i++) {
-                        FileInfo finfo = new FileInfo(cfg.EditorExePaths[i]);
-                        string? dirName = finfo.Directory?.Name; 
-                        listEditorExe.Add(new DmodLauncherSelectionViewModel() {
-                            Path = cfg.EditorExePaths[i],
-                            DisplayName = dirName != null ? Path.Combine(dirName,finfo.Name) : finfo.Name,
-                        });
+                        listEditorExe.Add(new DmodLauncherSelectionViewModel(cfg.EditorExePaths[i]));
                     }
                     this.EditorExePaths = listEditorExe;
                     if (cfg.ActiveEditorExeIndex >= 0 && cfg.ActiveEditorExeIndex < cfg.EditorExePaths.Count) {
@@ -515,7 +505,7 @@ namespace Martridge.ViewModels.Dmod {
         // -----------------------------------------------------------------------------------------------------------------------------------
 
         private void RefreshShowFreedinkLocalizations() {
-            if (this.ActiveGameExePath == null || this.ActiveGameExePath?.PathExists != true) {
+            if (this.ActiveGameExePath == null || this.ActiveGameExePath?.PathIsFile != true) {
                 this.ShowFreeDinkLocalizations = false;
                 return;
             }

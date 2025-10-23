@@ -137,18 +137,18 @@ namespace Martridge {
 
             if (File.Exists(defaultLinuxFreedinkExe) && 
                 this._config.General.GameExePaths.Contains(defaultLinuxFreedinkExe) == false) {
-                this._config.General.AddGameExePath(defaultLinuxFreedinkExe);
+                this._config.General.TryAddGameExePath(defaultLinuxFreedinkExe);
             }
 
             if (Directory.Exists(defaultLinuxDinkGameData) &&
                 this._config.General.AdditionalDmodLocations.Contains(defaultLinuxDinkGameData) == false) {
-                this._config.General.AddAdditionalDmodPath(defaultLinuxDinkGameData);
+                this._config.General.TryAddAdditionalDmodPath(defaultLinuxDinkGameData);
             }
 
             if (defaultLinuxHome != null &&
                 Directory.Exists(defaultLinuxDmods) &&
                 this._config.General.AdditionalDmodLocations.Contains(defaultLinuxDmods) == false) {
-                this._config.General.AddAdditionalDmodPath(defaultLinuxDmods);
+                this._config.General.TryAddAdditionalDmodPath(defaultLinuxDmods);
             }
         }
         

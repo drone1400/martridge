@@ -10,7 +10,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 
@@ -412,14 +411,7 @@ namespace Martridge.ViewModels.Configuration {
         #endregion
         
         #region COMMANDS - DMODs
-        
-        private bool IsDuplicatePath(ObservableCollection<string> list, string path) {
-            foreach (string s in list) {
-                if (LocationHelper.PathIsEqual(s, path)) return true;
-            }
-            return false;
-        }
-        
+
         //
         // Default dmods
         //
@@ -486,10 +478,10 @@ namespace Martridge.ViewModels.Configuration {
 
         
         public string AdditionalDmodLocationsAddNewManualValue {
-            get => this._AdditionalDmodLocationsAddNewManualValue;
-            set => this.RaiseAndSetIfChanged(ref  this._AdditionalDmodLocationsAddNewManualValue, value);
+            get => this._additionalDmodLocationsAddNewManualValue;
+            set => this.RaiseAndSetIfChanged(ref  this._additionalDmodLocationsAddNewManualValue, value);
         }
-        private string _AdditionalDmodLocationsAddNewManualValue = string.Empty;
+        private string _additionalDmodLocationsAddNewManualValue = string.Empty;
         
         
         public void CmdAdditionalDmodLocationsAddNewManual(object? parameter = null) {
@@ -500,7 +492,7 @@ namespace Martridge.ViewModels.Configuration {
             {
                 this.IsBusy = true;
                 
-                if (this.IsDuplicatePath(this.AdditionalDmodLocations, this.AdditionalDmodLocationsAddNewManualValue) == false)
+                if (LocationHelper.PathIsDuplicate(this.AdditionalDmodLocations, this.AdditionalDmodLocationsAddNewManualValue) == false)
                 {
                     this.AdditionalDmodLocations.Add(this.AdditionalDmodLocationsAddNewManualValue);
                 }
@@ -536,7 +528,7 @@ namespace Martridge.ViewModels.Configuration {
                             ? LocationHelper.GetPathDefaultFileBrowser()
                             : this.DefaultDmodLocation );
 
-                    if (storageFolder != null && this.IsDuplicatePath(this.AdditionalDmodLocations, storageFolder.Path.LocalPath) == false)
+                    if (storageFolder != null && LocationHelper.PathIsDuplicate(this.AdditionalDmodLocations, storageFolder.Path.LocalPath) == false)
                     {
                         this.AdditionalDmodLocations.Add(storageFolder.Path.LocalPath);
                     }
@@ -599,7 +591,7 @@ namespace Martridge.ViewModels.Configuration {
             {
                 this.IsBusy = true;
                 
-                if (this.IsDuplicatePath(this.GameExePaths, this.GameExeAddNewManualValue) == false)
+                if (LocationHelper.PathIsDuplicate(this.GameExePaths, this.GameExeAddNewManualValue) == false)
                 {
                     this.GameExePaths.Add(this.GameExeAddNewManualValue);
                 }
@@ -644,7 +636,7 @@ namespace Martridge.ViewModels.Configuration {
 #endif
                         LocationHelper.GetPathDefaultFileBrowser());
 
-                    if (storageFile != null && this.IsDuplicatePath(this.GameExePaths, storageFile.Path.LocalPath) == false)
+                    if (storageFile != null && LocationHelper.PathIsDuplicate(this.GameExePaths, storageFile.Path.LocalPath) == false)
                     {
                         this.GameExePaths.Add(storageFile.Path.LocalPath);
                     }
@@ -707,7 +699,7 @@ namespace Martridge.ViewModels.Configuration {
             {
                 this.IsBusy = true;
                 
-                if (this.IsDuplicatePath(this.EditorExePaths, this.EditorExeAddNewManualValue) == false)
+                if (LocationHelper.PathIsDuplicate(this.EditorExePaths, this.EditorExeAddNewManualValue) == false)
                 {
                     this.EditorExePaths.Add(this.EditorExeAddNewManualValue);
                 }
@@ -753,7 +745,7 @@ namespace Martridge.ViewModels.Configuration {
 #endif
                         LocationHelper.GetPathDefaultFileBrowser());
 
-                    if (storageFile != null && this.IsDuplicatePath(this.EditorExePaths, storageFile.Path.LocalPath) == false) {
+                    if (storageFile != null && LocationHelper.PathIsDuplicate(this.EditorExePaths, storageFile.Path.LocalPath) == false) {
                         this.EditorExePaths.Add(storageFile.Path.LocalPath);
                     }
                 } catch (Exception ex)

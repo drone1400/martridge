@@ -101,13 +101,16 @@ namespace Martridge {
         #region CONFIG stuff
         
         private string _defaultConfigFile = "";
+        private string _defaultStateFile = "";
         private readonly Config _config = new Config();
 
         
         private void InitializeConfiguration()
         {
             this._defaultConfigFile = Path.Combine(LocationHelper.GetPathConfig(), "config.json");
-            this._config.LoadFromFile(this._defaultConfigFile);
+            this._defaultStateFile = Path.Combine(LocationHelper.GetPathMartridgeState(), "app-state.json");
+            this._config.LoadConfig(this._defaultConfigFile);
+            this._config.LoadAppState(this._defaultStateFile);
             
             #if PLATF_LINUX
             this.AddDefaultLinuxFreeDinkLocations();
@@ -119,12 +122,12 @@ namespace Martridge {
         
         private void LaunchOnUpdated(object? sender, EventArgs e) {
             MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationChanged"]);
-            this._config.SaveToFile(this._defaultConfigFile);
+            this._config.SaveConfig(this._defaultConfigFile);
         }
 
         private void GeneralOnUpdated(object? sender, ConfigUpdateEventArgs e) {
             MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationChanged"]);
-            this._config.SaveToFile(this._defaultConfigFile);
+            this._config.SaveConfig(this._defaultConfigFile);
         }
         
         
@@ -290,7 +293,7 @@ namespace Martridge {
             });
             
             // save config to file after changes!
-            this._config.SaveToFile(this._defaultConfigFile);
+            this._config.SaveConfig(this._defaultConfigFile);
             
             try {
                 this.OnThemePaletteChange?.Invoke(this, EventArgs.Empty);
@@ -310,7 +313,7 @@ namespace Martridge {
                 this._citrusTheme.DesiredLightThemeVariant = data.VariantProvider;
                 
                 // save config to file after changes!
-                this._config.SaveToFile(this._defaultConfigFile);
+                this._config.SaveConfig(this._defaultConfigFile);
             }
         }
         
@@ -325,7 +328,7 @@ namespace Martridge {
                 this._citrusTheme.DesiredDarkThemeVariant = data.VariantProvider;
                 
                 // save config to file after changes!
-                this._config.SaveToFile(this._defaultConfigFile);
+                this._config.SaveConfig(this._defaultConfigFile);
             }
         }
 
@@ -436,8 +439,11 @@ namespace Martridge {
                 this._config.Remember.UpdateProperties(values);
             }
             
-            // save config when closing in order to save ConfigRemember
-            this._config.SaveToFile(this._defaultConfigFile);
+            // latest config should already be saved... don't think i need to do this but leaving this here for future reference in case of issues
+            // this._config.SaveConfig(this._defaultConfigFile);
+            
+            // save app state when closing
+            this._config.SaveAppState(this._defaultStateFile);
             
             this._logger.Close();
         }

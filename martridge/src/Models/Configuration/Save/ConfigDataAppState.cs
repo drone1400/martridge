@@ -1,13 +1,11 @@
+﻿using System;
+using System.IO;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using Newtonsoft.Json;
-using System;
-using System.IO;
-
 namespace Martridge.Models.Configuration.Save {
-    public class ConfigData {
-        public ConfigDataGeneral? General { get; set; }
-        public ConfigDataLaunch? Launch { get; set; }
+    public class ConfigDataAppState{
+        public ConfigDataRemember? Remember { get; set; }
         
         public void SaveToFile(string path) {
             string pathTemp = path + ".temp";
@@ -45,12 +43,12 @@ namespace Martridge.Models.Configuration.Save {
             }
         }
 
-        public static ConfigData? LoadFromFile(string path) {
+        public static ConfigDataAppState? LoadFromFile(string path) {
             try {
-                ConfigData? cfg;
+                ConfigDataAppState? cfg;
                 using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
                 using (StreamReader sr = new StreamReader(fs)) {
-                    cfg = JsonConvert.DeserializeObject<ConfigData>(sr.ReadToEnd());
+                    cfg = JsonConvert.DeserializeObject<ConfigDataAppState>(sr.ReadToEnd());
                     fs.Flush();
                     fs.Close();
                 }

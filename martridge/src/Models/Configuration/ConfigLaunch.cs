@@ -28,7 +28,7 @@ namespace Martridge.Models.Configuration {
         /// Launches the game in true color mode
         /// </summary>
         public bool TrueColor => this._trueColor;
-        private bool _trueColor = false;
+        private bool _trueColor = true;
         
         /// <summary>
         /// Launches the game in windowed mode
@@ -40,7 +40,7 @@ namespace Martridge.Models.Configuration {
         /// Launches the game with sound
         /// </summary>
         public bool Sound => this._sound;
-        private bool _sound = false;
+        private bool _sound = true;
         
         /// <summary>
         /// Launches the game with (questionable?) joystick support

@@ -106,6 +106,13 @@ namespace Martridge.Models {
         private static string PathMartridgeCustomThemes { get; } = string.Empty;
         private static string PathMartridgeDefaultDinkInstall { get; } = string.Empty;
         private static string PathMartridgeDefaultFileBrowser { get; } = string.Empty;
+        
+        
+        private const string ENV_VAR_HOME = "%HOME%";
+        private const string ENV_VAR_XDG_CONFIG_HOME = "%XDG_CONFIG_HOME%";
+        private const string ENV_VAR_XDG_DATA_HOME = "%XDG_DATA_HOME%";
+        private const string ENV_VAR_XDG_STATE_HOME = "%XDG_STATE_HOME%";
+        private const string ENV_VAR_XDG_CACHE_HOME = "%XDG_CACHE_HOME%";
 
         static LocationHelper() {
             bool arePathsInitialzied = false;
@@ -119,20 +126,20 @@ namespace Martridge.Models {
             #endif
 
             if (tryLinuxDefaultPaths) {
-                string home = Environment.ExpandEnvironmentVariables("%HOME%");
-                bool canFallback = string.IsNullOrWhiteSpace(home) == false;
+                string home = Environment.ExpandEnvironmentVariables(ENV_VAR_HOME);
+                bool canFallback = home != ENV_VAR_HOME;
                 
-                string homeConfig = Environment.ExpandEnvironmentVariables("%XDG_CONFIG_HOME%");
-                if (canFallback && string.IsNullOrWhiteSpace(homeConfig)) homeConfig = Path.Combine(home, ".config");
+                string homeConfig = Environment.ExpandEnvironmentVariables(ENV_VAR_XDG_CONFIG_HOME);
+                if (canFallback && homeConfig == ENV_VAR_XDG_CONFIG_HOME) homeConfig = Path.Combine(home, ".config");
 
-                string homeData = Environment.ExpandEnvironmentVariables("%XDG_DATA_HOME%");
-                if (canFallback && string.IsNullOrWhiteSpace(homeData)) homeData = Path.Combine(home, ".local","share");
+                string homeData = Environment.ExpandEnvironmentVariables(ENV_VAR_XDG_DATA_HOME);
+                if (canFallback && homeData == ENV_VAR_XDG_DATA_HOME) homeData = Path.Combine(home, ".local","share");
                 
-                string homeState = Environment.ExpandEnvironmentVariables("%XDG_STATE_HOME%");
-                if (canFallback && string.IsNullOrWhiteSpace(homeState)) homeState = Path.Combine(home, ".local","state");
+                string homeState = Environment.ExpandEnvironmentVariables(ENV_VAR_XDG_STATE_HOME);
+                if (canFallback && homeState == ENV_VAR_XDG_STATE_HOME) homeState = Path.Combine(home, ".local","state");
 
-                string homeCache = Environment.ExpandEnvironmentVariables("%XDG_CACHE_HOME%");
-                if (canFallback && string.IsNullOrWhiteSpace(homeCache)) homeCache = Path.Combine(home, ".cache");
+                string homeCache = Environment.ExpandEnvironmentVariables(ENV_VAR_XDG_CACHE_HOME);
+                if (canFallback && homeCache == ENV_VAR_XDG_CACHE_HOME) homeCache = Path.Combine(home, ".cache");
 
                 if (string.IsNullOrWhiteSpace(home) == false &&
                     string.IsNullOrWhiteSpace(homeConfig) == false &&

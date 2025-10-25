@@ -25,7 +25,7 @@
     <UserControl.Resources>
         <valueConverters:DoubleCompareBoolConverter x:Key="DoubleCompareBoolConverter" />
         <valueConverters:BoolToGridSizeStarOrXConverter x:Key="BoolToGridSizeZeroStarConverter" />
-        <system:Double x:Key="MinimumPathUiHeightThreshold">400</system:Double>
+        <system:Double x:Key="MinimumPathUiHeightThreshold">480</system:Double>
     </UserControl.Resources>
 
     <Border Classes="MartridgeCard">
@@ -126,20 +126,23 @@
                                     x:Name="gridPathSettingsMain"
                                     DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=configuration:SettingsGeneralView}}">
                                     <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="{Binding ShowDmodDevFeatures,
                                                 Converter={StaticResource BoolToGridSizeZeroStarConverter}}"/>
                                     </Grid.RowDefinitions>
                                     
-                                    <configuration:SettingsGeneralAdditionalDmodLocationsUserControl 
+                                    <configuration:SettingsGeneralDefaultDmodLocationsUserControl 
                                         Grid.Row="0"/>
+                                    <configuration:SettingsGeneralAdditionalDmodLocationsUserControl 
+                                        Grid.Row="1"/>
 
                                     <configuration:SettingsGeneralAddGameExeUserControl 
-                                        Grid.Row="1"/>
+                                        Grid.Row="2"/>
                                     
                                     <configuration:SettingsGeneralAddEditorExeUserControl 
-                                        Grid.Row="2" 
+                                        Grid.Row="3" 
                                         IsVisible="{Binding ShowDmodDevFeatures}"/>
                                 </Grid>
                             </DataTemplate>
@@ -149,7 +152,10 @@
                                     <TabControl>
                                         <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathDmod}"
                                                  Classes="SmallTab">
-                                            <configuration:SettingsGeneralAdditionalDmodLocationsUserControl/>
+                                            <Grid RowDefinitions="Auto,*">
+                                                <configuration:SettingsGeneralDefaultDmodLocationsUserControl Grid.Row="0"/>
+                                                <configuration:SettingsGeneralAdditionalDmodLocationsUserControl Grid.Row="1"/>
+                                            </Grid>
                                         </TabItem>
                                         <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathGame}"
                                                  Classes="SmallTab">

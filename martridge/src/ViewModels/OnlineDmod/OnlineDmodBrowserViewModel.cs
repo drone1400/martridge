@@ -380,7 +380,7 @@ namespace Martridge.ViewModels.OnlineDmod {
         private int _selectedDmodScreenshotIndex = -1;
 
         public bool SelectedDmodScreenshotIsFirst => this._selectedDmodDefinition == null ||  this._selectedDmodScreenshotIndex <= 0;
-        public bool SelectedDmodScreenshotIsLast => this._selectedDmodDefinition == null || this._selectedDmodScreenshotIndex >= this._selectedDmodDefinition.Screenshots.Count;
+        public bool SelectedDmodScreenshotIsLast => this._selectedDmodDefinition == null || this._selectedDmodScreenshotIndex + 1 >= this._selectedDmodDefinition.Screenshots.Count;
         
         
         private Dictionary<string, OnlineUserViewModel> _cachedUserViewModels = new Dictionary<string, OnlineUserViewModel>();

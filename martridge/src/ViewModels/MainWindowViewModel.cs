@@ -405,7 +405,27 @@ namespace Martridge.ViewModels {
             
             if (this._dmodCrawler == null) {
                 this._dmodCrawler = new DmodCrawler();
-                _ = this._dmodCrawler.InitializeDmodLists(false); // no await
+                Task.Run(async () =>
+                {
+                    try {
+                        await this._dmodCrawler.InitializeDmodLists(false);
+                        
+                        if (this._config == null) 
+                            return;
+
+                        if (this._config.General.OnlineDmodListAutoRefreshDays <= 0 ||
+                            double.IsNaN(this._config.General.OnlineDmodListAutoRefreshDays))
+                            return;
+
+                        if ((DateTime.Now - this._dmodCrawler.DmodPagesOldestWriteTime).TotalDays >= this._config.General.OnlineDmodListAutoRefreshDays) {
+                            // if the DMOD page data is too old, force online refresh
+                            await this._dmodCrawler.InitializeDmodLists(true);
+                        }
+                    } catch (Exception ex) {
+                        MyTrace.Global.WriteException(ex);
+                    }
+                });
+                
             }
             
             if (this._onlineDmodBrowserViewModel == null) {

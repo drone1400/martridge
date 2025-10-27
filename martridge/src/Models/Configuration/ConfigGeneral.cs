@@ -51,6 +51,12 @@ namespace Martridge.Models.Configuration {
         public bool EnableOnlineFeatures { get => this._EnableOnlineFeatures; }
         private bool _EnableOnlineFeatures = true;
         
+        /// <summary>
+        /// If the value is greater than 0 and the online DMOD list is older than this amount of days, it will be auto refreshed.
+        /// </summary>
+        public double OnlineDmodListAutoRefreshDays { get => this._onlineDmodListAutoRefreshDays; }
+        private double _onlineDmodListAutoRefreshDays = 5.0;
+        
         
         /// <summary>
         /// If true, displays the --refdir path launch config in the main window in the selected dmod view
@@ -236,6 +242,7 @@ namespace Martridge.Models.Configuration {
                     case nameof(this.LocalizationName): TryUpdateGeneric(kvp, ref this._localizationName); break;
                     case nameof(this.ShowDmodDevFeatures): TryUpdateGeneric(kvp, ref this._ShowDmodDevFeatures); break;
                     case nameof(this.EnableOnlineFeatures): TryUpdateGeneric(kvp, ref this._EnableOnlineFeatures); break;
+                    case nameof(this.OnlineDmodListAutoRefreshDays): TryUpdateGeneric(kvp, ref this._onlineDmodListAutoRefreshDays); break;
                     case nameof(this.ShowLaunchRefDirPathInMainWindow): TryUpdateGeneric(kvp, ref this._showLaunchRefDirPathInMainWindow); break;
                     case nameof(this.ShowLaunchCustomArgsInMainWindow): TryUpdateGeneric(kvp, ref this._showLaunchCustomArgsInMainWindow); break;
                     case nameof(this.ShowLogWindowOnStartup): TryUpdateGeneric(kvp, ref this._showLogWindowOnStartup); break;

@@ -13,11 +13,19 @@ namespace Martridge.Models.OnlineDmods {
     public class DmodCrawler : IDisposable {
 
         public DateTime DmodPagesLastWriteTime { get; private set; } = DateTime.MinValue;
+        public DateTime DmodPagesOldestWriteTime { get; private set; } = DateTime.MaxValue;
+        public bool IsInitializingDmods { get; private set; } = false;
         public event EventHandler? DmodListInitialized;
-
-        private readonly HttpClient _httpClient = new HttpClient();
+        public event EventHandler? DmodListInitializationChanged;
         
-        private readonly int _knownDmodPages = 8;
+        private readonly object _syncRootInitDmods = new object();
+
+        private readonly HttpClient _httpClient = new HttpClient() {
+            // if not set, default timeout should be ~100 seconds but that seems too long...
+            Timeout = TimeSpan.FromSeconds(30), // TODO, make this not hardcoded in the future...
+        };
+        
+        private readonly int _knownDmodPages = 9; // TODO, make this not hardcoded in the future...
 
         public List<OnlineDmodInfo> DmodList { get => this._dmodList; }
         private List<OnlineDmodInfo> _dmodList = new List<OnlineDmodInfo>();
@@ -25,15 +33,24 @@ namespace Martridge.Models.OnlineDmods {
         private Dictionary<string, OnlineUser> _onlineUsers = new Dictionary<string, OnlineUser>();
 
         public async Task InitializeDmodLists(bool forceOnlineRefresh) {
-            int dmodPageIdx = 1;
-            
             try {
+                lock (this._syncRootInitDmods) {
+                    if (this.IsInitializingDmods)
+                        return;
+                    this.IsInitializingDmods = true;
+                }
+                
+                this.DmodListInitializationChanged?.Invoke(this, EventArgs.Empty);
+                
+                int dmodPageIdx = 1;
+
                 List<OnlineDmodInfo> dmodEntries = new List<OnlineDmodInfo>();
 
                 bool nextPageExists = false;
                 while (dmodPageIdx <= this._knownDmodPages || nextPageExists) {
-                    OnlineDmodCachedResource? cachedResource = OnlineDmodCachedResource.FromDmodListPageNumber(dmodPageIdx);
-                    if (cachedResource != null) {
+                    try {
+                        OnlineDmodCachedResource cachedResource = OnlineDmodCachedResource.FromDmodListPageNumber(dmodPageIdx);
+
                         FileInfo localHtml = new FileInfo(cachedResource.Local);
                         if (localHtml.Directory?.Exists == false) {
                             localHtml.Directory.Create();
@@ -46,21 +63,36 @@ namespace Martridge.Models.OnlineDmods {
                             if (localHtml.LastWriteTime > this.DmodPagesLastWriteTime) {
                                 this.DmodPagesLastWriteTime = localHtml.LastWriteTime;
                             }
+                            if (localHtml.LastWriteTime < this.DmodPagesOldestWriteTime) {
+                                this.DmodPagesOldestWriteTime =  localHtml.LastWriteTime;
+                            }
                             int dmodCount = this.ParseDmodsPage(cachedResource.Local, dmodEntries);
                             nextPageExists = this.ParseDmodsNextPageExists(cachedResource.Local);
-                        } else {
+                        }
+                        else {
                             nextPageExists = false;
                         }
-                    }
 
-                    dmodPageIdx++;
+                        dmodPageIdx++;
+                    } catch (Exception ex) {
+                        MyTrace.Global.WriteMessage($"Error parsing dmod lists #{dmodPageIdx}...", MyTraceLevel.Error);
+                        MyTrace.Global.WriteException(ex);
+                    }
                 }
-                
+
                 this._dmodList = dmodEntries;
                 this.DmodListInitialized?.Invoke(this, EventArgs.Empty);
             } catch (Exception ex) {
-                MyTrace.Global.WriteMessage($"Error parsing dmod lists #{dmodPageIdx}...", MyTraceLevel.Error);
                 MyTrace.Global.WriteException(ex);
+            } finally {
+                try {
+                    lock (this._syncRootInitDmods) {
+                        this.IsInitializingDmods = false;
+                    }
+                    this.DmodListInitializationChanged?.Invoke(this, EventArgs.Empty);
+                } catch (Exception ex) {
+                    MyTrace.Global.WriteException(ex);
+                }
             }
         }
 

@@ -31,6 +31,11 @@ namespace Martridge.Views {
                     e.Handled = true;
                 }
             }
+
+            if (e.Key == Key.F10) {
+                this.Width = 1280;
+                this.Height = 800;
+            }
         }
     }
 }

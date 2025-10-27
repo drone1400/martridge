@@ -152,6 +152,7 @@ namespace Martridge.ViewModels.OnlineDmod {
             set {
                 if (this._dmodCrawler != null) {
                     this._dmodCrawler.DmodListInitialized -= this.DmodCrawler_DmodListInitialized;
+                    this._dmodCrawler.DmodListInitializationChanged -= this.DmodCrawler_DmodListInitializingChanged;
                     this._dmodCrawler = null;
                 }
                 this._dmodCrawler = value;
@@ -159,7 +160,9 @@ namespace Martridge.ViewModels.OnlineDmod {
 
                 if (this._dmodCrawler != null) {
                     this._dmodCrawler.DmodListInitialized += this.DmodCrawler_DmodListInitialized;
+                    this._dmodCrawler.DmodListInitializationChanged += this.DmodCrawler_DmodListInitializingChanged;
                     this.InitializeDmods();
+                    this.IsReloadingDmodList = this._dmodCrawler?.IsInitializingDmods ?? false;
                 }
             }
         }
@@ -194,6 +197,10 @@ namespace Martridge.ViewModels.OnlineDmod {
         
         private void DmodCrawler_DmodListInitialized(object? sender, EventArgs e) {
             this.InitializeDmods();
+        }
+
+        private void DmodCrawler_DmodListInitializingChanged(object? sender, EventArgs e) {
+            this.IsReloadingDmodList = this._dmodCrawler?.IsInitializingDmods ?? false;
         }
         
         /// <summary>
@@ -469,15 +476,15 @@ namespace Martridge.ViewModels.OnlineDmod {
             if (this.IsReloadingDmodList) return;
 
             try {
+                // Preemptively set this to true
                 this.IsReloadingDmodList = true;
-                
+
                 this.SelectedDmodDefinition = null;
                 this.SelectedDmodScreenshotVm = null;
                 this.DmodSearchString = null;
                 await this.DmodCrawler.InitializeDmodLists(true);
-                this.InitializeDmods();
-            } finally {
-                this.IsReloadingDmodList = false;
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(ex);
             }
         }
         [DependsOn(nameof(DmodManager))]

@@ -41,6 +41,11 @@ namespace Martridge.Models.Configuration.Save {
         public bool? EnableOnlineFeatures { get; set; }
 
         /// <summary>
+        /// If the value is greater than 0 and the online DMOD list is older than this amount of days, it will be auto refreshed.
+        /// </summary>
+        public double? OnlineDmodListAutoRefreshDays { get; set; }
+
+        /// <summary>
         /// If true, displays the --refdir path launch config in the main window in the selected dmod view
         /// </summary>
         public bool? ShowLaunchRefDirPathInMainWindow { get; set; }
@@ -104,6 +109,7 @@ namespace Martridge.Models.Configuration.Save {
                 [nameof(ConfigGeneral.LocalizationName)] = this.LocalizationName,
                 [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
                 [nameof(ConfigGeneral.EnableOnlineFeatures)] = this.EnableOnlineFeatures,
+                [nameof(ConfigGeneral.OnlineDmodListAutoRefreshDays)] = this.OnlineDmodListAutoRefreshDays,
                 [nameof(ConfigGeneral.ShowLaunchRefDirPathInMainWindow)] = this.ShowLaunchRefDirPathInMainWindow,
                 [nameof(ConfigGeneral.ShowLaunchCustomArgsInMainWindow)] = this.ShowLaunchCustomArgsInMainWindow,
                 [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,

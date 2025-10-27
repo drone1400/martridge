@@ -40,11 +40,18 @@
                     HorizontalAlignment="Stretch"
                     Width="NaN"
                     Content="{dloc:Localize OnlineDmodBrowser/ReloadDmods}"/>
+            
+            <ProgressBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
+                         Minimum="0" Maximum="1"
+                         IsVisible="{Binding IsReloadingDmodList}"
+                         Value="{Binding ProgressBarPercent}"
+                         IsIndeterminate="{Binding ProgressIsIndeterminate}" />
         </Grid>
         
         <Grid Grid.Row="1"
               ColumnDefinitions="Auto,*"
-              RowDefinitions="Auto,Auto,Auto">
+              RowDefinitions="Auto,Auto,Auto"
+              IsEnabled="{Binding !IsReloadingDmodList}">
             <Label Grid.Row="0" Grid.Column="0"
                    Classes="Heading2B"
                    Content="{dloc:Localize OnlineDmodBrowser/Search}" />
@@ -69,6 +76,7 @@
                   IsReadOnly="True"
                   VerticalScrollBarVisibility="Visible"
                   HorizontalScrollBarVisibility="Disabled"
+                  IsEnabled="{Binding !IsReloadingDmodList}"
                   IsVisible="{Binding DmodDefinitionsFilteredHasItems}"
                   ItemsSource="{Binding DmodDefinitionsCollection}" 
                   SelectionChanged="DataGridDmods_OnSelectionChanged">

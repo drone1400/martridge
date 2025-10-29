@@ -293,20 +293,16 @@ namespace Martridge.ViewModels {
                     e.DragEffects = DragDropEffects.None;
                 }
 
-                if (e.Data.Contains(DataFormats.Files)) {
-                    IEnumerable<IStorageItem>? files = e.Data.GetFiles();
-                    if (files == null)
-                        return;
-                    
+                if (e.DataTransfer.TryGetFiles() is IEnumerable<IStorageItem> files) {
                     IStorageItem? file = files.FirstOrDefault();
                     if (file != null) {
                         this.CmdShowPageDmodInstaller(file.Path.LocalPath);
                     }
-                } else if (e.Data.Contains(DataFormats.Text)) {
-                    string? text = e.Data.GetText();
-                    if (text == null)
-                        return;
-                    
+
+                    return;
+                }
+                
+                if (e.DataTransfer.TryGetText() is string text) {
                     Task.Run(() => {
                         try {
                             Task<IStorageFile?>? taskFile = App.Instance?.StorageProvider?.TryGetFileFromPathAsync(text);
@@ -319,7 +315,9 @@ namespace Martridge.ViewModels {
                             MyTrace.Global.WriteException(ex);
                         }
                     });
+                    return;
                 }
+                
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
             }

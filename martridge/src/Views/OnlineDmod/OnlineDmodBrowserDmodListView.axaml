@@ -130,17 +130,17 @@
                     x:DataType="onlineDmod:OnlineDmodInfoViewModel"/>
                 <DataGridTextColumn 
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Author}"
-                    Width="140"
+                    Width="120"
                     Binding="{Binding Author, Mode=OneWay}"
                     x:DataType="onlineDmod:OnlineDmodInfoViewModel"/>
                 <DataGridTextColumn 
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Updated}"
-                    Width="120"
+                    Width="100"
                     Binding="{Binding Updated, Converter={StaticResource GenericDateConverter}, Mode=OneWay}"
                     x:DataType="onlineDmod:OnlineDmodInfoViewModel"/>
                 <DataGridTextColumn 
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Downloads}"
-                    Width="120"
+                    Width="100"
                     Binding="{Binding Downloads, Mode=OneWay}"
                     x:DataType="onlineDmod:OnlineDmodInfoViewModel"/>
             </DataGrid.Columns>

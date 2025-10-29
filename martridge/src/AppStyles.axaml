@@ -27,6 +27,12 @@
             <Thickness x:Key="MartridgeLabelMarginH2">6,3</Thickness>
             <Thickness x:Key="MartridgeLabelMarginH1">6,3</Thickness>
             <Thickness x:Key="MartridgeLabelPadding">1</Thickness>
+            
+            <x:Double x:Key="DataGridSortIconMinWidth">20</x:Double>
+            <x:Double x:Key="DataGridSortIconSize">14</x:Double>
+            <Thickness x:Key="DataGridHeaderMargin">6,0,0,0</Thickness>
+            <x:Int32 x:Key="DataGridHeaderContentColumnSpan">2</x:Int32>
+            <x:Double x:Key="DataGridHeaderHeight">28</x:Double>
         </ResourceDictionary>
     </Styles.Resources>
 

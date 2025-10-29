@@ -28,8 +28,8 @@
     <Border Classes="MartridgeCard">
         <vw:MagicSplitPresenterView
             Name="MagicSplit"
-            OnePageSwitchThreshold="1000"
-            LeftPanelMinWidth="620"
+            OnePageSwitchThreshold="950"
+            LeftPanelMinWidth="560"
             RightPanelMinWidth="360"
             IsOnePageShowingRightContent="{Binding SelectedDmodDefinition, 
                 Converter={StaticResource ConverterIsNotNullCheck}}"

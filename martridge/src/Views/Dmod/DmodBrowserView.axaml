@@ -29,7 +29,7 @@
         <vw:MagicSplitPresenterView
             Name="MagicSplit"
             Margin="0"
-            OnePageSwitchThreshold="1000"
+            OnePageSwitchThreshold="950"
             LeftPanelMinWidth="375"
             RightPanelMinWidth="560"
             IsOnePageShowingRightContent="{Binding SelectedDmodDefinition, 

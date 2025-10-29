@@ -11,7 +11,7 @@
         <RootNamespace>Martridge</RootNamespace>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU;win-x64</Platforms>
-        <AvaloniaVersion>11.3.0</AvaloniaVersion>
+        <AvaloniaVersion>11.3.8</AvaloniaVersion>
     </PropertyGroup>
 
     <PropertyGroup>

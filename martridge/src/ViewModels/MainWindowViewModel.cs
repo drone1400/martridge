@@ -472,12 +472,14 @@ namespace Martridge.ViewModels {
                 case nameof(AboutViewModel):
                     this.IsViewModelSwitchable = true;
                     return;
+#if ENABLE_FEATURE_DINK_INSTALLER && ENABLE_FEATURE_ONLINE
                 case nameof(DinkInstallerViewModel):
                     this.IsViewModelSwitchable = 
                         ((DinkInstallerViewModel)this.CurrentViewModel).IsInstallerStarted == false ||
                         ((DinkInstallerViewModel)this.CurrentViewModel).IsInstallerFinished == true || 
                         ((DinkInstallerViewModel)this.CurrentViewModel).IsInstallerCancelled == true;
                     return;
+#endif
                 case nameof(DmodInstallerViewModel):
                     this.IsViewModelSwitchable =
                         ((DmodInstallerViewModel)this.CurrentViewModel).InstallPhase == DmodInstallPhase.Inactive ||

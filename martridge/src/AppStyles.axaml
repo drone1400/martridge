@@ -33,6 +33,9 @@
             <Thickness x:Key="DataGridHeaderMargin">6,0,0,0</Thickness>
             <x:Int32 x:Key="DataGridHeaderContentColumnSpan">2</x:Int32>
             <x:Double x:Key="DataGridHeaderHeight">28</x:Double>
+            
+            <StreamGeometry x:Key="IconTrashCan">M 3.1326316,15.420296 2.6080977,14.253594 2.6076252,3.3365731 H 2.0076251 V 2.0031967 H 5.6076253 V 1.1855209 L 5.9407066,0.37323449 6.6717416,0.0031321 h 2.6717677 l 0.7310347,0.37010239 0.333081,0.81228641 v 0.8176758 h 3.6 v 1.3333764 h -0.6 l -4.5e-4,10.9170209 -0.524543,1.166702 -1.05,0.582836 H 4.1826315 Z M 12.207632,14.270262 V 3.3365731 H 3.8076316 V 14.270262 l 0.3599999,0.40001 H 11.847632 Z M 5.0076316,5.3366382 H 6.2076314 V 12.670209 H 5.0076316 Z m 2.4000003,0 H 8.6076318 V 12.670209 H 7.4076319 Z m 2.3999999,0 H 11.007633 V 12.670209 H 9.8076318 Z M 9.2076326,1.3365085 H 6.8076319 v 0.6666882 h 2.4000007 z</StreamGeometry>
+            <StreamGeometry x:Key="IconGear">m 0,0 -1.567956,-0.64679 -1.643039,1.07475 -1.696444,-1.69871 1.132132,-1.58172 -0.650984,-1.60121 c -1.333372,-0.2763 -0.155176,-0.0446 -1.988215,-0.43538 -0.0154,-0.74413 -0.01146,-1.44924 -0.01931,-2.19933 0.874369,-0.21639 0.878558,-0.20933 2.007521,-0.4898 l 0.644646,-1.57317 -1.07118,-1.64851 1.693077,-1.70209 1.576466,1.1359 1.583282,-0.65315 c 0.118348,-0.69374 0.232759,-1.27589 0.375178,-1.97211 0.760415,0.004 1.520831,0.004 2.281251,0.004 0.156415,0.74357 0.249635,1.13814 0.457719,1.9678 l 1.595914,0.65315 1.576462,-1.13589 1.69308,1.70208 -1.07118,1.64851 0.64464,1.57317 c 0.67487,0.14788 1.33315,0.32104 2.01313,0.52354 l -0.0137,2.14872 C 8.88847,-4.74437 8.22224,-4.59265 7.55306,-4.45399 L 6.90208,-2.85278 8.03421,-1.27107 6.33777,0.42764 4.694728,-0.6471 3.114148,-3.1e-4 C 2.960352,0.64824 2.796151,1.36386 2.640972,2.00014 L 0.45455,2.00814 C 0.295955,1.29397 0.133373,0.71595 -5e-6,-4.3e-4 Z m 5.56618,-5.99132 c -0.031,-2.14357 -1.912822,-4.0202 -3.999996,-4 -2.087174,0.0202 -4.008797,1.6462 -4,4 0.0088,2.3538 1.716586,4.02268 4,4 2.283414,-0.0227 4.030996,-1.85643 3.999996,-4 z m -3.999996,1.7 c -0.960251,0.0152 -1.698489,-0.80554 -1.7,-1.7 -0.0015,-0.89446 0.90384,-1.70291 1.7,-1.7 0.79616,0.003 1.708024,0.78724 1.7,1.7 -0.008,0.91276 -0.739749,1.68481 -1.7,1.7 z</StreamGeometry>
         </ResourceDictionary>
     </Styles.Resources>
 
@@ -186,6 +189,41 @@
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="Width" Value="120" />
         <Setter Property="Height" Value="32" />
+    </Style>
+    
+    <Style Selector="Button.ListBoxButton">
+        <Setter Property="Margin" Value="0, 0, 6,0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Width" Value="NaN" />
+        <Setter Property="Height" Value="NaN" />
+        <Setter Property="MinHeight" Value="15" />
+        <Setter Property="MinWidth" Value="12" />
+    </Style>
+    
+    <Style Selector="Path.ListBoxIconGear">
+        <Setter Property="Fill" Value="{DynamicResource HighlightForegroundBrush}" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="Width" Value="16" />
+        <Setter Property="Height" Value="16" />
+        <Setter Property="Stretch" Value="Uniform" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Data" Value="{DynamicResource IconGear}" />
+    </Style>
+    
+    <Style Selector="Path.ListBoxIconTrashCan">
+        <Setter Property="Fill" Value="{DynamicResource HighlightForegroundBrush}" />
+        <Setter Property="Margin" Value="4,2" />
+        <Setter Property="Width" Value="12" />
+        <Setter Property="Height" Value="16" />
+        <Setter Property="Stretch" Value="Uniform" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Data" Value="{DynamicResource IconTrashCan}" />
     </Style>
 
     <Style Selector="DataGridCell">

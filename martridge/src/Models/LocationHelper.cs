@@ -126,12 +126,14 @@ namespace Martridge.Models {
             #endif
 
             if (tryLinuxDefaultPaths) {
-                string home = Environment.ExpandEnvironmentVariables(ENV_VAR_HOME);
-                bool canFallback = home != ENV_VAR_HOME;
+                string home = TryGetHomeDirectory();
+                bool canFallback = string.IsNullOrWhiteSpace(home) == false;
                 
+                // System.Environment.SpecialFolder.ApplicationData
                 string homeConfig = Environment.ExpandEnvironmentVariables(ENV_VAR_XDG_CONFIG_HOME);
                 if (canFallback && homeConfig == ENV_VAR_XDG_CONFIG_HOME) homeConfig = Path.Combine(home, ".config");
 
+                // System.Environment.SpecialFolder
                 string homeData = Environment.ExpandEnvironmentVariables(ENV_VAR_XDG_DATA_HOME);
                 if (canFallback && homeData == ENV_VAR_XDG_DATA_HOME) homeData = Path.Combine(home, ".local","share");
                 
@@ -162,34 +164,41 @@ namespace Martridge.Models {
                 }
             }
             
-            // initialize base directory somehow...
-            //_AppBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            //_AppBaseDirectory = AppContext.BaseDirectory;
+            {
+                //
+                // initialize AppBaseDirectory
+                //
+                
+                AppBaseDirectory = "";
 
-            AppBaseDirectory = "";
-            
-            string? processFile = Process.GetCurrentProcess().MainModule?.FileName;
+                string? processFile = Process.GetCurrentProcess().MainModule?.FileName;
 
-            if (processFile == null) {
-                NullReferenceException ex = new NullReferenceException("Could not determine current process start location...");
-                MyTrace.Global.WriteException(ex);
-            }
-            else {
-
-                FileInfo finfo = new FileInfo(processFile);
-
-                if (finfo.DirectoryName == null) {
+                if (processFile == null) {
                     NullReferenceException ex = new NullReferenceException("Could not determine current process start location...");
                     MyTrace.Global.WriteException(ex);
-                } else {
-                    AppBaseDirectory = finfo.DirectoryName;
+                }
+                else {
+
+                    FileInfo finfo = new FileInfo(processFile);
+
+                    if (finfo.DirectoryName == null) {
+                        NullReferenceException ex = new NullReferenceException("Could not determine current process start location...");
+                        MyTrace.Global.WriteException(ex);
+                    }
+                    else {
+                        AppBaseDirectory = finfo.DirectoryName;
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(AppBaseDirectory)) {
+                    AppBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                    //AppBaseDirectory = AppContext.BaseDirectory;
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(AppBaseDirectory)) {
-                AppBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            }
-            
+            //
+            // initialize paths locally if they were not initialized before
+            //
 
             if (arePathsInitialzied == false && string.IsNullOrWhiteSpace(AppBaseDirectory) == false) {
                 PathMartridgeState = Path.Combine(AppBaseDirectory, "config");
@@ -209,6 +218,23 @@ namespace Martridge.Models {
                 MyTrace.Global.WriteException(ex);
                 throw ex;
             }
+        }
+
+        public static string TryGetHomeDirectory() {
+            string home = Environment.ExpandEnvironmentVariables(ENV_VAR_HOME);
+            if (home != ENV_VAR_HOME) return home;
+            
+            string homeUserProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            if (Directory.Exists(homeUserProfile)) return homeUserProfile;
+            
+#if !PLATF_WINDOWS
+            //  NOTE: on windows this actually resolves to 
+            //      C:\Users\<USER_NAME>\Documents
+            //  instead of the desired C:\Users\<USER_NAME>
+            string homePersonal = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            if (Directory.Exists(homePersonal)) return homePersonal;
+#endif
+            return string.Empty;
         }
 
 

@@ -101,6 +101,7 @@ namespace Martridge {
         #region CONFIG stuff
         
         private string _defaultConfigFile = "";
+        private string _defaultConfigExtensionFile = "";
         private string _defaultStateFile = "";
         private readonly Config _config = new Config();
 
@@ -108,11 +109,14 @@ namespace Martridge {
         private void InitializeConfiguration()
         {
             this._defaultConfigFile = Path.Combine(LocationHelper.GetPathConfig(), "config.json");
+            this._defaultConfigExtensionFile = Path.Combine(LocationHelper.GetPathConfig(), "configExeExtension.json");
             this._defaultStateFile = Path.Combine(LocationHelper.GetPathMartridgeState(), "app-state.json");
             this._config.LoadConfig(this._defaultConfigFile);
+            this._config.LoadConfigExtension(this._defaultConfigExtensionFile);
             this._config.LoadAppState(this._defaultStateFile);
             
             #if PLATF_LINUX
+            // TODO fix this...
             this.AddDefaultLinuxFreeDinkLocations();
             #endif
             
@@ -130,9 +134,9 @@ namespace Martridge {
             this._config.SaveConfig(this._defaultConfigFile);
         }
         
-        
         private void AddDefaultLinuxFreeDinkLocations()
         {
+            // TODO fix this...
             string defaultLinuxFreedinkExe = "/usr/games/freedink";
             string defaultLinuxDinkGameData = "/usr/share/games/dink";
             string? defaultLinuxHome = Environment.GetEnvironmentVariable("HOME");
@@ -153,6 +157,10 @@ namespace Martridge {
                 this._config.General.AdditionalDmodLocations.Contains(defaultLinuxDmods) == false) {
                 this._config.General.TryAddAdditionalDmodPath(defaultLinuxDmods);
             }
+        }
+
+        public void SaveConfigExtension() {
+            this._config.SaveConfigExtension(this._defaultConfigExtensionFile);
         }
         
         #endregion

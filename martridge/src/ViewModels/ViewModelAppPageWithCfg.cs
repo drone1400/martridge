@@ -36,6 +36,18 @@ namespace Martridge.ViewModels {
         protected virtual void OnConfigRememberChanging() {}
         protected virtual void OnConfigRememberChanged() {}
         protected virtual void OnCfgRememberUpdated(object? sender, ConfigUpdateEventArgs e) {}
+        
+        
+        public ConfigExtension? CfgExtension {
+            get => this._cfgExtension;
+            set => this.RaiseAndSetIfChanged(ref this._cfgExtension, value);
+        }
+        private ConfigExtension? _cfgExtension = null;
+        
+        protected virtual void OnConfigExtensionChanging() {}
+        protected virtual void OnConfigExtensionChanged() {}
+        protected virtual void OnCfgExtensionUpdated(object? sender, ConfigUpdateEventArgs e) {}
+        
 
         public ViewModelAppPageWithCfg() {
             this.PropertyChanging += this.OnPropertyChanging;
@@ -64,6 +76,13 @@ namespace Martridge.ViewModels {
                             this.CfgRemember.Updated += this.OnCfgRememberUpdated;
                         }
                         this.OnConfigRememberChanged();
+                        break;
+                    }
+                    case nameof(this.CfgExtension): {
+                        if (this.CfgExtension != null) {
+                            //this.CfgExtension.Updated += this.OnCfgExtensionUpdated;
+                        }
+                        this.OnConfigExtensionChanged();
                         break;
                     }
                     
@@ -97,6 +116,13 @@ namespace Martridge.ViewModels {
                         this.OnConfigRememberChanging();
                         break;
                     }
+                    case nameof(this.CfgExtension): {
+                        if (this.CfgExtension != null) {
+                            //this.CfgExtension.Updated -= this.OnCfgExtensionUpdated;
+                        }
+                        this.OnConfigExtensionChanging();
+                        break;
+                    }
                 }
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
@@ -108,6 +134,7 @@ namespace Martridge.ViewModels {
             this.CfgGeneral = null;
             this.CfgLaunch = null;
             this.CfgRemember = null;
+            this.CfgExtension = null;
         }
     }
 }

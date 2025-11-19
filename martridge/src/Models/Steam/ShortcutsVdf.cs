@@ -73,6 +73,21 @@ namespace Martridge.Models.Steam {
 
             return null;
         }
+        
+        public List<VdfObject> FindAllShortcutsByExe(string exePath) {
+            List<VdfObject> shortcuts = new List<VdfObject>();
+            
+            foreach (var kvp in this._root.Children) {
+                if (kvp.Value.Properties.TryGetValue(nameof(Constants.ShortcutsEntryFields.Exe), out VdfData? data) && data.Value is string path) {
+                    path = path.Trim('\"');
+                    if (LocationHelper.PathIsEqual(exePath, path)) {
+                        shortcuts.Add(kvp.Value);
+                    }
+                }
+            }
+
+            return shortcuts;
+        }
 
         public static int GetAppId(VdfObject obj) {
             if (obj.Properties.TryGetValue(nameof(Constants.ShortcutsEntryFields.appid), out VdfData? data) && data.Value is Int32 intValue) {

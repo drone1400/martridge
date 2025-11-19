@@ -150,6 +150,7 @@ namespace Martridge.ViewModels {
                     this._dmodBrowserViewModel.CfgGeneral = this._config?.General;
                     this._dmodBrowserViewModel.CfgLaunch = this._config?.Launch;
                     this._dmodBrowserViewModel.CfgRemember = this._config?.Remember;
+                    this._dmodBrowserViewModel.CfgExtension = this._config?.ExeExtension;
 
                     this.SwapToDefaultViewModel();
             
@@ -557,6 +558,7 @@ namespace Martridge.ViewModels {
                 SettingsGeneralViewModel vm = new SettingsGeneralViewModel();
                 vm.CfgGeneral = this._config?.General;
                 vm.CfgLaunch = this._config?.Launch;
+                vm.CfgExtension = this._config?.ExeExtension;
                 this.SwapCurrentViewModel(vm);
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);

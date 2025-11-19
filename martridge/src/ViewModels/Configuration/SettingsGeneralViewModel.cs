@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 
@@ -29,6 +30,12 @@ namespace Martridge.ViewModels.Configuration {
 #else 
         public bool ShowOnlineSettings => false;
 #endif
+
+        public SettingsExtensionComponentConfigViewModel? ExeExtensionViewModel {
+            get => this._exeExtensionViewModel;
+            private set => this.RaiseAndSetIfChanged(ref this._exeExtensionViewModel, value);
+        }
+        private SettingsExtensionComponentConfigViewModel? _exeExtensionViewModel = null;
         
         //
         // General Configuration properties
@@ -74,24 +81,12 @@ namespace Martridge.ViewModels.Configuration {
             set => this.RaiseAndSetIfChanged(ref this._defaultDmodLocation, value);
         }
         private string _defaultDmodLocation = "DMODS";
-        
-        public int ActiveGameExeIndex {
-            get => this._activeGameExeIndex;
-            set => this.RaiseAndSetIfChanged(ref this._activeGameExeIndex, value);
-        }
-        private int _activeGameExeIndex = 0;
 
         public ObservableCollection<string> GameExePaths {
             get => this._gameExePaths;
             set => this.RaiseAndSetIfChanged(ref this._gameExePaths, value);
         }
         private ObservableCollection<string> _gameExePaths = new ObservableCollection<string>();
-        
-        public int ActiveEditorExeIndex {
-            get => this._activeEditorExeIndex;
-            set => this.RaiseAndSetIfChanged(ref this._activeEditorExeIndex, value);
-        }
-        private int _activeEditorExeIndex = 0;
 
         public ObservableCollection<string> EditorExePaths {
             get => this._editorExePaths;
@@ -111,12 +106,7 @@ namespace Martridge.ViewModels.Configuration {
         }
         private CultureInfo? _selectedLocalization = null;
         private string? _savedLocalization = null;
-
-        public int AdditionalDmodLocationsIndex {
-            get => this._additionalDmodLocationsIndex;
-            set => this.RaiseAndSetIfChanged(ref this._additionalDmodLocationsIndex, value);
-        }
-        private int _additionalDmodLocationsIndex = 0;
+        
         public ObservableCollection<string> AdditionalDmodLocations {
             get => this._additionalDmodLocations;
             set => this.RaiseAndSetIfChanged(ref this._additionalDmodLocations, value);
@@ -261,16 +251,10 @@ namespace Martridge.ViewModels.Configuration {
             this.ShowLaunchRefDirPathInMainWindow = this.CfgGeneral.ShowLaunchRefDirPathInMainWindow;
             this.ShowLaunchCustomArgsInMainWindow = this.CfgGeneral.ShowLaunchCustomArgsInMainWindow;
             this.UseRelativePathForSubfolders = this.CfgGeneral.UseRelativePathForSubfolders;
-            this.AdditionalDmodLocationsIndex = -1;
             this.AdditionalDmodLocations = listDmod;
-            this.AdditionalDmodLocationsIndex = 0;
             this.DefaultDmodLocation = this.CfgGeneral.DefaultDmodLocation;
-            this.ActiveGameExeIndex = -1;
             this.GameExePaths = listGameExe;
-            this.ActiveGameExeIndex = this.CfgGeneral.ActiveGameExeIndex;
-            this.ActiveEditorExeIndex = -1;
             this.EditorExePaths = listEditorExe;
-            this.ActiveEditorExeIndex = this.CfgGeneral.ActiveEditorExeIndex;
             
             // find and select the right localization
             foreach (CultureInfo ci in this._localizations) {
@@ -302,14 +286,6 @@ namespace Martridge.ViewModels.Configuration {
 
             this._savedLocalization = Localizer.Instance.Language;
 
-            if (this.ActiveGameExeIndex < 0 && this.GameExePaths.Count > 0) {
-                this.ActiveGameExeIndex = 0;
-            }
-            
-            if (this.ActiveEditorExeIndex < 0 && this.EditorExePaths.Count > 0) {
-                this.ActiveEditorExeIndex = 0;
-            }
-
             this.CfgGeneral.UpdateProperties(new Dictionary<string, object?>() {
                 [nameof(ConfigGeneral.LocalizationName)] = this._savedLocalization ?? "en-US",
                 [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
@@ -318,8 +294,6 @@ namespace Martridge.ViewModels.Configuration {
                 [nameof(ConfigGeneral.ShowLaunchCustomArgsInMainWindow)] = this.ShowLaunchCustomArgsInMainWindow,
                 [nameof(ConfigGeneral.ShowLogWindowOnStartup)] = this.ShowLogWindowOnStartup,
                 [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,
-                [nameof(ConfigGeneral.ActiveGameExeIndex)] = this.ActiveGameExeIndex,
-                [nameof(ConfigGeneral.ActiveEditorExeIndex)] = this.ActiveEditorExeIndex,
                 [nameof(ConfigGeneral.GameExePaths)] = listGameExe,
                 [nameof(ConfigGeneral.EditorExePaths)] = listEditorExe,
                 [nameof(ConfigGeneral.DefaultDmodLocation)] = this.DefaultDmodLocation,
@@ -459,21 +433,18 @@ namespace Martridge.ViewModels.Configuration {
         //
 
         public void CmdAdditionalDmodsRemoveSelected(object? parameter = null) {
+            if (parameter is not string target) return;
             if (this.IsBusy ) return;
+            this.AdditionalDmodLocations.Remove(target);
 
-            if (this.AdditionalDmodLocationsIndex >= 0 && this.AdditionalDmodLocationsIndex < this.AdditionalDmodLocations.Count) {
-                this.AdditionalDmodLocations.RemoveAt(this.AdditionalDmodLocationsIndex);
-            }
         }
         
         [DependsOn(nameof(IsBusy))]
-        [DependsOn(nameof(AdditionalDmodLocationsIndex))]
         [DependsOn(nameof(AdditionalDmodLocations))]
         public bool CanCmdAdditionalDmodsRemoveSelected(object? parameter = null) {
-            // general conditions
+            if (parameter is not string) return false;
             if (this.IsBusy ) return false;
-            // specific conditions
-            return this.AdditionalDmodLocationsIndex >= 0 && this.AdditionalDmodLocationsIndex < this.AdditionalDmodLocations.Count;
+            return true;
         }
 
         
@@ -558,22 +529,17 @@ namespace Martridge.ViewModels.Configuration {
         //
         // Game exe paths
         //
-        public void CmdGameExeRemoveSelected(object? parameter = null) {
+        public void CmdGameExeRemove(object? parameter = null) {
+            if (parameter is not string target) return;
             if (this.IsBusy ) return;
-
-            if (this.ActiveGameExeIndex >= 0 && this.ActiveGameExeIndex < this.GameExePaths.Count) {
-                this.GameExePaths.RemoveAt(this.ActiveGameExeIndex);
-            }
+            this.GameExePaths.Remove(target);
         }
         
         [DependsOn(nameof(IsBusy))]
-        [DependsOn(nameof(ActiveGameExeIndex))]
-        [DependsOn(nameof(GameExePaths))]
-        public bool CanCmdGameExeRemoveSelected(object? parameter = null) {
-            // general conditions
+        public bool CanCmdGameExeRemove(object? parameter = null) {
+            if (parameter is not string) return false;
             if (this.IsBusy ) return false;
-            // specific conditions
-            return this.ActiveGameExeIndex >= 0 && this.ActiveGameExeIndex < this.GameExePaths.Count;
+            return true;
         }
 
         public string GameExeAddNewManualValue {
@@ -666,22 +632,17 @@ namespace Martridge.ViewModels.Configuration {
         //
         // Editor exe paths
         //
-        public void CmdEditorExeRemoveSelected(object? parameter = null) {
+        public void CmdEditorExeRemove(object? parameter = null) {
+            if (parameter is not string target) return;
             if (this.IsBusy ) return;
-
-            if (this.ActiveEditorExeIndex >= 0 && this.ActiveEditorExeIndex < this.EditorExePaths.Count) {
-                this.EditorExePaths.RemoveAt(this.ActiveEditorExeIndex);
-            }
+            this.EditorExePaths.Remove(target);
         }
         
         [DependsOn(nameof(IsBusy))]
-        [DependsOn(nameof(ActiveEditorExeIndex))]
-        [DependsOn(nameof(EditorExePaths))]
-        public bool CanCmdEditorExeRemoveSelected(object? parameter = null) {
-            // general conditions
+        public bool CanCmdEditorExeRemove(object? parameter = null) {
+            if (parameter is not string) return false;
             if (this.IsBusy ) return false;
-            // specific conditions
-            return this.ActiveEditorExeIndex >= 0 && this.ActiveEditorExeIndex < this.EditorExePaths.Count;
+            return true;
         }
 
         public string EditorExeAddNewManualValue {
@@ -765,6 +726,97 @@ namespace Martridge.ViewModels.Configuration {
             if (this.IsBusy ) return false;
             // specific conditions
             return true;
+        }
+        
+        #endregion
+        
+        #region COMMANDS - EXE EXTENSION
+
+        public void CmdExeExtensionEdit(object? parameter = null) {
+            if (parameter is not string target) return;
+            if (this.IsBusy ) return;
+            if (this.ExeExtensionViewModel != null) return;
+            if (this.CfgExtension == null) return;
+            
+            this.ExeExtensionViewModel = new SettingsExtensionComponentConfigViewModel();
+
+            ConfigExtensionComponent? component = this.CfgExtension.TryAddOrGetExtension(target);
+            if (component == null) return;
+            
+            this.ExeExtensionViewModel.Initialize(target, component.WineData, component.SteamData);
+        }
+        [DependsOn(nameof(IsBusy))]
+        [DependsOn(nameof(ExeExtensionViewModel))]
+        [DependsOn(nameof(CfgExtension))]
+        public bool CanCmdExeExtensionEdit(object? parameter = null) {
+            if (parameter is not string) return false;
+            if (this.IsBusy ) return false;
+            if (this.ExeExtensionViewModel != null) return false;
+            if (this.CfgExtension == null) return false;
+            return true;
+        }
+        
+        public void CmdExeExtensionOk(object? parameter = null) {
+            if (this.ExeExtensionViewModel == null) return;
+            if (this.CfgExtension == null) return;
+
+            try {
+                try {
+                    string exeOriginal = this.ExeExtensionViewModel.ExePathOriginal;
+                    string exeCurrent = this.ExeExtensionViewModel.ExePath;
+                    var cfgWine = this.ExeExtensionViewModel.GetWineData();
+                    var cfgSteam = this.ExeExtensionViewModel.GetSteamData();
+
+
+
+                    if (exeOriginal != exeCurrent) {
+                        // have to update exe path...
+                        int foundGameExeIndex = this.GameExePaths.IndexOf(exeOriginal);
+                        if (foundGameExeIndex != -1) {
+                            this.GameExePaths[foundGameExeIndex] = exeCurrent;
+                        }
+
+                        int foundEditorExeIndex = this.EditorExePaths.IndexOf(exeOriginal);
+                        if (foundEditorExeIndex != -1) {
+                            this.EditorExePaths[foundEditorExeIndex] = exeCurrent;
+                        }
+
+                        this.CfgExtension.TryChangeTargetPath(exeOriginal, exeCurrent);
+                    }
+
+                    // update data
+                    ConfigExtensionComponent? component = this.CfgExtension.TryAddOrGetExtension(exeCurrent);
+                    if (component == null) return;
+                    component.SteamData = cfgSteam;
+                    component.WineData = cfgWine;
+                }
+                finally {
+                    // TODO... this is rather inconsistent, as in other places the config is passed to the view model by instance, but here i just save it directly in the current app
+                    // i think i'll have to reorganize how i handle the config objects later...
+                    // save changes...
+                    if (Application.Current is App app) {
+                        app.SaveConfigExtension();
+                    }
+                    
+                    this.ExeExtensionViewModel = null;
+                }
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(ex);
+            } 
+        }
+        [DependsOn(nameof(ExeExtensionViewModel))]
+        [DependsOn(nameof(CfgExtension))]
+        public bool CanCmdExeExtensionOk(object? parameter = null) {
+            return this.ExeExtensionViewModel != null;
+        }
+        
+        public void CmdExeExtensionCancel(object? parameter = null) {
+            this.ExeExtensionViewModel = null;
+        }
+        [DependsOn(nameof(ExeExtensionViewModel))]
+        [DependsOn(nameof(CfgExtension))]
+        public bool CanCmdExeExtensionCancel(object? parameter = null) {
+            return this.ExeExtensionViewModel != null;
         }
         
         #endregion

@@ -147,4 +147,19 @@
         <Compile Remove="Views\DinkInstaller\*"/>
         <AvaloniaXaml Remove="Views\DinkInstaller\*"/>
     </ItemGroup>
+    
+    <!-- remove certain windows only files -->
+    <ItemGroup Condition="'$(IsWindows)'!='true'">
+        <Compile Remove="Models\WindowsHelper.cs"/>
+        <Compile Remove="Models\Steam\SteamHelperWindows.cs"/>
+        <None Include="Models\Steam\SteamHelperWindows.cs"/>
+    </ItemGroup>
+    <ItemGroup Condition="'$(IsMacOs)'!='true'">
+        <Compile Remove="Models\Steam\SteamHelperMacOs.cs"/>
+        <None Include="Models\Steam\SteamHelperMacOs.cs"/>
+    </ItemGroup>
+    <ItemGroup Condition="'$(IsLinux)'!='true'">
+        <Compile Remove="Models\Steam\SteamHelperLinux.cs"/>
+        <None Include="Models\Steam\SteamHelperLinux.cs"/>
+    </ItemGroup>
 </Project>

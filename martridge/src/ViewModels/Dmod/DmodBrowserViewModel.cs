@@ -727,18 +727,11 @@ namespace Martridge.ViewModels.Dmod {
                 //if (!this.GameExeFound) return;
                 if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.DmodDirectory)) return;
 
-                string exePath;
-                bool quitAfterLaunch = false;
+                string exePath = launchEditor
+                    ? this.ActiveEditorExePath?.Path ?? string.Empty
+                    : this.ActiveGameExePath?.Path ?? string.Empty;
                 
-                if (launchEditor) {
-                    if (string.IsNullOrEmpty(this.ActiveEditorExePath?.Path)) return;
-                    exePath = this.ActiveEditorExePath.Path;
-                    quitAfterLaunch = this.CfgLaunch.QuitMartridgeOnEditorLaunch;
-                } else {
-                    if (string.IsNullOrEmpty(this.ActiveGameExePath?.Path)) return;
-                    exePath = this.ActiveGameExePath.Path;
-                    quitAfterLaunch = this.CfgLaunch.QuitMartridgeOnGameLaunch;
-                }
+                if (string.IsNullOrEmpty(exePath)) return;
                 
                 string dmodPath = this.SelectedDmodDefinition.DmodDirectory;
                 
@@ -747,9 +740,11 @@ namespace Martridge.ViewModels.Dmod {
                 this.SaveToConfigLauncher();
                 this.SaveActiveIndexToConfigGeneral();
 
+                var extension = this.CfgExtension?.TryAddOrGetExtension(exePath);
+
                 // launch dmod with separate task to prevent gui lockup
                 await Task.Run(() => {
-                    DmodLauncher.LaunchDmod(exePath, dmodPath, this.CfgLaunch, quitAfterLaunch, this.SelectedLocalization?.CultureInfo?.Name);
+                    DmodLauncher.LaunchDmod(exePath, launchEditor, dmodPath, this.CfgLaunch, extension, this.SelectedLocalization?.CultureInfo?.Name);
                 });
                 this._dmodLauncherDelay.Start();
             } catch (Exception ex) {

@@ -5,6 +5,8 @@ namespace Martridge.Models.Configuration {
         public ConfigGeneral General { get; } = new ConfigGeneral();
         public ConfigLaunch Launch { get; } = new ConfigLaunch();
 
+        public ConfigExtension ExeExtension { get; } = new ConfigExtension();
+
         public ConfigRemember Remember { get; } = new ConfigRemember();
         
         public void SaveConfig(string pathConfig) {
@@ -42,6 +44,19 @@ namespace Martridge.Models.Configuration {
             if (state?.Remember != null) {
                 this.Remember.UpdateProperties(state.Remember.GetValues());
             }
+        }
+        
+        
+        public void SaveConfigExtension(string pathExtension) {
+            ConfigDataExtension extension = this.ExeExtension.GetData();
+            if (extension.ExtensionDefinitions?.Count > 0) {
+                extension.SaveToFile(pathExtension);
+            }
+        }
+
+        public void LoadConfigExtension(string pathExtension) {
+            ConfigDataExtension? data  = ConfigDataExtension.LoadFromFile(pathExtension);
+            this.ExeExtension.SetFromData(data);
         }
     }
 }

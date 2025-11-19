@@ -29,149 +29,176 @@
     </UserControl.Resources>
 
     <Border Classes="MartridgeCard">
-        <Grid RowDefinitions="Auto, *">
-            <StackPanel Grid.Row="0">
-
-                <!-- Localization -->
-                <Grid ColumnDefinitions="*, Auto"
-                      RowDefinitions="Auto,Auto">
-                    <Label Grid.Row="0" Grid.Column="0 " Classes="Heading2B"
-                           Content="{dloc:Localize SettingsGeneral/Localization}" />
-                    <ComboBox 
-                        Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
-                        ItemsSource="{Binding Localizations}"
-                        HorizontalAlignment="Left"
-                        SelectedItem="{Binding SelectedLocalization}"
-                        Width="360"
-                        Height="40"
-                        Padding="0">
-                        <ComboBox.DataTemplates>
-                            <DataTemplate DataType="globalization:CultureInfo">
-                                <Label Classes="Heading2I"
-                                       Content="{Binding NativeName}" />
-                            </DataTemplate>
-                        </ComboBox.DataTemplates>
-                    </ComboBox>
-                    
-                                    
-                    <Button 
-                        Grid.Row="0" Grid.Column="1"
-                        HorizontalAlignment="Right"
-                        Width="240"
-                        Content="{dloc:Localize SettingsGeneral/ShowLogWindow}"
-                        Classes="Primary"
-                        Command="{Binding CmdShowLogWindow}" />
-                </Grid>
-
-
-                <!-- Online Features -->
-                <Grid ColumnDefinitions="*,*"
-                      IsVisible="{Binding ShowOnlineSettings}">
-                    <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding EnableOnlineFeatures}"
-                              Content="{dloc:Localize SettingsGeneral/EnableOnlineFeatures}" />
-                </Grid>
-
-                <!-- Other Checkboxes -->
-                <Grid ColumnDefinitions="*,*"
-                      RowDefinitions="Auto,Auto,Auto">
-                    <!-- <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding ShowLogWindowOnStartup}" Content="{dloc:Localize SettingsGeneral/ShowLogWindowOnStartup}"/> -->
-                    <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding ShowDmodDevFeatures}"
-                              Content="{dloc:Localize SettingsGeneral/ShowDmodDevFeatures}" />
-                    <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding UseRelativePathForSubfolders}"
-                              Content="{dloc:Localize SettingsGeneral/UseRelativePathForSubfolders}" />
-                    <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding QuitMartridgeOnGameLaunch}"
-                              Content="{dloc:Localize SettingsGeneral/QuitMartridgeOnGameLaunch}" />
-                    <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding QuitMartridgeOnEditorLaunch}"
-                              IsVisible="{Binding ShowDmodDevFeatures}"
-                              Content="{dloc:Localize SettingsGeneral/QuitMartridgeOnEditorLaunch}" />
-                </Grid>
+        <Grid>
+            <Grid RowDefinitions="*,Auto"
+                IsVisible="{Binding ExeExtensionViewModel,
+                                Converter={x:Static ObjectConverters.IsNotNull}}">
                 
-                <!-- RefDir -->
-                <Border BorderThickness="1"
-                        BorderBrush="{DynamicResource ThemeBorderHighBrush}"
-                        Margin="6">
-                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
-                        <Label Grid.Row="0" Grid.Column="0" Classes="Heading2B"
-                               Content="{dloc:Localize SettingsGeneral/LaunchRefDirLocation}" />
-                        <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding ShowLaunchRefDirPathInMainWindow}"
-                                  Content="{dloc:Localize SettingsGeneral/ShowLaunchRefDirPathInMainWindow}" />
-                        <Button Grid.Row="0" Grid.Column="2"
-                                Content="{dloc:Localize SettingsGeneral/LaunchRefDirLocation/Browse}"
-                                Classes="Primary"
-                                Command="{Binding CmdLaunchRefDirBrowse}" />
+                <ScrollViewer Grid.Row="0" 
+                              HorizontalScrollBarVisibility="Disabled" 
+                              VerticalScrollBarVisibility="Auto">
+                    <configuration:SettingsExtensionComponentUserControl 
+                        DataContext="{Binding ExeExtensionViewModel}"/>
+                </ScrollViewer>
+                
+                <Grid Grid.Row="1"
+                      ColumnDefinitions="*,Auto,Auto">
+                    <Button Grid.Column="1"
+                            Classes="Primary"
+                            Content="{dloc:Localize SettingsGeneral/ExeExtension/ButtonOk}"
+                            Command="{Binding CmdExeExtensionOk}"/>
+                    <Button Grid.Column="2"
+                            Content="{dloc:Localize SettingsGeneral/ExeExtension/ButtonCancel}"
+                            Command="{Binding CmdExeExtensionCancel}"/>
+                </Grid>
+            </Grid>
+            
+            <Grid RowDefinitions="Auto, *"
+                  IsVisible="{Binding ExeExtensionViewModel,
+                                Converter={x:Static ObjectConverters.IsNull}}">
+                <StackPanel Grid.Row="0">
 
-                        <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
-                                 Text="{Binding LaunchRefDirPath}" />
+                    <!-- Localization -->
+                    <Grid ColumnDefinitions="*, Auto"
+                          RowDefinitions="Auto,Auto">
+                        <Label Grid.Row="0" Grid.Column="0 " Classes="Heading2B"
+                               Content="{dloc:Localize SettingsGeneral/Localization}" />
+                        <ComboBox 
+                            Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
+                            ItemsSource="{Binding Localizations}"
+                            HorizontalAlignment="Left"
+                            SelectedItem="{Binding SelectedLocalization}"
+                            Width="360"
+                            Height="40"
+                            Padding="0">
+                            <ComboBox.DataTemplates>
+                                <DataTemplate DataType="globalization:CultureInfo">
+                                    <Label Classes="Heading2I"
+                                           Content="{Binding NativeName}" />
+                                </DataTemplate>
+                            </ComboBox.DataTemplates>
+                        </ComboBox>
                         
-                        <Label Grid.Row="2" Grid.Column="0" Classes="Heading2B"
-                               Content="{dloc:Localize SettingsGeneral/LaunchCustomUserArguments}" />
-                        <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding ShowLaunchCustomArgsInMainWindow}"
-                                  Content="{dloc:Localize SettingsGeneral/ShowLaunchCustomArgsInMainWindow}" />
-                        <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
-                                 Text="{Binding LaunchCustomUserArguments}" />
+                                        
+                        <Button 
+                            Grid.Row="0" Grid.Column="1"
+                            HorizontalAlignment="Right"
+                            Width="240"
+                            Content="{dloc:Localize SettingsGeneral/ShowLogWindow}"
+                            Classes="Primary"
+                            Command="{Binding CmdShowLogWindow}" />
                     </Grid>
-                </Border>
-            </StackPanel>
 
 
-            <Grid Grid.Row="1" x:Name="gridPathSettings">
-                <ContentPresenter
-                    Content="{Binding Bounds.Height, ElementName=gridPathSettings, 
-                        Converter={StaticResource DoubleCompareBoolConverter},
-                        ConverterParameter={StaticResource MinimumPathUiHeightThreshold}}">
-                    <ContentPresenter.ContentTemplate>
-                        <martridge:GenericTemplateSelector>
-                            <DataTemplate x:Key="true">
-                                <Grid
-                                    x:Name="gridPathSettingsMain"
-                                    DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=configuration:SettingsGeneralView}}">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="{Binding ShowDmodDevFeatures,
-                                                Converter={StaticResource BoolToGridSizeZeroStarConverter}}"/>
-                                    </Grid.RowDefinitions>
-                                    
-                                    <configuration:SettingsGeneralDefaultDmodLocationsUserControl 
-                                        Grid.Row="0"/>
-                                    <configuration:SettingsGeneralAdditionalDmodLocationsUserControl 
-                                        Grid.Row="1"/>
+                    <!-- Online Features -->
+                    <Grid ColumnDefinitions="*,*"
+                          IsVisible="{Binding ShowOnlineSettings}">
+                        <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding EnableOnlineFeatures}"
+                                  Content="{dloc:Localize SettingsGeneral/EnableOnlineFeatures}" />
+                    </Grid>
 
-                                    <configuration:SettingsGeneralAddGameExeUserControl 
-                                        Grid.Row="2"/>
-                                    
-                                    <configuration:SettingsGeneralAddEditorExeUserControl 
-                                        Grid.Row="3" 
-                                        IsVisible="{Binding ShowDmodDevFeatures}"/>
-                                </Grid>
-                            </DataTemplate>
-                            <DataTemplate x:Key="false">
-                                <Grid x:Name="gridPathSettingsAlternative"
-                                      DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=configuration:SettingsGeneralView}}">
-                                    <TabControl>
-                                        <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathDmod}"
-                                                 Classes="SmallTab">
-                                            <Grid RowDefinitions="Auto,*">
-                                                <configuration:SettingsGeneralDefaultDmodLocationsUserControl Grid.Row="0"/>
-                                                <configuration:SettingsGeneralAdditionalDmodLocationsUserControl Grid.Row="1"/>
-                                            </Grid>
-                                        </TabItem>
-                                        <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathGame}"
-                                                 Classes="SmallTab">
-                                            <configuration:SettingsGeneralAddGameExeUserControl />
-                                        </TabItem>
-                                        <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathEditor}"
-                                                 Classes="SmallTab"
-                                                 IsVisible="{Binding ShowDmodDevFeatures}">
-                                            <configuration:SettingsGeneralAddEditorExeUserControl />
-                                        </TabItem>
-                                    </TabControl>
-                                </Grid>
-                            </DataTemplate>
-                        </martridge:GenericTemplateSelector>
-                    </ContentPresenter.ContentTemplate>
-                </ContentPresenter>
+                    <!-- Other Checkboxes -->
+                    <Grid ColumnDefinitions="*,*"
+                          RowDefinitions="Auto,Auto,Auto">
+                        <!-- <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding ShowLogWindowOnStartup}" Content="{dloc:Localize SettingsGeneral/ShowLogWindowOnStartup}"/> -->
+                        <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding ShowDmodDevFeatures}"
+                                  Content="{dloc:Localize SettingsGeneral/ShowDmodDevFeatures}" />
+                        <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding UseRelativePathForSubfolders}"
+                                  Content="{dloc:Localize SettingsGeneral/UseRelativePathForSubfolders}" />
+                        <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding QuitMartridgeOnGameLaunch}"
+                                  Content="{dloc:Localize SettingsGeneral/QuitMartridgeOnGameLaunch}" />
+                        <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding QuitMartridgeOnEditorLaunch}"
+                                  IsVisible="{Binding ShowDmodDevFeatures}"
+                                  Content="{dloc:Localize SettingsGeneral/QuitMartridgeOnEditorLaunch}" />
+                    </Grid>
+                    
+                    <!-- RefDir -->
+                    <Border BorderThickness="1"
+                            BorderBrush="{DynamicResource ThemeBorderHighBrush}"
+                            Margin="6">
+                        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                            <Label Grid.Row="0" Grid.Column="0" Classes="Heading2B"
+                                   Content="{dloc:Localize SettingsGeneral/LaunchRefDirLocation}" />
+                            <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding ShowLaunchRefDirPathInMainWindow}"
+                                      Content="{dloc:Localize SettingsGeneral/ShowLaunchRefDirPathInMainWindow}" />
+                            <Button Grid.Row="0" Grid.Column="2"
+                                    Content="{dloc:Localize SettingsGeneral/LaunchRefDirLocation/Browse}"
+                                    Classes="Primary"
+                                    Command="{Binding CmdLaunchRefDirBrowse}" />
+
+                            <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                                     Text="{Binding LaunchRefDirPath}" />
+                            
+                            <Label Grid.Row="2" Grid.Column="0" Classes="Heading2B"
+                                   Content="{dloc:Localize SettingsGeneral/LaunchCustomUserArguments}" />
+                            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding ShowLaunchCustomArgsInMainWindow}"
+                                      Content="{dloc:Localize SettingsGeneral/ShowLaunchCustomArgsInMainWindow}" />
+                            <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
+                                     Text="{Binding LaunchCustomUserArguments}" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+
+                <Grid Grid.Row="1" x:Name="gridPathSettings">
+                    <ContentPresenter
+                        Content="{Binding Bounds.Height, ElementName=gridPathSettings, 
+                            Converter={StaticResource DoubleCompareBoolConverter},
+                            ConverterParameter={StaticResource MinimumPathUiHeightThreshold}}">
+                        <ContentPresenter.ContentTemplate>
+                            <martridge:GenericTemplateSelector>
+                                <DataTemplate x:Key="true">
+                                    <Grid
+                                        x:Name="gridPathSettingsMain"
+                                        DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=configuration:SettingsGeneralView}}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="{Binding ShowDmodDevFeatures,
+                                                    Converter={StaticResource BoolToGridSizeZeroStarConverter}}"/>
+                                        </Grid.RowDefinitions>
+                                        
+                                        <configuration:SettingsGeneralDefaultDmodLocationsUserControl 
+                                            Grid.Row="0"/>
+                                        <configuration:SettingsGeneralAdditionalDmodLocationsUserControl 
+                                            Grid.Row="1"/>
+
+                                        <configuration:SettingsGeneralAddGameExeUserControl 
+                                            Grid.Row="2"/>
+                                        
+                                        <configuration:SettingsGeneralAddEditorExeUserControl 
+                                            Grid.Row="3" 
+                                            IsVisible="{Binding ShowDmodDevFeatures}"/>
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate x:Key="false">
+                                    <Grid x:Name="gridPathSettingsAlternative"
+                                          DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=configuration:SettingsGeneralView}}">
+                                        <TabControl>
+                                            <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathDmod}"
+                                                     Classes="SmallTab">
+                                                <Grid RowDefinitions="Auto,*">
+                                                    <configuration:SettingsGeneralDefaultDmodLocationsUserControl Grid.Row="0"/>
+                                                    <configuration:SettingsGeneralAdditionalDmodLocationsUserControl Grid.Row="1"/>
+                                                </Grid>
+                                            </TabItem>
+                                            <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathGame}"
+                                                     Classes="SmallTab">
+                                                <configuration:SettingsGeneralAddGameExeUserControl />
+                                            </TabItem>
+                                            <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathEditor}"
+                                                     Classes="SmallTab"
+                                                     IsVisible="{Binding ShowDmodDevFeatures}">
+                                                <configuration:SettingsGeneralAddEditorExeUserControl />
+                                            </TabItem>
+                                        </TabControl>
+                                    </Grid>
+                                </DataTemplate>
+                            </martridge:GenericTemplateSelector>
+                        </ContentPresenter.ContentTemplate>
+                    </ContentPresenter>
+                </Grid>
             </Grid>
         </Grid>
     </Border>

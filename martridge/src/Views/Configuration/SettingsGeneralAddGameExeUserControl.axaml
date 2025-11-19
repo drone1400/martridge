@@ -22,29 +22,44 @@
     <Border BorderThickness="1"
             BorderBrush="{DynamicResource ThemeBorderHighBrush}"
             Margin="6,3">
-        <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,*,Auto">
-            <Label Grid.Row="0" Grid.Column="0" Classes="Heading2B"
-                   Content="{dloc:Localize SettingsGeneral/GameExePaths}" />
-            
-            <Button Grid.Row="0" Grid.Column="2"
-                    Content="{dloc:Localize SettingsGeneral/GameExePaths_Remove}"
-                    Command="{Binding CmdGameExeRemoveSelected}" />
-            
-            <TextBox Grid.Row="2" Grid.Column="0" 
+        <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,*">
+            <TextBox Grid.Row="0" Grid.Column="0" 
+                     UseFloatingWatermark="True"
+                     Watermark="{dloc:Localize SettingsGeneral/GameExePaths}"
                      Text="{Binding GameExeAddNewManualValue}"/>
-            
-            <Button Grid.Row="2" Grid.Column="1"
+            <Button Grid.Row="0" Grid.Column="1"
                     Content="{dloc:Localize SettingsGeneral/GameExePaths_AddManual}"
                     Classes="Primary"
                     Command="{Binding CmdGameExeAddNewManual}" />
-            <Button Grid.Row="2" Grid.Column="2"
+            <Button Grid.Row="0" Grid.Column="2"
                     Content="{dloc:Localize SettingsGeneral/GameExePaths_AddBrowse}"
                     Classes="Primary"
                     Command="{Binding CmdGameExeAddNew}" />
 
             <ListBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
-                     ItemsSource="{Binding GameExePaths}"
-                     SelectedIndex="{Binding ActiveGameExeIndex}" />
+                     ItemsSource="{Binding GameExePaths}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                            <Button Grid.Column="0"
+                                    IsVisible="{Binding $parent[ListBoxItem].IsSelected}"
+                                    Command="{Binding $parent[UserControl].DataContext.CmdExeExtensionEdit}"
+                                    CommandParameter="{Binding }" 
+                                    Classes="ListBoxButton">
+                                <Path Classes="ListBoxIconGear" />
+                            </Button>
+                            <TextBlock Grid.Column="2" Text="{Binding}"></TextBlock>
+                            <Button Grid.Column="1"
+                                    IsVisible="{Binding $parent[ListBoxItem].IsSelected}"
+                                    Command="{Binding $parent[UserControl].DataContext.CmdGameExeRemove}"
+                                    CommandParameter="{Binding }" 
+                                    Classes="ListBoxButton">
+                                <Path Classes="ListBoxIconTrashCan" />
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Grid>
     </Border>
 </UserControl>

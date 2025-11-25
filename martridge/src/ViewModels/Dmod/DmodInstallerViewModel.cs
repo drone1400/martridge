@@ -175,10 +175,14 @@ namespace Martridge.ViewModels.Dmod {
         // ------------------------------------------------------------------------------------------
         //      Constructor
         //
-        
+
         public DmodInstallerViewModel() {
             this.ResetInstallerState();
-            
+            this.InitializeValidationRules();
+            this.InitializeFromConfig();
+            this.InitializeDmodLocations();
+        }
+        private void InitializeValidationRules() {
             // validate source DMOD
             this.ValidationRule(x => x.TemporaryDmodSource,
                 dmodSource => {
@@ -223,42 +227,14 @@ namespace Martridge.ViewModels.Dmod {
                 Localizer.Instance["DmodInstaller/ViewModel/Validation/DestinationAlreadyExists"]);
         }
 
-        protected override void Dispose(bool disposing) {
-            base.Dispose(disposing);
-            
-            if (this._installerLogic != null && this._installerLogic.InstallPhase != DmodInstallPhase.Finished)
-                this._installerLogic.Cancel();
-        }
-
-        protected override void OnConfigGeneralChanged() {
-            this.InitializeDmodLocations();
-        }
-        protected override void OnCfgGeneralUpdated(object? sender, ConfigUpdateEventArgs e) {
-            this.InitializeDmodLocations();
-        }
-
-        private void InitializeDmodLocations() {
-            if (this.CfgGeneral == null) return;
-            this.BaseDestinations.Clear();
-            List<DirectoryInfo> dmodPlaces = this.CfgGeneral.GetRealDmodDirectories();
-
-            foreach (DirectoryInfo dirInfo in dmodPlaces) {
-                this.BaseDestinations.Add(dirInfo);
-            }
-            
-            this.SelectedBaseDestination = dmodPlaces.First();
-        }
-
-        protected override void OnConfigRememberChanged() {
-            if (this.CfgRemember == null) return;
-            
-            if (this._installerLogic == null || this._installerLogic.InstallPhase != DmodInstallPhase.Inactive) {
-                this.TemporaryDmodSource = this.CfgRemember.InstallDmodSourcePath;
-                if (string.IsNullOrWhiteSpace(this.CfgRemember.InstallDmodDestinationBaseDirectory) == false) {
+        private void InitializeFromConfig() {
+            if (this._installerLogic == null || this._installerLogic.InstallPhase == DmodInstallPhase.Inactive) {
+                this.TemporaryDmodSource = this.CfgAppState.InstallDmodSourcePath;
+                if (string.IsNullOrWhiteSpace(this.CfgAppState.InstallDmodDestinationBaseDirectory) == false) {
                     foreach (DirectoryInfo x in this.BaseDestinations) {
                         if (LocationHelper.PathIsEqual(
                                 x.FullName, 
-                                this.CfgRemember.InstallDmodDestinationBaseDirectory, 
+                                this.CfgAppState.InstallDmodDestinationBaseDirectory, 
                                 LocationHelperPathCompareFlags.IgnoreDirectorySeparator)) 
                         {
                             this.SelectedBaseDestination = x;
@@ -267,6 +243,28 @@ namespace Martridge.ViewModels.Dmod {
                     }
                 }
             }
+        }
+
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+            
+            if (this._installerLogic != null && this._installerLogic.InstallPhase != DmodInstallPhase.Finished)
+                this._installerLogic.Cancel();
+        }
+        
+        protected override void OnCfgGeneralUpdated(object? sender, ConfigUpdateEventArgs e) {
+            this.InitializeDmodLocations();
+        }
+
+        private void InitializeDmodLocations() {
+            this.BaseDestinations.Clear();
+            List<DirectoryInfo> dmodPlaces = this.CfgGeneral.GetRealDmodDirectories();
+
+            foreach (DirectoryInfo dirInfo in dmodPlaces) {
+                this.BaseDestinations.Add(dirInfo);
+            }
+            
+            this.SelectedBaseDestination = dmodPlaces.First();
         }
 
         // ------------------------------------------------------------------------------------------
@@ -494,13 +492,11 @@ namespace Martridge.ViewModels.Dmod {
 
         private void RememberSelections() {
             try {
-                if (this.CfgRemember != null) {
-                    Dictionary<string, object?> values = new Dictionary<string, object?>() {
-                        [nameof(ConfigAppState.InstallDmodSourcePath)] = this.TemporaryDmodSource,
-                        [nameof(ConfigAppState.InstallDmodDestinationBaseDirectory)] = this.SelectedBaseDestination?.FullName ?? "",
-                    };
-                    this.CfgRemember.UpdateProperties(values);
-                }
+                Dictionary<string, object?> values = new Dictionary<string, object?>() {
+                    [nameof(ConfigAppState.InstallDmodSourcePath)] = this.TemporaryDmodSource,
+                    [nameof(ConfigAppState.InstallDmodDestinationBaseDirectory)] = this.SelectedBaseDestination?.FullName ?? "",
+                };
+                this.CfgAppState.UpdateProperties(values);
             } catch (Exception ex)
             {
                 MyTrace.Global.WriteException(ex);

@@ -248,6 +248,22 @@ namespace Martridge.ViewModels.DinkInstaller
             //this.SelectedInstallableVersionIndex = 0;
             this.PropertyChanged += this.DinkInstallerViewModel_PropertyChanged;
             
+            this.InitializeValidationRules();
+            this.InitializeFromConfig();
+
+            this._dinkInstallerConfigFileSourceUpdateTimer = new Timer() {
+                Interval = 1000,
+                AutoReset = true,
+            };
+            this._dinkInstallerConfigFileSourceUpdateTimer.Elapsed += ( _,  _) => {
+                this._dinkInstallerConfigFileSourceUpdateTimer.Stop();
+                this.CfgGeneral.UpdateProperties(new Dictionary<string, object?>() {
+                    [nameof(ConfigGeneral.DinkInstallerConfigFileSource)] = this.DinkInstallerConfigFileSource,
+                });
+            };
+        }
+
+        private void InitializeValidationRules() {
             this.ValidationRule(x => x.DinkInstallerConfigFileSource,
                 configSource => {
                     try
@@ -280,32 +296,16 @@ namespace Martridge.ViewModels.DinkInstaller
                     }
                 },
                 Localizer.Instance["DinkInstallerViewModel/Validation/InstallerSourceInvalid"]);
-
-            this._dinkInstallerConfigFileSourceUpdateTimer = new Timer() {
-                Interval = 1000,
-                AutoReset = true,
-            };
-            this._dinkInstallerConfigFileSourceUpdateTimer.Elapsed += ( _,  _) => {
-                this._dinkInstallerConfigFileSourceUpdateTimer.Stop();
-                if (this.CfgGeneral == null)
-                    return;
-                this.CfgGeneral.UpdateProperties(new Dictionary<string, object?>() {
-                    [nameof(ConfigGeneral.DinkInstallerConfigFileSource)] = this.DinkInstallerConfigFileSource,
-                });
-            };
         }
         
-        protected override void OnConfigGeneralChanged() {
-            if (this.CfgGeneral == null) 
-                return;
+        private void InitializeFromConfig() {
             this.DinkInstallerConfigFileSource = this.CfgGeneral.DinkInstallerConfigFileSource;
             if (string.IsNullOrWhiteSpace(this.DinkInstallerConfigFileSource)) {
                 this.DinkInstallerConfigFileSource = DinkInstallerOnlineListHelper.DefaultConfigInstallerListUrl;
             }
         }
+        
         protected override void OnCfgGeneralUpdated(object? sender, ConfigUpdateEventArgs e) {
-            if (this.CfgGeneral == null) 
-                return;
             if (e.UpdatedProperties.Contains(nameof(ConfigGeneral.DinkInstallerConfigFileSource)) == false)
                 return;
             this.DinkInstallerConfigFileSource = this.CfgGeneral.DinkInstallerConfigFileSource;
@@ -707,7 +707,7 @@ namespace Martridge.ViewModels.DinkInstaller
                     this._installerTraceListener = new MyTraceListenerGui("Installer Trace Listener");
                     this._installerTraceListener.ShowLevels = false;
                     this._installerTraceListener.Levels = MyTraceLevel.Critical | MyTraceLevel.Error | MyTraceLevel.Warning | MyTraceLevel.Information;
-                    this._installerTraceListener.PropertyChanged += ( sender,  args) => {
+                    this._installerTraceListener.PropertyChanged += ( _,  _) => {
                         this.RaisePropertyChanged(nameof(this.InstallerLogText));
                         this.InstallerLogCaretIndex = int.MaxValue;
                     };

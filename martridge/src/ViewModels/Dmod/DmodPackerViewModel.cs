@@ -8,7 +8,6 @@ using Avalonia.Metadata;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Martridge.Models;
-using Martridge.Models.Configuration;
 using Martridge.Models.Configuration.AppState;
 using Martridge.Models.Dmod;
 using Martridge.Models.DmodPacker;
@@ -160,7 +159,11 @@ namespace Martridge.ViewModels.Dmod {
         
         public DmodPackerViewModel() {
             this.ResetPackerState();
-            
+            this.InitializeValidationRules();
+            this.InitializeFromConfig();
+        }
+
+        private void InitializeValidationRules() {
             // validate source DMOD directory
             this.ValidationRule(x => x.TemporaryDmodSourceDirectory,
                 dmodSource => string.IsNullOrWhiteSpace(dmodSource) == false,
@@ -199,20 +202,18 @@ namespace Martridge.ViewModels.Dmod {
                 Localizer.Instance["DmodPacker/ViewModel/Validation/DestinationDmodAlreadyExists"]);
         }
         
+        private void InitializeFromConfig() {
+            if (this._packerLogic == null || this._packerLogic.PackPhase == DmodPackerPhase.Inactive) {
+                this.TemporaryDmodSourceDirectory = this.CfgAppState.PackDmodSourcePath;
+                this.TemporaryDmodDestination = this.CfgAppState.PackDmodDestinationPath;
+            }
+        }
+        
         protected override void Dispose(bool disposing) {
             base.Dispose(disposing);
             
             if (this._packerLogic != null && this._packerLogic.PackPhase != DmodPackerPhase.Finished)
                 this._packerLogic.Cancel();
-        }
-
-        protected override void OnConfigRememberChanged() {
-            if (this.CfgRemember == null) return;
-            
-            if (this._packerLogic == null || this._packerLogic.PackPhase != DmodPackerPhase.Inactive) {
-                this.TemporaryDmodSourceDirectory = this.CfgRemember.PackDmodSourcePath;
-                this.TemporaryDmodDestination = this.CfgRemember.PackDmodDestinationPath;
-            }
         }
 
         // ------------------------------------------------------------------------------------------
@@ -437,7 +438,7 @@ namespace Martridge.ViewModels.Dmod {
                     this._packerTraceListener = new MyTraceListenerGui("Installer Trace Listener");
                     this._packerTraceListener.ShowLevels = false;
                     this._packerTraceListener.Levels = MyTraceLevel.Critical | MyTraceLevel.Error | MyTraceLevel.Warning | MyTraceLevel.Information;
-                    this._packerTraceListener.PropertyChanged += ( sender,  args) => {
+                    this._packerTraceListener.PropertyChanged += ( _,  _) => {
                         this.RaisePropertyChanged(nameof(this.DmodPackerProgressLog));
                         this.DmodPackerProgressLogCaretIndex = int.MaxValue;
                     };
@@ -502,13 +503,11 @@ namespace Martridge.ViewModels.Dmod {
 
         private void RememberSelections() {
             try {
-                if (this.CfgRemember != null) {
-                    Dictionary<string, object?> values = new Dictionary<string, object?>() {
-                        [nameof(ConfigAppState.PackDmodSourcePath)] = this.TemporaryDmodSourceDirectory,
-                        [nameof(ConfigAppState.PackDmodDestinationPath)] = this.TemporaryDmodDestination
-                    };
-                    this.CfgRemember.UpdateProperties(values);
-                }
+                Dictionary<string, object?> values = new Dictionary<string, object?>() {
+                    [nameof(ConfigAppState.PackDmodSourcePath)] = this.TemporaryDmodSourceDirectory,
+                    [nameof(ConfigAppState.PackDmodDestinationPath)] = this.TemporaryDmodDestination
+                };
+                this.CfgAppState.UpdateProperties(values);
             } catch (Exception ex)
             {
                 MyTrace.Global.WriteException(ex);

@@ -178,7 +178,12 @@ namespace Martridge.ViewModels.Configuration {
             
             this.PropertyChanged += OnPropertyChanged;
 
-            
+            this.InitializeFromConfig();
+        }
+
+        private void InitializeFromConfig() {
+            this.LoadFromConfig();
+            this.LoadFromConfigLaunch();
         }
 
         private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
@@ -189,17 +194,9 @@ namespace Martridge.ViewModels.Configuration {
                 }
             }
         }
-
-        protected override void OnConfigGeneralChanged() {
-            this.LoadFromConfig();
-        }
-
+        
         protected override void OnCfgGeneralUpdated(object? sender, ConfigUpdateEventArgs e) {
             this.LoadFromConfig();
-        }
-
-        protected override void OnConfigLaunchChanged() {
-            this.LoadFromConfigLaunch();
         }
 
         protected override void OnCfgLaunchUpdated(object? sender, ConfigUpdateEventArgs e) {
@@ -314,11 +311,7 @@ namespace Martridge.ViewModels.Configuration {
             this.SettingsDone?.Invoke(this, EventArgs.Empty);
         }
 
-        [DependsOn(nameof(CfgGeneral))]
-        [DependsOn(nameof(CfgLaunch))]
         public bool CanCmdSettingsOk(object? parameter = null) {
-            if (this.CfgGeneral == null) { return false; }
-            if (this.CfgLaunch == null) { return false; }
             return true;
         }
 
@@ -333,7 +326,7 @@ namespace Martridge.ViewModels.Configuration {
             // signal that settings are done...
             this.SettingsDone?.Invoke(this, EventArgs.Empty);
         }
-        [DependsOn(nameof(CfgGeneral))]
+        
         public bool CanCmdSettingsCancel(object? parameter = null) {
             //if (this.Configuration == null) { return false; }
             return true;
@@ -749,18 +742,15 @@ namespace Martridge.ViewModels.Configuration {
         }
         [DependsOn(nameof(IsBusy))]
         [DependsOn(nameof(ExeExtensionViewModel))]
-        [DependsOn(nameof(CfgExtension))]
         public bool CanCmdExeExtensionEdit(object? parameter = null) {
             if (parameter is not string) return false;
             if (this.IsBusy ) return false;
             if (this.ExeExtensionViewModel != null) return false;
-            if (this.CfgExtension == null) return false;
             return true;
         }
         
         public void CmdExeExtensionOk(object? parameter = null) {
             if (this.ExeExtensionViewModel == null) return;
-            if (this.CfgExtension == null) return;
 
             try {
                 try {
@@ -807,7 +797,6 @@ namespace Martridge.ViewModels.Configuration {
             } 
         }
         [DependsOn(nameof(ExeExtensionViewModel))]
-        [DependsOn(nameof(CfgExtension))]
         public bool CanCmdExeExtensionOk(object? parameter = null) {
             return this.ExeExtensionViewModel != null;
         }
@@ -816,7 +805,6 @@ namespace Martridge.ViewModels.Configuration {
             this.ExeExtensionViewModel = null;
         }
         [DependsOn(nameof(ExeExtensionViewModel))]
-        [DependsOn(nameof(CfgExtension))]
         public bool CanCmdExeExtensionCancel(object? parameter = null) {
             return this.ExeExtensionViewModel != null;
         }

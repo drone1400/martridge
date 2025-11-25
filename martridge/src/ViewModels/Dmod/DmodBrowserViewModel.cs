@@ -40,6 +40,9 @@ namespace Martridge.ViewModels.Dmod {
         
         private readonly Timer _dmodLauncherDelay;
         private readonly Timer _dmodSearchTimer;
+        
+        // this is so we don't override the app state until the view model has been fully initialized...
+        private bool _canSaveSelectedDmodNameToAppState = false;
 
         /// <summary>
         /// Constructor for Local Dmod Browser / Launcher View Model
@@ -50,7 +53,7 @@ namespace Martridge.ViewModels.Dmod {
                 Interval = 5000,
                 AutoReset = true,
             };
-            this._dmodLauncherDelay.Elapsed += ( sender,  args) => {
+            this._dmodLauncherDelay.Elapsed += ( _, _) => {
                 this._dmodLauncherDelay.Stop();
                 this.DmodLauncherWaitingForDelay = false;
             };
@@ -60,15 +63,18 @@ namespace Martridge.ViewModels.Dmod {
                 Interval = 200,
                 AutoReset = true,
             };
-            this._dmodSearchTimer.Elapsed += ( sender,  args) => {
+            this._dmodSearchTimer.Elapsed += ( _, _) => {
                 this._dmodSearchTimer.Stop();
                 this.InitializeFilteredDmods(this._lastusedDmodDefinitions);
             };
             
             // self properties changed
-            this.PropertyChanged += this.OnPropertyChanged; 
+            this.PropertyChanged += this.OnPropertyChanged;
 
+
+            this.InitializeFromConfig();
         }
+        
         private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
             try {
                 switch (e.PropertyName) {
@@ -88,39 +94,40 @@ namespace Martridge.ViewModels.Dmod {
                 MyTrace.Global.WriteException(ex);
             }
         }
-
-        protected override void OnConfigGeneralChanged() {
+        
+        private void InitializeFromConfig() {
             this.LoadFromConfigGeneral();
 
-            this.InitializeSelectedDmodFromRemembered();
+            // restore selected dmod...
+            this.SelectDmodByPath(this.CfgAppState.DmodBrowserSelectedDmodPath);
+            
+            // reset flags so the values get updated in the UI...
+            this.DmodBrowserLeftPanelColumnWidthSet = false;
+            this.DmodBrowserRightPanelColumnWidthSet = false;
+            // write actual values
+            this.DmodBrowserLeftPanelColumnWidth = new GridLength(this.CfgAppState.DmodBrowserLeftPanelColumnWidth, GridUnitType.Star);
+            this.DmodBrowserRightPanelColumnWidth = new GridLength(this.CfgAppState.DmodBrowserRightPanelColumnWidth, GridUnitType.Star);
         }
+
+        public void InitializeDmodManager(DmodManager dmodManager, bool restoreSelectedDmod) {
+            this.DmodManager = dmodManager;
+            
+            if (restoreSelectedDmod) {
+                this.SelectDmodByPath(this.CfgAppState.DmodBrowserSelectedDmodPath);
+            }
+
+            this._canSaveSelectedDmodNameToAppState = true;
+        }
+        
         protected override void OnCfgGeneralUpdated(object? sender, ConfigUpdateEventArgs e) {
             this.LoadFromConfigGeneral();
-        }
-
-        protected override void OnConfigLaunchChanged() {
-            this.LoadFromConfigLauncher();
         }
 
         protected override void OnCfgLaunchUpdated(object? sender, ConfigUpdateEventArgs e) {
             this.LoadFromConfigLauncher();
         }
-
-        protected override void OnConfigRememberChanged() {
-            this.InitializeSelectedDmodFromRemembered();
-
-            if (this.CfgRemember == null)
-                return;
-
-            // reset flags so the values get updated in the UI...
-            this.DmodBrowserLeftPanelColumnWidthSet = false;
-            this.DmodBrowserRightPanelColumnWidthSet = false;
-            // write actual values
-            this.DmodBrowserLeftPanelColumnWidth = new GridLength(this.CfgRemember.DmodBrowserLeftPanelColumnWidth, GridUnitType.Star);
-            this.DmodBrowserRightPanelColumnWidth = new GridLength(this.CfgRemember.DmodBrowserRightPanelColumnWidth, GridUnitType.Star);
-        }
-
-        protected override void OnCfgRememberUpdated(object? sender, ConfigUpdateEventArgs e) {
+        
+        protected override void OnCfgAppStateUpdated(object? sender, ConfigUpdateEventArgs e) {
             // don't care...
         }
 
@@ -140,10 +147,6 @@ namespace Martridge.ViewModels.Dmod {
             // as a fallback, make sure the current item is selected
             this.SelectDmodFromCollectionViewCurentItem();
         }
-        private void InitializeSelectedDmodFromRemembered() {
-            if (this.CfgRemember == null) return;
-            this.SelectDmodByPath(this.CfgRemember.DmodBrowserSelectedDmodPath);
-        }
 
         #endregion
         
@@ -162,7 +165,7 @@ namespace Martridge.ViewModels.Dmod {
                 Dictionary<string, object?> values = new Dictionary<string, object?>() {
                     [nameof(ConfigAppState.DmodBrowserLeftPanelColumnWidth)] = value.Value,
                 };
-                this.CfgRemember?.UpdateProperties(values);
+                this.CfgAppState.UpdateProperties(values);
             }
         }
         private GridLength _dmodBrowserLeftPanelColumnWidth = new GridLength(1.0, GridUnitType.Star); 
@@ -180,7 +183,7 @@ namespace Martridge.ViewModels.Dmod {
                 Dictionary<string, object?> values = new Dictionary<string, object?>() {
                     [nameof(ConfigAppState.DmodBrowserRightPanelColumnWidth)] = value.Value,
                 };
-                this.CfgRemember?.UpdateProperties(values);
+                this.CfgAppState.UpdateProperties(values);
             }
         }
         private GridLength _dmodBrowserRightPanelColumnWidth = new GridLength(1.0, GridUnitType.Star);
@@ -545,7 +548,7 @@ namespace Martridge.ViewModels.Dmod {
         
         public DmodManager? DmodManager {
             get => this._dmodManager;
-            set {
+            private set {
                 if (this._dmodManager != null) {
                     this._dmodManager.DmodListInitialized -= this.DmodManager_DmodListInitialized;
                     this._dmodManager = null;
@@ -656,11 +659,11 @@ namespace Martridge.ViewModels.Dmod {
             if (this.DmodDefinitionsCollection is IDataGridCollectionView dgcv) {
                 this.SelectedDmodDefinition = dgcv.CurrentItem as DmodDefinition;
 
-                if (this.SelectedDmodDefinition != null && this.CfgRemember != null) {
+                if (this._canSaveSelectedDmodNameToAppState && this.SelectedDmodDefinition != null) {
                     Dictionary<string, object?> values = new Dictionary<string, object?>() {
                         [nameof(ConfigAppState.DmodBrowserSelectedDmodPath)] = this.SelectedDmodDefinition.DmodDirectory
                     };
-                    this.CfgRemember.UpdateProperties(values);
+                    this.CfgAppState.UpdateProperties(values);
                 }
             }
             else {
@@ -723,8 +726,7 @@ namespace Martridge.ViewModels.Dmod {
             try {
                 bool launchEditor = false;
                 if (parameter is string str && str == this.LaunchEditorParameter) launchEditor = true;
-
-                if (this.CfgLaunch == null) return;
+                
                 if (this.DmodManager is not DmodManager dmodMan) return;
                 //if (!this.GameExeFound) return;
                 if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.DmodDirectory)) return;
@@ -742,7 +744,7 @@ namespace Martridge.ViewModels.Dmod {
                 this.SaveToConfigLauncher();
                 this.SaveActiveIndexToConfigGeneral();
 
-                var extension = this.CfgExtension?.TryAddOrGetExtension(exePath);
+                var extension = this.CfgExtension.TryAddOrGetExtension(exePath);
 
                 // launch dmod with separate task to prevent gui lockup
                 await Task.Run(() => {
@@ -760,13 +762,10 @@ namespace Martridge.ViewModels.Dmod {
         [DependsOn(nameof(ActiveGameExePath))]
         [DependsOn(nameof(ActiveEditorExePath))]
         [DependsOn(nameof(SelectedDmodDefinition))]
-        [DependsOn(nameof(CfgLaunch))]
         public bool CanCmdLaunchDmod(object? parameter = null) {
             try {
-                bool launchEditor = false;
-                if (parameter is string str && str == this.LaunchEditorParameter) launchEditor = true;
+                bool launchEditor = parameter is string str && str == this.LaunchEditorParameter;
                 
-                if (this.CfgLaunch == null) return false;
                 if (this.DmodManager == null) return false;
                 //if (!this.GameExeFound) return false;
                 if (string.IsNullOrEmpty(this.SelectedDmodDefinition?.DmodDirectory)) return false;

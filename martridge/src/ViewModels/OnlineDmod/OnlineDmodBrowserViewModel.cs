@@ -11,7 +11,6 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Metadata;
 using Avalonia.Threading;
-using Martridge.Models.Configuration;
 using Martridge.Models.Configuration.AppState;
 using Martridge.Models.Dmod;
 using Martridge.Models.Localization;
@@ -56,7 +55,7 @@ namespace Martridge.ViewModels.OnlineDmod {
                 Interval = 200,
                 AutoReset = true,
             };
-            this._dmodSearchTimer.Elapsed += ( sender,  args) => {
+            this._dmodSearchTimer.Elapsed += ( _, _) => {
                 this._dmodSearchTimer.Stop();
                 this.InitializeFilteredDmods(this._lastusedDmodDefinitions);
             };
@@ -77,18 +76,17 @@ namespace Martridge.ViewModels.OnlineDmod {
                     this.OnDmodScreenshotVmChanged();
                 }
             };
+            
+            this.InitializeFromConfig();
         }
-        
-        protected override void OnConfigRememberChanged() {
-            if (this.CfgRemember == null)
-                return;
 
+        private void InitializeFromConfig() {
             // reset flags so the values get updated in the UI...
             this.OnlineDmodBrowserLeftPanelColumnWidthSet = false;
             this.OnlineDmodBrowserRightPanelColumnWidthSet = false;
             // write actual values
-            this.OnlineDmodBrowserLeftPanelColumnWidth = new GridLength(this.CfgRemember.OnlineDmodBrowserLeftPanelColumnWidth, GridUnitType.Star);
-            this.OnlineDmodBrowserRightPanelColumnWidth = new GridLength(this.CfgRemember.OnlineDmodBrowserRightPanelColumnWidth, GridUnitType.Star);
+            this.OnlineDmodBrowserLeftPanelColumnWidth = new GridLength(this.CfgAppState.OnlineDmodBrowserLeftPanelColumnWidth, GridUnitType.Star);
+            this.OnlineDmodBrowserRightPanelColumnWidth = new GridLength(this.CfgAppState.OnlineDmodBrowserRightPanelColumnWidth, GridUnitType.Star);
         }
         
         #region CONFIGURATION - remembered layout
@@ -106,7 +104,7 @@ namespace Martridge.ViewModels.OnlineDmod {
                 Dictionary<string, object?> values = new Dictionary<string, object?>() {
                     [nameof(ConfigAppState.OnlineDmodBrowserLeftPanelColumnWidth)] = value.Value,
                 };
-                this.CfgRemember?.UpdateProperties(values);
+                this.CfgAppState.UpdateProperties(values);
             }
         }
         private GridLength _onlineDmodBrowserLeftPanelColumnWidth = new GridLength(1.0, GridUnitType.Star); 
@@ -124,7 +122,7 @@ namespace Martridge.ViewModels.OnlineDmod {
                 Dictionary<string, object?> values = new Dictionary<string, object?>() {
                     [nameof(ConfigAppState.OnlineDmodBrowserRightPanelColumnWidth)] = value.Value,
                 };
-                this.CfgRemember?.UpdateProperties(values);
+                this.CfgAppState.UpdateProperties(values);
             }
         }
         private GridLength _onlineDmodBrowserRightPanelColumnWidth = new GridLength(1.0, GridUnitType.Star);
@@ -248,7 +246,7 @@ namespace Martridge.ViewModels.OnlineDmod {
         }
         
         /// <summary>
-        /// Initializes filtered dmods list for the view using current <see cref="DmodDefinitions"/>
+        /// Initializes filtered dmods list for the view using current <see cref="OnlineDmodInfoViewModel"/>
         /// </summary>
         private void InitializeFilteredDmods(List<OnlineDmodInfoViewModel> newDmodList) {
             this._lastusedDmodDefinitions = newDmodList;

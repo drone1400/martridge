@@ -12,6 +12,7 @@ using Avalonia.Controls;
 using Avalonia.Metadata;
 using Avalonia.Threading;
 using Martridge.Models.Configuration;
+using Martridge.Models.Configuration.AppState;
 using Martridge.Models.Dmod;
 using Martridge.Models.Localization;
 using Martridge.Models.OnlineDmods;
@@ -103,7 +104,7 @@ namespace Martridge.ViewModels.OnlineDmod {
             set {
                 this.RaiseAndSetIfChanged(ref this._onlineDmodBrowserLeftPanelColumnWidth, value);
                 Dictionary<string, object?> values = new Dictionary<string, object?>() {
-                    [nameof(ConfigRemember.OnlineDmodBrowserLeftPanelColumnWidth)] = value.Value,
+                    [nameof(ConfigAppState.OnlineDmodBrowserLeftPanelColumnWidth)] = value.Value,
                 };
                 this.CfgRemember?.UpdateProperties(values);
             }
@@ -121,7 +122,7 @@ namespace Martridge.ViewModels.OnlineDmod {
             set {
                 this.RaiseAndSetIfChanged(ref this._onlineDmodBrowserRightPanelColumnWidth, value);
                 Dictionary<string, object?> values = new Dictionary<string, object?>() {
-                    [nameof(ConfigRemember.OnlineDmodBrowserRightPanelColumnWidth)] = value.Value,
+                    [nameof(ConfigAppState.OnlineDmodBrowserRightPanelColumnWidth)] = value.Value,
                 };
                 this.CfgRemember?.UpdateProperties(values);
             }

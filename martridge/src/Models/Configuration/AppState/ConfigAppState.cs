@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Martridge.Models.Configuration.Save;
-namespace Martridge.Models.Configuration {
-    public class ConfigRemember : IConfigGeneric{
+namespace Martridge.Models.Configuration.AppState {
+    public class ConfigAppState : IConfigGeneric{
 
         public event EventHandler<ConfigUpdateEventArgs>? Updated;
 

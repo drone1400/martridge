@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Martridge.Models.Configuration.Save;
-namespace Martridge.Models.Configuration {
+using Martridge.Models.Configuration.Launcher.FileData;
+namespace Martridge.Models.Configuration.Launcher {
     public class ConfigExtension {
 
         public IReadOnlyDictionary<string, ConfigExtensionComponent> Extensions {

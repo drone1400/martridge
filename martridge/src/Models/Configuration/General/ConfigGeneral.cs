@@ -1,11 +1,10 @@
-﻿using Martridge.Models.Configuration.Save;
-using Martridge.Trace;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-
-namespace Martridge.Models.Configuration {
+using Martridge.Models.Configuration.General.FileData;
+using Martridge.Trace;
+namespace Martridge.Models.Configuration.General {
     public class ConfigGeneral : IConfigGeneric {
         public event EventHandler<ConfigUpdateEventArgs>? Updated;
 

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-
-namespace Martridge.Models.Configuration.Save {
+namespace Martridge.Models.Configuration.Installer.FileData {
     
     /// <summary>
     /// Class used for JSON serialization

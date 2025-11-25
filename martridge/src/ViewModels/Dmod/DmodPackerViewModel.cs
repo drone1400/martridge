@@ -9,6 +9,7 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Martridge.Models;
 using Martridge.Models.Configuration;
+using Martridge.Models.Configuration.AppState;
 using Martridge.Models.Dmod;
 using Martridge.Models.DmodPacker;
 using Martridge.Models.Localization;
@@ -503,8 +504,8 @@ namespace Martridge.ViewModels.Dmod {
             try {
                 if (this.CfgRemember != null) {
                     Dictionary<string, object?> values = new Dictionary<string, object?>() {
-                        [nameof(ConfigRemember.PackDmodSourcePath)] = this.TemporaryDmodSourceDirectory,
-                        [nameof(ConfigRemember.PackDmodDestinationPath)] = this.TemporaryDmodDestination
+                        [nameof(ConfigAppState.PackDmodSourcePath)] = this.TemporaryDmodSourceDirectory,
+                        [nameof(ConfigAppState.PackDmodDestinationPath)] = this.TemporaryDmodDestination
                     };
                     this.CfgRemember.UpdateProperties(values);
                 }

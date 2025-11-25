@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Martridge.Models.Configuration.Save;
-namespace Martridge.Models.Configuration {
+﻿using Martridge.Models.Configuration.Launcher.FileData;
+namespace Martridge.Models.Configuration.Launcher {
     public class ConfigExtensionLinuxWine {
 
         /// <summary>

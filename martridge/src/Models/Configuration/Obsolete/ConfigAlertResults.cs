@@ -1,9 +1,8 @@
-using Martridge.Models.Configuration.Save;
-using Martridge.ViewModels.DinkyAlerts;
 using System;
 using System.Collections.Generic;
-
-namespace Martridge.Models.Configuration {
+using Martridge.Models.Configuration.Save;
+using Martridge.ViewModels.DinkyAlerts;
+namespace Martridge.Models.Configuration.Obsolete {
     
     /// <summary>
     /// This class was used in a previous version to keep track of remembered results for popup-alert prompts...

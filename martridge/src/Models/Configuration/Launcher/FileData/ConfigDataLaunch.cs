@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-namespace Martridge.Models.Configuration.Save {
+namespace Martridge.Models.Configuration.Launcher.FileData {
     public class ConfigDataLaunch {
         
         /// <summary>

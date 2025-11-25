@@ -13,6 +13,8 @@ using Avalonia.Threading;
 using Citrus.Avalonia;
 using Martridge.Models;
 using Martridge.Models.Configuration;
+using Martridge.Models.Configuration.AppState;
+using Martridge.Models.Configuration.General;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using Martridge.ViewModels;
@@ -42,7 +44,7 @@ namespace Martridge {
             if (this.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
                 MyTrace.Global.Listeners.Add(this._console);
                 
-                if (this._config.Remember.LogWindowShowOnStartup) {
+                if (this._config.AppState.LogWindowShowOnStartup) {
                     this.ShowLogWindow();
                 }
                 
@@ -407,11 +409,11 @@ namespace Martridge {
 
                 this.RestoreWindowState(
                     this._mainWindow,
-                    this._config.Remember.MainWindowState,
-                    this._config.Remember.MainWindowWidth,
-                    this._config.Remember.MainWindowHeight,
-                    this._config.Remember.MainWindowPositionX,
-                    this._config.Remember.MainWindowPositionY);
+                    this._config.AppState.MainWindowState,
+                    this._config.AppState.MainWindowWidth,
+                    this._config.AppState.MainWindowHeight,
+                    this._config.AppState.MainWindowPositionX,
+                    this._config.AppState.MainWindowPositionY);
                 
                 this._mainWindow.Closed += this.MainWindow_Closed;
                 this._mainWindow.Closing += this.MainWindow_Closing;
@@ -426,25 +428,25 @@ namespace Martridge {
         private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e) {
             if (this._logWindow is Window logWindow) {
                 Dictionary<string, object?> values = new Dictionary<string, object?>() {
-                    [nameof(ConfigRemember.LogWindowState)] = logWindow.WindowState,
-                    [nameof(ConfigRemember.LogWindowWidth)] = logWindow.Width,
-                    [nameof(ConfigRemember.LogWindowHeight)] = logWindow.Height,
-                    [nameof(ConfigRemember.LogWindowPositionX)] = logWindow.Position.X,
-                    [nameof(ConfigRemember.LogWindowPositionY)] = logWindow.Position.Y,
-                    [nameof(ConfigRemember.LogWindowShowOnStartup)] = true,
+                    [nameof(ConfigAppState.LogWindowState)] = logWindow.WindowState,
+                    [nameof(ConfigAppState.LogWindowWidth)] = logWindow.Width,
+                    [nameof(ConfigAppState.LogWindowHeight)] = logWindow.Height,
+                    [nameof(ConfigAppState.LogWindowPositionX)] = logWindow.Position.X,
+                    [nameof(ConfigAppState.LogWindowPositionY)] = logWindow.Position.Y,
+                    [nameof(ConfigAppState.LogWindowShowOnStartup)] = true,
                 };
-                this._config.Remember.UpdateProperties(values);
+                this._config.AppState.UpdateProperties(values);
             }
             
             if (this._mainWindow is Window mainWindow) {
                 Dictionary<string, object?> values = new Dictionary<string, object?>() {
-                    [nameof(ConfigRemember.MainWindowState)] = mainWindow.WindowState,
-                    [nameof(ConfigRemember.MainWindowWidth)] = mainWindow.Width,
-                    [nameof(ConfigRemember.MainWindowHeight)] = mainWindow.Height,
-                    [nameof(ConfigRemember.MainWindowPositionX)] = mainWindow.Position.X,
-                    [nameof(ConfigRemember.MainWindowPositionY)] = mainWindow.Position.Y,
+                    [nameof(ConfigAppState.MainWindowState)] = mainWindow.WindowState,
+                    [nameof(ConfigAppState.MainWindowWidth)] = mainWindow.Width,
+                    [nameof(ConfigAppState.MainWindowHeight)] = mainWindow.Height,
+                    [nameof(ConfigAppState.MainWindowPositionX)] = mainWindow.Position.X,
+                    [nameof(ConfigAppState.MainWindowPositionY)] = mainWindow.Position.Y,
                 };
-                this._config.Remember.UpdateProperties(values);
+                this._config.AppState.UpdateProperties(values);
             }
             
             // latest config should already be saved... don't think i need to do this but leaving this here for future reference in case of issues
@@ -468,11 +470,11 @@ namespace Martridge {
                 
                 this.RestoreWindowState(
                     this._logWindow,
-                    this._config.Remember.LogWindowState,
-                    this._config.Remember.LogWindowWidth,
-                    this._config.Remember.LogWindowHeight,
-                    this._config.Remember.LogWindowPositionX,
-                    this._config.Remember.LogWindowPositionY);
+                    this._config.AppState.LogWindowState,
+                    this._config.AppState.LogWindowWidth,
+                    this._config.AppState.LogWindowHeight,
+                    this._config.AppState.LogWindowPositionX,
+                    this._config.AppState.LogWindowPositionY);
 
                 this._logWindow.Closing += this.LogWindowOnClosing;
                 this._logWindow.Closed += this.LogWindowOnClosed;
@@ -492,14 +494,14 @@ namespace Martridge {
                 return;
             
             Dictionary<string, object?> values = new Dictionary<string, object?>() {
-                [nameof(ConfigRemember.LogWindowState)] = window.WindowState,
-                [nameof(ConfigRemember.LogWindowWidth)] = window.Width,
-                [nameof(ConfigRemember.LogWindowHeight)] = window.Height,
-                [nameof(ConfigRemember.LogWindowPositionX)] = window.Position.X,
-                [nameof(ConfigRemember.LogWindowPositionY)] = window.Position.Y,
-                [nameof(ConfigRemember.LogWindowShowOnStartup)] = false,
+                [nameof(ConfigAppState.LogWindowState)] = window.WindowState,
+                [nameof(ConfigAppState.LogWindowWidth)] = window.Width,
+                [nameof(ConfigAppState.LogWindowHeight)] = window.Height,
+                [nameof(ConfigAppState.LogWindowPositionX)] = window.Position.X,
+                [nameof(ConfigAppState.LogWindowPositionY)] = window.Position.Y,
+                [nameof(ConfigAppState.LogWindowShowOnStartup)] = false,
             };
-            this._config.Remember.UpdateProperties(values);
+            this._config.AppState.UpdateProperties(values);
         }
 
         #endregion

@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Martridge.Models.Configuration;
+using Martridge.Models.Configuration.Installer;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using SevenZipExtractor;

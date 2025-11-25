@@ -1,12 +1,11 @@
-﻿using Martridge.Models.Configuration.Save;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Martridge.Models.Configuration.Installer.FileData;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-
-namespace Martridge.Models.Configuration {
+namespace Martridge.Models.Configuration.Installer {
     public class ConfigInstallerList {
         public Dictionary<string, Dictionary<string,ConfigInstaller>> Installables { get; private set; } = new Dictionary<string, Dictionary<string,ConfigInstaller>>();
 

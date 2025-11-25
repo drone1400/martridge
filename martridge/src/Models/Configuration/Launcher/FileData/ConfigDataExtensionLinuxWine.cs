@@ -1,4 +1,4 @@
-﻿namespace Martridge.Models.Configuration.Save {
+﻿namespace Martridge.Models.Configuration.Launcher.FileData {
     public class ConfigDataExtensionLinuxWine {
         public string? WINEVERPATH { get; set; }
         public string? WINEBINPATH { get; set; }

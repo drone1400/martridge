@@ -5,6 +5,7 @@ using System.IO;
 using System.Timers;
 using Avalonia.Metadata;
 using Martridge.Models.Configuration;
+using Martridge.Models.Configuration.Launcher;
 using Martridge.Models.Localization;
 using Martridge.Models.Steam;
 using Martridge.Trace;

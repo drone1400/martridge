@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
+using Martridge.Models.Configuration.Obsolete;
 using Martridge.Trace;
 
 namespace Martridge.ViewModels.DinkyAlerts {

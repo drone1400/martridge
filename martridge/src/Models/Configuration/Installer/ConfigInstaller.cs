@@ -1,9 +1,7 @@
-﻿using Martridge.Models.Configuration.Save;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using SharpCompress;
-
-namespace Martridge.Models.Configuration {
+using Martridge.Models.Configuration.Installer.FileData;
+namespace Martridge.Models.Configuration.Installer {
     public class ConfigInstaller {
 
         /// <summary>

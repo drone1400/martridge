@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-
-namespace Martridge.Models.Configuration.Save {
+namespace Martridge.Models.Configuration.Installer.FileData {
     public class ConfigDataInstallerList {
         public string ConfigDataVersion {
             get => "V3";

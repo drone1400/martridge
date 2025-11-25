@@ -1,8 +1,7 @@
-﻿using Martridge.Models.Configuration.Save;
-using System;
+﻿using System;
 using System.Collections.Generic;
-
-namespace Martridge.Models.Configuration {
+using Martridge.Models.Configuration.Launcher.FileData;
+namespace Martridge.Models.Configuration.Launcher {
     public class ConfigLaunch : IConfigGeneric{
         public event EventHandler<ConfigUpdateEventArgs>? Updated;
 

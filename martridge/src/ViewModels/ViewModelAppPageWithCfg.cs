@@ -2,6 +2,9 @@ using ReactiveUI;
 using System;
 using System.ComponentModel;
 using Martridge.Models.Configuration;
+using Martridge.Models.Configuration.AppState;
+using Martridge.Models.Configuration.General;
+using Martridge.Models.Configuration.Launcher;
 using Martridge.Trace;
 
 namespace Martridge.ViewModels {
@@ -27,11 +30,11 @@ namespace Martridge.ViewModels {
         protected virtual void OnConfigLaunchChanged() {}
         protected virtual void OnCfgLaunchUpdated(object? sender, ConfigUpdateEventArgs e) {}
         
-        public ConfigRemember? CfgRemember {
+        public ConfigAppState? CfgRemember {
             get => this._cfgRemember;
             set => this.RaiseAndSetIfChanged(ref this._cfgRemember, value);
         }
-        private ConfigRemember? _cfgRemember = null;
+        private ConfigAppState? _cfgRemember = null;
         
         protected virtual void OnConfigRememberChanging() {}
         protected virtual void OnConfigRememberChanged() {}

@@ -11,6 +11,8 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Martridge.Models;
 using Martridge.Models.Configuration;
+using Martridge.Models.Configuration.General;
+using Martridge.Models.Configuration.Installer;
 using Martridge.Models.DinkInstaller;
 using Martridge.Models.Localization;
 using Martridge.Trace;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
+using Martridge.Models.Configuration.AppState;
 namespace Martridge.Models.Configuration.Save {
     public class ConfigDataRemember {
         /// <summary>
@@ -75,28 +76,28 @@ namespace Martridge.Models.Configuration.Save {
             if (Enum.TryParse(this.LogWindowState, true, out WindowState logWindowState) == false) logWindowState = WindowState.Normal;
             
             return new Dictionary<string, object?>() {
-                [nameof(ConfigRemember.InstallDmodSourcePath)] = this.InstallDmodSourcePath,
-                [nameof(ConfigRemember.InstallDmodDestinationBaseDirectory)] = this.InstallDmodDestinationBaseDirectory,
-                [nameof(ConfigRemember.PackDmodSourcePath)] = this.PackDmodSourcePath,
-                [nameof(ConfigRemember.PackDmodDestinationPath)] = this.PackDmodDestinationPath,
-                [nameof(ConfigRemember.DmodBrowserSelectedDmodPath)] = this.DmodBrowserSelectedDmodPath,
-                [nameof(ConfigRemember.DmodBrowserLeftPanelColumnWidth)] = this.DmodBrowserLeftPanelColumnWidth,
-                [nameof(ConfigRemember.DmodBrowserRightPanelColumnWidth)] = this.DmodBrowserRightPanelColumnWidth,
-                [nameof(ConfigRemember.OnlineDmodBrowserLeftPanelColumnWidth)] = this.OnlineDmodBrowserLeftPanelColumnWidth,
-                [nameof(ConfigRemember.OnlineDmodBrowserRightPanelColumnWidth)] = this.OnlineDmodBrowserRightPanelColumnWidth,
+                [nameof(ConfigAppState.InstallDmodSourcePath)] = this.InstallDmodSourcePath,
+                [nameof(ConfigAppState.InstallDmodDestinationBaseDirectory)] = this.InstallDmodDestinationBaseDirectory,
+                [nameof(ConfigAppState.PackDmodSourcePath)] = this.PackDmodSourcePath,
+                [nameof(ConfigAppState.PackDmodDestinationPath)] = this.PackDmodDestinationPath,
+                [nameof(ConfigAppState.DmodBrowserSelectedDmodPath)] = this.DmodBrowserSelectedDmodPath,
+                [nameof(ConfigAppState.DmodBrowserLeftPanelColumnWidth)] = this.DmodBrowserLeftPanelColumnWidth,
+                [nameof(ConfigAppState.DmodBrowserRightPanelColumnWidth)] = this.DmodBrowserRightPanelColumnWidth,
+                [nameof(ConfigAppState.OnlineDmodBrowserLeftPanelColumnWidth)] = this.OnlineDmodBrowserLeftPanelColumnWidth,
+                [nameof(ConfigAppState.OnlineDmodBrowserRightPanelColumnWidth)] = this.OnlineDmodBrowserRightPanelColumnWidth,
                 // Main Window
-                [nameof(ConfigRemember.MainWindowState)] = mainWindowState,
-                [nameof(ConfigRemember.MainWindowWidth)] = this.MainWindowWidth,
-                [nameof(ConfigRemember.MainWindowHeight)] = this.MainWindowHeight,
-                [nameof(ConfigRemember.MainWindowPositionX)] = this.MainWindowPositionX,
-                [nameof(ConfigRemember.MainWindowPositionY)] = this.MainWindowPositionY,
+                [nameof(ConfigAppState.MainWindowState)] = mainWindowState,
+                [nameof(ConfigAppState.MainWindowWidth)] = this.MainWindowWidth,
+                [nameof(ConfigAppState.MainWindowHeight)] = this.MainWindowHeight,
+                [nameof(ConfigAppState.MainWindowPositionX)] = this.MainWindowPositionX,
+                [nameof(ConfigAppState.MainWindowPositionY)] = this.MainWindowPositionY,
                 // Log Window
-                [nameof(ConfigRemember.LogWindowState)] = logWindowState,
-                [nameof(ConfigRemember.LogWindowWidth)] = this.LogWindowWidth,
-                [nameof(ConfigRemember.LogWindowHeight)] = this.LogWindowHeight,
-                [nameof(ConfigRemember.LogWindowPositionX)] = this.LogWindowPositionX,
-                [nameof(ConfigRemember.LogWindowPositionY)] = this.LogWindowPositionY,
-                [nameof(ConfigRemember.LogWindowShowOnStartup)] = this.LogWindowShowOnStartup,
+                [nameof(ConfigAppState.LogWindowState)] = logWindowState,
+                [nameof(ConfigAppState.LogWindowWidth)] = this.LogWindowWidth,
+                [nameof(ConfigAppState.LogWindowHeight)] = this.LogWindowHeight,
+                [nameof(ConfigAppState.LogWindowPositionX)] = this.LogWindowPositionX,
+                [nameof(ConfigAppState.LogWindowPositionY)] = this.LogWindowPositionY,
+                [nameof(ConfigAppState.LogWindowShowOnStartup)] = this.LogWindowShowOnStartup,
             };
         }
     }

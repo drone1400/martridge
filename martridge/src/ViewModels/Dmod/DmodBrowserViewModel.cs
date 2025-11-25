@@ -18,6 +18,9 @@ using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Martridge.Models;
+using Martridge.Models.Configuration.AppState;
+using Martridge.Models.Configuration.General;
+using Martridge.Models.Configuration.Launcher;
 using Martridge.Models.Localization;
 
 namespace Martridge.ViewModels.Dmod {
@@ -158,7 +161,7 @@ namespace Martridge.ViewModels.Dmod {
             set {
                 this.RaiseAndSetIfChanged(ref this._dmodBrowserLeftPanelColumnWidth, value);
                 Dictionary<string, object?> values = new Dictionary<string, object?>() {
-                    [nameof(ConfigRemember.DmodBrowserLeftPanelColumnWidth)] = value.Value,
+                    [nameof(ConfigAppState.DmodBrowserLeftPanelColumnWidth)] = value.Value,
                 };
                 this.CfgRemember?.UpdateProperties(values);
             }
@@ -176,7 +179,7 @@ namespace Martridge.ViewModels.Dmod {
             set {
                 this.RaiseAndSetIfChanged(ref this._dmodBrowserRightPanelColumnWidth, value);
                 Dictionary<string, object?> values = new Dictionary<string, object?>() {
-                    [nameof(ConfigRemember.DmodBrowserRightPanelColumnWidth)] = value.Value,
+                    [nameof(ConfigAppState.DmodBrowserRightPanelColumnWidth)] = value.Value,
                 };
                 this.CfgRemember?.UpdateProperties(values);
             }
@@ -656,7 +659,7 @@ namespace Martridge.ViewModels.Dmod {
 
                 if (this.SelectedDmodDefinition != null && this.CfgRemember != null) {
                     Dictionary<string, object?> values = new Dictionary<string, object?>() {
-                        [nameof(ConfigRemember.DmodBrowserSelectedDmodPath)] = this.SelectedDmodDefinition.DmodDirectory
+                        [nameof(ConfigAppState.DmodBrowserSelectedDmodPath)] = this.SelectedDmodDefinition.DmodDirectory
                     };
                     this.CfgRemember.UpdateProperties(values);
                 }

@@ -4,7 +4,7 @@ using System.IO;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using Newtonsoft.Json;
-namespace Martridge.Models.Configuration.Save {
+namespace Martridge.Models.Configuration.Launcher.FileData {
     public class ConfigDataExtension {
         public string ConfigDataVersion {
             get => "V1";

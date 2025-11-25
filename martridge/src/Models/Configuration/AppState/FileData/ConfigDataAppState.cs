@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
+using Martridge.Models.Configuration.Save;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using Newtonsoft.Json;
-namespace Martridge.Models.Configuration.Save {
+namespace Martridge.Models.Configuration.AppState.FileData {
     public class ConfigDataAppState{
         public ConfigDataRemember? Remember { get; set; }
         

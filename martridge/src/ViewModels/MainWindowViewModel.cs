@@ -19,6 +19,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Martridge.Models;
 using Martridge.Models.Configuration;
+using Martridge.Models.Configuration.General;
 using Martridge.Models.DmodInstaller;
 using Martridge.Models.DmodPacker;
 using Martridge.ViewModels.DinkyAlerts;
@@ -149,8 +150,8 @@ namespace Martridge.ViewModels {
                     this._dmodBrowserViewModel.DmodManager = this._dmodManager; // NOTE: initialize this first or the remembered selected DMOD won't be restored
                     this._dmodBrowserViewModel.CfgGeneral = this._config?.General;
                     this._dmodBrowserViewModel.CfgLaunch = this._config?.Launch;
-                    this._dmodBrowserViewModel.CfgRemember = this._config?.Remember;
-                    this._dmodBrowserViewModel.CfgExtension = this._config?.ExeExtension;
+                    this._dmodBrowserViewModel.CfgRemember = this._config?.AppState;
+                    this._dmodBrowserViewModel.CfgExtension = this._config?.LaunchExtension;
 
                     this.SwapToDefaultViewModel();
             
@@ -444,7 +445,7 @@ namespace Martridge.ViewModels {
             if (this._onlineDmodBrowserViewModel == null) {
                 this._onlineDmodBrowserViewModel = new OnlineDmodBrowserViewModel();
                 this._onlineDmodBrowserViewModel.DmodCrawler = this._dmodCrawler;
-                this._onlineDmodBrowserViewModel.CfgRemember = this._config?.Remember;
+                this._onlineDmodBrowserViewModel.CfgRemember = this._config?.AppState;
                 this._onlineDmodBrowserViewModel.InstallDmodRequested += (_, args) => {
                     this.CmdShowPageDmodInstaller(args.Path);
                 };
@@ -558,7 +559,7 @@ namespace Martridge.ViewModels {
                 SettingsGeneralViewModel vm = new SettingsGeneralViewModel();
                 vm.CfgGeneral = this._config?.General;
                 vm.CfgLaunch = this._config?.Launch;
-                vm.CfgExtension = this._config?.ExeExtension;
+                vm.CfgExtension = this._config?.LaunchExtension;
                 this.SwapCurrentViewModel(vm);
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
@@ -666,7 +667,7 @@ namespace Martridge.ViewModels {
             try {
                 DmodInstallerViewModel vm = new DmodInstallerViewModel();
                 vm.CfgGeneral = this._config?.General;
-                vm.CfgRemember = this._config?.Remember;
+                vm.CfgRemember = this._config?.AppState;
                 if (parameter is string path && string.IsNullOrWhiteSpace(path) == false) {
                     vm.TemporaryDmodSource = path;
                 }
@@ -733,7 +734,7 @@ namespace Martridge.ViewModels {
             try {
                 DmodPackerViewModel vm = new DmodPackerViewModel();
                 vm.CfgGeneral = this._config?.General;
-                vm.CfgRemember = this._config?.Remember;
+                vm.CfgRemember = this._config?.AppState;
                 if (parameter is string path && string.IsNullOrWhiteSpace(path) == false) {
                     vm.TemporaryDmodSourceDirectory = path;
                 }

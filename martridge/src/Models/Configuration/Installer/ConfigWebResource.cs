@@ -1,6 +1,5 @@
-﻿using Martridge.Models.Configuration.Save;
-
-namespace Martridge.Models.Configuration {
+﻿using Martridge.Models.Configuration.Installer.FileData;
+namespace Martridge.Models.Configuration.Installer {
     public class ConfigWebResource {
         public string Uri { get; private set; } = "";
         public string Name { get; private set; } = "";

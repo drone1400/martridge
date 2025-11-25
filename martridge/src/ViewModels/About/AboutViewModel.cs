@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using Martridge.Models.Configuration.General;
 
 namespace Martridge.ViewModels.About {
     public class AboutViewModel : ViewModelAppPage

@@ -8,6 +8,7 @@
              xmlns:cfg="clr-namespace:Martridge.Models.Configuration"
              xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
              xmlns:dinkInstaller="clr-namespace:Martridge.ViewModels.DinkInstaller"
+             xmlns:installer="clr-namespace:Martridge.Models.Configuration.Installer"
 
              mc:Ignorable="d"
              d:DesignWidth="800"
@@ -64,7 +65,7 @@
                     <StackLayout Spacing="4" Orientation="Vertical" />
                 </ItemsRepeater.Layout>
                 <ItemsRepeater.ItemTemplate>
-                    <DataTemplate DataType="cfg:ConfigInstallerComponent">
+                    <DataTemplate DataType="installer:ConfigInstallerComponent">
                         <Border BorderThickness="1" BorderBrush="{DynamicResource ThemeBorderHighBrush}">
                             <Grid Margin="2"
                                   RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"

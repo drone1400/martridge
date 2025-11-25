@@ -1,5 +1,5 @@
-﻿using Martridge.Models.Configuration.Save;
-namespace Martridge.Models.Configuration {
+﻿using Martridge.Models.Configuration.Launcher.FileData;
+namespace Martridge.Models.Configuration.Launcher {
     public class ConfigExtensionSteamInfo {
         /// <summary>
         /// The Known 32 bit Steam ID for the target app exe

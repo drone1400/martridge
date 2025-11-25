@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Martridge.Models.Configuration;
+using Martridge.Models.Configuration.Installer;
 namespace Martridge.Models.DinkInstaller {
     public class DinkInstallerDoneEventArgs : EventArgs {
         public DinkInstallerResult Result { get; }

@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
+using Martridge.Models.Configuration.General;
+using Martridge.Models.Configuration.Launcher;
 
 namespace Martridge.ViewModels.Configuration {
     public class SettingsGeneralViewModel : ViewModelAppPageWithCfg {

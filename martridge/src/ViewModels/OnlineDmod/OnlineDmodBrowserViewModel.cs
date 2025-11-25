@@ -497,6 +497,9 @@ namespace Martridge.ViewModels.OnlineDmod {
         public void CmdClearSelectedDmod(object? parameter = null) {
             if (this.SelectedDmodDefinition == null) { return; }
             this.SelectedDmodDefinition = null;
+            Dispatcher.UIThread.InvokeAsync(() => {
+                this.DmodDefinitionsCollection?.MoveCurrentTo(null);
+            });
         }
 
         [DependsOn(nameof(SelectedDmodDefinition))]

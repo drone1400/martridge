@@ -717,6 +717,9 @@ namespace Martridge.ViewModels.Dmod {
         public bool CanCmdRefreshDmods(object? parameter = null) => this.DmodManager != null;
         public void CmdClearSelectedDmod(object? parameter = null) {
             this.SelectedDmodDefinition = null;
+            Dispatcher.UIThread.InvokeAsync(() => {
+                this.DmodDefinitionsCollection?.MoveCurrentTo(null);
+            });
         }
 
         [DependsOn(nameof(SelectedDmodDefinition))]

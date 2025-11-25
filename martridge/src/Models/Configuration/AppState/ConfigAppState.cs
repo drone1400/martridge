@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
-using Martridge.Models.Configuration.Save;
+using Martridge.Models.Configuration.AppState.FileData;
 namespace Martridge.Models.Configuration.AppState {
     public class ConfigAppState : IConfigGeneric{
 
@@ -149,8 +149,8 @@ namespace Martridge.Models.Configuration.AppState {
             this.Updated?.Invoke(this, new ConfigUpdateEventArgs(updatedProperties));
         }
 
-        public ConfigDataRemember GetData() {
-            return new ConfigDataRemember() {
+        public ConfigDataAppState GetData() {
+            return new ConfigDataAppState() {
                 InstallDmodSourcePath = this.InstallDmodSourcePath,
                 InstallDmodDestinationBaseDirectory = this.InstallDmodDestinationBaseDirectory,
                 PackDmodSourcePath = this.PackDmodSourcePath,

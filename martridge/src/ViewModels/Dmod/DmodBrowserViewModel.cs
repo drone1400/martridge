@@ -20,7 +20,6 @@ using Avalonia.Threading;
 using Martridge.Models;
 using Martridge.Models.Configuration.AppState;
 using Martridge.Models.Configuration.General;
-using Martridge.Models.Configuration.Launcher;
 using Martridge.Models.Localization;
 
 namespace Martridge.ViewModels.Dmod {

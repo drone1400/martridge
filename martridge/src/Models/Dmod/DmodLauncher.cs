@@ -7,7 +7,8 @@ using Martridge.Models.Configuration;
 using Martridge.Trace;
 using System.Linq;
 using Avalonia;
-using Martridge.Models.Configuration.Launcher;
+using Martridge.Models.Configuration.General;
+using Martridge.Models.Configuration.LaunchExtension;
 using Martridge.Models.Steam;
 
 namespace Martridge.Models.Dmod

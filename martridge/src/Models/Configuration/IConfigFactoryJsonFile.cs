@@ -1,17 +1,11 @@
+﻿using System;
+using System.IO;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using Newtonsoft.Json;
-using System;
-using System.IO;
-using Martridge.Models.Configuration.General.FileData;
-using Martridge.Models.Configuration.Launcher.FileData;
-
-namespace Martridge.Models.Configuration.Save {
-    public class ConfigData {
-        public ConfigDataGeneral? General { get; set; }
-        public ConfigDataLaunch? Launch { get; set; }
-        
-        public void SaveToFile(string path) {
+namespace Martridge.Models.Configuration {
+    public static class ConfigJsonSerializer {
+        public static void SaveToFile<TConfig>(TConfig data, string path) {
             string pathTemp = path + ".temp";
             
             try {
@@ -22,7 +16,7 @@ namespace Martridge.Models.Configuration.Save {
 
                 using (FileStream fs = new FileStream(pathTemp, FileMode.Create, FileAccess.Write))
                 using (StreamWriter sw = new StreamWriter(fs)) {
-                    sw.Write(JsonConvert.SerializeObject(this, Formatting.Indented));
+                    sw.Write(JsonConvert.SerializeObject(data, Formatting.Indented));
                     sw.Flush();
                     fs.Flush();
                     sw.Close();
@@ -47,12 +41,12 @@ namespace Martridge.Models.Configuration.Save {
             }
         }
 
-        public static ConfigData? LoadFromFile(string path) {
+        public static TConfig? LoadFromFile<TConfig>(string path) {
             try {
-                ConfigData? cfg;
+                TConfig? cfg;
                 using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
                 using (StreamReader sr = new StreamReader(fs)) {
-                    cfg = JsonConvert.DeserializeObject<ConfigData>(sr.ReadToEnd());
+                    cfg = JsonConvert.DeserializeObject<TConfig>(sr.ReadToEnd());
                     fs.Flush();
                     fs.Close();
                 }
@@ -65,7 +59,7 @@ namespace Martridge.Models.Configuration.Save {
                 MyTrace.Global.WriteMessage("Could not load config file...");
                 MyTrace.Global.WriteMessage($"    \"{path}\"");
                 MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
-                return null;
+                return default;
             }
         }
     }

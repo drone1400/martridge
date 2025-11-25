@@ -15,7 +15,6 @@ using Martridge.Models;
 using Martridge.Models.Configuration;
 using Martridge.Models.Configuration.AppState;
 using Martridge.Models.Configuration.General;
-using Martridge.Models.Localization;
 using Martridge.Trace;
 using Martridge.ViewModels;
 using Martridge.ViewModels.DinkyAlerts;
@@ -35,7 +34,7 @@ namespace Martridge {
 
         public override void Initialize()
         {
-            this.InitializeConfiguration();
+            Config.InitializeConfiguration();
             this.InitializeTheme();
         }
 
@@ -44,7 +43,7 @@ namespace Martridge {
             if (this.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
                 MyTrace.Global.Listeners.Add(this._console);
                 
-                if (this._config.AppState.LogWindowShowOnStartup) {
+                if (Config.Instance.AppState.LogWindowShowOnStartup) {
                     this.ShowLogWindow();
                 }
                 
@@ -76,13 +75,13 @@ namespace Martridge {
 
         private void PurgeOldLogs() {
             try {
-                if (this._config.General.MaxLogsToKeep <= 0)
+                if (Config.Instance.General.MaxLogsToKeep <= 0)
                     return;
 
                 DirectoryInfo dirInfo = new DirectoryInfo(LocationHelper.GetPathLogs());
                 FileInfo[] files = dirInfo.GetFiles("martridge*.log");
                 
-                int delCount = files.Length - this._config.General.MaxLogsToKeep;
+                int delCount = files.Length - Config.Instance.General.MaxLogsToKeep;
                 if (delCount <= 0)
                     return;
                 
@@ -96,73 +95,6 @@ namespace Martridge {
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
             }
-        }
-        
-        #endregion
-        
-        #region CONFIG stuff
-        
-        private string _defaultConfigFile = "";
-        private string _defaultConfigExtensionFile = "";
-        private string _defaultStateFile = "";
-        private readonly Config _config = new Config();
-
-        
-        private void InitializeConfiguration()
-        {
-            this._defaultConfigFile = Path.Combine(LocationHelper.GetPathConfig(), "config.json");
-            this._defaultConfigExtensionFile = Path.Combine(LocationHelper.GetPathConfig(), "configExeExtension.json");
-            this._defaultStateFile = Path.Combine(LocationHelper.GetPathMartridgeState(), "app-state.json");
-            this._config.LoadConfig(this._defaultConfigFile);
-            this._config.LoadConfigExtension(this._defaultConfigExtensionFile);
-            this._config.LoadAppState(this._defaultStateFile);
-            
-            #if PLATF_LINUX
-            // TODO fix this...
-            this.AddDefaultLinuxFreeDinkLocations();
-            #endif
-            
-            this._config.General.Updated += this.GeneralOnUpdated;
-            this._config.Launch.Updated += this.LaunchOnUpdated;
-        }
-        
-        private void LaunchOnUpdated(object? sender, EventArgs e) {
-            MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationChanged"]);
-            this._config.SaveConfig(this._defaultConfigFile);
-        }
-
-        private void GeneralOnUpdated(object? sender, ConfigUpdateEventArgs e) {
-            MyTrace.Global.WriteMessage(Localizer.Instance["General/ConfigurationChanged"]);
-            this._config.SaveConfig(this._defaultConfigFile);
-        }
-        
-        private void AddDefaultLinuxFreeDinkLocations()
-        {
-            // TODO fix this...
-            string defaultLinuxFreedinkExe = "/usr/games/freedink";
-            string defaultLinuxDinkGameData = "/usr/share/games/dink";
-            string? defaultLinuxHome = Environment.GetEnvironmentVariable("HOME");
-            string defaultLinuxDmods = Path.Combine(defaultLinuxHome ?? "", "dmods");
-
-            if (File.Exists(defaultLinuxFreedinkExe) && 
-                this._config.General.GameExePaths.Contains(defaultLinuxFreedinkExe) == false) {
-                this._config.General.TryAddGameExePath(defaultLinuxFreedinkExe);
-            }
-
-            if (Directory.Exists(defaultLinuxDinkGameData) &&
-                this._config.General.AdditionalDmodLocations.Contains(defaultLinuxDinkGameData) == false) {
-                this._config.General.TryAddAdditionalDmodPath(defaultLinuxDinkGameData);
-            }
-
-            if (defaultLinuxHome != null &&
-                Directory.Exists(defaultLinuxDmods) &&
-                this._config.General.AdditionalDmodLocations.Contains(defaultLinuxDmods) == false) {
-                this._config.General.TryAddAdditionalDmodPath(defaultLinuxDmods);
-            }
-        }
-
-        public void SaveConfigExtension() {
-            this._config.SaveConfigExtension(this._defaultConfigExtensionFile);
         }
         
         #endregion
@@ -226,16 +158,16 @@ namespace Martridge {
 
             this._themeVariants = this._citrusTheme.GetRegisteredThemeVariants();
 
-            if (string.IsNullOrWhiteSpace(this._config.General.DarkThemeOverride) == false) {
-                this.OverrideCitrusDarkTheme(this._config.General.DarkThemeOverride);
+            if (string.IsNullOrWhiteSpace(Config.Instance.General.DarkThemeOverride) == false) {
+                this.OverrideCitrusDarkTheme(Config.Instance.General.DarkThemeOverride);
             }
             
-            if (string.IsNullOrWhiteSpace(this._config.General.LightThemeOverride) == false) {
-                this.OverrideCitrusLightTheme(this._config.General.LightThemeOverride);
+            if (string.IsNullOrWhiteSpace(Config.Instance.General.LightThemeOverride) == false) {
+                this.OverrideCitrusLightTheme(Config.Instance.General.LightThemeOverride);
             }
             
             // try to set loaded theme...
-            string themeName = this._config.General.ThemeName;
+            string themeName = Config.Instance.General.ThemeName;
             this.SetCitrusThemePalette(themeName);
         }
 
@@ -298,12 +230,12 @@ namespace Martridge {
             this.RequestedThemeVariant = themeVariant;
             
             // update in configuration...
-            this._config.General.UpdateProperties(new Dictionary<string, object?>() {
+            Config.Instance.General.UpdateProperties(new Dictionary<string, object?>() {
                 [nameof(ConfigGeneral.ThemeName)] = themeVariant.Key.ToString(),
             });
             
             // save config to file after changes!
-            this._config.SaveConfig(this._defaultConfigFile);
+            Config.Instance.SaveGeneralConfig();
             
             try {
                 this.OnThemePaletteChange?.Invoke(this, EventArgs.Empty);
@@ -316,14 +248,14 @@ namespace Martridge {
             CitrusThemeVariantData? data = this.TryGetThemeVariantDataFromKey(themeKey);
             if (data != null && this._citrusTheme != null) {
                 // update in configuration...
-                this._config.General.UpdateProperties(new Dictionary<string, object?>() {
+                Config.Instance.General.UpdateProperties(new Dictionary<string, object?>() {
                     [nameof(ConfigGeneral.LightThemeOverride)] = themeKey,
                 });
                 // set desired light theme
                 this._citrusTheme.DesiredLightThemeVariant = data.VariantProvider;
                 
                 // save config to file after changes!
-                this._config.SaveConfig(this._defaultConfigFile);
+                Config.Instance.SaveGeneralConfig();
             }
         }
         
@@ -331,14 +263,14 @@ namespace Martridge {
             CitrusThemeVariantData? data = this.TryGetThemeVariantDataFromKey(themeKey);
             if (data != null && this._citrusTheme != null) {
                 // update in configuration...
-                this._config.General.UpdateProperties(new Dictionary<string, object?>() {
+                Config.Instance.General.UpdateProperties(new Dictionary<string, object?>() {
                     [nameof(ConfigGeneral.DarkThemeOverride)] = themeKey,
                 });
                 // set desired dark theme
                 this._citrusTheme.DesiredDarkThemeVariant = data.VariantProvider;
                 
                 // save config to file after changes!
-                this._config.SaveConfig(this._defaultConfigFile);
+                Config.Instance.SaveGeneralConfig();
             }
         }
 
@@ -401,7 +333,7 @@ namespace Martridge {
         private void InitializeMainWindow(string[]? args = null) {
             if (this._mainWindow == null) {
                 this._mainWindowViewModel = new MainWindowViewModel();
-                this._mainWindowViewModel.Initialize(this._config);
+                this._mainWindowViewModel.Initialize(Config.Instance);
                 this._mainWindowViewModel.InitializeArgs(args);
                 this._mainWindow = new MainWindow {
                     DataContext = this._mainWindowViewModel,
@@ -409,11 +341,11 @@ namespace Martridge {
 
                 this.RestoreWindowState(
                     this._mainWindow,
-                    this._config.AppState.MainWindowState,
-                    this._config.AppState.MainWindowWidth,
-                    this._config.AppState.MainWindowHeight,
-                    this._config.AppState.MainWindowPositionX,
-                    this._config.AppState.MainWindowPositionY);
+                    Config.Instance.AppState.MainWindowState,
+                    Config.Instance.AppState.MainWindowWidth,
+                    Config.Instance.AppState.MainWindowHeight,
+                    Config.Instance.AppState.MainWindowPositionX,
+                    Config.Instance.AppState.MainWindowPositionY);
                 
                 this._mainWindow.Closed += this.MainWindow_Closed;
                 this._mainWindow.Closing += this.MainWindow_Closing;
@@ -435,7 +367,7 @@ namespace Martridge {
                     [nameof(ConfigAppState.LogWindowPositionY)] = logWindow.Position.Y,
                     [nameof(ConfigAppState.LogWindowShowOnStartup)] = true,
                 };
-                this._config.AppState.UpdateProperties(values);
+                Config.Instance.AppState.UpdateProperties(values);
             }
             
             if (this._mainWindow is Window mainWindow) {
@@ -446,14 +378,14 @@ namespace Martridge {
                     [nameof(ConfigAppState.MainWindowPositionX)] = mainWindow.Position.X,
                     [nameof(ConfigAppState.MainWindowPositionY)] = mainWindow.Position.Y,
                 };
-                this._config.AppState.UpdateProperties(values);
+                Config.Instance.AppState.UpdateProperties(values);
             }
             
             // latest config should already be saved... don't think i need to do this but leaving this here for future reference in case of issues
             // this._config.SaveConfig(this._defaultConfigFile);
             
             // save app state when closing
-            this._config.SaveAppState(this._defaultStateFile);
+            Config.Instance.SaveAppState();
             
             this._logger.Close();
         }
@@ -470,11 +402,11 @@ namespace Martridge {
                 
                 this.RestoreWindowState(
                     this._logWindow,
-                    this._config.AppState.LogWindowState,
-                    this._config.AppState.LogWindowWidth,
-                    this._config.AppState.LogWindowHeight,
-                    this._config.AppState.LogWindowPositionX,
-                    this._config.AppState.LogWindowPositionY);
+                    Config.Instance.AppState.LogWindowState,
+                    Config.Instance.AppState.LogWindowWidth,
+                    Config.Instance.AppState.LogWindowHeight,
+                    Config.Instance.AppState.LogWindowPositionX,
+                    Config.Instance.AppState.LogWindowPositionY);
 
                 this._logWindow.Closing += this.LogWindowOnClosing;
                 this._logWindow.Closed += this.LogWindowOnClosed;
@@ -501,7 +433,7 @@ namespace Martridge {
                 [nameof(ConfigAppState.LogWindowPositionY)] = window.Position.Y,
                 [nameof(ConfigAppState.LogWindowShowOnStartup)] = false,
             };
-            this._config.AppState.UpdateProperties(values);
+            Config.Instance.AppState.UpdateProperties(values);
         }
 
         #endregion

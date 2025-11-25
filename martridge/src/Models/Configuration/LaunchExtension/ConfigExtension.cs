@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Martridge.Models.Configuration.Launcher.FileData;
-namespace Martridge.Models.Configuration.Launcher {
+using Martridge.Models.Configuration.LaunchExtension.FileData;
+namespace Martridge.Models.Configuration.LaunchExtension {
     public class ConfigExtension {
 
         public IReadOnlyDictionary<string, ConfigExtensionComponent> Extensions {
@@ -45,7 +45,7 @@ namespace Martridge.Models.Configuration.Launcher {
             return newComponent;
         }
 
-        public void SetFromData(ConfigDataExtension? data) {
+        public void SetFromData(ConfigFileDataExtension? data) {
             this._extensionsBase.Clear();
             if (data?.ExtensionDefinitions == null)
                 return;
@@ -59,18 +59,18 @@ namespace Martridge.Models.Configuration.Launcher {
             }
         }
 
-        public ConfigDataExtension GetData() {
-            ConfigDataExtension data = new ConfigDataExtension() {
+        public ConfigFileDataExtension GetData() {
+            ConfigFileDataExtension fileData = new ConfigFileDataExtension() {
                 ExtensionDefinitions = new List<ConfigDataExtensionComponent>()
             };
             foreach (var pair in this._extensionsBase) {
                 if (string.IsNullOrWhiteSpace(pair.Value.TargetExePath) == false &&
                     (pair.Value.SteamData != null || pair.Value.WineData != null)) {
                     // only add if actually has data
-                    data.ExtensionDefinitions.Add(pair.Value.GetData());
+                    fileData.ExtensionDefinitions.Add(pair.Value.GetData());
                 }
             }
-            return data;
+            return fileData;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Martridge.Models.Configuration.Launcher.FileData {
+﻿namespace Martridge.Models.Configuration.LaunchExtension.FileData {
     public class ConfigDataExtensionComponent {
         /// <summary>
         /// The path of the target exe "file"

@@ -14,7 +14,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Martridge.Models.Configuration.General;
-using Martridge.Models.Configuration.Launcher;
+using Martridge.Models.Configuration.LaunchExtension;
 
 namespace Martridge.ViewModels.Configuration {
     public class SettingsGeneralViewModel : ViewModelAppPageWithCfg {
@@ -797,7 +797,7 @@ namespace Martridge.ViewModels.Configuration {
                     // i think i'll have to reorganize how i handle the config objects later...
                     // save changes...
                     if (Application.Current is App app) {
-                        app.SaveConfigExtension();
+                        Config.Instance.SaveConfigExtension();
                     }
                     
                     this.ExeExtensionViewModel = null;

@@ -4,7 +4,7 @@ using System.ComponentModel;
 using Martridge.Models.Configuration;
 using Martridge.Models.Configuration.AppState;
 using Martridge.Models.Configuration.General;
-using Martridge.Models.Configuration.Launcher;
+using Martridge.Models.Configuration.LaunchExtension;
 using Martridge.Trace;
 
 namespace Martridge.ViewModels {

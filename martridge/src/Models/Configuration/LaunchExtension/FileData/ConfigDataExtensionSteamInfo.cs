@@ -1,4 +1,4 @@
-﻿namespace Martridge.Models.Configuration.Launcher.FileData {
+﻿namespace Martridge.Models.Configuration.LaunchExtension.FileData {
     public class ConfigDataExtensionSteamInfo {
         /// <summary>
         /// The Known 32 bit Steam ID for the target app exe

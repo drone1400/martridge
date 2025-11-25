@@ -1,5 +1,5 @@
-﻿using Martridge.Models.Configuration.Launcher.FileData;
-namespace Martridge.Models.Configuration.Launcher {
+﻿using Martridge.Models.Configuration.LaunchExtension.FileData;
+namespace Martridge.Models.Configuration.LaunchExtension {
     public class ConfigExtensionLinuxWine {
 
         /// <summary>

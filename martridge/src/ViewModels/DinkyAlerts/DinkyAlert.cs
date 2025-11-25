@@ -1,14 +1,12 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
-using Martridge.Models.Configuration;
 using Martridge.ViewModels.DinkyGraphics;
 using Martridge.Views.DinkyAlerts;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
-using Martridge.Models.Configuration.Obsolete;
 using Martridge.Trace;
 
 namespace Martridge.ViewModels.DinkyAlerts {
@@ -146,59 +144,6 @@ namespace Martridge.ViewModels.DinkyAlerts {
             }
             window.Position = new PixelPoint(posX, posY);
         }
-
-        public async static Task<AlertResults> GetRememberedResultOrShowDialog(
-            ConfigAlertResults config, 
-            ConfigAlertResultMap rememberId, 
-            string title, 
-            string message, 
-            AlertResults resultButtons, 
-            AlertType type, 
-            Window parentWindow, 
-            Dictionary<AlertResults, string>? customButtonText = null, 
-            string? specialMessage = null) {
-
-            AlertResults result = config.GetResult(rememberId);
-            
-            // check if result is remembered
-            if (result != AlertResults.None) {
-                return result;
-            }
-            
-            DinkyAlertWindowViewModel vm = new DinkyAlertWindowViewModel(title, message, resultButtons, type, customButtonText);
-            DinkyAlertWindow win = new DinkyAlertWindow { DataContext = vm, };
-            
-            // cancel closing if result is not set yet
-            win.Closing += ( sender,  args) => { if (vm.Result == AlertResults.None) args.Cancel = true; };
-
-            // try to center on parent window
-            CenterOnParentWindow(win, parentWindow);
-
-            // show dialog and get result when done
-            await win.ShowDialog(parentWindow);
-
-            List<AlertResults> resultPriority = new List<AlertResults>() {
-                AlertResults.Cancel,
-                AlertResults.No,
-                AlertResults.Yes,
-                AlertResults.Ok,
-            };
-
-            result = vm.Result;
-
-            if (result.HasFlag(AlertResults.RememberResult)) {
-                foreach (AlertResults res in resultPriority) {
-                    if (result.HasFlag(res)) {
-                        config.SaveResult(rememberId, AlertResults.Cancel);
-                        return res;
-                    }
-                }
-                return AlertResults.None;
-            }
-            
-            return result;
-        }
-
 
         private static readonly object _syncRoot_Alert = new object();
 

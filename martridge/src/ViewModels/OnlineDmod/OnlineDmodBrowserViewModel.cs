@@ -288,6 +288,11 @@ namespace Martridge.ViewModels.OnlineDmod {
                         return;
                     }
                 }
+            } else {
+                Dispatcher.UIThread.InvokeAsync(() => {
+                    this.DmodDefinitionsCollection?.MoveCurrentTo(null);
+                });
+                return;
             }
 
             // as a fallback, make sure the current item is selected

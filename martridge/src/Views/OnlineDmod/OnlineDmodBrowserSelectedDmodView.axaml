@@ -25,6 +25,7 @@
     <UserControl.Resources>
         <x:String x:Key="DataNotAvailable">N/A</x:String>
         <valueConverters:DmodScoreToSolidColorBrushConverter x:Key="DmodScoreToSolidColorBrushConverter" />
+        <valueConverters:GenericDateConverter x:Key="GenericDateConverter"/>
     </UserControl.Resources>
     <Grid>
         <!-- this is needed to trigger the context menu when right clicking empty spaces... -->
@@ -186,7 +187,7 @@
                                             <Label Grid.Row="1" Grid.Column="0" Classes="Heading2B"
                                                    Content="{dloc:Localize OnlineDmodBrowser/Versions/Released}" />
                                             <Label Grid.Row="1" Grid.Column="1" Classes="Heading2"
-                                                   Content="{Binding Released}" />
+                                                   Content="{Binding Released, Converter={StaticResource GenericDateConverter}}" />
 
                                             <Label Grid.Row="2" Grid.Column="0" Classes="Heading2B"
                                                    Content="{dloc:Localize OnlineDmodBrowser/Versions/FileSize}" />

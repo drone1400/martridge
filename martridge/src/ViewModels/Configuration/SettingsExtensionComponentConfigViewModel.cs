@@ -38,10 +38,10 @@ namespace Martridge.ViewModels.Configuration {
         }
         private bool _preferLaunchingAsSteamApp = false;
 
-#if PLATF_LINUX
-        public bool ShowWineUi => true;
+#if PLATF_WINDOWS
+        public bool ShowWineUi => false;
 #else
-        public bool ShowWineUi => true; // TODO set this to false later :P
+        public bool ShowWineUi => true;
 #endif
         
         public string WineVerPath {

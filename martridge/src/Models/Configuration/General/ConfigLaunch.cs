@@ -45,7 +45,7 @@ namespace Martridge.Models.Configuration.General {
         /// Launches the game with (questionable?) joystick support
         /// </summary>
         public bool Joystick => this._joystick;
-        private bool _joystick = false;
+        private bool _joystick = true;
         
         /// <summary>
         /// Launches the game in DEBUG mode

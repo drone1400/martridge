@@ -470,6 +470,8 @@
   "AboutWindow/Package/HtmlAgilityPack/Description": "HTML parser - used to parse data from The Dink Network in the online DMOD browser",
   "AboutWindow/Package/Ignore/Name": "Ignore",
   "AboutWindow/Package/Ignore/Description": "C# implementation of a .gitignore parser. Used to parse .dmodignore files.",
+  "AboutWindow/Package/Ude/Name": "UDE",
+  "AboutWindow/Package/Ude/Description": "C# implementation of Mozilla Universal Charset Detector.",
   "AboutWindow/Package/LinkType/Website": "Website",
   "AboutWindow/Package/LinkType/Source": "Source Code",
   "AboutWindow/Package/LinkType/OriginalSource": "Original Source Code",

@@ -102,6 +102,8 @@
         <!-- only include SevenZipExtractor if building with dink installer enabled for windows -->
         <PackageReference Condition="'$(IsWindows)'=='true' And '$(IsDinkInstallerEnabled)'=='true' And '$(IsOnlineFeaturesEnabled)'=='true'" 
                           Include="SevenZipExtractor" Version="1.0.17"/>
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+        <PackageReference Include="UDE.CSharp" Version="1.1.0" />
     </ItemGroup>
 
     <ItemGroup>

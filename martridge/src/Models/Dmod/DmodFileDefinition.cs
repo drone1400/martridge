@@ -4,6 +4,7 @@ using Martridge.Trace;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Martridge.Models.Dmod {
     public class DmodFileDefinition {
@@ -123,12 +124,32 @@ namespace Martridge.Models.Dmod {
             this.IsCompletelyDefined = (fileCount == 5) ;
         }
 
+        private Encoding GetDmodDizEncoding() {
+            if (this.DmodDiz == null) 
+                return Encoding.ASCII;
+            try {
+                using FileStream fileStream = this.DmodDiz.OpenRead();
+                Ude.CharsetDetector cdet = new Ude.CharsetDetector();
+                cdet.Feed(fileStream);
+                cdet.DataEnd();
+
+                return Encoding.GetEncoding(cdet.Charset);
+            } catch (Exception) {
+                // fallback to UTF8 if anything breaks?...
+                return Encoding.UTF8;
+            }
+        }
+
         public string? GetDescription() {
             try {
                 if (this.DmodDiz == null)
                     return null;
 
-                string desc = File.ReadAllText(this.DmodDiz!.FullName);
+                Encoding enc = this.GetDmodDizEncoding();
+                using FileStream fileStream = this.DmodDiz.OpenRead();
+                using StreamReader streamReader = new StreamReader(fileStream, enc);
+
+                string desc = streamReader.ReadToEnd();
 
                 return desc;
             } catch (Exception ex) {
@@ -139,22 +160,24 @@ namespace Martridge.Models.Dmod {
 
         public string? GetName() {
             try {
-                string[]? lines = null;
-
+                string? firstLine = null;
                 if (this.DmodDiz != null) {
                     try {
-                        lines = File.ReadAllLines(this.DmodDiz!.FullName);
-                    } catch (Exception ex) {
-                        MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
+                        Encoding enc = this.GetDmodDizEncoding();
+                        using FileStream fileStream = this.DmodDiz.OpenRead();
+                        using StreamReader streamReader = new StreamReader(fileStream, enc);
+                        firstLine = streamReader.ReadLine();
+                    } catch (Exception) {
+                        firstLine = null;
                     }
                 }
 
-                if (lines == null || lines.Length == 0 || string.IsNullOrWhiteSpace(lines[0])) {
+                if (string.IsNullOrWhiteSpace(firstLine)) {
                     // fallback to directory name
                     return this.DmodRoot.Name;
-                } else {
-                    return lines[0];
                 }
+
+                return firstLine;
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
                 return null;

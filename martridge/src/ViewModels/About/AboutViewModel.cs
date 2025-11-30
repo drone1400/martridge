@@ -163,6 +163,12 @@ namespace Martridge.ViewModels.About {
                     new List<UsedPackageLinkViewModel>() {
                         new UsedPackageLinkViewModel(linkSource, "https://github.com/goelhardik/ignore"),
                     }),
+                new AboutUsedPackageViewModel(
+                    Localizer.Instance["AboutWindow/Package/Ude/Name"],
+                    Localizer.Instance["AboutWindow/Package/Ude/Description"],
+                    new List<UsedPackageLinkViewModel>() {
+                        new UsedPackageLinkViewModel(linkSource, "https://github.com/errepi/ude"),
+                    }),
 #if ENABLE_FEATURE_ONLINE
                 new AboutUsedPackageViewModel(
                     Localizer.Instance["AboutWindow/Package/HtmlAgilityPack/Name"],

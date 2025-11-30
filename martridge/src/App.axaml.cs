@@ -34,6 +34,9 @@ namespace Martridge {
 
         public override void Initialize()
         {
+            // apparently we need to do this to initialize some text encoding stuff needed for parsing the old DMOD.DIZ files...
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+            
             Config.InitializeConfiguration();
             this.InitializeTheme();
         }

@@ -26,6 +26,7 @@
         <x:String x:Key="DataNotAvailable">N/A</x:String>
         <valueConverters:DmodScoreToSolidColorBrushConverter x:Key="DmodScoreToSolidColorBrushConverter" />
         <valueConverters:GenericDateConverter x:Key="GenericDateConverter"/>
+        <valueConverters:GenericDateTimeConverter x:Key="GenericDateTimeConverter"/>
     </UserControl.Resources>
     <Grid>
         <!-- this is needed to trigger the context menu when right clicking empty spaces... -->
@@ -60,80 +61,109 @@
                    Content="{dloc:Localize DmodBrowser/NoDmodSelectedBody}" />
         </Grid>
 
-        <Grid RowDefinitions="Auto,Auto,Auto,*"
-              IsVisible="{Binding SelectedDmodDefinition,
-                      Converter={x:Static ObjectConverters.IsNotNull}}">
-
+        <Grid 
+            RowDefinitions="Auto,Auto,Auto,*"
+            IsVisible="{Binding SelectedDmodDefinition,
+            Converter={x:Static ObjectConverters.IsNotNull}}">
+            <!-- Header Grid... -->
             <Grid Grid.Row="0"
+                  RowDefinitions="Auto,Auto,Auto">
+                <Label 
+                    Grid.Row="0" Grid.Column="0" 
+                    Classes="Heading1B"
+                    Content="{Binding SelectedDmodDefinition.Name, 
+                        FallbackValue={StaticResource DataNotAvailable},
+                        TargetNullValue={StaticResource DataNotAvailable} }" />
+                <Label 
+                    Grid.Row="1" Grid.Column="0" 
+                    Classes="Heading2I"
+                    Content="{Binding SelectedDmodDefinition.Author, 
+                       FallbackValue={StaticResource DataNotAvailable},
+                       TargetNullValue={StaticResource DataNotAvailable} }" />
+                <Button 
+                    Grid.Row="2" Grid.Column="0" 
+                    Classes="Invisibutton"
+                    HorizontalAlignment="Left"
+                    Command="{Binding SelectedDmodDefinition.CmdOpenDmodHyperlink}">
+                    <TextBlock 
+                        Classes="HyperlinkWrapping"
+                        Text="{Binding SelectedDmodDefinition.UrlMain, 
+                            FallbackValue={StaticResource DataNotAvailable},
+                            TargetNullValue={StaticResource DataNotAvailable} }" />
+                </Button>
+            </Grid>
+            
+            <Grid Grid.Row="1"
                   ColumnDefinitions="Auto,Auto,*,200"
                   RowDefinitions="Auto,Auto,Auto">
-
-                <Label Grid.Row="0" Grid.Column="0"
-                       Classes="Heading2B"
-                       Content="{dloc:Localize OnlineDmodBrowser/ReloadLastRefreshed}" />
-                <Label Grid.Row="0" Grid.Column="1"
-                       Classes="Heading2I"
-                       Content="{Binding LastRefreshedDmodString }" />
-                <Button Grid.Row="0" Grid.Column="3"
+                <Label 
+                    Grid.Row="0" Grid.Column="0" Classes="Heading2"
+                    Content="{dloc:Localize OnlineDmodBrowser/LastUpdate}"
+                    HorizontalAlignment="Left" />
+                <Label 
+                    Grid.Row="0" Grid.Column="1" Classes="Heading2IWrapping"
+                    Content="{Binding SelectedDmodDefinition.Updated,
+                    Converter={StaticResource GenericDateConverter},
+                    FallbackValue={StaticResource DataNotAvailable},
+                    TargetNullValue={StaticResource DataNotAvailable} }"
+                    HorizontalAlignment="Right" />
+                <Label 
+                    Grid.Row="1" Grid.Column="0"
+                    Classes="Heading2"
+                    Content="{dloc:Localize OnlineDmodBrowser/ReloadLastRefreshed}" />
+                <Label 
+                    Grid.Row="1" Grid.Column="1"
+                    Classes="Heading2I"
+                    Content="{Binding SelectedDmodDefinition.LastRefreshed, 
+                        Converter={StaticResource GenericDateTimeConverter},
+                        FallbackValue={StaticResource DataNotAvailable},
+                        TargetNullValue={StaticResource DataNotAvailable} }" />
+                
+                <Label 
+                    Grid.Row="2" Grid.Column="0" Classes="Heading2"
+                    Content="{dloc:Localize OnlineDmodBrowser/Downloads}"
+                    HorizontalAlignment="Left" />
+                <Label 
+                    Grid.Row="2" Grid.Column="1" Classes="Heading2IWrapping"
+                    Content="{Binding SelectedDmodDefinition.Downloads, 
+                        FallbackValue={StaticResource DataNotAvailable},
+                        TargetNullValue={StaticResource DataNotAvailable} }"
+                    HorizontalAlignment="Right" />
+                
+                <Grid 
+                    Grid.Row="0" Grid.RowSpan="3" Grid.Column="3"
+                    RowDefinitions="Auto,Auto">
+                    <Button 
+                        Grid.Row="0"
                         Command="{Binding CmdReloadSelectedDmodFromWeb}"
                         HorizontalAlignment="Stretch"
                         Width="NaN"
                         Content="{dloc:Localize OnlineDmodBrowser/ReloadDmod}" />
-
-            </Grid>
-
-            <!-- Header Grid... -->
-            <Grid Grid.Row="1"
-                  RowDefinitions="Auto,Auto,Auto"
-                  ColumnDefinitions="*, Auto, Auto" Margin="4">
-
-                <Label Grid.Row="0" Grid.Column="0" Classes="Heading2B"
-                       Content="{Binding SelectedDmodDefinition.Name, 
-                        FallbackValue={StaticResource DataNotAvailable},
-                        TargetNullValue={StaticResource DataNotAvailable} }" />
-                <Label Grid.Row="0" Grid.Column="1" Classes="Heading2"
-                       Content="{dloc:Localize OnlineDmodBrowser/LastUpdate}"
-                       HorizontalAlignment="Left" />
-                <Label Grid.Row="0" Grid.Column="2" Classes="Heading2IWrapping"
-                       Content="{Binding SelectedDmodDefinition.Updated,
-                       FallbackValue={StaticResource DataNotAvailable},
-                       TargetNullValue={StaticResource DataNotAvailable} }"
-                       HorizontalAlignment="Right" />
-
-                <Label Grid.Row="1" Grid.Column="0" Classes="Heading2I"
-                       Content="{Binding SelectedDmodDefinition.Author, 
-                       FallbackValue={StaticResource DataNotAvailable},
-                       TargetNullValue={StaticResource DataNotAvailable} }" />
-                <Label Grid.Row="1" Grid.Column="1" Classes="Heading2"
-                       Content="{dloc:Localize OnlineDmodBrowser/Downloads}"
-                       HorizontalAlignment="Left" />
-                <Label Grid.Row="1" Grid.Column="2" Classes="Heading2IWrapping"
-                       Content="{Binding SelectedDmodDefinition.Downloads, 
-                       FallbackValue={StaticResource DataNotAvailable},
-                       TargetNullValue={StaticResource DataNotAvailable} }"
-                       HorizontalAlignment="Right" />
-
-                <Button Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
-                        Classes="Invisibutton"
-                        HorizontalAlignment="Left"
-                        Command="{Binding SelectedDmodDefinition.CmdOpenDmodHyperlink}">
-                    <TextBlock Classes="HyperlinkWrapping"
-                               Text="{Binding SelectedDmodDefinition.UrlMain, 
-                                    FallbackValue={StaticResource DataNotAvailable},
-                                    TargetNullValue={StaticResource DataNotAvailable} }" />
-                </Button>
+                    <Button 
+                        Grid.Row="1"
+                        Command="{Binding CmdQuickInstallDmod}"
+                        CommandParameter="{Binding SelectedDmodDefinition}"
+                        HorizontalAlignment="Stretch"
+                        Width="NaN"
+                        Content="{dloc:Localize OnlineDmodBrowser/QuickInstall}" />
+                </Grid>
             </Grid>
 
             <!-- Loading Grid... -->
-            <Grid Grid.Row="2" Grid.Column="0"
-                  RowDefinitions="Auto,Auto"
-                  IsVisible="{Binding ProgressIsVisible}">
-                <Label Grid.Row="0" Classes="Heading2B"
-                       Content="{Binding ProgressMessage}" />
-                <ProgressBar Grid.Row="1"
-                             Minimum="0" Maximum="1"
-                             Value="{Binding ProgressBarPercent}"
-                             IsIndeterminate="{Binding ProgressIsIndeterminate}" />
+            <Grid 
+                Grid.Row="2" Grid.Column="0"
+                RowDefinitions="Auto,Auto"
+                IsVisible="{Binding ProgressIsVisible}">
+                <Label 
+                    Grid.Row="0" 
+                    Classes="Heading2B"
+                    Content="{Binding ProgressMessage}" />
+                <ProgressBar 
+                    Grid.Row="1"
+                    Minimum="0" 
+                    Maximum="1"
+                    Value="{Binding ProgressBarPercent}"
+                    IsIndeterminate="{Binding ProgressIsIndeterminate}" />
             </Grid>
 
             <!-- Dmod More info -->

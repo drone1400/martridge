@@ -16,7 +16,9 @@ namespace Martridge.ViewModels.OnlineDmod {
 
         public string Name { get => this.DmodInfo.Name; }
         public string Author { get => this._author; }
-        private string _author = "";
+        private string _author = string.Empty;
+        public string AuthorOnePerLine { get => this._authorOnePerLine; }
+        private string _authorOnePerLine = string.Empty;
         public string UrlMain { get => this.DmodInfo.ResMain.Url; }
         public int Downloads { get => this.DmodInfo.Downloads; }
         public DateTime Updated { get => this._updated; }
@@ -28,6 +30,12 @@ namespace Martridge.ViewModels.OnlineDmod {
         //
         // Properties parsed from the individual DMOD page
         //
+        
+        public DateTime LastRefreshed {
+            get => this._lastRefreshed;
+            private set => this.RaiseAndSetIfChanged(ref this._lastRefreshed, value);
+        }
+        private DateTime _lastRefreshed = DateTime.MinValue;
         
         public string Description {
             get => this._description;
@@ -56,7 +64,8 @@ namespace Martridge.ViewModels.OnlineDmod {
         public OnlineDmodInfoViewModel(OnlineDmodInfo dmodInfo) {
             this.DmodInfo = dmodInfo;
 
-            this._author = Regex.Replace(this.DmodInfo.Author, @",\s+", Environment.NewLine);
+            this._author = this.DmodInfo.Author;
+            this._authorOnePerLine = Regex.Replace(this.DmodInfo.Author, @",\s+", Environment.NewLine);
             this._updated = this.DmodInfo.Updated;
         }
 
@@ -80,6 +89,15 @@ namespace Martridge.ViewModels.OnlineDmod {
                 screenshots.Add(new OnlineDmodScreenshotViewModel(scr));
             }
             this.Screenshots = screenshots;
+            
+            string testFile = this.DmodInfo.ResMain.Local;
+            if (File.Exists(testFile)) {
+                FileInfo finfoTest = new FileInfo(testFile);
+                this.LastRefreshed = finfoTest.LastWriteTime;
+            }
+            else {
+                this.LastRefreshed = DateTime.MinValue;
+            }
         }
 
         public void UnloadOnlineData() {

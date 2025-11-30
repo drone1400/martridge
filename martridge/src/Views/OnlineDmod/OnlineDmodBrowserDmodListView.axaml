@@ -131,7 +131,7 @@
                 <DataGridTextColumn 
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Author}"
                     Width="130"
-                    Binding="{Binding Author, Mode=OneWay}"
+                    Binding="{Binding AuthorOnePerLine, Mode=OneWay}"
                     x:DataType="onlineDmod:OnlineDmodInfoViewModel"/>
                 <DataGridTextColumn 
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Updated}"

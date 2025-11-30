@@ -69,7 +69,9 @@ namespace Martridge.ViewModels.OnlineDmod {
                 }
 
                 if (args.PropertyName == nameof(this.SelectedDmodDefinition)) {
-                    _ = this.SelectedDmodDefinitionInitialize(false); // no await
+                    if (this.SelectedDmodDefinition != null) {
+                        _ = this.ReloadSelectedDmod(false); // no await
+                    }
                 }
 
                 if (args.PropertyName == nameof(this.SelectedDmodScreenshotVm)) {
@@ -354,12 +356,6 @@ namespace Martridge.ViewModels.OnlineDmod {
         // Properties
         // -----------------------------------------------------------------------------------------------------------------------------------
         
-        public string LastRefreshedDmodString {
-            get => this._lastRefreshedDmodString;
-            private set => this.RaiseAndSetIfChanged(ref this._lastRefreshedDmodString, value);
-        }
-        private string _lastRefreshedDmodString = "";
-        
         public OnlineDmodInfoViewModel? SelectedDmodDefinition {
             get => this._selectedDmodDefinition;
             private set {
@@ -404,9 +400,9 @@ namespace Martridge.ViewModels.OnlineDmod {
         /// Initialize selected DMOD Definition data from <see cref="DmodCrawler"/>, either using locally cached data or from the web
         /// </summary>
         /// <param name="forceReloadFromWeb">If true, will force attempt to get DMOD data from web</param>
-        private async Task SelectedDmodDefinitionInitialize(bool forceReloadFromWeb) {
-            if (this.SelectedDmodDefinition != null &&
-                this.DmodCrawler != null) {
+        private async Task ReloadSelectedDmod(bool forceReloadFromWeb) {
+            if (this.DmodCrawler != null &&
+                this.SelectedDmodDefinition != null) {
                 try {
                     this.ProgressBarPercent = 0;
                     this.ProgressIsIndeterminate = true;
@@ -441,11 +437,6 @@ namespace Martridge.ViewModels.OnlineDmod {
                     if (this.SelectedDmodDefinition.Screenshots.Count > 0) {
                         this.SelectedDmodScreenshotVm = this.SelectedDmodDefinition.Screenshots.First();
                     }
-
-                    string testFile = this.SelectedDmodDefinition.DmodInfo.ResMain.Local;
-                    FileInfo finfoTest = new FileInfo(testFile);
-
-                    this.LastRefreshedDmodString = finfoTest.LastWriteTime.ToString("G");
 
                     this.ProgressIsVisible = false;
                 } catch (Exception ex) {
@@ -522,7 +513,7 @@ namespace Martridge.ViewModels.OnlineDmod {
             if (this.SelectedDmodDefinition == null) return;
             if (this.ProgressIsVisible) return;
 
-            await this.SelectedDmodDefinitionInitialize(true);
+            await this.ReloadSelectedDmod(true);
         }
         [DependsOn(nameof(SelectedDmodDefinition))]
         [DependsOn(nameof(ProgressIsVisible))]
@@ -532,6 +523,24 @@ namespace Martridge.ViewModels.OnlineDmod {
             return true;
         }
 
+        public void CmdQuickInstallDmod(object? parameter = null) {
+            if (this.ProgressIsVisible) return;
+            if (this.DmodCrawler == null) return;
+            if (parameter is not OnlineDmodInfoViewModel def) return;
+
+            var versions = def.Versions.OrderByDescending(x => x.Released).ThenByDescending(x => x.Name);
+
+            this.CmdInstallDmod(versions.First());
+        }
+        [DependsOn(nameof(ProgressIsVisible))]
+        [DependsOn(nameof(DmodCrawler))]
+        public bool CanCmdQuickInstallDmod(object? parameter = null) {
+            if (this.ProgressIsVisible) return false;
+            if (this.DmodCrawler == null) return false;
+            if (parameter is OnlineDmodInfoViewModel) return true;
+            return false;
+        }
+
         /// <summary>
         /// Downloads an Online DMOD package and starts installing it when done
         /// </summary>
@@ -539,7 +548,7 @@ namespace Martridge.ViewModels.OnlineDmod {
         public async void CmdInstallDmod(object? parameter = null) {
             if (this.ProgressIsVisible) return;
             if (this.DmodCrawler == null) return;
-            if (!(parameter is OnlineDmodVersionViewModel def)) return;
+            if (parameter is not OnlineDmodVersionViewModel def) return;
 
             string url = def.RelativeDownloadUrl;
             OnlineDmodCachedResource? resource = OnlineDmodCachedResource.FromRelativeFileUrl(url);

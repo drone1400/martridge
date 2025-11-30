@@ -385,7 +385,8 @@
   "DmodBrowser/DataGrid/ColumnHeader/Name" : "DMOD Name",
   "DmodBrowser/DataGrid/ColumnHeader/Path" : "Path",
 
-  "OnlineDmodBrowser/ReloadDmod" : "Reload DMOD Info",
+  "OnlineDmodBrowser/ReloadDmod" : "Refresh DMOD Info",
+  "OnlineDmodBrowser/QuickInstall" : "Install Latest Version",
   "OnlineDmodBrowser/ReloadDmods" : "Reload DMOD List",
   "OnlineDmodBrowser/ReloadLastRefreshed" : "Last Refreshed",
   "OnlineDmodBrowser/ContextMenu/OpenDmodLocation" : "Open DMOD in Browser",

@@ -68,12 +68,6 @@ namespace Martridge.ViewModels.OnlineDmod {
                     }
                 }
 
-                if (args.PropertyName == nameof(this.SelectedDmodDefinition)) {
-                    if (this.SelectedDmodDefinition != null) {
-                        _ = this.ReloadSelectedDmod(false); // no await
-                    }
-                }
-
                 if (args.PropertyName == nameof(this.SelectedDmodScreenshotVm)) {
                     this.OnDmodScreenshotVmChanged();
                 }
@@ -359,13 +353,21 @@ namespace Martridge.ViewModels.OnlineDmod {
         public OnlineDmodInfoViewModel? SelectedDmodDefinition {
             get => this._selectedDmodDefinition;
             private set {
+                // do not do anything if this is the same object...
+                if (ReferenceEquals(this._selectedDmodDefinition, value))
+                    return;
+                
                 if (this._selectedDmodDefinition != null) {
                     // unload previous view models that are no longer needed...
                     this._selectedDmodDefinition.UnloadOnlineData();
                 }
+                
                 this.RaiseAndSetIfChanged(ref this._selectedDmodDefinition, value);
                 this.RaisePropertyChanged(nameof(this.SelectedDmodScreenshotIsFirst));
                 this.RaisePropertyChanged(nameof(this.SelectedDmodScreenshotIsLast));
+                
+                // reload selected dmod data
+                _ = this.ReloadSelectedDmod(false); // no await
             }
         }
         private OnlineDmodInfoViewModel? _selectedDmodDefinition;

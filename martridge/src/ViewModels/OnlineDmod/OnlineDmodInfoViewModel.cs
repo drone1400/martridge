@@ -101,6 +101,8 @@ namespace Martridge.ViewModels.OnlineDmod {
         }
 
         public void UnloadOnlineData() {
+            // NOTE: for future reference, this does not disposed the cached model data, only the view models themselves
+            
             foreach (var version in this.Versions) {
                 version.Dispose();
             }

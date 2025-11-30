@@ -56,50 +56,81 @@ namespace Martridge.Models.Steam {
                 wineVerPath = string.Empty;
                 winePfxPath = string.Empty;
                 protonVersion = string.Empty;
-            try {
-                string steamApps = FindSteamApps();
+                try {
+                    string steamApps = FindSteamApps();
 
-                if (string.IsNullOrWhiteSpace(steamApps)) {
-                    MyTrace.Global.WriteMessage(Localizer.Instance["SteamHelper/FindProtonWine/CouldNotFindSteamApps"]);
-                    return;
-                }
+                    if (string.IsNullOrWhiteSpace(steamApps)) {
+                        MyTrace.Global.WriteMessage(Localizer.Instance["SteamHelper/FindProtonWine/CouldNotFindSteamApps"]);
+                        return;
+                    }
 
-                string pathCompatData = Path.Combine(steamApps, "compatdata", nonSteamAppId.ToString(CultureInfo.InvariantCulture));
-                string pfxPath = Path.Combine(pathCompatData, "pfx");
-                string configPath = Path.Combine(pathCompatData, "config_info");
+                    string pathCompatData = Path.Combine(steamApps, "compatdata", nonSteamAppId.ToString(CultureInfo.InvariantCulture));
+                    string pfxPath = Path.Combine(pathCompatData, "pfx");
+                    string configPath = Path.Combine(pathCompatData, "config_info");
 
-                // check the pfx folder and version info exist
-                if (Directory.Exists(pfxPath) == false || File.Exists(configPath) == false) {
-                    MyTrace.Global.WriteMessage(Localizer.Instance["SteamHelper/FindProtonWine/CouldNotFindCompatData"]);
-                    return;
-                }
+                    // check the pfx folder and version info exist
+                    if (Directory.Exists(pfxPath) == false || File.Exists(configPath) == false) {
+                        MyTrace.Global.WriteMessage(Localizer.Instance["SteamHelper/FindProtonWine/CouldNotFindCompatData"]);
+                        return;
+                    }
 
-                string[] protonConfigs = File.ReadAllLines(configPath);
-                // 1st line should be proton version
-                // 2nd line is the proton /share/fonts/ dir
-                // 3rd line is the proton /lib/ dir
-                // 4th line is the proton /lib64/ dir [NOTE: sometimes this line is missing for 32 bit apps]
-                // 5th line is steam dir
-                // 6th, 7th, 8th lines are float values
-                // 9th line is the proton /share/default_pfx/ dir
-                // 10th line is another float
-                // 11th and 12th lines are bools
-                // 13th line is a list of dlls to use
-                // 14th line is another bool
-                // 15th line is sometimes another bool [NOTE: usually is missing?]
+                    string[] protonConfigs = File.ReadAllLines(configPath);
+                    // 1st line should be proton version
+                    // 2nd line is the proton /share/fonts/ dir
+                    // 3rd line is the proton /lib/ dir
+                    // 4th line is the proton /lib64/ dir [NOTE: sometimes this line is missing for 32 bit apps]
+                    // 5th line is steam dir
+                    // 6th, 7th, 8th lines are float values
+                    // 9th line is the proton /share/default_pfx/ dir
+                    // 10th line is another float
+                    // 11th and 12th lines are bools
+                    // 13th line is a list of dlls to use
+                    // 14th line is another bool
+                    // 15th line is sometimes another bool [NOTE: usually is missing?]
 
-                winePfxPath = pfxPath;
-                protonVersion = protonConfigs[0];
-                string libDir = protonConfigs[2];
-                DirectoryInfo libDirInfo = new DirectoryInfo(libDir);
-                wineVerPath = libDirInfo.Parent?.FullName ?? string.Empty;
+                    string winePfxPathTemp = pfxPath;
+                    string protonVersionTemp = protonConfigs[0];
+                    string libDir = protonConfigs[2];
+                    DirectoryInfo libDirInfo = new DirectoryInfo(libDir);
+                    string wineVerPathTemp = libDirInfo.Parent?.FullName ?? string.Empty;
 
-                MyTrace.Global.WriteMessage(Localizer.Instance["SteamHelper/FindProtonWine/FoundProtonVersion"] + " " + protonVersion);
-                MyTrace.Global.WriteMessage(Localizer.Instance["SteamHelper/FindProtonWine/FoundProtonWinePfx"] + " " + winePfxPath);
-                MyTrace.Global.WriteMessage(Localizer.Instance["SteamHelper/FindProtonWine/FoundProtonWineDir"] + " " + wineVerPath);
-            } catch (Exception ex) {
+                    if (Directory.Exists(wineVerPathTemp) && Directory.Exists(winePfxPathTemp)) {
+                        wineVerPath = wineVerPathTemp;
+                        winePfxPath = winePfxPathTemp;
+                        protonVersion = protonVersionTemp;
+                        
+                        MyTrace.Global.WriteMessage(Localizer.Instance["SteamHelper/FindProtonWine/FoundProtonVersion"] + " " + protonVersion);
+                        MyTrace.Global.WriteMessage(Localizer.Instance["SteamHelper/FindProtonWine/FoundProtonWinePfx"] + " " + winePfxPath);
+                        MyTrace.Global.WriteMessage(Localizer.Instance["SteamHelper/FindProtonWine/FoundProtonWineDir"] + " " + wineVerPath);
+                    }
+                } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
             }
+        }
+
+        public static void AutoDetectWinePaths(string wineVerPath, out string wineBinPath, out string wineLibPath, out string wineDllPath, out string wineServer, out string wineLoader) {
+            wineBinPath = string.Empty;
+            wineLibPath = string.Empty;
+            wineServer = string.Empty;
+            wineLoader = string.Empty;
+            wineDllPath = string.Empty;
+            
+            if (string.IsNullOrWhiteSpace(wineVerPath)) return;
+
+            string wineBinPathTemp = Path.Combine(wineVerPath, "bin");
+            if (Directory.Exists(wineBinPathTemp)) wineBinPath = wineBinPathTemp;
+            
+            string wineLibPathTemp = Path.Combine(wineVerPath, "lib");
+            if (Directory.Exists(wineLibPathTemp)) wineLibPath = wineLibPathTemp;
+            
+            string wineDllTemp = Path.Combine(wineVerPath, "lib", "wine");
+            if (Directory.Exists(wineDllTemp)) wineDllPath = wineDllTemp;
+            
+            string wineServerTemp = Path.Combine(wineVerPath, "bin", "wineserver");
+            if (File.Exists(wineServerTemp)) wineServer = wineServerTemp;
+            
+            string wineLoaderTemp = Path.Combine(wineVerPath, "bin", "wine");
+            if (File.Exists(wineLoaderTemp)) wineLoader = wineLoaderTemp;
         }
     }
 }

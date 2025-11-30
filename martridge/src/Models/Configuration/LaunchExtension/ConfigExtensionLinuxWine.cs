@@ -1,4 +1,6 @@
-﻿using Martridge.Models.Configuration.LaunchExtension.FileData;
+﻿using System.Collections.Generic;
+using Martridge.Models.Configuration.LaunchExtension.FileData;
+using Martridge.Models.Steam;
 namespace Martridge.Models.Configuration.LaunchExtension {
     public class ConfigExtensionLinuxWine {
 
@@ -87,5 +89,55 @@ namespace Martridge.Models.Configuration.LaunchExtension {
                 WINEPREFIX = this._WINEPREFIX,
             };
         }
+        
+        public static uint AutoDetectConfigDataWine(string exePath, uint knownSteamId, out ConfigDataExtensionLinuxWine? data) {
+            data = null;
+            
+            bool usingKnownSteamId = false;
+
+            List<uint> ids = new List<uint>();
+            
+            // try to autodetect known steam id first...
+            if (knownSteamId != 0) {
+                ids.Add(knownSteamId);
+                usingKnownSteamId = true;
+            } else {
+                ids = SteamHelper.FindNonSteamGameSteamIds(exePath);
+            }
+
+            for (int i = 0; i < ids.Count; i++) {
+                SteamHelper.FindProtonWine(ids[i], out string wineVerPath, out string winePfxPath, out string protonVersion);
+                SteamHelper.AutoDetectWinePaths(wineVerPath, out string wineBinPath, out string wineLibPath, out string wineDllPath, out string wineServer, out string wineLoader);
+
+                if (string.IsNullOrWhiteSpace(wineVerPath) == false &&
+                    string.IsNullOrWhiteSpace(winePfxPath) == false &&
+                    string.IsNullOrWhiteSpace(wineBinPath) == false &&
+                    string.IsNullOrWhiteSpace(wineLibPath) == false &&
+                    string.IsNullOrWhiteSpace(wineDllPath) == false &&
+                    string.IsNullOrWhiteSpace(wineServer) == false &&
+                    string.IsNullOrWhiteSpace(wineLoader) == false) {
+
+                    data = new ConfigDataExtensionLinuxWine() {
+                        WINEVERPATH = wineVerPath,
+                        WINEPREFIX = winePfxPath,
+                        WINEBINPATH = wineBinPath,
+                        WINELIBPATH = wineLibPath,
+                        WINEDLLPATH = wineDllPath,
+                        WINESERVER = wineServer,
+                        WINELOADER = wineLoader,
+                    };
+
+                    return ids[i];
+                }
+
+                if (usingKnownSteamId) {
+                    // failed to find using known steam id, try to scan again?
+                    ids = SteamHelper.FindNonSteamGameSteamIds(exePath);
+                    usingKnownSteamId = false;
+                }
+            }
+            
+            return 0;
+        } 
     }
 }

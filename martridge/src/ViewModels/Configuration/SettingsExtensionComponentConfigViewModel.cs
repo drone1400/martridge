@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Timers;
 using Avalonia.Metadata;
-using Martridge.Models.Configuration;
 using Martridge.Models.Configuration.LaunchExtension;
+using Martridge.Models.Configuration.LaunchExtension.FileData;
 using Martridge.Models.Localization;
 using Martridge.Models.Steam;
 using Martridge.Trace;
@@ -145,6 +144,16 @@ namespace Martridge.ViewModels.Configuration {
             this.WineDllPath = config?.WINEDLLPATH ?? string.Empty;
             this.WinePrefix = config?.WINEPREFIX ?? string.Empty;
         }
+        
+        private void SetFromWineData(ConfigDataExtensionLinuxWine? config) {
+            this.WineVerPath = config?.WINEVERPATH ?? string.Empty;
+            this.WineBinPath = config?.WINEBINPATH ?? string.Empty;
+            this.WineLibPath = config?.WINELIBPATH ?? string.Empty;
+            this.WineServer = config?.WINESERVER ?? string.Empty;
+            this.WineLoader = config?.WINELOADER ?? string.Empty;
+            this.WineDllPath = config?.WINEDLLPATH ?? string.Empty;
+            this.WinePrefix = config?.WINEPREFIX ?? string.Empty;
+        }
 
         private void SetFromSteamData(ConfigExtensionSteamInfo? config) {
             this.SteamId32 = config?.SteamId32 ?? 0;
@@ -152,34 +161,20 @@ namespace Martridge.ViewModels.Configuration {
         }
 
         private void TryAutoResolveSomeWinePaths() {
-            if (string.IsNullOrWhiteSpace(this._wineVerPath)) return;
+            
+            SteamHelper.AutoDetectWinePaths(this._wineVerPath, out string wineBinPath, out string wineLibPath, out string wineDllPath, out string wineServer, out string wineLoader);
 
-            if (string.IsNullOrWhiteSpace(this._wineBinPath)) {
-                string possiblePath = Path.Combine(this._wineVerPath, "bin");
-                if (Directory.Exists(possiblePath)) this.WineBinPath = possiblePath;
+            if (string.IsNullOrWhiteSpace(wineBinPath) == false &&
+                string.IsNullOrWhiteSpace(wineLibPath) == false &&
+                string.IsNullOrWhiteSpace(wineDllPath) == false &&
+                string.IsNullOrWhiteSpace(wineServer) == false &&
+                string.IsNullOrWhiteSpace(wineLoader) == false) {
+                this.WineBinPath = wineBinPath;
+                this.WineLibPath = wineLibPath;
+                this.WineDllPath = wineDllPath;
+                this.WineLoader = wineServer;
+                this.WineServer = wineLoader;
             }
-            
-            if (string.IsNullOrWhiteSpace(this._wineLibPath)) {
-                string possiblePath = Path.Combine(this._wineVerPath, "lib");
-                if (Directory.Exists(possiblePath)) this.WineLibPath = possiblePath;
-            }
-            
-            if (string.IsNullOrWhiteSpace(this._wineServer)) {
-                string possiblePath = Path.Combine(this._wineVerPath, "bin", "wineserver");
-                if (File.Exists(possiblePath)) this.WineServer = possiblePath;
-            }
-            
-            if (string.IsNullOrWhiteSpace(this._wineLoader)) {
-                string possiblePath = Path.Combine(this._wineVerPath, "bin", "wine");
-                if (File.Exists(possiblePath)) this.WineLoader = possiblePath;
-            }
-
-            if (string.IsNullOrWhiteSpace(this._wineDllPath)) {
-                string possiblePath = Path.Combine(this._wineVerPath, "lib", "wine");
-                if (Directory.Exists(possiblePath)) this.WineDllPath = possiblePath;
-            }
-            
-            // prefix can not be auto resolved here... so ignore that
         }
 
         public async void CmdAutoDetectSteamId(object? parameter = null) {
@@ -187,8 +182,7 @@ namespace Martridge.ViewModels.Configuration {
                 List<uint> ids = SteamHelper.FindNonSteamGameSteamIds(this.ExePath);
                 if (ids.Count > 0) {
                     this.SteamId32 = ids[0];
-                }
-                else {
+                } else {
                     string title = Localizer.Instance["SettingsExtensionConfigView/SteamAutoIdError/Title"];
                     string body = Localizer.Instance["SettingsExtensionConfigView/SteamAutoIdError/BodyPart1"]
                         + Environment.NewLine + this.ExePath + Environment.NewLine + Environment.NewLine +
@@ -199,49 +193,18 @@ namespace Martridge.ViewModels.Configuration {
                 MyTrace.Global.WriteException(ex);
             }
         }
-
+        
         public bool CanCmdAutoDetectSteamId() {
             return true;
         }
 
         public async void CmdAutoDetectWine(object? parameter = null) {
-            bool usingKnownSteamId = false;
-
-            List<uint> ids = new List<uint>();
             
-            // try to autodetect known steam id first...
-            if (this.SteamId32 != 0) {
-                ids.Add(this.SteamId32);
-                usingKnownSteamId = true;
-            } else {
-                ids = SteamHelper.FindNonSteamGameSteamIds(this.ExePath);
-            }
+            uint idResult = ConfigExtensionLinuxWine.AutoDetectConfigDataWine(this.ExePath, this.SteamId32, out ConfigDataExtensionLinuxWine? data);
 
-            for (int i = 0; i < ids.Count; i++) {
-                SteamHelper.FindProtonWine(ids[i], out string wineVerPath, out string winePfxPath, out string protonVersion);
-
-                if (Directory.Exists(wineVerPath) && Directory.Exists(winePfxPath)) {
-                    if (usingKnownSteamId == false) {
-                        this.SteamId32 = ids[i];
-                    }
-                    
-                    this.WineVerPath = wineVerPath;
-                    this.WinePrefix = winePfxPath;
-
-                    this.WineBinPath = "";
-                    this.WineLibPath = "";
-                    this.WineDllPath = "";
-                    this.WineLoader = "";
-                    this.WineServer = "";
-
-                    this.TryAutoResolveSomeWinePaths();
-                    return;
-                }
-
-                if (usingKnownSteamId) {
-                    // failed to find using known steam id, try to scan again?
-                    ids = SteamHelper.FindNonSteamGameSteamIds(this.ExePath);
-                }
+            if (data != null) {
+                this.SteamId32 = idResult;
+                this.SetFromWineData(data);
             }
         }
 

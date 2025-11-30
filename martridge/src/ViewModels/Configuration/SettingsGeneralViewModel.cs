@@ -15,6 +15,8 @@ using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Martridge.Models.Configuration.General;
 using Martridge.Models.Configuration.LaunchExtension;
+using Martridge.Models.Configuration.LaunchExtension.FileData;
+using Martridge.Models.Steam;
 
 namespace Martridge.ViewModels.Configuration {
     public class SettingsGeneralViewModel : ViewModelAppPageWithCfg {
@@ -520,7 +522,7 @@ namespace Martridge.ViewModels.Configuration {
         #endregion
         
         #region COMMANDS - GAME EXE
-
+        
         //
         // Game exe paths
         //
@@ -552,10 +554,7 @@ namespace Martridge.ViewModels.Configuration {
             {
                 this.IsBusy = true;
                 
-                if (LocationHelper.PathIsDuplicate(this.GameExePaths, this.GameExeAddNewManualValue) == false)
-                {
-                    this.GameExePaths.Add(this.GameExeAddNewManualValue);
-                }
+                this.TryAddExeInternal(this.GameExeAddNewManualValue, true);
             } catch (Exception ex)
             {
                 MyTrace.Global.WriteException(ex);
@@ -597,9 +596,9 @@ namespace Martridge.ViewModels.Configuration {
 #endif
                         LocationHelper.GetPathDefaultFileBrowser());
 
-                    if (storageFile != null && LocationHelper.PathIsDuplicate(this.GameExePaths, storageFile.Path.LocalPath) == false)
-                    {
-                        this.GameExePaths.Add(storageFile.Path.LocalPath);
+
+                    if (storageFile != null) {
+                        this.TryAddExeInternal(storageFile.Path.LocalPath, true);
                     }
                 } catch (Exception ex)
                 {
@@ -654,11 +653,8 @@ namespace Martridge.ViewModels.Configuration {
             try
             {
                 this.IsBusy = true;
-                
-                if (LocationHelper.PathIsDuplicate(this.EditorExePaths, this.EditorExeAddNewManualValue) == false)
-                {
-                    this.EditorExePaths.Add(this.EditorExeAddNewManualValue);
-                }
+
+                this.TryAddExeInternal(this.EditorExeAddNewManualValue, false);
             } catch (Exception ex)
             {
                 MyTrace.Global.WriteException(ex);
@@ -701,8 +697,8 @@ namespace Martridge.ViewModels.Configuration {
 #endif
                         LocationHelper.GetPathDefaultFileBrowser());
 
-                    if (storageFile != null && LocationHelper.PathIsDuplicate(this.EditorExePaths, storageFile.Path.LocalPath) == false) {
-                        this.EditorExePaths.Add(storageFile.Path.LocalPath);
+                    if (storageFile != null) {
+                        this.TryAddExeInternal(storageFile.Path.LocalPath, false);
                     }
                 } catch (Exception ex)
                 {
@@ -726,12 +722,57 @@ namespace Martridge.ViewModels.Configuration {
         #endregion
         
         #region COMMANDS - EXE EXTENSION
+        
+        private void TryAddExeInternal(string path, bool addGameExe) {
+            if (string.IsNullOrWhiteSpace(path))
+                return;
+
+            if (addGameExe) {
+                if (LocationHelper.PathIsDuplicate(this.GameExePaths, path))
+                    return;
+            }
+            else {
+                // adding editor exe
+                if (LocationHelper.PathIsDuplicate(this.EditorExePaths, path))
+                    return;
+            }
+            
+            // try to autodetect Steam and Wine stuff
+#if PLATF_WINDOWS
+            List<uint> list = SteamHelper.FindNonSteamGameSteamIds(path);
+            ConfigExtensionComponent? component = this.CfgExtension.TryAddOrGetExtension(path);
+            if (component != null && list.Count > 0) {
+                if (component.SteamData == null) component.SteamData = new ConfigExtensionSteamInfo(list[0], false);
+                else component.SteamData = new ConfigExtensionSteamInfo(list[0], component.SteamData.PreferLaunchingAsSteamApp);
+                
+                Config.Instance.SaveConfigExtension();
+            }
+#else
+            uint idResult = ConfigExtensionLinuxWine.AutoDetectConfigDataWine(path, 0, out ConfigDataExtensionLinuxWine? data);
+            if (idResult != 0 && data != null) {
+                ConfigExtensionComponent? component = this.CfgExtension.TryAddOrGetExtension(path);
+                if (component != null) {
+                    if (component.SteamData == null) component.SteamData = new ConfigExtensionSteamInfo(idResult, false);
+                    else component.SteamData = new ConfigExtensionSteamInfo(idResult, component.SteamData.PreferLaunchingAsSteamApp);
+
+                    component.WineData = new ConfigExtensionLinuxWine(data);
+                    
+                    Config.Instance.SaveConfigExtension();
+                }
+            }
+#endif
+
+            if (addGameExe) {
+                this.GameExePaths.Add(path);
+            } else {
+                this.EditorExePaths.Add(path);
+            }
+        }
 
         public void CmdExeExtensionEdit(object? parameter = null) {
             if (parameter is not string target) return;
             if (this.IsBusy ) return;
             if (this.ExeExtensionViewModel != null) return;
-            if (this.CfgExtension == null) return;
             
             this.ExeExtensionViewModel = new SettingsExtensionComponentConfigViewModel();
 
@@ -759,8 +800,6 @@ namespace Martridge.ViewModels.Configuration {
                     var cfgWine = this.ExeExtensionViewModel.GetWineData();
                     var cfgSteam = this.ExeExtensionViewModel.GetSteamData();
 
-
-
                     if (exeOriginal != exeCurrent) {
                         // have to update exe path...
                         int foundGameExeIndex = this.GameExePaths.IndexOf(exeOriginal);
@@ -783,12 +822,7 @@ namespace Martridge.ViewModels.Configuration {
                     component.WineData = cfgWine;
                 }
                 finally {
-                    // TODO... this is rather inconsistent, as in other places the config is passed to the view model by instance, but here i just save it directly in the current app
-                    // i think i'll have to reorganize how i handle the config objects later...
-                    // save changes...
-                    if (Application.Current is App app) {
-                        Config.Instance.SaveConfigExtension();
-                    }
+                    Config.Instance.SaveConfigExtension();
                     
                     this.ExeExtensionViewModel = null;
                 }

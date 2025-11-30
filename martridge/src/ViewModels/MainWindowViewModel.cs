@@ -656,8 +656,10 @@ namespace Martridge.ViewModels {
         private void ShowDmodInstallerCommon(object? parameter = null, bool browseDmodImmediately = false) {
             try {
                 DmodInstallerViewModel vm = new DmodInstallerViewModel();
-                if (parameter is string path && string.IsNullOrWhiteSpace(path) == false) {
+                if (parameter is string path && string.IsNullOrWhiteSpace(path) == false && File.Exists(path)) {
                     vm.TemporaryDmodSource = path;
+                    // since we are already passing a path to a file that exists, start initializing it immediately
+                    vm.CmdInitializeDmod(path);
                 }
                 
                 vm.PropertyChanged += (_, args) => {

@@ -525,14 +525,28 @@ namespace Martridge.ViewModels.OnlineDmod {
             return true;
         }
 
-        public void CmdQuickInstallDmod(object? parameter = null) {
-            if (this.ProgressIsVisible) return;
-            if (this.DmodCrawler == null) return;
-            if (parameter is not OnlineDmodInfoViewModel def) return;
+        public async void CmdQuickInstallDmod(object? parameter = null) {
+            try {
+                if (this.ProgressIsVisible) return;
+                if (this.DmodCrawler == null) return;
+                if (parameter is not OnlineDmodInfoViewModel def) return;
 
-            var versions = def.Versions.OrderByDescending(x => x.Released).ThenByDescending(x => x.Name);
+                await this.DmodCrawler.UpdateDmodVersionData(def.DmodInfo, true);
+                
+                IOrderedEnumerable<OnlineDmodVersion> versions = def.DmodInfo.DmodVersions
+                    .OrderByDescending(x => x.Released)
+                    .ThenByDescending(x => x.Name);
 
-            this.CmdInstallDmod(versions.First());
+                OnlineDmodVersion? versionInfo = versions.FirstOrDefault();
+
+                if (versionInfo != null) {
+                    using OnlineDmodVersionViewModel tempVersionInfoVm = new OnlineDmodVersionViewModel(versionInfo);
+
+                    this.CmdInstallDmod(tempVersionInfoVm);
+                }
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(ex);
+            }
         }
         [DependsOn(nameof(ProgressIsVisible))]
         [DependsOn(nameof(DmodCrawler))]

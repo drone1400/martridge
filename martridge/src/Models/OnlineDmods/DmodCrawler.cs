@@ -131,6 +131,27 @@ namespace Martridge.Models.OnlineDmods {
             
             dmodInfo.UpdateOnlineInfo(description, versions, reviews, screenshots);
         }
+        
+        public async Task UpdateDmodVersionData(OnlineDmodInfo dmodInfo, bool forceRefresh) {
+            if (!Directory.Exists(dmodInfo.LocalBase)) {
+                Directory.CreateDirectory(dmodInfo.LocalBase);
+            }
+
+            //
+            // cache html if necessary
+            //
+            
+            if (File.Exists(dmodInfo.ResVersions.Local) == false || forceRefresh) {
+                HttpStatusCode resultVersions = await this.DownloadWebContent(dmodInfo.ResVersions);
+            }
+            
+            //
+            //
+            //
+            List<OnlineDmodVersion> versions = this.ParseDmodVersions(dmodInfo.ResVersions.Local);
+            
+            dmodInfo.UpdateVersionInfo(versions);
+        }
 
         public async Task CacheUserData(OnlineUser user, bool forceRefresh) {
             List<OnlineDmodCachedResource> resources = new List<OnlineDmodCachedResource>();

@@ -66,5 +66,9 @@ namespace Martridge.Models.OnlineDmods {
             this.DmodReviews = reviews;
             this.DmodScreenshots = screenshots;
         }
+        
+        public void UpdateVersionInfo(List<OnlineDmodVersion> versions) {
+            this.DmodVersions = versions;
+        }
     }
 }

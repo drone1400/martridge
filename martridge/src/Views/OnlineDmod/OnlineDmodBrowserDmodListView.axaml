@@ -138,11 +138,31 @@
                     Width="90"
                     Binding="{Binding Updated, Converter={StaticResource GenericDateConverter}, Mode=OneWay}"
                     x:DataType="onlineDmod:OnlineDmodInfoViewModel"/>
-                <DataGridTextColumn 
+                <DataGridTemplateColumn
                     Header="{dloc:Localize OnlineDmodBrowser/DataGrid/ColumnHeader/Downloads}"
                     Width="90"
-                    Binding="{Binding Downloads, Mode=OneWay}"
-                    x:DataType="onlineDmod:OnlineDmodInfoViewModel"/>
+                    CanUserSort="True"
+                    SortMemberPath="Downloads"
+                    x:DataType="onlineDmod:OnlineDmodInfoViewModel">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="onlineDmod:OnlineDmodInfoViewModel">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock
+                                    Grid.Column="0"
+                                    Text="{Binding Downloads}"/>
+                                <Button 
+                                    Grid.Column="1"
+                                    Content="+++"
+                                    Width="NaN"
+                                    Height="NaN"
+                                    VerticalAlignment="Center"
+                                    Command="{Binding $parent[UserControl].DataContext.CmdQuickInstallDmod}"
+                                    CommandParameter="{Binding}"
+                                    />
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
         

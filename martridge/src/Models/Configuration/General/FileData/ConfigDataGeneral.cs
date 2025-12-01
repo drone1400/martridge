@@ -45,6 +45,16 @@ namespace Martridge.Models.Configuration.General.FileData {
         public double? OnlineDmodListAutoRefreshDays { get; set; }
 
         /// <summary>
+        /// How long it takes in seconds for a HTTP request to time out
+        /// </summary>
+        public double? OnlineWebCrawlerHttpTimeoutSeconds { get; set; }
+
+        /// <summary>
+        /// How long it takes for a 2nd HTTP request to be dropped while waiting for a previous one to complete
+        /// </summary>
+        public double? OnlineWebCrawlerBusyTimeoutSeconds { get; set; }
+
+        /// <summary>
         /// If true, displays the --refdir path launch config in the main window in the selected dmod view
         /// </summary>
         public bool? ShowLaunchRefDirPathInMainWindow { get; set; }
@@ -109,6 +119,8 @@ namespace Martridge.Models.Configuration.General.FileData {
                 [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
                 [nameof(ConfigGeneral.EnableOnlineFeatures)] = this.EnableOnlineFeatures,
                 [nameof(ConfigGeneral.OnlineDmodListAutoRefreshDays)] = this.OnlineDmodListAutoRefreshDays,
+                [nameof(ConfigGeneral.OnlineWebCrawlerHttpTimeoutSeconds)] = this.OnlineWebCrawlerHttpTimeoutSeconds,
+                [nameof(ConfigGeneral.OnlineWebCrawlerBusyTimeoutSeconds)] = this.OnlineWebCrawlerBusyTimeoutSeconds,
                 [nameof(ConfigGeneral.ShowLaunchRefDirPathInMainWindow)] = this.ShowLaunchRefDirPathInMainWindow,
                 [nameof(ConfigGeneral.ShowLaunchCustomArgsInMainWindow)] = this.ShowLaunchCustomArgsInMainWindow,
                 [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,

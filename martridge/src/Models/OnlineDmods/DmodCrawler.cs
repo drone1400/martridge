@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Martridge.Models.Configuration;
 
 namespace Martridge.Models.OnlineDmods {
     public class DmodCrawler : IDisposable, INotifyPropertyChanged {
@@ -87,18 +88,16 @@ namespace Martridge.Models.OnlineDmods {
         
 
         private readonly HttpClient _httpClient = new HttpClient() {
-            // if not set, default timeout should be ~100 seconds but that seems too long...
-            Timeout = TimeSpan.FromSeconds(30), // TODO, make this not hardcoded in the future...
+            // NOTE: it seems the default timeout can not be changed after sending a request...
+            Timeout = TimeSpan.FromSeconds(Config.Instance.General.OnlineWebCrawlerHttpTimeoutSeconds),
         };
-        
-        private readonly int _knownDmodPages = 9; // TODO, make this not hardcoded in the future...
 
         public List<OnlineDmodInfo> DmodList { get => this._dmodList; }
         private List<OnlineDmodInfo> _dmodList = new List<OnlineDmodInfo>();
 
         private Dictionary<string, OnlineUser> _onlineUsers = new Dictionary<string, OnlineUser>();
 
-        private TimeSpan _genericHttpClienTaskWaitToStartTime = TimeSpan.FromSeconds(30);
+        private TimeSpan HttpClientBusyWaitTime => TimeSpan.FromSeconds(Config.Instance.General.OnlineWebCrawlerBusyTimeoutSeconds);
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         
@@ -115,7 +114,7 @@ namespace Martridge.Models.OnlineDmods {
                     this.IsInitializingDmodList = true;
                 }
 
-                hasLock = await this.TryStartHttpClientTask(this._genericHttpClienTaskWaitToStartTime, this._cancellationTokenSource.Token);
+                hasLock = await this.TryStartHttpClientTask(this.HttpClientBusyWaitTime, this._cancellationTokenSource.Token);
                 if (hasLock == false) {
                     // failed to obtain lock...
                     return;
@@ -125,9 +124,11 @@ namespace Martridge.Models.OnlineDmods {
 
                 List<OnlineDmodInfo> dmodEntries = new List<OnlineDmodInfo>();
 
-                bool nextPageExists = false;
-                while (dmodPageIdx <= this._knownDmodPages || nextPageExists) {
+                bool nextPageExists = true;
+                while (nextPageExists) {
                     try {
+                        nextPageExists = false;
+                        
                         OnlineDmodCachedResource cachedResource = OnlineDmodCachedResource.FromDmodListPageNumber(dmodPageIdx);
 
                         FileInfo localHtml = new FileInfo(cachedResource.Local);
@@ -150,9 +151,6 @@ namespace Martridge.Models.OnlineDmods {
                             }
                             int dmodCount = this.ParseDmodsPage(cachedResource.Local, dmodEntries);
                             nextPageExists = this.ParseDmodsNextPageExists(cachedResource.Local);
-                        }
-                        else {
-                            nextPageExists = false;
                         }
 
                         dmodPageIdx++;
@@ -181,7 +179,7 @@ namespace Martridge.Models.OnlineDmods {
                 if (this._disposed)
                     return;
 
-                hasLock = await this.TryStartHttpClientTask(this._genericHttpClienTaskWaitToStartTime, this._cancellationTokenSource.Token);
+                hasLock = await this.TryStartHttpClientTask(this.HttpClientBusyWaitTime, this._cancellationTokenSource.Token);
                 if (hasLock == false) {
                     // failed to obtain lock...
                     MyTrace.Global.WriteMessage("Error reading online resource, Online DMOD Crawler seems busy... Try again later?");
@@ -245,7 +243,7 @@ namespace Martridge.Models.OnlineDmods {
                 if (this._disposed)
                     return;
                 
-                hasLock = await this.TryStartHttpClientTask(this._genericHttpClienTaskWaitToStartTime, this._cancellationTokenSource.Token);
+                hasLock = await this.TryStartHttpClientTask(this.HttpClientBusyWaitTime, this._cancellationTokenSource.Token);
                 if (hasLock == false) {
                     // failed to obtain lock...
                     MyTrace.Global.WriteMessage("Error reading online resource, Online DMOD Crawler seems busy... Try again later?");
@@ -288,7 +286,7 @@ namespace Martridge.Models.OnlineDmods {
                 if (this._disposed)
                     return;
                 
-                hasLock = await this.TryStartHttpClientTask(this._genericHttpClienTaskWaitToStartTime, this._cancellationTokenSource.Token);
+                hasLock = await this.TryStartHttpClientTask(this.HttpClientBusyWaitTime, this._cancellationTokenSource.Token);
                 if (hasLock == false) {
                     // failed to obtain lock...
                     MyTrace.Global.WriteMessage("Error reading online resource, Online DMOD Crawler seems busy... Try again later?");
@@ -331,7 +329,7 @@ namespace Martridge.Models.OnlineDmods {
                 if (this._disposed)
                     return false;
                 
-                hasLock = await this.TryStartHttpClientTask(this._genericHttpClienTaskWaitToStartTime, this._cancellationTokenSource.Token);
+                hasLock = await this.TryStartHttpClientTask(this.HttpClientBusyWaitTime, this._cancellationTokenSource.Token);
                 if (hasLock == false) {
                     // failed to obtain lock...
                     MyTrace.Global.WriteMessage("Error reading online resource, Online DMOD Crawler seems busy... Try again later?");

@@ -424,6 +424,7 @@
   "OnlineDmodBrowser/DataGrid/ColumnHeader/Score" : "Score",
   "OnlineDmodBrowser/DataGrid/ColumnHeader/Downloads" : "Downloads",
   "OnlineDmodBrowser/DataGrid/ColumnHeader/Updated" : "Updated",
+  "OnlineDmodBrowser/DownloadingData" : "Downloading...",
   
   "Generic/ButtonDebug": "Debug...",
   "Generic/ButtonBack": "Back",

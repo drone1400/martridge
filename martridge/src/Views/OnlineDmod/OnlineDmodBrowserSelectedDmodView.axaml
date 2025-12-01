@@ -5,8 +5,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 
              xmlns:dloc="using:Martridge.ViewModels.Localization"
-             xmlns:vm="using:Martridge.ViewModels.Dmod"
-             xmlns:vv="using:Martridge.Views.Dmod"
              xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
              xmlns:onlineDmod="clr-namespace:Martridge.ViewModels.OnlineDmod"
              xmlns:onlineDmod1="clr-namespace:Martridge.Views.OnlineDmod"
@@ -147,23 +145,6 @@
                         Width="NaN"
                         Content="{dloc:Localize OnlineDmodBrowser/QuickInstall}" />
                 </Grid>
-            </Grid>
-
-            <!-- Loading Grid... -->
-            <Grid 
-                Grid.Row="2" Grid.Column="0"
-                RowDefinitions="Auto,Auto"
-                IsVisible="{Binding ProgressIsVisible}">
-                <Label 
-                    Grid.Row="0" 
-                    Classes="Heading2B"
-                    Content="{Binding ProgressMessage}" />
-                <ProgressBar 
-                    Grid.Row="1"
-                    Minimum="0" 
-                    Maximum="1"
-                    Value="{Binding ProgressBarPercent}"
-                    IsIndeterminate="{Binding ProgressIsIndeterminate}" />
             </Grid>
 
             <!-- Dmod More info -->

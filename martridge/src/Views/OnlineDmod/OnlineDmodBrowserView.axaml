@@ -26,38 +26,84 @@
     </UserControl.Resources>
 
     <Border Classes="MartridgeCard">
-        <vw:MagicSplitPresenterView
-            Name="MagicSplit"
-            OnePageSwitchThreshold="950"
-            LeftPanelMinWidth="560"
-            RightPanelMinWidth="360"
-            IsOnePageShowingRightContent="{Binding SelectedDmodDefinition, 
+        <Grid>
+            <vw:MagicSplitPresenterView
+                Name="MagicSplit"
+                OnePageSwitchThreshold="950"
+                LeftPanelMinWidth="560"
+                RightPanelMinWidth="360"
+                IsOnePageShowingRightContent="{Binding SelectedDmodDefinition, 
                 Converter={StaticResource ConverterIsNotNullCheck}}"
-            LeftPanelolumnLengthInitialized="{Binding OnlineDmodBrowserLeftPanelColumnWidthSet, Mode=TwoWay}"
-            RightPanelolumnLengthInitialized="{Binding OnlineDmodBrowserRightPanelColumnWidthSet, Mode=TwoWay}"
-            LeftPanelLastSetColumnLength="{Binding OnlineDmodBrowserLeftPanelColumnWidth, Mode=TwoWay}"
-            RightPanelLastSetColumnLength="{Binding OnlineDmodBrowserRightPanelColumnWidth, Mode=TwoWay}">
+                LeftPanelolumnLengthInitialized="{Binding OnlineDmodBrowserLeftPanelColumnWidthSet, Mode=TwoWay}"
+                RightPanelolumnLengthInitialized="{Binding OnlineDmodBrowserRightPanelColumnWidthSet, Mode=TwoWay}"
+                LeftPanelLastSetColumnLength="{Binding OnlineDmodBrowserLeftPanelColumnWidth, Mode=TwoWay}"
+                RightPanelLastSetColumnLength="{Binding OnlineDmodBrowserRightPanelColumnWidth, Mode=TwoWay}"
+                IsEnabled="{Binding !DmodCrawlerIsBusy}">
 
-            <vw:MagicSplitPresenterView.LeftPanelContent>
-                <onlineDmod1:OnlineDmodBrowserDmodListView DataContext="{Binding }" />
-            </vw:MagicSplitPresenterView.LeftPanelContent>
+                <vw:MagicSplitPresenterView.LeftPanelContent>
+                    <onlineDmod1:OnlineDmodBrowserDmodListView DataContext="{Binding }" />
+                </vw:MagicSplitPresenterView.LeftPanelContent>
 
-            <vw:MagicSplitPresenterView.RightPanelContent>
-                <Grid RowDefinitions="Auto, *">
-                    <Button Grid.Row="0"
-                            IsVisible="{Binding IsViewOnePageMode, ElementName=MagicSplit}"
-                            HorizontalAlignment="Stretch"
-                            Width="NaN"
-                            Command="{Binding CmdClearSelectedDmod}"
-                            Content="{dloc:Localize DmodBrowser/BackToList}" />
+                <vw:MagicSplitPresenterView.RightPanelContent>
+                    <Grid RowDefinitions="Auto, *">
+                        <Button Grid.Row="0"
+                                IsVisible="{Binding IsViewOnePageMode, ElementName=MagicSplit}"
+                                HorizontalAlignment="Stretch"
+                                Width="NaN"
+                                Command="{Binding CmdClearSelectedDmod}"
+                                Content="{dloc:Localize DmodBrowser/BackToList}" />
 
 
-                    <onlineDmod1:OnlineDmodBrowserSelectedDmodView
-                        Grid.Row="1"
-                        DataContext="{Binding }" />
+                        <onlineDmod1:OnlineDmodBrowserSelectedDmodView
+                            Grid.Row="1"
+                            DataContext="{Binding }" />
+                    </Grid>
+                </vw:MagicSplitPresenterView.RightPanelContent>
+
+            </vw:MagicSplitPresenterView>
+
+
+            <!-- copied this layout from the DinkyAlert xaml lul -->
+            <Grid ColumnDefinitions="*,4*,*" RowDefinitions="*,Auto,*"
+                  IsVisible="{Binding DmodCrawlerIsBusy}"
+                  x:Name="TheGrid">
+                <Grid
+                    Grid.Row="0" Grid.RowSpan="3"
+                    Grid.Column="0" Grid.ColumnSpan="3"
+                    Background="{DynamicResource ThemeBackgroundBrush}" Opacity="0.5" />
+
+                <!-- this may seem rather odd, but if we don't do this max width binding here, the Label below that binds to the message
+                    will stretch endlessly instead of wrapping -->
+                <Grid
+                    Grid.Row="1" Grid.Column="1"
+                    MaxWidth="{Binding Bounds.Width, ElementName=TheGrid}">
+
+                    <Border Classes="MartridgeCard"
+                            Margin="40,10">
+                        <Grid
+                            RowDefinitions="Auto, Auto, Auto, Auto"
+                            Margin="5,10">
+
+                            <Label
+                                Grid.Row="0" Grid.Column="0"
+                                Classes="HeadingTitle"
+                                HorizontalAlignment="Center"
+                                Content="{dloc:Localize OnlineDmodBrowser/DownloadingData}" />
+                            <Label
+                                Grid.Row="1" Grid.Column="0"
+                                Classes="Heading2IWrapping"
+                                HorizontalAlignment="Center"
+                                Content="{Binding DmodCrawlerCurrentUrl}" />
+
+                            <ProgressBar
+                                Grid.Row="2"
+                                IsIndeterminate="True" />
+
+
+                        </Grid>
+                    </Border>
                 </Grid>
-            </vw:MagicSplitPresenterView.RightPanelContent>
-
-        </vw:MagicSplitPresenterView>
+            </Grid>
+        </Grid>
     </Border>
 </UserControl>

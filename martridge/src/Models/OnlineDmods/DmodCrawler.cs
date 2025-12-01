@@ -74,6 +74,12 @@ namespace Martridge.Models.OnlineDmods {
         }
         private bool _isInitializingDmodList = false;
 
+        public string CurrentUrl {
+            get => this._currentUrl; 
+            set => this.SetField(ref this._currentUrl, value);
+        }
+        private string _currentUrl = string.Empty;
+
         public DateTime DmodPagesLastWriteTime {
             get => this._dmodPagesLastWriteTime;
             private set => this.SetField(ref this._dmodPagesLastWriteTime, value);
@@ -356,7 +362,9 @@ namespace Martridge.Models.OnlineDmods {
             try {
                 if (this._disposed)
                     return false;
-                
+
+                this.CurrentUrl = res.Url;
+
                 MyTrace.Global.WriteMessage($"Sending HTTP Request to URL: \"{res.Url}\"");
 
                 // first only read the header
@@ -386,12 +394,15 @@ namespace Martridge.Models.OnlineDmods {
                 MyTrace.Global.WriteMessage($"    HTTP Response Status = {response.StatusCode}");
                 await response.Content.CopyToAsync(fileStream);
                 MyTrace.Global.WriteMessage($"    Content saved to = {res.Local}");
-                
+
                 // all done, yay
                 return true;
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
                 return false;
+            }
+            finally {
+                this.CurrentUrl = string.Empty;
             }
             
         }

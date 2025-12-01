@@ -84,7 +84,7 @@ namespace Martridge.Models.OnlineDmods {
             get => this._dmodPagesOldestWriteTime;
             private set => this.SetField(ref this._dmodPagesOldestWriteTime, value);
         }
-        private DateTime _dmodPagesOldestWriteTime = DateTime.MinValue;
+        private DateTime _dmodPagesOldestWriteTime = DateTime.MaxValue;
         
 
         private readonly HttpClient _httpClient = new HttpClient() {

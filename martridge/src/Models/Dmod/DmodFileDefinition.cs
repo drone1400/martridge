@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using UtfUnknown;
 
 namespace Martridge.Models.Dmod {
     public class DmodFileDefinition {
@@ -129,11 +130,8 @@ namespace Martridge.Models.Dmod {
                 return Encoding.ASCII;
             try {
                 using FileStream fileStream = this.DmodDiz.OpenRead();
-                Ude.CharsetDetector cdet = new Ude.CharsetDetector();
-                cdet.Feed(fileStream);
-                cdet.DataEnd();
-
-                return Encoding.GetEncoding(cdet.Charset);
+                DetectionResult? result = CharsetDetector.DetectFromStream(fileStream);
+                return result?.Detected.Encoding ?? Encoding.UTF8;
             } catch (Exception) {
                 // fallback to UTF8 if anything breaks?...
                 return Encoding.UTF8;

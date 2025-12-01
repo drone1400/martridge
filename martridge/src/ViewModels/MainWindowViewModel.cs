@@ -368,6 +368,18 @@ namespace Martridge.ViewModels {
 
             ViewModelAppPage? newViewModel = this._dmodBrowserViewModel;
             
+            // make sure settings get applied if swapping here from settings VM
+            if (this._currentViewModel is SettingsGeneralViewModel settings) {
+                // apply settings...
+                settings.CmdSettingsOk();
+                // dispose old view model
+                settings.Dispose();
+            } else
+            {
+                // dispose current view model if needed
+                this._currentViewModel?.Dispose();
+            }
+            
             // check we have a valid game or editor exe
             if (this._config != null &&
                 this._config.General.GameExePaths.Count == 0 &&

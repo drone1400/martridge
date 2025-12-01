@@ -62,8 +62,6 @@ namespace Martridge.ViewModels {
         private DmodManager? _dmodManager = null;
         
 #if ENABLE_FEATURE_ONLINE
-        private DmodCrawler? _dmodCrawler = null;
-
         public bool EnableOnlineFeatures {
             get => this._enableOnlineFeatures;
             private set { 
@@ -202,10 +200,6 @@ namespace Martridge.ViewModels {
                         this.SwapToDefaultViewModel();
                     }
 
-                    if (this._dmodCrawler != null) {
-                        this._dmodCrawler.Dispose();
-                        this._dmodCrawler = null;
-                    }
                     if (this._onlineDmodBrowserViewModel != null) {
                         this._onlineDmodBrowserViewModel.Dispose();
                         this._onlineDmodBrowserViewModel = null;
@@ -429,31 +423,26 @@ namespace Martridge.ViewModels {
             if (this.EnableOnlineFeatures == false)
                 return;
             
-            if (this._dmodCrawler == null) {
-                this._dmodCrawler = new DmodCrawler();
-                Task.Run(async () =>
-                {
-                    try {
-                        await this._dmodCrawler.InitializeDmodLists(false);
+            Task.Run(async () =>
+            {
+                try {
+                    await DmodCrawler.Instance.InitializeDmodLists(false);
 
-                        if (Config.Instance.General.OnlineDmodListAutoRefreshDays <= 0 ||
-                            double.IsNaN(Config.Instance.General.OnlineDmodListAutoRefreshDays))
-                            return;
+                    if (Config.Instance.General.OnlineDmodListAutoRefreshDays <= 0 ||
+                        double.IsNaN(Config.Instance.General.OnlineDmodListAutoRefreshDays))
+                        return;
 
-                        if ((DateTime.Now - this._dmodCrawler.DmodPagesOldestWriteTime).TotalDays >= Config.Instance.General.OnlineDmodListAutoRefreshDays) {
-                            // if the DMOD page data is too old, force online refresh
-                            await this._dmodCrawler.InitializeDmodLists(true);
-                        }
-                    } catch (Exception ex) {
-                        MyTrace.Global.WriteException(ex);
+                    if ((DateTime.Now - DmodCrawler.Instance.DmodPagesOldestWriteTime).TotalDays >= Config.Instance.General.OnlineDmodListAutoRefreshDays) {
+                        // if the DMOD page data is too old, force online refresh
+                        await DmodCrawler.Instance.InitializeDmodLists(true);
                     }
-                });
-                
-            }
+                } catch (Exception ex) {
+                    MyTrace.Global.WriteException(ex);
+                }
+            });
             
             if (this._onlineDmodBrowserViewModel == null) {
                 this._onlineDmodBrowserViewModel = new OnlineDmodBrowserViewModel();
-                this._onlineDmodBrowserViewModel.DmodCrawler = this._dmodCrawler;
                 this._onlineDmodBrowserViewModel.InstallDmodRequested += (_, args) => {
                     this.CmdShowPageDmodInstaller(args.Path);
                 };

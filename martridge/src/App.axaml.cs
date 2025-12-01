@@ -15,6 +15,7 @@ using Martridge.Models;
 using Martridge.Models.Configuration;
 using Martridge.Models.Configuration.AppState;
 using Martridge.Models.Configuration.General;
+using Martridge.Models.OnlineDmods;
 using Martridge.Trace;
 using Martridge.ViewModels;
 using Martridge.ViewModels.DinkyAlerts;
@@ -388,6 +389,9 @@ namespace Martridge {
             
             // save app state when closing
             Config.Instance.SaveAppState();
+            
+            // destroy web crawler...
+            DmodCrawler.Instance.Dispose();
             
             this._logger.Close();
         }

@@ -2,23 +2,89 @@ using HtmlAgilityPack;
 using Martridge.Trace;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Martridge.Models.OnlineDmods {
-    public class DmodCrawler : IDisposable {
-
-        public DateTime DmodPagesLastWriteTime { get; private set; } = DateTime.MinValue;
-        public DateTime DmodPagesOldestWriteTime { get; private set; } = DateTime.MaxValue;
-        public bool IsInitializingDmods { get; private set; } = false;
-        public event EventHandler? DmodListInitialized;
-        public event EventHandler? DmodListInitializationChanged;
+    public class DmodCrawler : IDisposable, INotifyPropertyChanged {
         
-        private readonly object _syncRootInitDmods = new object();
+        public static DmodCrawler Instance { get; } = new DmodCrawler();
+        
+        #region INotifyPropertyChanged
+        
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string? propertyName = null) {
+            try {
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(ex);
+            }
+        }
+        private bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null) {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            this.OnPropertyChanged(propertyName);
+            return true;
+        }
+        
+        #endregion
+        
+        public event EventHandler? DmodListInitialized;
+        private void OnDmodListInitialized() {
+            try {
+                this.DmodListInitialized?.Invoke(this, EventArgs.Empty);
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(ex);
+            }
+        }
+        
+        public bool IsBusy {
+            get {
+                lock (this._syncRootBusy) {
+                    return this._isBusy;
+                }
+            }
+            private set {
+                lock (this._syncRootBusy) {
+                    this.SetField(ref this._isBusy, value);
+                }
+            }
+        }
+        private bool _isBusy = false;
+        private readonly object _syncRootBusy = new object();
+
+        public bool IsInitializingDmodList {
+            get {
+                lock (this._syncRootBusy) {
+                    return this._isInitializingDmodList;
+                }
+            }
+            private set {
+                lock (this._syncRootBusy) {
+                    this.SetField(ref this._isInitializingDmodList, value);
+                }
+            }
+        }
+        private bool _isInitializingDmodList = false;
+
+        public DateTime DmodPagesLastWriteTime {
+            get => this._dmodPagesLastWriteTime;
+            private set => this.SetField(ref this._dmodPagesLastWriteTime, value);
+        }
+        private DateTime _dmodPagesLastWriteTime = DateTime.MinValue;
+
+        public DateTime DmodPagesOldestWriteTime {
+            get => this._dmodPagesOldestWriteTime;
+            private set => this.SetField(ref this._dmodPagesOldestWriteTime, value);
+        }
+        private DateTime _dmodPagesOldestWriteTime = DateTime.MinValue;
+        
 
         private readonly HttpClient _httpClient = new HttpClient() {
             // if not set, default timeout should be ~100 seconds but that seems too long...
@@ -32,15 +98,28 @@ namespace Martridge.Models.OnlineDmods {
 
         private Dictionary<string, OnlineUser> _onlineUsers = new Dictionary<string, OnlineUser>();
 
+        private TimeSpan _genericHttpClienTaskWaitToStartTime = TimeSpan.FromSeconds(30);
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
+        
         public async Task InitializeDmodLists(bool forceOnlineRefresh) {
+            bool hasLock = false;
+            
             try {
-                lock (this._syncRootInitDmods) {
-                    if (this.IsInitializingDmods)
+                if (this._disposed)
+                    return;
+
+                lock (this._syncRootBusy) {
+                    if (this._isInitializingDmodList)
                         return;
-                    this.IsInitializingDmods = true;
+                    this.IsInitializingDmodList = true;
                 }
-                
-                this.DmodListInitializationChanged?.Invoke(this, EventArgs.Empty);
+
+                hasLock = await this.TryStartHttpClientTask(this._genericHttpClienTaskWaitToStartTime, this._cancellationTokenSource.Token);
+                if (hasLock == false) {
+                    // failed to obtain lock...
+                    return;
+                }
                 
                 int dmodPageIdx = 1;
 
@@ -56,7 +135,10 @@ namespace Martridge.Models.OnlineDmods {
                             localHtml.Directory.Create();
                         }
                         if (localHtml.Exists == false || forceOnlineRefresh) {
-                            await this.DownloadWebContent(cachedResource);
+                            bool success = await this.DownloadWebContentInternal(cachedResource);
+                            if (!success) {
+                                MyTrace.Global.WriteMessage($"Error downloading dmod lists #{dmodPageIdx}...", MyTraceLevel.Error);
+                            }
                         }
                         localHtml.Refresh();
                         if (localHtml.Exists) {
@@ -81,116 +163,263 @@ namespace Martridge.Models.OnlineDmods {
                 }
 
                 this._dmodList = dmodEntries;
-                this.DmodListInitialized?.Invoke(this, EventArgs.Empty);
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
             } finally {
-                try {
-                    lock (this._syncRootInitDmods) {
-                        this.IsInitializingDmods = false;
-                    }
-                    this.DmodListInitializationChanged?.Invoke(this, EventArgs.Empty);
-                } catch (Exception ex) {
-                    MyTrace.Global.WriteException(ex);
+                if (hasLock) {
+                    this.IsBusy = false;
+                    this.IsInitializingDmodList = false;
                 }
+                this.OnDmodListInitialized();
             }
         }
 
         public async Task UpdateDmodData(OnlineDmodInfo dmodInfo, bool forceRefresh) {
-            if (!Directory.Exists(dmodInfo.LocalBase)) {
-                Directory.CreateDirectory(dmodInfo.LocalBase);
-            }
+            bool hasLock = false;
 
-            //
-            // cache html if necessary
-            //
-            
-            if (File.Exists(dmodInfo.ResVersions.Local) == false || forceRefresh) {
-                HttpStatusCode resultVersions = await this.DownloadWebContent(dmodInfo.ResVersions);
-            }
-            
-            if (File.Exists(dmodInfo.ResMain.Local) == false || forceRefresh) {
-                HttpStatusCode resultMain = await this.DownloadWebContent(dmodInfo.ResMain);
-            }
+            try {
+                if (this._disposed)
+                    return;
 
-            if (File.Exists(dmodInfo.ResReviews.Local) == false || forceRefresh) {
-                HttpStatusCode resultReviews = await this.DownloadWebContent(dmodInfo.ResReviews);
-            }
+                hasLock = await this.TryStartHttpClientTask(this._genericHttpClienTaskWaitToStartTime, this._cancellationTokenSource.Token);
+                if (hasLock == false) {
+                    // failed to obtain lock...
+                    MyTrace.Global.WriteMessage("Error reading online resource, Online DMOD Crawler seems busy... Try again later?");
+                    return;
+                }
 
-            if (File.Exists(dmodInfo.ResScreenshots.Local) == false || forceRefresh) {
-                HttpStatusCode resultScreenshots = await this.DownloadWebContent(dmodInfo.ResScreenshots);
-            }
-            
-            //
-            //
-            //
-            string? description = this.ParseDmodDescription(dmodInfo.ResMain.Local);
-            List<OnlineDmodVersion> versions = this.ParseDmodVersions(dmodInfo.ResVersions.Local);
-            List<OnlineDmodReview> reviews = this.ParseDmodReviews(dmodInfo.ResReviews.Local);
-            List<OnlineDmodScreenshot> screenshots = await this.ParseDmodScreenshots(dmodInfo.ResScreenshots.Local);
-            
-            dmodInfo.UpdateOnlineInfo(description, versions, reviews, screenshots);
-        }
-        
-        public async Task UpdateDmodVersionData(OnlineDmodInfo dmodInfo, bool forceRefresh) {
-            if (!Directory.Exists(dmodInfo.LocalBase)) {
-                Directory.CreateDirectory(dmodInfo.LocalBase);
-            }
+                if (!Directory.Exists(dmodInfo.LocalBase)) {
+                    Directory.CreateDirectory(dmodInfo.LocalBase);
+                }
 
-            //
-            // cache html if necessary
-            //
-            
-            if (File.Exists(dmodInfo.ResVersions.Local) == false || forceRefresh) {
-                HttpStatusCode resultVersions = await this.DownloadWebContent(dmodInfo.ResVersions);
-            }
-            
-            //
-            //
-            //
-            List<OnlineDmodVersion> versions = this.ParseDmodVersions(dmodInfo.ResVersions.Local);
-            
-            dmodInfo.UpdateVersionInfo(versions);
-        }
+                //
+                // cache html if necessary
+                //
 
-        public async Task CacheUserData(OnlineUser user, bool forceRefresh) {
-            List<OnlineDmodCachedResource> resources = new List<OnlineDmodCachedResource>();
-            
-            OnlineDmodCachedResource? pfpBack = OnlineDmodCachedResource.FromRelativeFileUrl(user.RelativePfpBackgroundUrl);
-            OnlineDmodCachedResource? pfpFore = OnlineDmodCachedResource.FromRelativeFileUrl(user.RelativePfpForegroundUrl);
+                if (File.Exists(dmodInfo.ResMain.Local) == false || forceRefresh) {
+                    if (!await this.DownloadWebContentInternal(dmodInfo.ResMain)) {
+                        MyTrace.Global.WriteMessage($"Error reading online DMOD data from: {dmodInfo.ResMain.Url}", MyTraceLevel.Error);
+                    }
+                }
 
-            if (pfpBack != null) resources.Add(pfpBack);
-            if (pfpFore != null) resources.Add(pfpFore);
-            
-            foreach (string badgeStr in user.RelativeBadgeIconUrls) {
-                OnlineDmodCachedResource? badge = OnlineDmodCachedResource.FromRelativeFileUrl(badgeStr);
-                if (badge != null) resources.Add(badge);
-            }
+                if (File.Exists(dmodInfo.ResVersions.Local) == false || forceRefresh) {
+                    if (!await this.DownloadWebContentInternal(dmodInfo.ResVersions)) {
+                        MyTrace.Global.WriteMessage($"Error reading online DMOD data from: {dmodInfo.ResVersions.Url}", MyTraceLevel.Error);
+                    }
+                }
 
-            foreach (OnlineDmodCachedResource res in resources) {
-                if (File.Exists(res.Local) == false || forceRefresh) {
-                    HttpStatusCode result = await this.DownloadWebContent(res);
+                if (File.Exists(dmodInfo.ResReviews.Local) == false || forceRefresh) {
+                    if (!await this.DownloadWebContentInternal(dmodInfo.ResReviews)) {
+                        MyTrace.Global.WriteMessage($"Error reading online DMOD data from: {dmodInfo.ResReviews.Url}", MyTraceLevel.Error);
+                    }
+                }
+
+                if (File.Exists(dmodInfo.ResScreenshots.Local) == false || forceRefresh) {
+                    if (!await this.DownloadWebContentInternal(dmodInfo.ResScreenshots)) {
+                        MyTrace.Global.WriteMessage($"Error reading online DMOD data from: {dmodInfo.ResScreenshots.Url}", MyTraceLevel.Error);
+                    }
+                }
+
+                //
+                //
+                //
+                string? description = this.ParseDmodDescription(dmodInfo.ResMain.Local);
+                List<OnlineDmodVersion> versions = this.ParseDmodVersions(dmodInfo.ResVersions.Local);
+                List<OnlineDmodReview> reviews = this.ParseDmodReviews(dmodInfo.ResReviews.Local);
+                List<OnlineDmodScreenshot> screenshots = await this.ParseDmodScreenshots(dmodInfo.ResScreenshots.Local);
+
+                dmodInfo.UpdateOnlineInfo(description, versions, reviews, screenshots);
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(ex);
+            } finally {
+                if (hasLock) {
+                    this.IsBusy = false;
                 }
             }
         }
         
-        
+        public async Task UpdateDmodVersionData(OnlineDmodInfo dmodInfo, bool forceRefresh) {
+            bool hasLock = false;
+            
+            try {
+                if (this._disposed)
+                    return;
+                
+                hasLock = await this.TryStartHttpClientTask(this._genericHttpClienTaskWaitToStartTime, this._cancellationTokenSource.Token);
+                if (hasLock == false) {
+                    // failed to obtain lock...
+                    MyTrace.Global.WriteMessage("Error reading online resource, Online DMOD Crawler seems busy... Try again later?");
+                    return;
+                }
+                
+                if (!Directory.Exists(dmodInfo.LocalBase)) {
+                    Directory.CreateDirectory(dmodInfo.LocalBase);
+                }
 
-        public async Task<HttpStatusCode> DownloadWebContent(OnlineDmodCachedResource res) {
-            FileInfo fileInfo = new FileInfo(res.Local);
-            if (fileInfo.Directory?.Exists == false) {
-                fileInfo.Directory.Create();
+                //
+                // cache html if necessary
+                //
+
+                if (File.Exists(dmodInfo.ResVersions.Local) == false || forceRefresh) {
+                    if (!await this.DownloadWebContentInternal(dmodInfo.ResVersions)) {
+                        MyTrace.Global.WriteMessage($"Error reading online DMOD data from: {dmodInfo.ResVersions.Url}", MyTraceLevel.Error);
+                    }
+                }
+
+                //
+                //
+                //
+                List<OnlineDmodVersion> versions = this.ParseDmodVersions(dmodInfo.ResVersions.Local);
+
+                dmodInfo.UpdateVersionInfo(versions);
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(ex);
+            } finally {
+                if (hasLock) {
+                    this.IsBusy = false;
+                }
+            }
+        }
+
+        public async Task CacheUserData(OnlineUser user, bool forceRefresh) {
+            bool hasLock = false;
+            
+            try {
+                if (this._disposed)
+                    return;
+                
+                hasLock = await this.TryStartHttpClientTask(this._genericHttpClienTaskWaitToStartTime, this._cancellationTokenSource.Token);
+                if (hasLock == false) {
+                    // failed to obtain lock...
+                    MyTrace.Global.WriteMessage("Error reading online resource, Online DMOD Crawler seems busy... Try again later?");
+                    return;
+                }
+            
+                List<OnlineDmodCachedResource> resources = new List<OnlineDmodCachedResource>();
+                
+                OnlineDmodCachedResource? pfpBack = OnlineDmodCachedResource.FromRelativeFileUrl(user.RelativePfpBackgroundUrl);
+                OnlineDmodCachedResource? pfpFore = OnlineDmodCachedResource.FromRelativeFileUrl(user.RelativePfpForegroundUrl);
+
+                if (pfpBack != null) resources.Add(pfpBack);
+                if (pfpFore != null) resources.Add(pfpFore);
+                
+                foreach (string badgeStr in user.RelativeBadgeIconUrls) {
+                    OnlineDmodCachedResource? badge = OnlineDmodCachedResource.FromRelativeFileUrl(badgeStr);
+                    if (badge != null) resources.Add(badge);
+                }
+
+                foreach (OnlineDmodCachedResource res in resources) {
+                    if (File.Exists(res.Local) == false || forceRefresh) {
+                        if (!await this.DownloadWebContentInternal(res)) {
+                            MyTrace.Global.WriteMessage($"Error reading online DMOD data from: {res.Url}", MyTraceLevel.Error);
+                        } 
+                    }
+                }
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(ex);
+            } finally {
+                if (hasLock) {
+                    this.IsBusy = false;
+                }
+            }
+        }
+
+        public async Task<bool> DownloadWebContent(OnlineDmodCachedResource res) {
+            bool hasLock = false;
+            
+            try {
+                if (this._disposed)
+                    return false;
+                
+                hasLock = await this.TryStartHttpClientTask(this._genericHttpClienTaskWaitToStartTime, this._cancellationTokenSource.Token);
+                if (hasLock == false) {
+                    // failed to obtain lock...
+                    MyTrace.Global.WriteMessage("Error reading online resource, Online DMOD Crawler seems busy... Try again later?");
+                    return false;
+                }
+
+                return await this.DownloadWebContentInternal(res);
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(ex);
+                return false;
+            } finally {
+                if (hasLock) {
+                    this.IsBusy = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Downloads online DMOD resources without checking/setting busy flag
+        /// </summary>
+        /// <param name="res"></param>
+        /// <returns></returns>
+        private async Task<bool> DownloadWebContentInternal(OnlineDmodCachedResource res) {
+            try {
+                if (this._disposed)
+                    return false;
+                
+                MyTrace.Global.WriteMessage($"Sending HTTP Request to URL: \"{res.Url}\"");
+
+                // first only read the header
+                using HttpResponseMessage responseHeader = await this._httpClient.GetAsync(res.Url, HttpCompletionOption.ResponseHeadersRead);
+                // check if request was successful
+                if (responseHeader.IsSuccessStatusCode == false) {
+                    MyTrace.Global.WriteMessage($"Error executing HTTP Request, StatusCode={responseHeader.StatusCode}");
+                    return false;
+                }
+
+                // since headers were ok, now read the content
+                using HttpResponseMessage response = await this._httpClient.GetAsync(res.Url, HttpCompletionOption.ResponseContentRead);
+                // check if request was successful
+                if (response.IsSuccessStatusCode == false) {
+                    MyTrace.Global.WriteMessage($"Error executing HTTP Request, StatusCode={response.StatusCode}");
+                    return false;
+                }
+
+                // ensure parent directory exists
+                FileInfo fileInfo = new FileInfo(res.Local);
+                if (fileInfo.Directory?.Exists == false) {
+                    fileInfo.Directory.Create();
+                }
+
+                // create file stream and read the data
+                await using FileStream fileStream = new FileStream(res.Local, FileMode.Create, FileAccess.Write, FileShare.Read);
+                MyTrace.Global.WriteMessage($"    HTTP Response Status = {response.StatusCode}");
+                await response.Content.CopyToAsync(fileStream);
+                MyTrace.Global.WriteMessage($"    Content saved to = {res.Local}");
+                
+                // all done, yay
+                return true;
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(ex);
+                return false;
             }
             
-            MyTrace.Global.WriteMessage($"Sending HTTP Request to URL: \"{res.Url}\"");
-            using (HttpResponseMessage response = await this._httpClient.GetAsync(res.Url, HttpCompletionOption.ResponseContentRead))
-            using (FileStream fstream = new FileStream(res.Local, FileMode.Create, FileAccess.Write, FileShare.Read)) {
-                MyTrace.Global.WriteMessage($"    HTTP Response Status = {response.StatusCode}");
-                await response.Content.CopyToAsync(fstream);
-                MyTrace.Global.WriteMessage($"    Content saved to = {res.Local}");
+        }
+        
+        /// <summary>
+        /// Tries to start a HttpClient related task
+        /// </summary>
+        /// <param name="waitTimeout">maximum TimeSpan to wait</param>
+        /// <param name="cancellationToken">Cancellation token to stop waiting</param>
+        /// <returns>true if lock was successful and IsBusy flag was set to true</returns>
+        private async Task<bool> TryStartHttpClientTask(TimeSpan waitTimeout, CancellationToken cancellationToken) {
+            DateTime startTime = DateTime.Now;
+            DateTime endTime = startTime +  waitTimeout;
 
-                return response.StatusCode;
+            while (DateTime.Now < endTime) {
+                if (cancellationToken.IsCancellationRequested)
+                    return false;
+                lock (this._syncRootBusy) {
+                    if (this._isBusy == false) {
+                        this.IsBusy = true;
+                        return true;
+                    }
+                }
+                await Task.Delay(500, cancellationToken);
             }
+            return false;
         }
         
         #region Dmod Parsing
@@ -235,7 +464,9 @@ namespace Martridge.Models.OnlineDmods {
                             // add screenshot if resource for it is valid
                             
                             if (File.Exists(res.Local) == false) {
-                                HttpStatusCode result = await this.DownloadWebContent(res);
+                                if (!await this.DownloadWebContentInternal(res)) {
+                                    MyTrace.Global.WriteMessage($"Error reading online DMOD data from: {res.Url}", MyTraceLevel.Error);
+                                }
                             }
 
                             if (File.Exists(res.Local)) {
@@ -508,10 +739,12 @@ namespace Martridge.Models.OnlineDmods {
                 this._onlineUsers.Clear();
                 this._dmodList.Clear();
             }
-            
+
+            this._cancellationTokenSource.Cancel();
             this._httpClient.Dispose();
             
             this._disposed = true;
         }
+        
     }
 }

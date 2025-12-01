@@ -74,6 +74,15 @@ namespace Martridge.ViewModels.OnlineDmod {
             };
             
             this.InitializeFromConfig();
+            this.InitializeDmodCrawler();
+        }
+
+        private void InitializeDmodCrawler() {
+            DmodCrawler.Instance.DmodListInitialized += this.DmodCrawler_DmodListInitialized;
+            DmodCrawler.Instance.PropertyChanged += this.DmodCrawler_PropertyChanged;
+            this.IsReloadingDmodList = DmodCrawler.Instance.IsInitializingDmodList;
+            this.InitializeDmods();
+            
         }
 
         private void InitializeFromConfig() {
@@ -138,31 +147,6 @@ namespace Martridge.ViewModels.OnlineDmod {
         }
         private string _lastRefreshedString = "";
         
-        
-        /// <summary>
-        /// Handles online DMOD data acquisition
-        /// </summary>
-        public DmodCrawler? DmodCrawler {
-            get => this._dmodCrawler;
-            set {
-                if (this._dmodCrawler != null) {
-                    this._dmodCrawler.DmodListInitialized -= this.DmodCrawler_DmodListInitialized;
-                    this._dmodCrawler.DmodListInitializationChanged -= this.DmodCrawler_DmodListInitializingChanged;
-                    this._dmodCrawler = null;
-                }
-                this._dmodCrawler = value;
-                this.RaisePropertyChanged(nameof(this.DmodCrawler));
-
-                if (this._dmodCrawler != null) {
-                    this._dmodCrawler.DmodListInitialized += this.DmodCrawler_DmodListInitialized;
-                    this._dmodCrawler.DmodListInitializationChanged += this.DmodCrawler_DmodListInitializingChanged;
-                    this.InitializeDmods();
-                    this.IsReloadingDmodList = this._dmodCrawler?.IsInitializingDmods ?? false;
-                }
-            }
-        }
-        private DmodCrawler? _dmodCrawler = null;
-        
         public string? DmodSearchString {
             get => this._dmodSearchString;
             set {
@@ -189,31 +173,34 @@ namespace Martridge.ViewModels.OnlineDmod {
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Methods
         // -----------------------------------------------------------------------------------------------------------------------------------
-        
+
+
+        private void DmodCrawler_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+            if (e.PropertyName == nameof(DmodCrawler.IsInitializingDmodList)) {
+                this.IsReloadingDmodList = DmodCrawler.Instance.IsInitializingDmodList;
+            }
+            if (e.PropertyName == nameof(DmodCrawler.IsBusy)) {
+                // TODO...
+            }
+        }
         private void DmodCrawler_DmodListInitialized(object? sender, EventArgs e) {
             this.InitializeDmods();
-        }
-
-        private void DmodCrawler_DmodListInitializingChanged(object? sender, EventArgs e) {
-            this.IsReloadingDmodList = this._dmodCrawler?.IsInitializingDmods ?? false;
         }
         
         /// <summary>
         /// Initializes the DMOD lists for the view from the <see cref="DmodCrawler"/>
         /// </summary>
         private void InitializeDmods() {
-            if (this.DmodCrawler == null) {
-                this.LastRefreshedString = DateTime.MinValue.ToString("G");
-                return;
-            }
+            this.LastRefreshedString = DmodCrawler.Instance.DmodPagesLastWriteTime.ToString("G");
+            
             
             List<OnlineDmodInfoViewModel> dmodList = new List<OnlineDmodInfoViewModel>();
 
-            foreach (OnlineDmodInfo dmod in this.DmodCrawler.DmodList) {
+            List<OnlineDmodInfo> onlineDmodList = DmodCrawler.Instance.DmodList;
+
+            foreach (OnlineDmodInfo dmod in onlineDmodList) {
                 dmodList.Add(new OnlineDmodInfoViewModel(dmod));
             }
-            
-            this.LastRefreshedString = this.DmodCrawler.DmodPagesLastWriteTime.ToString("G");
 
             this.InitializeFilteredDmods(dmodList);
         }
@@ -403,8 +390,7 @@ namespace Martridge.ViewModels.OnlineDmod {
         /// </summary>
         /// <param name="forceReloadFromWeb">If true, will force attempt to get DMOD data from web</param>
         private async Task ReloadSelectedDmod(bool forceReloadFromWeb) {
-            if (this.DmodCrawler != null &&
-                this.SelectedDmodDefinition != null) {
+            if (this.SelectedDmodDefinition != null) {
                 try {
                     this.ProgressBarPercent = 0;
                     this.ProgressIsIndeterminate = true;
@@ -412,12 +398,12 @@ namespace Martridge.ViewModels.OnlineDmod {
                     this.ProgressIsVisible = true;
                     this.SelectedDmodScreenshotVm = null;
 
-                    await this.DmodCrawler.UpdateDmodData(this.SelectedDmodDefinition.DmodInfo, forceReloadFromWeb);
+                    await DmodCrawler.Instance.UpdateDmodData(this.SelectedDmodDefinition.DmodInfo, forceReloadFromWeb);
 
                     foreach (OnlineDmodReview rev in this.SelectedDmodDefinition.DmodInfo.DmodReviews) {
                         if (this._cachedUserViewModels.ContainsKey(rev.User.Name) == false) {
                             // user view model was not encountered before...
-                            await this.DmodCrawler.CacheUserData(rev.User, false);
+                            await DmodCrawler.Instance.CacheUserData(rev.User, false);
                             this._cachedUserViewModels.Add(rev.User.Name, new OnlineUserViewModel(rev.User));
                         }
                     }
@@ -425,12 +411,12 @@ namespace Martridge.ViewModels.OnlineDmod {
                     foreach (OnlineDmodScreenshot scr in this.SelectedDmodDefinition.DmodInfo.DmodScreenshots) {
                         OnlineDmodCachedResource? resPreview = OnlineDmodCachedResource.FromRelativeFileUrl(scr.RelativePreviewUrl);
                         if (resPreview != null && File.Exists(resPreview.Local) == false) {
-                            HttpStatusCode result = await this.DmodCrawler.DownloadWebContent(resPreview);
+                            bool success = await DmodCrawler.Instance.DownloadWebContent(resPreview);
                         }
 
                         OnlineDmodCachedResource? resScreenshot = OnlineDmodCachedResource.FromRelativeFileUrl(scr.RelativeScreenshotUrl);
                         if (resScreenshot != null && File.Exists(resScreenshot.Local) == false) {
-                            HttpStatusCode result = await this.DmodCrawler.DownloadWebContent(resScreenshot);
+                            bool success = await DmodCrawler.Instance.DownloadWebContent(resScreenshot);
                         }
                     }
 
@@ -469,7 +455,6 @@ namespace Martridge.ViewModels.OnlineDmod {
         /// </summary>
         /// <param name="parameter">N/A</param>
         public async void CmdRefreshDmods(object? parameter = null) {
-            if (this.DmodCrawler == null) return;
             if (this.IsReloadingDmodList) return;
 
             try {
@@ -479,7 +464,7 @@ namespace Martridge.ViewModels.OnlineDmod {
                 this.SelectedDmodDefinition = null;
                 this.SelectedDmodScreenshotVm = null;
                 this.DmodSearchString = null;
-                await this.DmodCrawler.InitializeDmodLists(true);
+                await DmodCrawler.Instance.InitializeDmodLists(true);
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
             }
@@ -487,7 +472,6 @@ namespace Martridge.ViewModels.OnlineDmod {
         [DependsOn(nameof(DmodManager))]
         [DependsOn(nameof(IsReloadingDmodList))]
         public bool CanCmdRefreshDmods(object? parameter = null) {
-            if (this.DmodCrawler == null) return false;
             if (this.IsReloadingDmodList) return false;
             return true;
         }
@@ -528,10 +512,9 @@ namespace Martridge.ViewModels.OnlineDmod {
         public async void CmdQuickInstallDmod(object? parameter = null) {
             try {
                 if (this.ProgressIsVisible) return;
-                if (this.DmodCrawler == null) return;
                 if (parameter is not OnlineDmodInfoViewModel def) return;
 
-                await this.DmodCrawler.UpdateDmodVersionData(def.DmodInfo, true);
+                await DmodCrawler.Instance.UpdateDmodVersionData(def.DmodInfo, true);
                 
                 IOrderedEnumerable<OnlineDmodVersion> versions = def.DmodInfo.DmodVersions
                     .OrderByDescending(x => x.Released)
@@ -549,10 +532,8 @@ namespace Martridge.ViewModels.OnlineDmod {
             }
         }
         [DependsOn(nameof(ProgressIsVisible))]
-        [DependsOn(nameof(DmodCrawler))]
         public bool CanCmdQuickInstallDmod(object? parameter = null) {
             if (this.ProgressIsVisible) return false;
-            if (this.DmodCrawler == null) return false;
             if (parameter is OnlineDmodInfoViewModel) return true;
             return false;
         }
@@ -563,7 +544,6 @@ namespace Martridge.ViewModels.OnlineDmod {
         /// <param name="parameter"><see cref="OnlineDmodVersionViewModel"/></param>
         public async void CmdInstallDmod(object? parameter = null) {
             if (this.ProgressIsVisible) return;
-            if (this.DmodCrawler == null) return;
             if (parameter is not OnlineDmodVersionViewModel def) return;
 
             string url = def.RelativeDownloadUrl;
@@ -576,7 +556,7 @@ namespace Martridge.ViewModels.OnlineDmod {
                     this.ProgressMessage = Localizer.Instance[@"OnlineDmodBrowser/Progress/DownloadingData"];
                     this.ProgressIsVisible = true;
 
-                    await this.DmodCrawler.DownloadWebContent(resource);
+                    await DmodCrawler.Instance.DownloadWebContent(resource);
 
                     this.ProgressIsVisible = false;
                 }
@@ -591,10 +571,8 @@ namespace Martridge.ViewModels.OnlineDmod {
             }
         }
         [DependsOn(nameof(ProgressIsVisible))]
-        [DependsOn(nameof(DmodCrawler))]
         public bool CanCmdInstallDmod(object? parameter = null) {
             if (this.ProgressIsVisible) { return false;}
-            if (this.DmodCrawler == null) { return false;}
             if (parameter is OnlineDmodVersionViewModel) { return true; }
             return false;
         }
@@ -637,6 +615,9 @@ namespace Martridge.ViewModels.OnlineDmod {
                 
                 this._cachedUserViewModels.Clear();
             }
+            
+            DmodCrawler.Instance.DmodListInitialized -= this.DmodCrawler_DmodListInitialized;
+            DmodCrawler.Instance.PropertyChanged -= this.DmodCrawler_PropertyChanged;
             
             this._disposed = true;
         }

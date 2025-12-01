@@ -16,13 +16,13 @@ namespace Martridge.Models.Dmod {
 
 
 
-        public Task Initialize(ConfigGeneral cfg) {
+        public Task Initialize() {
             return Task.Run(() => { 
                 try {
                     Dictionary<string, DmodFileDefinition> tempAddedDirectories = new Dictionary<string, DmodFileDefinition>();
                     List<DmodFileDefinition> tempSymbolicLinks = new List<DmodFileDefinition>();
 
-                    List<DirectoryInfo> directories = cfg.GetRealDmodDirectories();
+                    List<DirectoryInfo> directories = Config.Instance.General.GetRealDmodDirectories();
 
                     foreach (DirectoryInfo dir in directories) {
                         ScanDirectoryForDmods(dir, tempAddedDirectories, tempSymbolicLinks);

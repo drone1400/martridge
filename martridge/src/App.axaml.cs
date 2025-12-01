@@ -336,8 +336,7 @@ namespace Martridge {
         private void InitializeMainWindow(string[]? args = null) {
             if (this._mainWindow == null) {
                 this._mainWindowViewModel = new MainWindowViewModel();
-                this._mainWindowViewModel.Initialize(Config.Instance);
-                this._mainWindowViewModel.InitializeArgs(args);
+                this._mainWindowViewModel.Initialize(args);
                 this._mainWindow = new MainWindow {
                     DataContext = this._mainWindowViewModel,
                 };

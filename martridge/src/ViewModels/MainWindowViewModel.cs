@@ -58,8 +58,7 @@ namespace Martridge.ViewModels {
             this.RefreshSidePanelImage();
         }
 
-
-        private Config? _config = null;
+        
         private DmodManager? _dmodManager = null;
         
 #if ENABLE_FEATURE_ONLINE
@@ -99,6 +98,12 @@ namespace Martridge.ViewModels {
         }
         private bool _isInitialized = false;
 
+        public bool IsInitializing {
+            get => this._isInitializing;
+            private set => this.RaiseAndSetIfChanged(ref this._isInitializing, value);
+        }
+        private bool _isInitializing = false;
+
         public ViewModelAppPage? CurrentViewModel {
             get => this._currentViewModel;
             private set {
@@ -129,19 +134,18 @@ namespace Martridge.ViewModels {
         //
 
 
-        public void Initialize(Config appConfig)
-        {
-            // sanity check if already initialized.. should never happen...
-            if (this._config != null)
+        public void Initialize(string[]? args) {
+            if (this.IsInitializing)
                 return;
             
-            this._config = appConfig;
-            this._config.General.Updated += this.GeneralOnUpdated;
+            this.IsInitializing = true;
+            
+            Config.Instance.General.Updated += this.GeneralOnUpdated;
 
-            this.EnableDmodDeveloperFeatures = this._config.General.ShowDmodDevFeatures;
+            this.EnableDmodDeveloperFeatures = Config.Instance.General.ShowDmodDevFeatures;
             
             this._dmodManager = new DmodManager();
-            this._dmodManager.Initialize(this._config.General).ContinueWith((_) => {
+            this._dmodManager.Initialize().ContinueWith((_) => {
                 try {
                     // initialize view models after dmod manager is done initializing so that the selected DMOD remember feature works properly...
                     
@@ -159,13 +163,35 @@ namespace Martridge.ViewModels {
             
                         
 #if ENABLE_FEATURE_ONLINE
-            this.EnableOnlineFeatures = this._config.General.EnableOnlineFeatures;
+            this.EnableOnlineFeatures = Config.Instance.General.EnableOnlineFeatures;
             if (this.EnableOnlineFeatures) {
                 this.EnsureInitializedOnlineDmodBrowser();
             }
 #endif
             
             this.PropertyChanged += this.OnPropertyChanged;
+            
+            this.InitializeArgs(args);
+        }
+        
+        //
+        // arguments...
+        //
+
+        private void InitializeArgs(string[]? args) {
+            try {
+                if (args != null && args.Length == 1) {
+                    string path = args[0];
+                    FileInfo finfo = new FileInfo(path);
+                    if (finfo.Exists && finfo.Extension.ToLowerInvariant() == ".dmod") {
+                        // try to open dmod file?...
+                        this.CmdShowPageDmodInstaller(finfo.FullName);
+                    }
+                }
+            } catch (Exception ex) {
+                MyTrace.Global.WriteMessage("Error initializing arguments");
+                MyTrace.Global.WriteException(ex);
+            }
         }
         
         private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
@@ -199,7 +225,7 @@ namespace Martridge.ViewModels {
                 if (name == nameof(ConfigGeneral.AdditionalDmodLocations) ||
                     name == nameof(ConfigGeneral.DefaultDmodLocation) ||
                     name == nameof(ConfigGeneral.GameExePaths)) {
-                    this._dmodManager?.Initialize(general);
+                    this._dmodManager?.Initialize();
                 } else if (name == nameof(ConfigGeneral.ShowDmodDevFeatures)) {
                     this.EnableDmodDeveloperFeatures = general.ShowDmodDevFeatures;
                 } 
@@ -208,26 +234,6 @@ namespace Martridge.ViewModels {
                     this.EnableOnlineFeatures = general.EnableOnlineFeatures;
                 }
 #endif
-            }
-        }
-
-        //
-        // arguments...
-        //
-
-        public void InitializeArgs(string[]? args) {
-            try {
-                if (args != null && args.Length == 1) {
-                    string path = args[0];
-                    FileInfo finfo = new FileInfo(path);
-                    if (finfo.Exists && finfo.Extension.ToLowerInvariant() == ".dmod") {
-                        // try to open dmod file?...
-                        this.CmdShowPageDmodInstaller(finfo.FullName);
-                    }
-                }
-            } catch (Exception ex) {
-                MyTrace.Global.WriteMessage("Error initializing arguments");
-                MyTrace.Global.WriteException(ex);
             }
         }
         
@@ -381,9 +387,8 @@ namespace Martridge.ViewModels {
             }
             
             // check we have a valid game or editor exe
-            if (this._config != null &&
-                this._config.General.GameExePaths.Count == 0 &&
-                (this._config.General.EditorExePaths.Count == 0 || this._config.General.ShowDmodDevFeatures == false)) {
+            if (Config.Instance.General.GameExePaths.Count == 0 &&
+                (Config.Instance.General.EditorExePaths.Count == 0 || Config.Instance.General.ShowDmodDevFeatures == false)) {
                 
 #if ENABLE_FEATURE_DINK_INSTALLER && ENABLE_FEATURE_ONLINE
                 if (this.EnableOnlineFeatures) {
@@ -430,15 +435,12 @@ namespace Martridge.ViewModels {
                 {
                     try {
                         await this._dmodCrawler.InitializeDmodLists(false);
-                        
-                        if (this._config == null) 
+
+                        if (Config.Instance.General.OnlineDmodListAutoRefreshDays <= 0 ||
+                            double.IsNaN(Config.Instance.General.OnlineDmodListAutoRefreshDays))
                             return;
 
-                        if (this._config.General.OnlineDmodListAutoRefreshDays <= 0 ||
-                            double.IsNaN(this._config.General.OnlineDmodListAutoRefreshDays))
-                            return;
-
-                        if ((DateTime.Now - this._dmodCrawler.DmodPagesOldestWriteTime).TotalDays >= this._config.General.OnlineDmodListAutoRefreshDays) {
+                        if ((DateTime.Now - this._dmodCrawler.DmodPagesOldestWriteTime).TotalDays >= Config.Instance.General.OnlineDmodListAutoRefreshDays) {
                             // if the DMOD page data is too old, force online refresh
                             await this._dmodCrawler.InitializeDmodLists(true);
                         }
@@ -517,8 +519,6 @@ namespace Martridge.ViewModels {
             
             try {
                 AboutViewModel vm = new AboutViewModel();
-                vm.Configuration = this._config!.General;
-
                 this.SwapCurrentViewModel(vm);
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
@@ -540,7 +540,6 @@ namespace Martridge.ViewModels {
             
             try {
                 SettingsThemeViewModel vm = new SettingsThemeViewModel();
-
                 this.SwapCurrentViewModel(vm);
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
@@ -616,14 +615,14 @@ namespace Martridge.ViewModels {
                             if (string.IsNullOrWhiteSpace(args.UsedInstaller.GameFileName) == false) {
                                 string pathGame = Path.Combine(args.Destination.FullName, args.UsedInstaller.GameFileName);
                                 if (File.Exists(pathGame)) {
-                                    this._config!.General.TryAddGameExePath(pathGame);
+                                    Config.Instance.General.TryAddGameExePath(pathGame);
                                 }
                             }
                             // update editor exe paths
                             if (string.IsNullOrWhiteSpace(args.UsedInstaller.EditorFileName) == false) {
                                 string pathGame = Path.Combine(args.Destination.FullName, args.UsedInstaller.EditorFileName);
                                 if (File.Exists(pathGame)) {
-                                    this._config!.General.TryAddEditorExePath(pathGame);
+                                    Config.Instance.General.TryAddEditorExePath(pathGame);
                                 }
                             }
                         }
@@ -690,7 +689,7 @@ namespace Martridge.ViewModels {
                     // if DMOD installed successfully, reinitialize dmod manager lists...
                     if (args.Result == DinkInstallerResult.Success) {
                         // refresh dmods...
-                        this._dmodManager?.Initialize(this._config!.General).ContinueWith((_) =>
+                        this._dmodManager?.Initialize().ContinueWith((_) =>
                         {
                             // select DMOD after installing!
                             this._dmodBrowserViewModel?.SelectDmodByPath(args.Destination?.FullName ?? string.Empty);

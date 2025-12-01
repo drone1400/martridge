@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
-using Martridge.Models.Configuration.General;
 
 namespace Martridge.ViewModels.About {
     public class AboutViewModel : ViewModelAppPage
@@ -25,29 +24,11 @@ namespace Martridge.ViewModels.About {
         public AnimatedDinkGraphicViewModel AnimatedMartridgeRight {
             get => DinkyAlert.AnimatedMartridgeRight;
         }
-
-        //
-        // General Configuration object...
-        //
-        public ConfigGeneral? Configuration { 
-            get => this._cfg;
-            set {
-                if (this._cfg != null) {
-                    this._cfg.Updated -= this.CfgOnUpdated;
-                }
-                this.RaiseAndSetIfChanged(ref this._cfg, value);
-                
-                if (this._cfg != null) {
-                    this._cfg.Updated += this.CfgOnUpdated;
-                    this.InitializeLocalizedPackageInfo();
-                }
-            }
-        }
-        private ConfigGeneral? _cfg = null;
+        
 
         private string? _lastInitializedLanguage = null;
-        private void CfgOnUpdated(object? sender, EventArgs e) {
-            if (this._cfg?.LocalizationName != this._lastInitializedLanguage) {
+        private void ConfigGeneralOnUpdated(object? sender, EventArgs e) {
+            if (Config.Instance.General.LocalizationName != this._lastInitializedLanguage) {
                 this.InitializeLocalizedPackageInfo();
             }
         }
@@ -78,10 +59,20 @@ namespace Martridge.ViewModels.About {
             Version? version = Assembly.GetExecutingAssembly().GetName().Version;
             // note, this should be impossible i think?...
             this.Version = version != null ? version.ToString() : "VersionError!!?!";
+
+            this.InitializeLocalizedPackageInfo();
+            
+            Config.Instance.General.Updated += this.ConfigGeneralOnUpdated;
+        }
+
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+            
+            Config.Instance.General.Updated -= this.ConfigGeneralOnUpdated;
         }
 
         private void InitializeLocalizedPackageInfo() {
-            this._lastInitializedLanguage = this._cfg?.LocalizationName;
+            this._lastInitializedLanguage = Config.Instance.General.LocalizationName;
 
             string linkWebsite = Localizer.Instance["AboutWindow/Package/LinkType/Website"];
             string linkSource = Localizer.Instance["AboutWindow/Package/LinkType/Source"];

@@ -709,13 +709,14 @@ namespace Martridge.ViewModels.Dmod {
         #region COMMANDS
 
         public void CmdRefreshDmods(object? parameter = null) {
-            if (this.DmodManager is not DmodManager manager ||
-                this.CfgGeneral is not ConfigGeneral cfgGen) { return; }
+            if (this.DmodManager is not DmodManager manager) 
+                return;
+            
             this.DmodSearchString = null;
 
             // reload configuration just in case something was not synchronized previously...
             this.LoadFromConfigGeneral();
-            manager.Initialize(cfgGen);
+            manager.Initialize();
         }
 
         [DependsOn(nameof(DmodManager))]

@@ -287,6 +287,20 @@ namespace Martridge.ViewModels.Configuration {
 
             this._savedLocalization = Localizer.Instance.Language;
 
+            int activeGameExeIndex = Config.Instance.General.ActiveGameExeIndex;
+            string activeGameExe = activeGameExeIndex >= 0 && activeGameExeIndex < Config.Instance.General.GameExePaths.Count 
+                ? Config.Instance.General.GameExePaths[activeGameExeIndex]
+                : string.Empty;
+            int newActiveGameExeIndex = listGameExe.FindIndex(x => x == activeGameExe);
+            activeGameExeIndex = newActiveGameExeIndex >= 0 ? newActiveGameExeIndex : 0;
+            
+            int activeEditorExeIndex = Config.Instance.General.ActiveEditorExeIndex;
+            string activeEditorExe = activeEditorExeIndex >= 0 && activeEditorExeIndex < Config.Instance.General.EditorExePaths.Count 
+                 ? Config.Instance.General.EditorExePaths[activeEditorExeIndex]
+                 : string.Empty;
+            int newActiveEditorExeIndex = listEditorExe.FindIndex(x => x == activeEditorExe);
+            activeEditorExeIndex = newActiveEditorExeIndex >= 0 ? newActiveEditorExeIndex : 0;
+
             this.CfgGeneral.UpdateProperties(new Dictionary<string, object?>() {
                 [nameof(ConfigGeneral.LocalizationName)] = this._savedLocalization ?? "en-US",
                 [nameof(ConfigGeneral.ShowDmodDevFeatures)] = this.ShowDmodDevFeatures,
@@ -299,6 +313,8 @@ namespace Martridge.ViewModels.Configuration {
                 [nameof(ConfigGeneral.EditorExePaths)] = listEditorExe,
                 [nameof(ConfigGeneral.DefaultDmodLocation)] = this.DefaultDmodLocation,
                 [nameof(ConfigGeneral.AdditionalDmodLocations)] = listDmod,
+                [nameof(ConfigGeneral.ActiveGameExeIndex)] = activeGameExeIndex,
+                [nameof(ConfigGeneral.ActiveEditorExeIndex)] = activeEditorExeIndex,
             });
         }
         

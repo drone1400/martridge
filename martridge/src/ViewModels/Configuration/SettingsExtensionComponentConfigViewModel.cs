@@ -172,8 +172,8 @@ namespace Martridge.ViewModels.Configuration {
                 this.WineBinPath = wineBinPath;
                 this.WineLibPath = wineLibPath;
                 this.WineDllPath = wineDllPath;
-                this.WineLoader = wineServer;
-                this.WineServer = wineLoader;
+                this.WineLoader = wineLoader;
+                this.WineServer = wineServer;
             }
         }
 

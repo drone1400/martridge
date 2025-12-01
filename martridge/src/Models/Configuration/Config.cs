@@ -24,7 +24,7 @@ namespace Martridge.Models.Configuration {
             
             #if PLATF_LINUX
             // TODO fix this...
-            this.AddDefaultLinuxFreeDinkLocations();
+            // this.AddDefaultLinuxFreeDinkLocations();
             #endif
             
             Instance.General.Updated += GeneralOnUpdated;

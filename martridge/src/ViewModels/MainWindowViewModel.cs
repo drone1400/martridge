@@ -372,12 +372,6 @@ namespace Martridge.ViewModels {
             if (this._currentViewModel is SettingsGeneralViewModel settings) {
                 // apply settings...
                 settings.CmdSettingsOk();
-                // dispose old view model
-                settings.Dispose();
-            } else
-            {
-                // dispose current view model if needed
-                this._currentViewModel?.Dispose();
             }
             
             // check we have a valid game or editor exe

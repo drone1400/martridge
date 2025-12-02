@@ -221,6 +221,15 @@ namespace Martridge.Models.OnlineDmods {
                 // cache html if necessary
                 //
 
+                // check if DMOD data needs to be refreshed...
+                if (forceRefresh == false && File.Exists(dmodInfo.ResMain.Local))
+                {
+                    FileInfo finfoTest = new FileInfo(dmodInfo.ResMain.Local);
+                    if (finfoTest.LastWriteTime < dmodInfo.Updated) {
+                        forceRefresh = true;
+                    }
+                }
+
                 if (File.Exists(dmodInfo.ResMain.Local) == false || forceRefresh) {
                     if (!await this.DownloadWebContentInternal(dmodInfo.ResMain)) {
                         MyTrace.Global.WriteMessage($"Error reading online DMOD data from: {dmodInfo.ResMain.Url}", MyTraceLevel.Error);

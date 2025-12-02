@@ -421,15 +421,6 @@ namespace Martridge.ViewModels {
             {
                 try {
                     await DmodCrawler.Instance.InitializeDmodLists(false);
-
-                    if (Config.Instance.General.OnlineDmodListAutoRefreshDays <= 0 ||
-                        double.IsNaN(Config.Instance.General.OnlineDmodListAutoRefreshDays))
-                        return;
-
-                    if ((DateTime.Now - DmodCrawler.Instance.DmodPagesOldestWriteTime).TotalDays >= Config.Instance.General.OnlineDmodListAutoRefreshDays) {
-                        // if the DMOD page data is too old, force online refresh
-                        await DmodCrawler.Instance.InitializeDmodLists(true);
-                    }
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(ex);
                 }

@@ -126,10 +126,16 @@ namespace Martridge.Models.OnlineDmods {
                     // failed to obtain lock...
                     return;
                 }
-                
-                int dmodPageIdx = 1;
 
+                bool canForceRefreshAutomatically = !(
+                    Config.Instance.General.OnlineDmodListAutoRefreshDays <= 0 || 
+                    double.IsNaN(Config.Instance.General.OnlineDmodListAutoRefreshDays)
+                );
+                bool hasForceRefreshAutomatically = false;
+  
+                int dmodPageIdx = 1;
                 List<OnlineDmodInfo> dmodEntries = new List<OnlineDmodInfo>();
+                Dictionary<int,bool> dmodPageDownloadedSuccessfully = new Dictionary<int,bool>();
 
                 bool nextPageExists = true;
                 while (nextPageExists) {
@@ -142,10 +148,12 @@ namespace Martridge.Models.OnlineDmods {
                         if (localHtml.Directory?.Exists == false) {
                             localHtml.Directory.Create();
                         }
-                        if (localHtml.Exists == false || forceOnlineRefresh) {
+                        if (localHtml.Exists == false || (forceOnlineRefresh && dmodPageDownloadedSuccessfully.ContainsKey(dmodPageIdx) == false)) {
                             bool success = await this.DownloadWebContentInternal(cachedResource);
                             if (!success) {
                                 MyTrace.Global.WriteMessage($"Error downloading dmod lists #{dmodPageIdx}...", MyTraceLevel.Error);
+                            } else {
+                                dmodPageDownloadedSuccessfully[dmodPageIdx] = true;
                             }
                         }
                         localHtml.Refresh();
@@ -156,8 +164,20 @@ namespace Martridge.Models.OnlineDmods {
                             if (localHtml.LastWriteTime < this.DmodPagesOldestWriteTime) {
                                 this.DmodPagesOldestWriteTime =  localHtml.LastWriteTime;
                             }
+                            
                             int dmodCount = this.ParseDmodsPage(cachedResource.Local, dmodEntries);
                             nextPageExists = this.ParseDmodsNextPageExists(cachedResource.Local);
+                            
+                            if (hasForceRefreshAutomatically == false && 
+                                (DateTime.Now - this.DmodPagesOldestWriteTime).TotalDays >= Config.Instance.General.OnlineDmodListAutoRefreshDays) {
+                                // if we found a DMOD page that was too old, restart the whole process and make sure to download any pages that were skipped over...
+                                hasForceRefreshAutomatically = true;
+                                dmodPageIdx = 1;
+                                dmodEntries.Clear();
+                                forceOnlineRefresh = true;
+                                
+                                continue;
+                            }
                         }
 
                         dmodPageIdx++;

@@ -25,8 +25,8 @@
         <valueConverters:IsNotNullCheckBoolConverter x:Key="ConverterIsNotNullCheck" />
     </UserControl.Resources>
 
-    <Border Classes="MartridgeCard">
-        <Grid>
+    <Grid>
+        <Border Classes="MartridgeCard">
             <vw:MagicSplitPresenterView
                 Name="MagicSplit"
                 OnePageSwitchThreshold="950"
@@ -61,49 +61,46 @@
                 </vw:MagicSplitPresenterView.RightPanelContent>
 
             </vw:MagicSplitPresenterView>
+        </Border>
+        
+        <!-- copied this layout from the DinkyAlert xaml lul -->
+        <Grid ColumnDefinitions="*,4*,*" RowDefinitions="*,Auto,*"
+              IsVisible="{Binding DmodCrawlerIsBusy}"
+              x:Name="TheGrid">
+            <Grid
+                Grid.Row="0" Grid.RowSpan="3"
+                Grid.Column="0" Grid.ColumnSpan="3"
+                Background="{DynamicResource ThemeBackgroundBrush}" Opacity="0.5" />
 
-
-            <!-- copied this layout from the DinkyAlert xaml lul -->
-            <Grid ColumnDefinitions="*,4*,*" RowDefinitions="*,Auto,*"
-                  IsVisible="{Binding DmodCrawlerIsBusy}"
-                  x:Name="TheGrid">
-                <Grid
-                    Grid.Row="0" Grid.RowSpan="3"
-                    Grid.Column="0" Grid.ColumnSpan="3"
-                    Background="{DynamicResource ThemeBackgroundBrush}" Opacity="0.5" />
-
-                <!-- this may seem rather odd, but if we don't do this max width binding here, the Label below that binds to the message
+            <!-- this may seem rather odd, but if we don't do this max width binding here, the Label below that binds to the message
                     will stretch endlessly instead of wrapping -->
-                <Grid
-                    Grid.Row="1" Grid.Column="1"
-                    MaxWidth="{Binding Bounds.Width, ElementName=TheGrid}">
+            <Grid
+                Grid.Row="1" Grid.Column="1"
+                MaxWidth="{Binding Bounds.Width, ElementName=TheGrid}">
 
-                    <Border Classes="MartridgeCard"
-                            Margin="40,10">
-                        <Grid
-                            RowDefinitions="Auto, Auto, Auto, Auto"
-                            Margin="5,10">
+                <Border Classes="MartridgeCard"
+                        Margin="40,10">
+                    <Grid
+                        RowDefinitions="Auto, Auto, Auto, Auto"
+                        Margin="5,10">
 
-                            <Label
-                                Grid.Row="0" Grid.Column="0"
-                                Classes="HeadingTitle"
-                                HorizontalAlignment="Center"
-                                Content="{dloc:Localize OnlineDmodBrowser/DownloadingData}" />
-                            <Label
-                                Grid.Row="1" Grid.Column="0"
-                                Classes="Heading2IWrapping"
-                                HorizontalAlignment="Center"
-                                Content="{Binding DmodCrawlerCurrentUrl}" />
+                        <Label
+                            Grid.Row="0" Grid.Column="0"
+                            Classes="HeadingTitle"
+                            HorizontalAlignment="Center"
+                            Content="{dloc:Localize OnlineDmodBrowser/DownloadingData}" />
+                        <Label
+                            Grid.Row="1" Grid.Column="0"
+                            Classes="Heading2IWrapping"
+                            HorizontalAlignment="Center"
+                            Content="{Binding DmodCrawlerCurrentUrl}" />
 
-                            <ProgressBar
-                                Grid.Row="2"
-                                IsIndeterminate="True" />
-
-
-                        </Grid>
-                    </Border>
-                </Grid>
+                        <ProgressBar
+                            Grid.Row="2"
+                            IsIndeterminate="True" />
+                    </Grid>
+                </Border>
             </Grid>
         </Grid>
-    </Border>
+    </Grid>
 </UserControl>

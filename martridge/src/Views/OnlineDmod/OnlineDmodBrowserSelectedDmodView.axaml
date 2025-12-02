@@ -74,7 +74,7 @@
                         TargetNullValue={StaticResource DataNotAvailable} }" />
                 <Label 
                     Grid.Row="1" Grid.Column="0" 
-                    Classes="Heading2I"
+                    Classes="Heading2IWrapping"
                     Content="{Binding SelectedDmodDefinition.Author, 
                        FallbackValue={StaticResource DataNotAvailable},
                        TargetNullValue={StaticResource DataNotAvailable} }" />

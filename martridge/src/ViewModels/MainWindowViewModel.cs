@@ -634,17 +634,32 @@ namespace Martridge.ViewModels {
         public bool CanCmdShowPageDmodInstaller(object? parameter = null) 
             => this.CurrentViewModel is DmodInstallerViewModel || this.IsViewModelSwitchable;
         public void CmdShowPageDmodInstaller(object? parameter = null) {
-            if (this.CurrentViewModel is DmodInstallerViewModel) return; // already the correct view model
             if (this.CanCmdShowPageDmodInstaller() == false) return;
             this.ShowDmodInstallerCommon(parameter, false);
         }
         private void ShowDmodInstallerCommon(object? parameter = null, bool browseDmodImmediately = false) {
             try {
+                if (this._currentViewModel is DmodInstallerViewModel alreadyInstalling) {
+                    // if on the first page try to use the passed path
+                    if (alreadyInstalling.InstallPhase == DmodInstallPhase.Inactive &&
+                        parameter is string path1 && string.IsNullOrWhiteSpace(path1) == false) {
+                        alreadyInstalling.TemporaryDmodSource = path1;
+                        if (File.Exists(path1)) {
+                            // since we are already passing a path to a file that exists, start initializing it immediately
+                            alreadyInstalling.CmdInitializeDmod(path1);
+                        }
+                    }
+                    // if not on the first page don't do anything!
+                    return;
+                }
+                
                 DmodInstallerViewModel vm = new DmodInstallerViewModel();
-                if (parameter is string path && string.IsNullOrWhiteSpace(path) == false && File.Exists(path)) {
-                    vm.TemporaryDmodSource = path;
-                    // since we are already passing a path to a file that exists, start initializing it immediately
-                    vm.CmdInitializeDmod(path);
+                if (parameter is string path2 && string.IsNullOrWhiteSpace(path2) == false) {
+                    vm.TemporaryDmodSource = path2;
+                    if (File.Exists(path2)) {
+                        // since we are already passing a path to a file that exists, start initializing it immediately
+                        vm.CmdInitializeDmod(path2);
+                    }
                 }
                 
                 vm.PropertyChanged += (_, args) => {

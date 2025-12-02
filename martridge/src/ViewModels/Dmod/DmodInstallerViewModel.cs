@@ -186,15 +186,29 @@ namespace Martridge.ViewModels.Dmod {
             // validate source DMOD
             this.ValidationRule(x => x.TemporaryDmodSource,
                 dmodSource => {
-                    try
-                    {
-                        return (string.IsNullOrWhiteSpace(dmodSource) == false && File.Exists(dmodSource));
+                    try {
+                        // ignore if empty
+                        if (string.IsNullOrWhiteSpace(dmodSource))
+                            return true;
+                        // check if file exists
+                        return File.Exists(dmodSource);
                     } catch (Exception)
                     {
                         return false;
                     }
                 },
-                Localizer.Instance["DmodInstaller/ViewModel/Validation/MissingSourceDmod"]);
+                Localizer.Instance["DmodInstaller/ViewModel/Validation/SourceDmodFileNotFound"]);
+            this.ValidationRule(x => x.TemporaryDmodSource,
+                dmodSource => {
+                    try
+                    {
+                        return (string.IsNullOrWhiteSpace(dmodSource) == false);
+                    } catch (Exception)
+                    {
+                        return false;
+                    }
+                },
+                Localizer.Instance["DmodInstaller/ViewModel/Validation/SourceDmodEmpty"]);
             
             // validate final destination directory...
             this.ValidationRule(x => x.FinalDmodDestination,

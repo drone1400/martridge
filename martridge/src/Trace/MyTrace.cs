@@ -37,11 +37,22 @@ namespace Martridge.Trace {
             }
         }
 
+        private string CategoryFromCallerFilePath(string? filePath = null) {
+            if (filePath == null)
+                return "generic";
+            
+            // NOTE: when building/publishing under Windows for Linux,
+            // the CallerFilePath uses \ instead of / this causes
+            // Path.GetFileNameWithoutExtension to return the full path
+            // instead of just the file name
+            // so we need to deal with that...
+            string filePathNoWindowsSlashes = filePath.Replace('\\', '/');
+            return Path.GetFileNameWithoutExtension(filePathNoWindowsSlashes);
+        }
+
         public void WriteMessage(string message, MyTraceLevel level = MyTraceLevel.Information, [CallerFilePath] string? callerFilePath = null) {
             DateTime now = DateTime.Now;
-            string category = callerFilePath == null
-                ? "generic"
-                : Path.GetFileNameWithoutExtension(callerFilePath);
+            string category = this.CategoryFromCallerFilePath(callerFilePath);
             foreach (MyTraceListener listener in this.Listeners) {
                 if (!listener.IsClosed && listener.Levels.HasFlag(level)) {
                     listener.WriteMessage(now, category, message, level);
@@ -68,9 +79,7 @@ namespace Martridge.Trace {
 
         public void WriteMessage(List<string> messages, MyTraceLevel level = MyTraceLevel.Information, [CallerFilePath] string? callerFilePath = null) {
             DateTime now = DateTime.Now;
-            string category = callerFilePath == null
-                ? "generic"
-                : Path.GetFileNameWithoutExtension(callerFilePath);
+            string category = this.CategoryFromCallerFilePath(callerFilePath);
             foreach (MyTraceListener listener in this.Listeners) {
                 if (!listener.IsClosed && listener.Levels.HasFlag(level)) {
                     listener.WriteMessage(now, category, messages, level);
@@ -96,9 +105,7 @@ namespace Martridge.Trace {
         }
 
         public void WriteException(Exception ex, MyTraceLevel level = MyTraceLevel.Error, [CallerFilePath] string? callerFilePath = null) {
-            string category = callerFilePath == null
-                ? "generic"
-                : Path.GetFileNameWithoutExtension(callerFilePath);
+            string category = this.CategoryFromCallerFilePath(callerFilePath);
             this.WriteMessage(category,GetExceptionStringAsList(ex), level);
         }
 

@@ -3,6 +3,7 @@ using Martridge.Trace;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -359,10 +360,13 @@ namespace Martridge.Models.OnlineDmods {
         /// <param name="res"></param>
         /// <returns></returns>
         private async Task<bool> DownloadWebContentInternal(OnlineDmodCachedResource res) {
+            if (this._disposed)
+                return false;
+            
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            
             try {
-                if (this._disposed)
-                    return false;
-
                 this.CurrentUrl = res.Url;
 
                 MyTrace.Global.WriteMessage($"Sending HTTP Request to URL: \"{res.Url}\"");
@@ -394,14 +398,24 @@ namespace Martridge.Models.OnlineDmods {
                 MyTrace.Global.WriteMessage($"    HTTP Response Status = {response.StatusCode}");
                 await response.Content.CopyToAsync(fileStream);
                 MyTrace.Global.WriteMessage($"    Content saved to = {res.Local}");
+                
+                stopwatch.Stop();
 
                 // all done, yay
                 return true;
             } catch (Exception ex) {
+                stopwatch.Stop();
+                
                 MyTrace.Global.WriteException(ex);
                 return false;
             }
             finally {
+                // have a minimum execution time of one second...
+                // this both helps prevent spamming TDN with requests, and helps with displaying the URL in the UI
+                if (stopwatch.ElapsedMilliseconds < 1000) {
+                    await Task.Delay((int)Math.Ceiling(1000.0-stopwatch.ElapsedMilliseconds));
+                }
+                
                 this.CurrentUrl = string.Empty;
             }
             

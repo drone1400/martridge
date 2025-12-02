@@ -65,7 +65,19 @@ namespace Martridge.ViewModels.OnlineDmod {
             this.DmodInfo = dmodInfo;
 
             this._author = this.DmodInfo.Author;
-            this._authorOnePerLine = Regex.Replace(this.DmodInfo.Author, @",\s+", Environment.NewLine);
+            this._authorOnePerLine = string.Empty;
+            string[] authors = this.DmodInfo.Author.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            for (int idx = 0; idx < authors.Length; idx++) {
+                if (idx > 0) {
+                    this._authorOnePerLine += Environment.NewLine;
+                }
+                if (idx >= 3) {
+                    this._authorOnePerLine += "...";
+                    break;
+                }
+                
+                this._authorOnePerLine += authors[idx];
+            }
             this._updated = this.DmodInfo.Updated;
         }
 

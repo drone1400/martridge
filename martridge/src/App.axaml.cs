@@ -15,12 +15,14 @@ using Martridge.Models;
 using Martridge.Models.Configuration;
 using Martridge.Models.Configuration.AppState;
 using Martridge.Models.Configuration.General;
-using Martridge.Models.OnlineDmods;
 using Martridge.Trace;
 using Martridge.ViewModels;
 using Martridge.ViewModels.DinkyAlerts;
 using Martridge.Views;
 using Martridge.Views.Log;
+#if ENABLE_FEATURE_ONLINE
+using Martridge.Models.OnlineDmods;
+#endif
 
 namespace Martridge {
     
@@ -389,9 +391,11 @@ namespace Martridge {
             
             // save app state when closing
             Config.Instance.SaveAppState();
-            
+
+#if ENABLE_FEATURE_ONLINE
             // destroy web crawler...
             DmodCrawler.Instance.Dispose();
+#endif
             
             this._logger.Close();
         }

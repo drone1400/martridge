@@ -7,7 +7,8 @@ using Ignore;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using SharpCompress.Common;
-using SharpCompress.Compressors.PBZip2;
+using SharpCompress.Common.Tar.Headers;
+using SharpCompress.Compressors.BZip2MT.OutputStream;
 using SharpCompress.Writers.Tar;
 
 namespace Martridge.Models.DmodPacker {
@@ -464,7 +465,7 @@ namespace Martridge.Models.DmodPacker {
             int fileCount = 0;
             
             using (FileStream fs = new FileStream(tempTarFile, FileMode.Create, FileAccess.Write))
-            using (TarWriter writer = new TarWriter(fs, new TarWriterOptions(CompressionType.None, true, TarHeaderWriteFormat.Ustar))) {
+            using (TarWriter writer = new TarWriter(fs, new TarWriterOptions(CompressionType.None, true, TarHeaderWriteFormat.USTAR))) {
                 while (queue.Count > 0)
                 {
                     if (this._cancellationTokenSource.IsCancellationRequested) {
@@ -501,10 +502,9 @@ namespace Martridge.Models.DmodPacker {
             
             this.LogMessage( Localizer.Instance["DmodPacker/Log/Packing//CompressingDmodFile"]);
             
-            int threads = Environment.ProcessorCount;
             using (FileStream fsin = new FileStream(tempTarFile, FileMode.Open, FileAccess.Read))
             using (FileStream fsout = new FileStream(this._destinationFile.FullName, FileMode.Create, FileAccess.Write)) 
-            using (BZip2ParallelOutputStream bzip2 = new BZip2ParallelOutputStream(fsout,threads, true, 9)) {
+            using (BZip2ParallelOutputStream bzip2 = new BZip2ParallelOutputStream(fsout,true, 9)) {
                 fsin.CopyTo(bzip2);
                 bzip2.Close();
             }

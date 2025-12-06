@@ -7,7 +7,7 @@ using System.Threading;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using SharpCompress.Common;
-using SharpCompress.Compressors.PBZip2;
+using SharpCompress.Compressors.BZip2MT.InputStream;
 using SharpCompress.Readers;
 namespace Martridge.Models.DmodInstaller {
     
@@ -335,7 +335,7 @@ namespace Martridge.Models.DmodInstaller {
 
                 // the DMOD should be a bzip2-ed tar archive...
                 using FileStream fs = new FileStream(this._sourceFile.FullName, FileMode.Open, FileAccess.Read);
-                using BZip2InputStream decompressor = new BZip2InputStream(fs, false);
+                using BZip2ParallelInputStream decompressor = new BZip2ParallelInputStream(fs, false);
 
                 this._tempTarArchive = this._temp.TryCreateTempFile();
 

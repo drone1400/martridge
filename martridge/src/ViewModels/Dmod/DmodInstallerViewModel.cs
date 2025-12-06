@@ -52,7 +52,7 @@ namespace Martridge.ViewModels.Dmod {
         /// </summary>
         public int InstallerProgressLogCaretIndex {
             get => this._installerProgressLogCaretIndex;
-            private set => this.RaiseAndSetIfChanged(ref this._installerProgressLogCaretIndex, value);
+            private set => this.RaiseAndSetIfChanged(ref this._installerProgressLogCaretIndex, value); //todo, investigating ui lockup issue here
         }
         private int _installerProgressLogCaretIndex = 0;
 
@@ -485,29 +485,35 @@ namespace Martridge.ViewModels.Dmod {
         }
 
         private void ResetInstallerState() {
-            if (this._installerLogic != null)
-            {
-                this._installerLogic.CustomTrace.Flush();
-                this._installerLogic.CustomTrace.Close();
-                this._installerLogic.ProgressReport -= this.InstallerOnProgressReport;
-                this._installerLogic = null;
-            }
+            Task.Run(() => {
+                try {
+                    if (this._installerLogic != null) {
+                        this._installerLogic.CustomTrace.Flush();
+                        this._installerLogic.CustomTrace.Close();
+                        this._installerLogic.ProgressReport -= this.InstallerOnProgressReport;
+                        this._installerLogic = null;
+                    }
 
-            this._installerTraceListener?.Close();
-            this._installerTraceListener = null;
-            
-            this.RaisePropertyChanged(nameof(this.InstallerProgressLog));
-            this.RaisePropertyChanged(nameof(this.InstallerProgressLogCaretIndex));
-            
-            this.InstallPhase = DmodInstallPhase.Inactive;
-            
-            this.SelectedBaseDestination = null;
-            this.TemporaryDmodSource = "";
-            this.DesiredDmodDirectory = "";
+                    this._installerTraceListener?.Close();
+                    this._installerTraceListener = null;
 
-            this.DmodInstallerTitle = Localizer.Instance[@"DmodInstaller/ViewModel/Title"];
-            this.DmodInstallerPhaseProgressPercent = 0.0;
-            this.DmodInstallerInProgress = false;
+                    this.RaisePropertyChanged(nameof(this.InstallerProgressLog));
+                    this.RaisePropertyChanged(nameof(this.InstallerProgressLogCaretIndex));
+
+                    this.InstallPhase = DmodInstallPhase.Inactive;
+
+                    this.SelectedBaseDestination = null;
+                    this.TemporaryDmodSource = "";
+                    this.DesiredDmodDirectory = "";
+
+                    this.DmodInstallerTitle = Localizer.Instance[@"DmodInstaller/ViewModel/Title"];
+                    this.DmodInstallerPhaseProgressPercent = 0.0;
+                    this.DmodInstallerInProgress = false;
+                } catch (Exception ex)
+                {
+                    MyTrace.Global.WriteException(ex);
+                }
+            });
         }
 
         private void RememberSelections() {

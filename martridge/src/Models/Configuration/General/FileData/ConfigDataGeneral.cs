@@ -109,6 +109,11 @@ namespace Martridge.Models.Configuration.General.FileData {
         /// List of additional directories to scan for DMODS
         /// </summary>
         public List<string>? AdditionalDmodLocations { get; set; }
+        
+        /// <summary>
+        /// If ture, will decompress DMOD tar archives from bzip2 to a memory stream instead of a temporary file
+        /// </summary>
+        public bool? DecompressDmodsToMemoryStreamInsteadOfTemporaryFile { get; set; }
 
         public Dictionary<string, object?> GetValues() {
             return new Dictionary<string, object?>() {
@@ -132,6 +137,7 @@ namespace Martridge.Models.Configuration.General.FileData {
                 [nameof(ConfigGeneral.AdditionalDmodLocations)] = this.AdditionalDmodLocations,
                 [nameof(ConfigGeneral.DinkInstallerConfigFileSource)] = this.DinkInstallerConfigFileSource,
                 [nameof(ConfigGeneral.MaxLogsToKeep)] = this.MaxLogsToKeep,
+                [nameof(ConfigGeneral.DecompressDmodsToMemoryStreamInsteadOfTemporaryFile)] = this.DecompressDmodsToMemoryStreamInsteadOfTemporaryFile,
             };
         }
     }

@@ -144,6 +144,12 @@ namespace Martridge.Models.Configuration.General {
         /// </summary>
         public int MaxLogsToKeep { get => this._maxLogsToKeep; }
         private int _maxLogsToKeep = 25;
+        
+        /// <summary>
+        /// If ture, will decompress DMOD tar archives from bzip2 to a memory stream instead of a temporary file
+        /// </summary>
+        public bool DecompressDmodsToMemoryStreamInsteadOfTemporaryFile { get => this._decompressDmodsToMemoryStreamInsteadOfTemporaryFile; }
+        private bool _decompressDmodsToMemoryStreamInsteadOfTemporaryFile = true;
 
         public ConfigGeneral() {
             this.GameExePaths = new ReadOnlyCollection<string>(this._gameExePaths);
@@ -263,6 +269,7 @@ namespace Martridge.Models.Configuration.General {
                     case nameof(this.ActiveEditorExeIndex): TryUpdateGeneric(kvp, ref this._activeEditorExeIndex); break;
                     case nameof(this.DinkInstallerConfigFileSource): TryUpdateGeneric(kvp, ref this._dinkInstallerConfigFileSource); break;
                     case nameof(this.MaxLogsToKeep): TryUpdateGeneric(kvp, ref this._maxLogsToKeep); break;
+                    case nameof(this.DecompressDmodsToMemoryStreamInsteadOfTemporaryFile): TryUpdateGeneric(kvp, ref this._decompressDmodsToMemoryStreamInsteadOfTemporaryFile); break;
                     
                     case nameof(this.DefaultDmodLocation): {
                         if (kvp.Value is string path) {
@@ -324,6 +331,7 @@ namespace Martridge.Models.Configuration.General {
                     AdditionalDmodLocations = additionalDmodLocations,
                     DinkInstallerConfigFileSource = this.DinkInstallerConfigFileSource,
                     MaxLogsToKeep = this.MaxLogsToKeep,
+                    DecompressDmodsToMemoryStreamInsteadOfTemporaryFile = this.DecompressDmodsToMemoryStreamInsteadOfTemporaryFile,
                 };
 
                 return data;

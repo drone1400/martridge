@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using Martridge.Models.Configuration;
 using Martridge.Models.Localization;
 using Martridge.Trace;
 using SharpCompress.Common;
@@ -35,7 +36,9 @@ namespace Martridge.Models.DmodInstaller {
         
         // private fields
         private readonly DinkTempFileHelper _temp = new DinkTempFileHelper();
+        
         private FileInfo? _tempTarArchive = null;
+        private Stream? _tempTarStream  = null;
         
         private DmodInstallPhase _installPhase = DmodInstallPhase.Inactive;
         
@@ -325,6 +328,8 @@ namespace Martridge.Models.DmodInstaller {
         private bool TryInitializeEntriesFromStandardDmod() {
             this._archiveEntries.Clear();
             this._archiveTopLevelEntries.Clear();
+            this._tempTarStream?.Dispose();
+            this._tempTarStream = null;
             this._tempTarArchive = null;
             this._dmodRootDirName = null;
             
@@ -336,25 +341,26 @@ namespace Martridge.Models.DmodInstaller {
                 // the DMOD should be a bzip2-ed tar archive...
                 using FileStream fs = new FileStream(this._sourceFile.FullName, FileMode.Open, FileAccess.Read);
                 using BZip2ParallelInputStream decompressor = new BZip2ParallelInputStream(fs, false);
+                
+                if (Config.Instance.General.DecompressDmodsToMemoryStreamInsteadOfTemporaryFile == false) {
+                    this._tempTarArchive = this._temp.TryCreateTempFile();
+                }
 
-                this._tempTarArchive = this._temp.TryCreateTempFile();
-
-                if (this._tempTarArchive == null)
-                    return false;
-
-                using FileStream fsTar = new FileStream(this._tempTarArchive.FullName, FileMode.Create, FileAccess.ReadWrite);
-
+                this._tempTarStream = this._tempTarArchive != null
+                    ? new FileStream(this._tempTarArchive.FullName, FileMode.Create, FileAccess.ReadWrite)
+                    : new MemoryStream((int)this._sourceFile.Length);
+                
                 try {
-                    decompressor.CopyTo(fsTar);
+                    decompressor.CopyTo(this._tempTarStream);
                 } catch (Exception) {
                     this._tempTarArchive = null;
                     return false;
                 }
 
                 // now we have an extracted temporary tar file... time to read all its entries...
-                fsTar.Seek(0, SeekOrigin.Begin);
+                this._tempTarStream.Seek(0, SeekOrigin.Begin);
 
-                using IReader reader = ReaderFactory.Open(fsTar);
+                using IReader reader = ReaderFactory.Open(this._tempTarStream);
                 Dictionary<string, bool> tempTopLevelEntries = new Dictionary<string, bool>();
 
                 while (reader.MoveToNextEntry()) {
@@ -550,25 +556,56 @@ namespace Martridge.Models.DmodInstaller {
                 }
             }
             
-            string archiveName = this._tempTarArchive == null 
-                ? this._sourceFile.FullName
-                : this._tempTarArchive.FullName;
-
+            // determine final destination
             string finalDestination = this._installationDestination.FullName;
             if (doTopLevelAppend) finalDestination = Path.Combine(finalDestination, topLevelOverride, this._dmodRootDirName ?? string.Empty);
             else if (doTopLevelReplace) finalDestination = Path.Combine(finalDestination, topLevelOverride);
             else Path.Combine(finalDestination,  this._dmodRootDirName ?? string.Empty);
-
             this._installationFinalDestination = new DirectoryInfo(finalDestination);
-            
             this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodExtractStart"], $"    \"{this._sourceFile.FullName}\"", $"    \"{finalDestination}\"");
+            
+            // check if reusing existing tar that was already extracted
+            if (this._tempTarStream == null) {
 
-            using FileStream fs = new FileStream(archiveName, FileMode.Open, FileAccess.Read);
+                // create a temp file or use a memory stream
+                this._tempTarArchive = null;
+                if (Config.Instance.General.DecompressDmodsToMemoryStreamInsteadOfTemporaryFile == false) {
+                    this._tempTarArchive = this._temp.TryCreateTempFile();
+                }
+                this._tempTarStream = this._tempTarArchive != null
+                    ? new FileStream(this._tempTarArchive.FullName, FileMode.Create, FileAccess.ReadWrite)
+                    : new MemoryStream((int)this._sourceFile.Length);
+                
+                // open the source file
+                using FileStream tempFs = new FileStream(this._sourceFile.FullName, FileMode.Open, FileAccess.Read);
+                
+                // check if it is a valid bz2 file
+                if (SharpCompress.Compressors.BZip2.BZip2Stream.IsBZip2(tempFs)) {
+                    // reset position
+                    tempFs.Seek(0, SeekOrigin.Begin);
+                    
+                    // decompress bz2 file
+                    BZip2ParallelInputStream bZip2Stream = new BZip2ParallelInputStream(tempFs, true);
+                    bZip2Stream.CopyTo(this._tempTarStream, 10485760);
+                    this._tempTarStream.Seek(0, SeekOrigin.Begin);
+                } else {
+                    this._tempTarStream.Dispose();
+                    this._tempTarStream = null;
+                }
+            } else {
+                this._tempTarStream.Seek(0, SeekOrigin.Begin);
+            }
+
+            using Stream fs = this._tempTarStream is null
+                ? new FileStream(this._sourceFile.FullName, FileMode.Open, FileAccess.Read)
+                : this._tempTarStream;
             using IReader reader = ReaderFactory.Open(fs);
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             int fileCount = 0;
+
+            this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodExtractingProgress"] + "1");
             
             while (reader.MoveToNextEntry())
             {

@@ -45,7 +45,7 @@ jobs:
       - name: Clean Citrus.Avalonia.DataGrid
         run: dotnet clean ./citrus/src/Citrus.Avalonia.DataGrid/Citrus.Avalonia.DataGrid.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
       - name: Clean SharpCompress
-        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Clean martridge
         run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Publish net10.0 win-x86
@@ -64,7 +64,7 @@ jobs:
       - name: Clean Citrus.Avalonia.DataGrid
         run: dotnet clean ./citrus/src/Citrus.Avalonia.DataGrid/Citrus.Avalonia.DataGrid.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
       - name: Clean SharpCompress
-        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Clean martridge
         run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Publish net10.0 win-x64
@@ -82,7 +82,7 @@ jobs:
       - name: Clean Citrus.Avalonia.DataGrid
         run: dotnet clean ./citrus/src/Citrus.Avalonia.DataGrid/Citrus.Avalonia.DataGrid.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
       - name: Clean SharpCompress
-        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Clean martridge
         run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Publish net10.0 linux-x64
@@ -99,7 +99,7 @@ jobs:
       - name: Clean Citrus.Avalonia.DataGrid
         run: dotnet clean ./citrus/src/Citrus.Avalonia.DataGrid/Citrus.Avalonia.DataGrid.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
       - name: Clean SharpCompress
-        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Clean martridge
         run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Publish net10.0 linux-x64
@@ -117,7 +117,7 @@ jobs:
       - name: Clean Citrus.Avalonia.DataGrid
         run: dotnet clean ./citrus/src/Citrus.Avalonia.DataGrid/Citrus.Avalonia.DataGrid.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
       - name: Clean SharpCompress
-        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
+        run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Clean martridge
         run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Publish net10.0 linux-x64

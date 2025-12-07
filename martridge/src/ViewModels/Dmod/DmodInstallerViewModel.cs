@@ -409,6 +409,12 @@ namespace Martridge.ViewModels.Dmod {
                             new FilePickerFileType("DMOD") {
                                 Patterns = new [] { "*.dmod" },
                             },
+                            new FilePickerFileType("Archive") {
+                                Patterns = new [] { "*.rar", "*.zip", "*.7zip", "*.xz", "*.tar", "*.bz2", "*.gz" },
+                            },
+                            new FilePickerFileType("Generic File") {
+                                Patterns = new [] { "*.*" },
+                            },
                         }, this.TemporaryDmodSource);
 
                     if (storageFile != null)

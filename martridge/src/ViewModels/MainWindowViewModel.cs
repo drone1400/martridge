@@ -845,46 +845,52 @@ namespace Martridge.ViewModels {
         public bool ProcessKeyDown(Key key, KeyModifiers modifiers) {
             // NOTE about the page swapping commands:
             // validation that the command can be executed is done within each of the page switching function
-            
-            switch (key) {
-                case Key.F1:
-                    this.CmdShowPageAbout();
-                    return true;
-                case Key.F2:
-#if ENABLE_FEATURE_ONLINE                
-                    if (this.EnableOnlineFeatures && this._currentViewModel != null && ReferenceEquals(this._currentViewModel, this._dmodBrowserViewModel)) {
-                        // swap to online view model
-                        this.CmdShowPageOnlineDmods();
+
+            if (modifiers == KeyModifiers.None) {
+
+                switch (key) {
+                    case Key.F1:
+                        this.CmdShowPageAbout();
                         return true;
-                    }
+                    case Key.F2:
+#if ENABLE_FEATURE_ONLINE
+                        if (this.EnableOnlineFeatures && this._currentViewModel != null && ReferenceEquals(this._currentViewModel, this._dmodBrowserViewModel)) {
+                            // swap to online view model
+                            this.CmdShowPageOnlineDmods();
+                            return true;
+                        }
 #endif
-                    this.CmdShowPageMyDmods();
-                    return true;
-                case Key.F3:
-                    this.CmdShowPageSettings();
-                    return true;
-                case Key.F4:
-                    this.CmdShowPageSettingsTheme();
-                    return true;
-                case Key.F5:
-                    this.CmdShowPageDmodInstallerAndBrowse();
-                    return true;
-                case Key.F6:
-                    if (this.EnableDmodDeveloperFeatures) {
-                        this.CmdShowPageDmodPackerAndBrowse();
-                    }
-                    return true;
-                case Key.F7:
+                        this.CmdShowPageMyDmods();
+                        return true;
+                    case Key.F3:
+                        this.CmdShowPageSettings();
+                        return true;
+                    case Key.F4:
+                        this.CmdShowPageSettingsTheme();
+                        return true;
+                    case Key.F5:
+                        this.CmdShowPageDmodInstallerAndBrowse();
+                        return true;
+                    case Key.F6:
+                        if (this.EnableDmodDeveloperFeatures) {
+                            this.CmdShowPageDmodPackerAndBrowse();
+                        }
+                        return true;
+                    case Key.F7:
 #if ENABLE_FEATURE_DINK_INSTALLER && ENABLE_FEATURE_ONLINE
-                    this.CmdShowPageDinkInstaller();
+                        this.CmdShowPageDinkInstaller();
 #endif
-                    return true;
-                case Key.L:
-                    if ((modifiers & KeyModifiers.Control) != 0) {
-                        App.Instance?.ShowLogWindow();
                         return true;
-                    }
-                    return false;
+                }
+            } else {
+                switch (key) {
+                    case Key.L:
+                        if ((modifiers & KeyModifiers.Control) != 0) {
+                            App.Instance?.ShowLogWindow();
+                            return true;
+                        }
+                        return false;
+                }
             }
             // let the current view model process the key input...
             return this._currentViewModel?.ProcessKeyDown(key, modifiers) ?? false;

@@ -337,9 +337,9 @@ namespace Martridge.ViewModels.Dmod {
         public bool CanCmdCancel(object? parameter = null)
         {
             if (this.InstallPhase == DmodInstallPhase.Inactive) return true;
-            if (this.InstallPhase == DmodInstallPhase.Initializing) return true;
+            if (this.InstallPhase == DmodInstallPhase.Decompressing) return true;
             if (this.InstallPhase == DmodInstallPhase.AwaitingUserInput) return true;
-            if (this.InstallPhase == DmodInstallPhase.Installing) return true;
+            if (this.InstallPhase == DmodInstallPhase.CopyingFiles) return true;
 
             return false;
         }
@@ -432,11 +432,11 @@ namespace Martridge.ViewModels.Dmod {
             return Task.Run(() => {
                 try
                 {
-                    FileInfo fileInfo = new FileInfo(this.FinalDmodSource);
-                    if (fileInfo.Exists == false) return;
+                    FileInfo sourceFile = new FileInfo(this.FinalDmodSource);
+                    if (sourceFile.Exists == false) return;
                     
                     // preemptively update phase...
-                    this.InstallPhase = DmodInstallPhase.Initializing;
+                    this.InstallPhase = DmodInstallPhase.Decompressing;
                     
                     // create installer trace listener
                     this._installerTraceListener = new MyTraceListenerGui("Installer Trace Listener");
@@ -454,7 +454,7 @@ namespace Martridge.ViewModels.Dmod {
                     this._installerLogic.ProgressReport += this.InstallerOnProgressReport;
                     this._installerLogic.DmodInstallerActivityStarted += this.InstallerLogicOnDmodInstallerActivityStarted;
                     this._installerLogic.DmodInstallerActivityEnded += this.InstallerLogicOnDmodInstallerActivityEnded;
-                    this._installerLogic.Initialize(fileInfo, DmodInstallPreprocessingMode.QuickPeek);
+                    this._installerLogic.InitializeAndDecompress(sourceFile);
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(ex);
                 }
@@ -469,7 +469,7 @@ namespace Martridge.ViewModels.Dmod {
                     if (this.SelectedBaseDestination == null) return;
                     if (this._installerLogic == null) return;
                     
-                    this._installerLogic.InstallDmod(this.SelectedBaseDestination, this.DesiredDmodDirectory, this.IsEnabledDesiredDmodDirectoryOverwrite);
+                    this._installerLogic.StartMovingDmodFiles(this.SelectedBaseDestination, this.DesiredDmodDirectory, this.IsEnabledDesiredDmodDirectoryOverwrite);
                     
                 } catch (Exception ex) {
                     MyTrace.Global.WriteException(ex);
@@ -572,7 +572,7 @@ namespace Martridge.ViewModels.Dmod {
                     case DmodInstallPhase.Finished:
                     {
                         // just finished overall...
-                        this._installerDoneEventArgs = new DmodInstallerDoneEventArgs(installer.InstallResult, installer.SourceFile, installer.InstallationFinalDestination ?? installer.InstallDestination);
+                        this._installerDoneEventArgs = new DmodInstallerDoneEventArgs(installer.InstallResult, installer.SourceFile, installer.InstallationFinalDestination);
                         if (installer.InstallResult == DinkInstallerResult.Cancelled) this.ShowInstallerCancelledMessageBox();
                         if (installer.InstallResult == DinkInstallerResult.Error) this.ShowInstallerErrorMessageBox(installer.InstallException);
                         break;

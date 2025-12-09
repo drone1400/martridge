@@ -1,282 +1,234 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using Martridge.Models.Configuration;
 using Martridge.Models.Localization;
 using Martridge.Trace;
+using SharpCompress.Archives;
 using SharpCompress.Common;
 using SharpCompress.Compressors.BZip2MT.InputStream;
 using SharpCompress.Readers;
 namespace Martridge.Models.DmodInstaller {
-    
+
     public class DmodInstaller {
         public event EventHandler<DmodInstallerProgressEventArgs>? ProgressReport;
-        public event EventHandler? DmodInstallerActivityStarted; 
-        public event EventHandler? DmodInstallerActivityEnded; 
-        
+        public event EventHandler? DmodInstallerActivityStarted;
+        public event EventHandler? DmodInstallerActivityEnded;
+
         public DmodInstallPhase InstallPhase => this._installPhase;
-        
+
         // data that gets set during initialization
         public FileInfo? SourceFile => this._sourceFile;
         public string DmodSourceNameNoExt => this._sourceFile?.Name.Substring(0, this._sourceFile.Name.Length - this._sourceFile.Extension.Length) ?? "";
-        public ReadOnlyCollection<string> ArchiveEntries { get; }
-        public ReadOnlyCollection<string> ArchiveTopLevelEntries { get; }
         public string? DmodRootName => this._dmodRootDirName;
-        
+
         // data that gets set during installation...
         public DirectoryInfo? InstallationFinalDestination => this._installationFinalDestination;
-        public DirectoryInfo? InstallDestination => this._installationDestination;
-        public string? DestinationOverride => this._destinationOverride;
         public DinkInstallerResult InstallResult => this._installResult;
         public Exception? InstallException => this._installException;
-        
-        
-        // private fields
+
+
+        // temporary file/directory helper
         private readonly DinkTempFileHelper _temp = new DinkTempFileHelper();
-        
-        private FileInfo? _tempTarArchive = null;
-        private Stream? _tempTarStream  = null;
-        
+
+        // temporary directory to extract non standard dmod archives to
+        private DirectoryInfo? _tempArchiveDir = null;
+
         private DmodInstallPhase _installPhase = DmodInstallPhase.Inactive;
-        
+
         private FileInfo? _sourceFile = null;
-        private readonly List<string> _archiveEntries = new List<string>();
-        private readonly List<string> _archiveTopLevelEntries = new List<string>();
+
+        // entries found in the archive
         private string? _dmodRootDirName = null;
 
         private DirectoryInfo? _installationFinalDestination = null;
-        private DirectoryInfo? _installationDestination = null;
-        private string? _destinationOverride = null;
+
         private DinkInstallerResult _installResult = DinkInstallerResult.Error;
         private Exception? _installException = null;
-        
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         public MyTrace CustomTrace { get; }
 
         private readonly object _syncRoot = new object();
-        
+
         private void ReportProgressPrimary() {
-            try
-            {
-               
+            try {
+
                 // NOTE: the primary progress is the phase itself
                 // there are a total of 5 phases to go through...
                 this.ProgressReport?.Invoke(this, new DmodInstallerProgressEventArgs(this._installPhase,  this._installResult, (int)this._installPhase / 5.0));
-            } catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
             }
         }
         private void ReportActivityStart() {
-            try
-            {
+            try {
                 this.DmodInstallerActivityStarted?.Invoke(this, EventArgs.Empty);
-            } catch (Exception ex)
-            {
-                MyTrace.Global.WriteException(ex);
-            }
-        }
-        
-        private void ReportActivityEnd() {
-            try
-            {
-                this.DmodInstallerActivityEnded?.Invoke(this, EventArgs.Empty);
-            } catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
             }
         }
 
-        private void LogMessage(string line1)
-        {
+        private void ReportActivityEnd() {
+            try {
+                this.DmodInstallerActivityEnded?.Invoke(this, EventArgs.Empty);
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(ex);
+            }
+        }
+
+        private void LogMessage(string line1) {
             this.CustomTrace.WriteMessage(line1);
         }
-        private void LogMessage(string line1, string line2)
-        {
+        private void LogMessage(string line1, string line2) {
             this.CustomTrace.WriteMessage([line1, line2]);
         }
-        private void LogMessage(string line1, string line2, string line3)
-        {
-            this.CustomTrace.WriteMessage([line1, line2, line3]);
+        private void LogWarning(string line1) {
+            this.CustomTrace.WriteMessage(line1, MyTraceLevel.Warning);
         }
         
+        private void LogWarning(string line1, string line2) {
+            this.CustomTrace.WriteMessage([line1, line2], MyTraceLevel.Warning);
+        }
+        private void LogError(string line1) {
+            this.CustomTrace.WriteMessage(line1, MyTraceLevel.Error);
+        }
+        private void LogError(string line1, string line2) {
+            this.CustomTrace.WriteMessage([line1, line2], MyTraceLevel.Error);
+        }
+        private void LogError(Exception ex) {
+            this.CustomTrace.WriteException(ex, MyTraceLevel.Error);
+        }
+
         public DmodInstaller() {
             this.CustomTrace = new MyTrace(this.GetType().ToString()) {
                 MirrorToGlobalTrace = true,
             };
-            
+
             this._temp.SetLogCallback(this.LogMessage);
+        }
+        
+        /// <summary>
+        /// Cleans up temporary files and flushes the log
+        /// </summary>
+        private void CleanUp() {
+            lock (this._syncRoot) {
+                this._installPhase = DmodInstallPhase.Cleanup;
+            }
+            this.ReportProgressPrimary();
+
+            this.ReportActivityStart();
+            this.LogMessage(Localizer.Instance["DmodInstaller/Log/CleaningUpStart"]);
+            this._temp.Dispose();
+            this.ReportActivityEnd();
+            this.LogMessage(Localizer.Instance["DmodInstaller/Log/CleaningUpEnd"]);
             
-            this.ArchiveEntries = new ReadOnlyCollection<string>(this._archiveEntries);
-            this.ArchiveTopLevelEntries = new ReadOnlyCollection<string>(this._archiveTopLevelEntries);
+            // flush log
+            this.CustomTrace.Flush();
+            this.CustomTrace.Close();
         }
 
-        public void Cancel()
-        {
+        /// <summary>
+        /// Cancels current DMOD installer action
+        /// </summary>
+        public void Cancel() {
             this._cancellationTokenSource.Cancel();
 
-            lock (this._syncRoot)
-            {
+            lock (this._syncRoot) {
                 if (this._installPhase != DmodInstallPhase.Inactive &&
                     this._installPhase != DmodInstallPhase.AwaitingUserInput) return;
-                
+
                 // jump to cleanup state to prevent starting initialization or installation...
                 this._installPhase = DmodInstallPhase.Cleanup;
             }
-            
+
             this.LogMessage(Localizer.Instance["DmodInstaller/Log/CancelledByUser"]);
-                
+
+            // clean up
             this.CleanUp();
-                
-            this.CustomTrace.Flush();
-            this.CustomTrace.Close();
-                
-            lock (this._syncRoot)
-            {
+            // finish things up
+            lock (this._syncRoot) {
                 this._installPhase = DmodInstallPhase.Finished;
                 this._installResult = DinkInstallerResult.Cancelled;
             }
             this.ReportProgressPrimary();
         }
 
-        public void Initialize(FileInfo sourceFile, DmodInstallPreprocessingMode installPreprocessingMode = DmodInstallPreprocessingMode.None) {
-            lock (this._syncRoot)
-            {
+        /// <summary>
+        /// Initializes and decompresses DMOD file to temporary location
+        /// </summary>
+        /// <param name="sourceFile">Source DMOD file</param>
+        /// <exception cref="DinkInstallerFileSystemException">if file can not be read</exception>
+        /// <exception cref="DinkInstallerUnzipException">if file can not be decompressed</exception>
+        public void InitializeAndDecompress(FileInfo sourceFile) {
+            lock (this._syncRoot) {
                 // some kind of sanity check i suppose?...
-                if (this._installPhase != DmodInstallPhase.Inactive || this._sourceFile != null)
+                if (this._installPhase != DmodInstallPhase.Inactive)
                     return;
-                
-                this._installPhase = DmodInstallPhase.Initializing;
+
+                this._installPhase = DmodInstallPhase.Decompressing;
                 this._sourceFile = sourceFile;
+                this._tempArchiveDir = null;
                 this._dmodRootDirName = null;
-                this._archiveEntries.Clear();
-                this._archiveTopLevelEntries.Clear();
             }
 
-            try
-            {
+            try {
                 this.ReportProgressPrimary();
 
                 this._sourceFile.Refresh();
-                if (this._sourceFile.Exists == false)
-                {
+                if (this._sourceFile.Exists == false) {
                     this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodFileNotFound"], $"    \"{this._sourceFile.FullName}\"");
                     throw new DinkInstallerFileSystemException(this._sourceFile.FullName);
                 }
-                
+
                 // begin initializing DMOD file...
-                this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializingDmodFileStart"], $"    \"{this._sourceFile.FullName}\"");
+                this.LogMessage(Localizer.Instance["DmodInstaller/Log/Decompressing/StartInitializing"], $"    \"{this._sourceFile.FullName}\"");
 
-                switch (installPreprocessingMode)
-                {
-                    case DmodInstallPreprocessingMode.None:
-                    {
-                        this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializedNone"]);
-                        lock (this._syncRoot)
-                        {
-                            this._installPhase = DmodInstallPhase.AwaitingUserInput;
-                        }
-                        this.ReportProgressPrimary();
-                        break;
-                    }
-                    case DmodInstallPreprocessingMode.QuickPeek:
-                    {
-                        this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializingQuickPeek"]);
-                        
-                        this.ReportActivityStart();
-                        bool result = this.TryInitializeQuickPeek();
-                        this.ReportActivityEnd();
-
-                        if (result)
-                        {
-                            this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializedQuickPeek"], this.DmodRootName ?? string.Empty);
-
-                            lock (this._syncRoot)
-                            {
-                                this._installPhase = DmodInstallPhase.AwaitingUserInput;
-                            }
-                            this.ReportProgressPrimary();
-                        }
-                        else
-                        {
-                            string message = Localizer.Instance["DmodInstaller/Log/InitializeFailedQuickPeek"];
-                            this.LogMessage(message);
-                            throw new Exception(message);
-                        }
-                        break;
-                    }
-                    case DmodInstallPreprocessingMode.PeekAll:
-                    {
-                        this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializingPeekAll"]);
-                        this.ReportActivityStart();
-                        // try to initialize the DMOD top entries info from the standard bzip2/tar dmod format
-                        // if that fails, maybe this is a different archive type like 7z, so try that instead?
-                        bool result = this.TryInitializeEntriesFromStandardDmod();
-                        if (result == false)
-                        {
-                            result = this.TryInitializeEntriesFromUnknownDmod();
-                        }
-                        this.ReportActivityEnd();
-
-                        if (result)
-                        {
-                            this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializedPeekAll"]);
-
-                            if (this._archiveTopLevelEntries.Count > 1)
-                            {
-                                this.LogMessage(Localizer.Instance["DmodInstaller/Log/WarningMultipleTopLevelItems"]);
-                            }
-
-                            lock (this._syncRoot)
-                            {
-                                this._installPhase = DmodInstallPhase.AwaitingUserInput;
-                            }
-                            this.ReportProgressPrimary();
-                        }
-                        else
-                        {
-                            string message = Localizer.Instance["DmodInstaller/Log/InitializeFailedPeekAll"];
-                            this.LogMessage(message);
-                            throw new Exception(message);
-                        }
-                        break;
-                    }
+                this.ReportActivityStart();
+                // try to initialize the DMOD top entries info from the standard bzip2/tar dmod format
+                // if that fails, maybe this is a different archive type like 7z, so try that instead?
+                bool result = this.TryDecompressFromStandardDmod();
+                if (result == false) {
+                    result = this.TryInitializeEntriesFromUnknownDmod();
                 }
-                
+                this.ReportActivityEnd();
+
+                if (result == false) {
+                    string message = Localizer.Instance["DmodInstaller/Log/Decompressing/Failure"];
+                    this.LogMessage(message);
+                    throw new DinkInstallerUnzipException(message);
+                }
+
                 // finished initializing DMOD file
-                this.LogMessage(Localizer.Instance["DmodInstaller/Log/InitializingDmodFileEnd"]);
-            } catch (DinkInstallerCancelledByUserException)
-            {
+                this.LogMessage(Localizer.Instance["DmodInstaller/Log/Decompressing/Success"]);
+
+                // move on to next phase
+                lock (this._syncRoot) {
+                    this._installPhase = DmodInstallPhase.AwaitingUserInput;
+                }
+                this.ReportProgressPrimary();
+            } catch (DinkInstallerCancelledByUserException) {
                 this.LogMessage(Localizer.Instance["DmodInstaller/Log/CancelledByUser"]);
-                
+                // clean up
                 this.CleanUp();
-                
-                this.CustomTrace.Flush();
-                this.CustomTrace.Close();
-                
-                lock (this._syncRoot)
-                {
+                // finish things up
+                lock (this._syncRoot) {
                     this._installPhase = DmodInstallPhase.Finished;
                     this._installResult = DinkInstallerResult.Cancelled;
                 }
                 this.ReportProgressPrimary();
-            }  catch (Exception ex)
-            {
+            }  catch (Exception ex) {
+                // log exception
                 this._installException = ex;
-                this.CustomTrace.WriteException(this._installException);
+                this.LogError(this._installException);
                 MyTrace.Global.WriteException(this._installException);
-                
+                // clean up
                 this.CleanUp();
-                
-                this.CustomTrace.Flush();
-                this.CustomTrace.Close();
-                
-                lock (this._syncRoot)
-                {
+                // finish things up
+                lock (this._syncRoot) {
                     this._installPhase = DmodInstallPhase.Finished;
                     this._installResult = DinkInstallerResult.Error;
                 }
@@ -284,110 +236,159 @@ namespace Martridge.Models.DmodInstaller {
             }
         }
 
-        private bool TryInitializeQuickPeek() {
-            this._archiveEntries.Clear();
-            this._archiveTopLevelEntries.Clear();
-            this._tempTarArchive = null;
-            this._dmodRootDirName = null;
-            
-            if (this._sourceFile == null)
-                return false;
-
-            try {
-                using FileStream fs = new FileStream(this._sourceFile.FullName, FileMode.Open, FileAccess.Read);
-                using IReader reader = ReaderFactory.Open(fs);
-
-                while (reader.MoveToNextEntry()) {
-                    if (string.IsNullOrEmpty(reader.Entry.Key))
-                        continue;
-                    
-                    if (this._cancellationTokenSource.IsCancellationRequested) {
-                        throw new DinkInstallerCancelledByUserException();
-                    }
-
-                    this._archiveEntries.Add(reader.Entry.Key);
-
-                    string[] split = reader.Entry.Key.Split('/', 2, StringSplitOptions.RemoveEmptyEntries);
-
-                    if (split.Length > 1) {
-                        if (string.IsNullOrWhiteSpace(this._dmodRootDirName)) {
-                            this._dmodRootDirName = split[0];
-                            return true;
-                        }
-                    }
+        
+        /// <summary>
+        /// Helper class used during extraction so I don't have to write two functions for
+        /// Extracting from an <see cref="IReader"/>'s current <see cref="IEntry"/> or an <see cref="IArchiveEntry"/>
+        /// </summary>
+        private class EntryWrapper {
+            public string Key => this._entry?.Key ?? this._reader?.Entry.Key ?? string.Empty;
+            public void WriteToDirectory(DirectoryInfo destination, ExtractionOptions options) {
+                if (this._entry != null) {
+                    this._entry.WriteToDirectory(destination.FullName, options);
+                    return;
                 }
-            } catch (Exception ex) {
-                MyTrace.Global.WriteException(ex);
-                return false;
+                if (this._reader != null) {
+                    this._reader.WriteEntryToDirectory(destination.FullName, options);
+                }
             }
 
-            return string.IsNullOrWhiteSpace(this._dmodRootDirName) == false;
+            private IArchiveEntry? _entry = null;
+            private IReader? _reader = null;
+            public EntryWrapper(IArchiveEntry entry) {
+                this._entry = entry;
+            }
 
+            public EntryWrapper(IReader reader) {
+                this._reader = reader;
+            }
         }
 
-        private bool TryInitializeEntriesFromStandardDmod() {
-            this._archiveEntries.Clear();
-            this._archiveTopLevelEntries.Clear();
-            this._tempTarStream?.Dispose();
-            this._tempTarStream = null;
-            this._tempTarArchive = null;
-            this._dmodRootDirName = null;
-            
+        /// <summary>
+        /// Extracts a DMOD file entry to the destination root directory
+        /// </summary>
+        /// <param name="entry">Current DMOD archive entry</param>
+        /// <param name="destination">Destination root directory</param>
+        /// <param name="tempTopLevelEntries">Dictionary of top level directories within</param>
+        /// <param name="options">Entry extraction options</param>
+        /// <exception cref="DinkInstallerCancelledByUserException">if operation is cancelled by the user</exception>
+        private void ExtractDmodArchiveEntry(EntryWrapper entry, DirectoryInfo destination, Dictionary<string, bool> tempTopLevelEntries, ExtractionOptions options) {
+            // skip empty entries...
+            if (string.IsNullOrEmpty(entry.Key))
+                return;
+
+            // check if cancelled
+            if (this._cancellationTokenSource.IsCancellationRequested) {
+                throw new DinkInstallerCancelledByUserException();
+            }
+
+            bool isValidEntry = true;
+
+            string[] split = entry.Key.Split('/', 2, StringSplitOptions.RemoveEmptyEntries);
+
+            // check for and disallow going back in relative path
+            foreach (string s in split) {
+                if (s == "..") {
+                    isValidEntry = false;
+                    break;
+                }
+            }
+
+            if (split.Length > 1) {
+                if (split[0] != "..") {
+                    tempTopLevelEntries[split[0]] = true;
+                }
+            }
+            else {
+                if (entry.Key != "..") {
+                    tempTopLevelEntries[entry.Key] = true;
+                }
+            }
+
+            if (isValidEntry) {
+                entry.WriteToDirectory(destination, options);
+            }
+            else {
+                this.LogWarning(Localizer.Instance["DmodInstaller/Log/Decompressing/SkippingInvalidEntry"], "    " + entry.Key);
+            }
+        }
+
+
+        /// <summary>
+        /// Tries to decompress a standard .tar.bz2 type .dmod file
+        /// </summary>
+        /// <returns>True if successfull</returns>
+        /// <exception cref="DinkInstallerCancelledByUserException">if operation is cancelled by the user</exception>
+        private bool TryDecompressFromStandardDmod() {
             if (this._sourceFile == null)
                 return false;
 
             try {
+                FileInfo? tempTarArchive = null;
+
+                // initialize output archive
+                if (Config.Instance.General.DecompressDmodsToMemoryStreamInsteadOfTemporaryFile == false) {
+                    tempTarArchive = this._temp.TryCreateTempFile();
+                }
+                using Stream tempTarStream = tempTarArchive != null
+                    ? new FileStream(tempTarArchive.FullName, FileMode.Create, FileAccess.ReadWrite)
+                    : new MemoryStream((int)this._sourceFile.Length);
 
                 // the DMOD should be a bzip2-ed tar archive...
                 using FileStream fs = new FileStream(this._sourceFile.FullName, FileMode.Open, FileAccess.Read);
-                using BZip2ParallelInputStream decompressor = new BZip2ParallelInputStream(fs, false);
-                
-                if (Config.Instance.General.DecompressDmodsToMemoryStreamInsteadOfTemporaryFile == false) {
-                    this._tempTarArchive = this._temp.TryCreateTempFile();
-                }
 
-                this._tempTarStream = this._tempTarArchive != null
-                    ? new FileStream(this._tempTarArchive.FullName, FileMode.Create, FileAccess.ReadWrite)
-                    : new MemoryStream((int)this._sourceFile.Length);
-                
+                // try decompressing the stream
                 try {
-                    decompressor.CopyTo(this._tempTarStream);
-                } catch (Exception) {
-                    this._tempTarArchive = null;
+                    using BZip2ParallelInputStream decompressor = new BZip2ParallelInputStream(fs, false);
+
+                    // initialize temporary archive directory after BZip2 decompressor
+                    // this way the temp dir only gets created if the file is a valid BZip2 stream (or at least has a valid header)
+                    this._tempArchiveDir = this._temp.TryCreateTempDirectory();
+                    if (this._tempArchiveDir == null) {
+                        this.LogError(Localizer.Instance["DmodInstaller/Log/Decompressing/CouldNotCreateTempDir"]);
+                        return false;
+                    }
+
+                    this.LogMessage(Localizer.Instance["DmodInstaller/Log/Decompressing/StartExtraction"]);
+                    decompressor.CopyTo(tempTarStream);
+                } catch (IOException) {
+                    this._tempArchiveDir = null;
                     return false;
                 }
 
-                // now we have an extracted temporary tar file... time to read all its entries...
-                this._tempTarStream.Seek(0, SeekOrigin.Begin);
+                // check if cancelled
+                if (this._cancellationTokenSource.IsCancellationRequested) {
+                    throw new DinkInstallerCancelledByUserException();
+                }
 
-                using IReader reader = ReaderFactory.Open(this._tempTarStream);
+                // now we have an extracted temporary tar file... time to read all its entries!
+                tempTarStream.Seek(0, SeekOrigin.Begin);
+
                 Dictionary<string, bool> tempTopLevelEntries = new Dictionary<string, bool>();
 
-                while (reader.MoveToNextEntry()) {
-                    if (string.IsNullOrEmpty(reader.Entry.Key))
-                        continue;
-                    
-                    if (this._cancellationTokenSource.IsCancellationRequested) {
-                        throw new DinkInstallerCancelledByUserException();
-                    }
+                using IArchive archive = ArchiveFactory.Open(tempTarStream, new ReaderOptions() {
+                    ExtensionHint = ".tar"
+                });
 
-                    this._archiveEntries.Add(reader.Entry.Key);
+                ExtractionOptions options = new ExtractionOptions() {
+                    ExtractFullPath = true,
+                    Overwrite = true,
+                    PreserveFileTime = true,
+                    PreserveAttributes = false, // NOTE: tar archive does not have file attributes, setting this to true throws exception
+                };
 
-                    string[] split = reader.Entry.Key.Split('/', 2, StringSplitOptions.RemoveEmptyEntries);
-
-                    if (split.Length > 1) {
-                        if (string.IsNullOrEmpty(this._dmodRootDirName)) {
-                            this._dmodRootDirName = split[0];
-                        }
-                        tempTopLevelEntries[split[0]] = true;
-                    } else {
-                        tempTopLevelEntries[reader.Entry.Key] = true;
-                    }
+                foreach (IArchiveEntry entry in archive.Entries) {
+                    this.ExtractDmodArchiveEntry(new EntryWrapper(entry), this._tempArchiveDir, tempTopLevelEntries, options);
                 }
 
-                foreach (var kvp in tempTopLevelEntries) {
-                    this._archiveTopLevelEntries.Add(kvp.Key);
+                // determine output root directory name, either use the single top level entry or the source file name
+                // user can change this later...
+                if (tempTopLevelEntries.Count > 0) {
+                    this._dmodRootDirName = tempTopLevelEntries.Count > 1
+                        ? Path.GetFileNameWithoutExtension(this._sourceFile.Name)
+                        : tempTopLevelEntries.First().Key;
                 }
+
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
                 return false;
@@ -396,45 +397,68 @@ namespace Martridge.Models.DmodInstaller {
             return string.IsNullOrWhiteSpace(this._dmodRootDirName) == false;
         }
 
+        /// <summary>
+        /// Tries to decompress a generic .rar, .zip, .7z or other possibly compatible archive types,
+        /// except for standard bzip2 compressed .dmod files
+        /// </summary>
+        /// <returns>True if successfull</returns>
+        /// <exception cref="DinkInstallerCancelledByUserException">if operation is cancelled by the user</exception>
         private bool TryInitializeEntriesFromUnknownDmod() {
-            this._archiveEntries.Clear();
-            this._archiveTopLevelEntries.Clear();
-            this._tempTarArchive = null;
-            this._dmodRootDirName = null;
-            
             if (this._sourceFile == null)
                 return false;
 
+            this._tempArchiveDir = this._temp.TryCreateTempDirectory();
+            if (this._tempArchiveDir == null) {
+                this.LogError(Localizer.Instance["DmodInstaller/Log/Decompressing/CouldNotCreateTempDir"]);
+                return false;
+            }
+
             try {
+                // the DMOD is some unknown kind of archive
                 using FileStream fs = new FileStream(this._sourceFile.FullName, FileMode.Open, FileAccess.Read);
-                using IReader reader = ReaderFactory.Open(fs);
+
                 Dictionary<string, bool> tempTopLevelEntries = new Dictionary<string, bool>();
 
-                while (reader.MoveToNextEntry()) {
-                    if (string.IsNullOrEmpty(reader.Entry.Key))
-                        continue;
-                    
-                    if (this._cancellationTokenSource.IsCancellationRequested) {
-                        throw new DinkInstallerCancelledByUserException();
-                    }
+                using IArchive archive = ArchiveFactory.Open(fs, new ReaderOptions() {
+                    ExtensionHint = this._sourceFile.Extension
+                });
 
-                    this._archiveEntries.Add(reader.Entry.Key);
+                // check if cancelled
+                if (this._cancellationTokenSource.IsCancellationRequested) {
+                    throw new DinkInstallerCancelledByUserException();
+                }
 
-                    string[] split = reader.Entry.Key.Split('/', 2, StringSplitOptions.RemoveEmptyEntries);
+                ExtractionOptions options = new ExtractionOptions() {
+                    ExtractFullPath = true,
+                    Overwrite = true,
+                    PreserveFileTime = true,
+                    PreserveAttributes = archive.Type != ArchiveType.Tar, // NOTE: tar archive does not have file attributes
+                };
 
-                    if (split.Length > 1) {
-                        if (string.IsNullOrEmpty(this._dmodRootDirName)) {
-                            this._dmodRootDirName = split[0];
-                        }
-                        tempTopLevelEntries[split[0]] = true;
-                    } else {
-                        tempTopLevelEntries[reader.Entry.Key] = true;
+                this.LogMessage(Localizer.Instance["DmodInstaller/Log/Decompressing/StartExtraction"]);
+                if (archive.Type == ArchiveType.SevenZip || archive.Type == ArchiveType.Rar && archive.IsSolid) {
+                    // use ExtractAllEntries for 7zip and solid RAR archives
+                    using IReader reader = archive.ExtractAllEntries();
+                    EntryWrapper entryWrapper = new EntryWrapper(reader);
+
+                    while (reader.MoveToNextEntry()) {
+                        this.ExtractDmodArchiveEntry(entryWrapper, this._tempArchiveDir, tempTopLevelEntries, options);
                     }
                 }
-                
-                foreach (var kvp in tempTopLevelEntries) {
-                    this._archiveTopLevelEntries.Add(kvp.Key);
+                else {
+                    foreach (IArchiveEntry entry in archive.Entries) {
+                        this.ExtractDmodArchiveEntry(new EntryWrapper(entry), this._tempArchiveDir, tempTopLevelEntries, options);
+                    }
                 }
+
+                // determine output root directory name, either use the single top level entry or the source file name
+                // user can change this later...
+                if (tempTopLevelEntries.Count > 0) {
+                    this._dmodRootDirName = tempTopLevelEntries.Count > 1
+                        ? Path.GetFileNameWithoutExtension(this._sourceFile.Name)
+                        : tempTopLevelEntries.First().Key;
+                }
+
             } catch (Exception ex) {
                 MyTrace.Global.WriteException(ex);
                 return false;
@@ -442,64 +466,62 @@ namespace Martridge.Models.DmodInstaller {
 
             return string.IsNullOrWhiteSpace(this._dmodRootDirName) == false;
         }
-
-        public void InstallDmod(DirectoryInfo destinationDirectory, string destinationOverride, bool allowOverwrite) {
-            lock (this._syncRoot)
-            {
+        
+        /// <summary>
+        /// Starts moving DMOD files from the temporary directory they were decompressed in,
+        /// to the final destination
+        /// </summary>
+        /// <param name="destinationDirectory">destination root directory</param>
+        /// <param name="destinationOverride">destination subdirectory name, if user wishes to override</param>
+        /// <param name="allowOverwrite">if true, allows overwriting files in the destination</param>
+        /// <exception cref="NullReferenceException">if the temporary DMOD decompression directory does not exist</exception>
+        /// <exception cref="DinkInstallerCancelledByUserException">if operation is cancelled by the user</exception>
+        /// <exception cref="DinkInstallerFileSystemException">if destination is drive root, or destination is not rooted at all</exception>
+        public void StartMovingDmodFiles(DirectoryInfo destinationDirectory, string destinationOverride, bool allowOverwrite) {
+            lock (this._syncRoot) {
                 if (this._installPhase != DmodInstallPhase.AwaitingUserInput) return;
+                if (this._tempArchiveDir == null)
+                    throw new NullReferenceException("Temporary archive directory was not previously initialized!");
 
-                this._installPhase = DmodInstallPhase.Installing;
-                this._installationDestination = destinationDirectory;
-                this._destinationOverride = destinationOverride;
+                this._installPhase = DmodInstallPhase.CopyingFiles;
             }
-            
+
             bool cancelled = false;
 
             try {
                 this.ReportProgressPrimary();
-                
+
                 if (this._cancellationTokenSource.IsCancellationRequested) {
                     throw new DinkInstallerCancelledByUserException();
                 }
-                
-                // sanity checks for source
-                this._sourceFile?.Refresh();
-                if (this._sourceFile?.Exists != true)
-                {
-                    this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodFileNotFound"], $"    \"{this._sourceFile?.FullName}\"");
-                    throw new DinkInstallerFileSystemException(this._sourceFile?.FullName ?? "");
-                }
-                
+
                 // sanity checks for destination
-                if (this._installationDestination.Parent == null) {
-                    throw new DinkInstallerFileSystemException(Localizer.Instance["DmodInstaller/Log/DestinationErrorIsRoot"] + $" \"{destinationDirectory.FullName}\"");
+                if (destinationDirectory.Parent == null) {
+                    throw new DinkInstallerFileSystemException(Localizer.Instance["DmodInstaller/Log/MovingToDestination/ErrorIsRoot"] + $" \"{destinationDirectory.FullName}\"");
                 }
                 if (Path.IsPathRooted(destinationDirectory.FullName) == false) {
-                    throw new DinkInstallerFileSystemException(Localizer.Instance["DmodInstaller/Log/DestinationErrorIsNotRooted"] + $" \"{destinationDirectory.FullName}\"");
+                    throw new DinkInstallerFileSystemException(Localizer.Instance["DmodInstaller/Log/MovingToDestination/ErrorIsNotRooted"] + $" \"{destinationDirectory.FullName}\"");
                 }
-                
+
                 // extracting DMOD
                 this.ReportActivityStart();
-                this.ExtractDmod(allowOverwrite);
+                this.ExecuteMoveDmodFiles(destinationDirectory, destinationOverride, allowOverwrite);
                 this.ReportActivityEnd();
-                this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodExtractEnd"]);
+                this.LogMessage(Localizer.Instance["DmodInstaller/Log/InstallingDone"]);
             } catch (DinkInstallerCancelledByUserException) {
                 cancelled = true;
                 this.LogMessage(Localizer.Instance["DmodInstaller/Log/CancelledByUser"]);
             } catch (Exception ex) {
                 this._installException = ex;
-                this.CustomTrace.WriteException(this._installException);
+                this.LogError(this._installException);
                 MyTrace.Global.WriteException(this._installException);
-            } finally {
+            }
+            finally {
                 this.ReportActivityEnd();
-                
+                // clean up
                 this.CleanUp();
-
-                this.CustomTrace.Flush();
-                this.CustomTrace.Close();
-                
-                lock (this._syncRoot)
-                {
+                // finish things up
+                lock (this._syncRoot) {
                     this._installPhase = DmodInstallPhase.Finished;
                     if (cancelled == false && this._installException == null) this._installResult = DinkInstallerResult.Success;
                     else if (cancelled) this._installResult = DinkInstallerResult.Cancelled;
@@ -508,144 +530,57 @@ namespace Martridge.Models.DmodInstaller {
                 this.ReportProgressPrimary();
             }
         }
-
-
-        private void CleanUp() {
-            lock (this._syncRoot)
-            {
-                this._installPhase = DmodInstallPhase.Cleanup;
-            }
-            this.ReportProgressPrimary();
-            
-            this.ReportActivityStart();
-            this.LogMessage(Localizer.Instance["DmodInstaller/Log/CleaningUpStart"]);
-            this._temp.Dispose();
-            this.ReportActivityEnd();
-            this.LogMessage(Localizer.Instance["DmodInstaller/Log/CleaningUpEnd"]);
-        }
         
-        private void ExtractDmod(bool allowOverwrite) {
-            if (this._sourceFile == null) return;
-            if (this._installationDestination == null) return;
-            
+        private void ExecuteMoveDmodFiles(DirectoryInfo destinationDirectory, string destinationOverride, bool allowOverwrite) {
             if (this._cancellationTokenSource.IsCancellationRequested) {
                 throw new DinkInstallerCancelledByUserException();
             }
 
-            bool doTopLevelAppend = this._archiveTopLevelEntries.Count > 1;
-            bool doTopLevelReplace = string.IsNullOrWhiteSpace(this._destinationOverride) == false;
-            string topLevelOverride = doTopLevelReplace 
-                ? this._destinationOverride! // ensured valid by previous check, suppress warning 
-                : this._sourceFile.Name.Substring(0, this._sourceFile.Name.Length - this._sourceFile.Extension.Length);
-            
-            if (string.IsNullOrWhiteSpace(topLevelOverride)) {
-                doTopLevelAppend = false;
-                doTopLevelReplace = false;
+            string dmodDirectory = this._dmodRootDirName ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(destinationOverride)) {
+                dmodDirectory = destinationOverride;
             }
 
-            if (doTopLevelAppend || doTopLevelReplace)
-            {
-                // check if folder already exists...
-                string path =  Path.Combine(this._installationDestination.FullName, topLevelOverride);
-
-                if (Directory.Exists(path) && allowOverwrite == false)
-                {
-                    string msg = Localizer.Instance["DmodInstaller/Log/DestinationErrorAlreadyExists"];
-                    this.LogMessage(msg);
-                    throw new DinkInstallerFileSystemException(msg);
-                }
-            }
-            
-            // determine final destination
-            string finalDestination = this._installationDestination.FullName;
-            if (doTopLevelAppend) finalDestination = Path.Combine(finalDestination, topLevelOverride, this._dmodRootDirName ?? string.Empty);
-            else if (doTopLevelReplace) finalDestination = Path.Combine(finalDestination, topLevelOverride);
-            else Path.Combine(finalDestination,  this._dmodRootDirName ?? string.Empty);
-            this._installationFinalDestination = new DirectoryInfo(finalDestination);
-            this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodExtractStart"], $"    \"{this._sourceFile.FullName}\"", $"    \"{finalDestination}\"");
-            
-            // check if reusing existing tar that was already extracted
-            if (this._tempTarStream == null) {
-
-                // create a temp file or use a memory stream
-                this._tempTarArchive = null;
-                if (Config.Instance.General.DecompressDmodsToMemoryStreamInsteadOfTemporaryFile == false) {
-                    this._tempTarArchive = this._temp.TryCreateTempFile();
-                }
-                this._tempTarStream = this._tempTarArchive != null
-                    ? new FileStream(this._tempTarArchive.FullName, FileMode.Create, FileAccess.ReadWrite)
-                    : new MemoryStream((int)this._sourceFile.Length);
-                
-                // open the source file
-                using FileStream tempFs = new FileStream(this._sourceFile.FullName, FileMode.Open, FileAccess.Read);
-                
-                // check if it is a valid bz2 file
-                if (SharpCompress.Compressors.BZip2.BZip2Stream.IsBZip2(tempFs)) {
-                    // reset position
-                    tempFs.Seek(0, SeekOrigin.Begin);
-                    
-                    // decompress bz2 file
-                    BZip2ParallelInputStream bZip2Stream = new BZip2ParallelInputStream(tempFs, true);
-                    bZip2Stream.CopyTo(this._tempTarStream, 10485760);
-                    this._tempTarStream.Seek(0, SeekOrigin.Begin);
-                } else {
-                    this._tempTarStream.Dispose();
-                    this._tempTarStream = null;
-                }
-            } else {
-                this._tempTarStream.Seek(0, SeekOrigin.Begin);
+            if (string.IsNullOrWhiteSpace(dmodDirectory)) {
+                throw new DinkInstallerFileSystemException(Localizer.Instance["DmodInstaller/Log/MovingToDestination/ErrorUnknownDirectory"]);
             }
 
-            using Stream fs = this._tempTarStream is null
-                ? new FileStream(this._sourceFile.FullName, FileMode.Open, FileAccess.Read)
-                : this._tempTarStream;
-            using IReader reader = ReaderFactory.Open(fs);
+            if (this._tempArchiveDir == null) {
+                throw new DinkInstallerFileSystemException(Localizer.Instance["DmodInstaller/Log/MovingToDestination/ErrorTempDirNotFound"]);
+            }
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            int fileCount = 0;
+            this._installationFinalDestination = new DirectoryInfo(Path.Combine(destinationDirectory.FullName, dmodDirectory));
 
-            this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodExtractingProgress"] + "1");
-            
-            while (reader.MoveToNextEntry())
-            {
-                fileCount++;
-                
-                // log a message every 2 seconds so it does not seem like the installer is stuck when dealing with really large DMODs...
-                if (stopwatch.ElapsedMilliseconds > 2000)
-                {
-                    stopwatch.Restart();
-                    this.LogMessage(Localizer.Instance["DmodInstaller/Log/DmodExtractingProgress"] + $" {fileCount}...");
-                }
-                
-                if (string.IsNullOrEmpty(reader.Entry.Key))
-                    continue;
-                        
-                if (this._cancellationTokenSource.IsCancellationRequested) {
-                    throw new DinkInstallerCancelledByUserException();
-                }
+            DirectoryInfo tempRootDir = this._tempArchiveDir;
 
-                // archive entries are split using '/' 
-                string[] split = reader.Entry.Key.Split('/', StringSplitOptions.RemoveEmptyEntries);
-                        
-                // recreate path using system specific path separator
-                if (doTopLevelAppend) {
-                    split[0] = Path.Combine(topLevelOverride, split[0]);
-                } else if (doTopLevelReplace) {
-                    if (split[0] == this._dmodRootDirName)
-                        split[0] = topLevelOverride;
-                }
-                        
-                string relativePath = Path.Combine(split);
-                        
-                string fullPath = Path.Combine(this._installationDestination.FullName, relativePath);
-                        
-                if (reader.Entry.IsDirectory == false) {
-                    DirectoryInfo? parent = Directory.GetParent(fullPath);
-                    if (parent != null && parent.Exists == false) {
-                        parent.Create();
+            // navigate down into the directory structure until we encounter either some files or more than just one directory
+            DirectoryInfo[] subDirs = this._tempArchiveDir.GetDirectories();
+            FileInfo[] files = this._tempArchiveDir.GetFiles();
+            while (subDirs.Length == 1 && files.Length == 0) {
+                tempRootDir = subDirs[0];
+                subDirs = tempRootDir.GetDirectories();
+                files = tempRootDir.GetFiles();
+            }
+
+            // get all files!
+            files = tempRootDir.GetFiles("*", SearchOption.AllDirectories);
+
+            this.LogMessage(Localizer.Instance["DmodInstaller/Log/MovingToDestination/Location"], $"    \"{this._installationFinalDestination.FullName}\"");
+            this.LogMessage(Localizer.Instance["DmodInstaller/Log/MovingToDestination/FileCount"], $"    {files.Length}");
+
+            foreach (FileInfo file in files) {
+                try {
+                    string relativePath = Path.GetRelativePath(tempRootDir.FullName, file.FullName);
+                    string destinationFile = Path.Combine(this._installationFinalDestination.FullName, relativePath);
+                    FileInfo destinationFileInfo = new FileInfo(destinationFile);
+                    if (destinationFileInfo.Directory?.Exists != true) {
+                        destinationFileInfo.Directory?.Create();
                     }
-                    reader.WriteEntryToFile(fullPath, new ExtractionOptions() { Overwrite = allowOverwrite, });
+                    File.Move(file.FullName, destinationFile, allowOverwrite);
+                } catch (Exception ex) {
+                    this.LogError(Localizer.Instance["DmodInstaller/Log/MovingToDestination/ErrorMovingFile"], $"    \"{file.FullName}\"");
+                    MyTrace.Global.WriteException(ex);
                 }
             }
         }

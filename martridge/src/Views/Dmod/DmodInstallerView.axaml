@@ -77,7 +77,7 @@
                     <Label Classes="Heading2B"
                            Content="{dloc:Localize DmodInstaller/View/DmodSelect/SelectDestination}" />
 
-                    <ListBox Height="200"
+                    <ListBox Height="140"
                              ItemsSource="{Binding BaseDestinations}"
                              SelectionMode="Single"
                              SelectedItem="{Binding SelectedBaseDestination}">

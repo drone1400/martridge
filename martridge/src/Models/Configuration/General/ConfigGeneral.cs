@@ -186,8 +186,13 @@ namespace Martridge.Models.Configuration.General {
             if (this.UseRelativePathForSubfolders) {
                 path = LocationHelper.TryMakePathRelativeToMartridge(path);
             }
-            this._gameExePaths.Add(path);
+            int oldCount = this._gameExePaths.Count;
+            // add new path at first position
+            this._gameExePaths.Insert(0, path);
             this.FireUpdatedEvent(nameof(this.GameExePaths));
+            // select newly added game
+            this._activeGameExeIndex = 0;
+            this.FireUpdatedEvent(nameof(this.ActiveGameExeIndex));
         }
         
         public void TryAddEditorExePath(string? path) {
@@ -196,8 +201,12 @@ namespace Martridge.Models.Configuration.General {
             if (this.UseRelativePathForSubfolders) {
                 path = LocationHelper.TryMakePathRelativeToMartridge(path);
             }
-            this._editorExePaths.Add(path);
+            // add new path at first position
+            this._editorExePaths.Insert(0,path);
             this.FireUpdatedEvent(nameof(this.EditorExePaths));
+            // select newly added editor
+            this._activeEditorExeIndex = 0;
+            this.FireUpdatedEvent(nameof(this.ActiveEditorExeIndex));
         }
 
         public void TryAddAdditionalDmodPath(string? path) {
@@ -206,7 +215,8 @@ namespace Martridge.Models.Configuration.General {
             if (this.UseRelativePathForSubfolders) {
                 path = LocationHelper.TryMakePathRelativeToMartridge(path);
             }
-            this._additionalDmodLocations.Add(path);
+            // add new path at first position
+            this._additionalDmodLocations.Insert(0,path);
             this.FireUpdatedEvent(nameof(this.AdditionalDmodLocations));
         }
 

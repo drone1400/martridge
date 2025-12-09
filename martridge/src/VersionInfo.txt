@@ -15,6 +15,9 @@
 - note: by default, Online DMOD list is refreshed every 5 days, might make this interval shorter before release...
 - fixed issue with reading the DMOD.DIZ file with the wrong encoding
 - various internal code changes/refactoring/cleanup stuff
+- DMODs in non-standard format (like .rar, .7z, .zip) can now be installed
+- fixed issue with temporary files/directories not being deleted properly
+- fixed ALT+F4 not working (was the case for a while, oups!)
 
 stuff left to do:
 - option to auto detect DinkHD/Freedink/etc in settings, do it automatically on first ever launch too

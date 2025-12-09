@@ -92,11 +92,23 @@ namespace Martridge.ViewModels.Configuration {
         }
         private ObservableCollection<string> _gameExePaths = new ObservableCollection<string>();
 
+        public int SelectedGameExePathIndex {
+            get => this._selectedGameExePathIndex;
+            set => this.RaiseAndSetIfChanged(ref this._selectedGameExePathIndex, value);
+        }
+        private int _selectedGameExePathIndex = -1;
+
         public ObservableCollection<string> EditorExePaths {
             get => this._editorExePaths;
             set => this.RaiseAndSetIfChanged(ref this._editorExePaths, value);
         }
         private ObservableCollection<string> _editorExePaths = new ObservableCollection<string>();
+
+        public int SelectedEditorExePathIndex {
+            get => this._selectedEditorExePathIndex;
+            set => this.RaiseAndSetIfChanged(ref this._selectedEditorExePathIndex, value);
+        }
+        private int _selectedEditorExePathIndex = -1;
 
         public ObservableCollection<CultureInfo> Localizations {
             get => this._localizations;
@@ -111,11 +123,17 @@ namespace Martridge.ViewModels.Configuration {
         private CultureInfo? _selectedLocalization = null;
         private string? _savedLocalization = null;
         
-        public ObservableCollection<string> AdditionalDmodLocations {
-            get => this._additionalDmodLocations;
-            set => this.RaiseAndSetIfChanged(ref this._additionalDmodLocations, value);
+        public ObservableCollection<string> AdditionalDmods {
+            get => this._additionalDmods;
+            set => this.RaiseAndSetIfChanged(ref this._additionalDmods, value);
         }
-        private ObservableCollection<string> _additionalDmodLocations = new ObservableCollection<string>();
+        private ObservableCollection<string> _additionalDmods = new ObservableCollection<string>();
+
+        public int SelectedAdditionalDmodIndex {
+            get => this._selectedAdditionalDmodIndex;
+            set => this.RaiseAndSetIfChanged(ref this._selectedAdditionalDmodIndex, value);
+        }
+        private int _selectedAdditionalDmodIndex = -1;
         
         //
         // Launch settings
@@ -252,7 +270,7 @@ namespace Martridge.ViewModels.Configuration {
             this.ShowLaunchRefDirPathInMainWindow = this.CfgGeneral.ShowLaunchRefDirPathInMainWindow;
             this.ShowLaunchCustomArgsInMainWindow = this.CfgGeneral.ShowLaunchCustomArgsInMainWindow;
             this.UseRelativePathForSubfolders = this.CfgGeneral.UseRelativePathForSubfolders;
-            this.AdditionalDmodLocations = listDmod;
+            this.AdditionalDmods = listDmod;
             this.DefaultDmodLocation = this.CfgGeneral.DefaultDmodLocation;
             this.GameExePaths = listGameExe;
             this.EditorExePaths = listEditorExe;
@@ -281,7 +299,7 @@ namespace Martridge.ViewModels.Configuration {
             }
 
             List<string> listDmod = new List<string>();
-            foreach (string str in this.AdditionalDmodLocations) {
+            foreach (string str in this.AdditionalDmods) {
                 listDmod.Add(str);
             }
 
@@ -446,16 +464,60 @@ namespace Martridge.ViewModels.Configuration {
         //
 
         public void CmdAdditionalDmodsRemoveSelected(object? parameter = null) {
-            if (parameter is not string target) return;
+            if (this.SelectedAdditionalDmodIndex < 0 ||
+                this.SelectedAdditionalDmodIndex >= this.AdditionalDmods.Count) return;
             if (this.IsBusy ) return;
-            this.AdditionalDmodLocations.Remove(target);
-
+            
+            this.AdditionalDmods.RemoveAt(this.SelectedAdditionalDmodIndex);
         }
         
         [DependsOn(nameof(IsBusy))]
-        [DependsOn(nameof(AdditionalDmodLocations))]
+        [DependsOn(nameof(SelectedAdditionalDmodIndex))]
+        [DependsOn(nameof(AdditionalDmods))]
         public bool CanCmdAdditionalDmodsRemoveSelected(object? parameter = null) {
-            if (parameter is not string) return false;
+            if (this.SelectedAdditionalDmodIndex < 0 ||
+                this.SelectedAdditionalDmodIndex >= this.AdditionalDmods.Count) return false;
+            if (this.IsBusy ) return false;
+            return true;
+        }
+        
+        public void CmdAdditionalDmodsMoveSelectedUp(object? parameter = null) {
+            if (this.SelectedAdditionalDmodIndex < 1 ||
+                this.SelectedAdditionalDmodIndex >= this.AdditionalDmods.Count) return;
+            if (this.IsBusy ) return;
+
+            int newIndex = this.SelectedAdditionalDmodIndex - 1;
+            this.AdditionalDmods.Move(this.SelectedAdditionalDmodIndex, newIndex);
+            this.SelectedAdditionalDmodIndex = newIndex;
+            
+        }
+        
+        [DependsOn(nameof(IsBusy))]
+        [DependsOn(nameof(SelectedAdditionalDmodIndex))]
+        [DependsOn(nameof(AdditionalDmods))]
+        public bool CanCmdAdditionalDmodsMoveSelectedUp(object? parameter = null) {
+            if (this.SelectedAdditionalDmodIndex < 1 ||
+                this.SelectedAdditionalDmodIndex >= this.AdditionalDmods.Count) return false;
+            if (this.IsBusy ) return false;
+            return true;
+        }
+        
+        public void CmdAdditionalDmodsMoveSelectedDown(object? parameter = null) {
+            if (this.SelectedAdditionalDmodIndex < 0 ||
+                this.SelectedAdditionalDmodIndex >= this.AdditionalDmods.Count - 1) return;
+            if (this.IsBusy ) return;
+            
+            int newIndex = this.SelectedAdditionalDmodIndex + 1;
+            this.AdditionalDmods.Move(this.SelectedAdditionalDmodIndex, newIndex);
+            this.SelectedAdditionalDmodIndex = newIndex;
+        }
+        
+        [DependsOn(nameof(IsBusy))]
+        [DependsOn(nameof(SelectedAdditionalDmodIndex))]
+        [DependsOn(nameof(AdditionalDmods))]
+        public bool CanCmdAdditionalDmodsMoveSelectedDown(object? parameter = null) {
+            if (this.SelectedAdditionalDmodIndex < 0 ||
+                this.SelectedAdditionalDmodIndex >= this.AdditionalDmods.Count - 1) return false;
             if (this.IsBusy ) return false;
             return true;
         }
@@ -476,9 +538,9 @@ namespace Martridge.ViewModels.Configuration {
             {
                 this.IsBusy = true;
                 
-                if (LocationHelper.PathIsDuplicate(this.AdditionalDmodLocations, this.AdditionalDmodLocationsAddNewManualValue) == false)
+                if (LocationHelper.PathIsDuplicate(this.AdditionalDmods, this.AdditionalDmodLocationsAddNewManualValue) == false)
                 {
-                    this.AdditionalDmodLocations.Add(this.AdditionalDmodLocationsAddNewManualValue);
+                    this.AdditionalDmods.Add(this.AdditionalDmodLocationsAddNewManualValue);
                 }
             } catch (Exception ex)
             {
@@ -512,9 +574,9 @@ namespace Martridge.ViewModels.Configuration {
                             ? LocationHelper.GetPathDefaultFileBrowser()
                             : this.DefaultDmodLocation );
 
-                    if (storageFolder != null && LocationHelper.PathIsDuplicate(this.AdditionalDmodLocations, storageFolder.Path.LocalPath) == false)
+                    if (storageFolder != null && LocationHelper.PathIsDuplicate(this.AdditionalDmods, storageFolder.Path.LocalPath) == false)
                     {
-                        this.AdditionalDmodLocations.Add(storageFolder.Path.LocalPath);
+                        this.AdditionalDmods.Add(storageFolder.Path.LocalPath);
                     }
                 } catch (Exception ex)
                 {
@@ -542,15 +604,61 @@ namespace Martridge.ViewModels.Configuration {
         //
         // Game exe paths
         //
-        public void CmdGameExeRemove(object? parameter = null) {
-            if (parameter is not string target) return;
+        public void CmdGameExeRemoveSelected(object? parameter = null) {
+            if (this.SelectedGameExePathIndex < 0 ||
+                this.SelectedGameExePathIndex >= this.GameExePaths.Count) return;
             if (this.IsBusy ) return;
-            this.GameExePaths.Remove(target);
+            
+            this.GameExePaths.RemoveAt(this.SelectedGameExePathIndex);
         }
         
         [DependsOn(nameof(IsBusy))]
-        public bool CanCmdGameExeRemove(object? parameter = null) {
-            if (parameter is not string) return false;
+        [DependsOn(nameof(SelectedGameExePathIndex))]
+        [DependsOn(nameof(GameExePaths))]
+        public bool CanCmdGameExeRemoveSelected(object? parameter = null) {
+            if (this.SelectedGameExePathIndex < 0 ||
+                this.SelectedGameExePathIndex >= this.GameExePaths.Count) return false;
+            if (this.IsBusy ) return false;
+            return true;
+        }
+        
+        public void CmdGameExeMoveSelectedUp(object? parameter = null) {
+            if (this.SelectedGameExePathIndex < 1 ||
+                this.SelectedGameExePathIndex >= this.GameExePaths.Count) return;
+            if (this.IsBusy ) return;
+
+            int newIndex = this.SelectedGameExePathIndex - 1;
+            this.GameExePaths.Move(this.SelectedGameExePathIndex, newIndex);
+            this.SelectedGameExePathIndex = newIndex;
+            
+        }
+        
+        [DependsOn(nameof(IsBusy))]
+        [DependsOn(nameof(SelectedGameExePathIndex))]
+        [DependsOn(nameof(GameExePaths))]
+        public bool CanCmdGameExeMoveSelectedUp(object? parameter = null) {
+            if (this.SelectedGameExePathIndex < 1 ||
+                this.SelectedGameExePathIndex >= this.GameExePaths.Count) return false;
+            if (this.IsBusy ) return false;
+            return true;
+        }
+        
+        public void CmdGameExeMoveSelectedDown(object? parameter = null) {
+            if (this.SelectedGameExePathIndex < 0 ||
+                this.SelectedGameExePathIndex >= this.GameExePaths.Count - 1) return;
+            if (this.IsBusy ) return;
+            
+            int newIndex = this.SelectedGameExePathIndex + 1;
+            this.GameExePaths.Move(this.SelectedGameExePathIndex, newIndex);
+            this.SelectedGameExePathIndex = newIndex;
+        }
+        
+        [DependsOn(nameof(IsBusy))]
+        [DependsOn(nameof(SelectedGameExePathIndex))]
+        [DependsOn(nameof(GameExePaths))]
+        public bool CanCmdGameExeMoveSelectedDown(object? parameter = null) {
+            if (this.SelectedGameExePathIndex < 0 ||
+                this.SelectedGameExePathIndex >= this.GameExePaths.Count - 1) return false;
             if (this.IsBusy ) return false;
             return true;
         }
@@ -642,15 +750,61 @@ namespace Martridge.ViewModels.Configuration {
         //
         // Editor exe paths
         //
-        public void CmdEditorExeRemove(object? parameter = null) {
-            if (parameter is not string target) return;
+        public void CmdEditorExeRemoveSelected(object? parameter = null) {
+            if (this.SelectedEditorExePathIndex < 0 ||
+                this.SelectedEditorExePathIndex >= this.EditorExePaths.Count) return;
             if (this.IsBusy ) return;
-            this.EditorExePaths.Remove(target);
+            
+            this.EditorExePaths.RemoveAt(this.SelectedEditorExePathIndex);
         }
         
         [DependsOn(nameof(IsBusy))]
-        public bool CanCmdEditorExeRemove(object? parameter = null) {
-            if (parameter is not string) return false;
+        [DependsOn(nameof(SelectedEditorExePathIndex))]
+        [DependsOn(nameof(EditorExePaths))]
+        public bool CanCmdEditorExeRemoveSelected(object? parameter = null) {
+            if (this.SelectedEditorExePathIndex < 0 ||
+                this.SelectedEditorExePathIndex >= this.EditorExePaths.Count) return false;
+            if (this.IsBusy ) return false;
+            return true;
+        }
+        
+        public void CmdEditorExeMoveSelectedUp(object? parameter = null) {
+            if (this.SelectedEditorExePathIndex < 1 ||
+                this.SelectedEditorExePathIndex >= this.EditorExePaths.Count) return;
+            if (this.IsBusy ) return;
+
+            int newIndex = this.SelectedEditorExePathIndex - 1;
+            this.EditorExePaths.Move(this.SelectedEditorExePathIndex, newIndex);
+            this.SelectedEditorExePathIndex = newIndex;
+            
+        }
+        
+        [DependsOn(nameof(IsBusy))]
+        [DependsOn(nameof(SelectedEditorExePathIndex))]
+        [DependsOn(nameof(EditorExePaths))]
+        public bool CanCmdEditorExeMoveSelectedUp(object? parameter = null) {
+            if (this.SelectedEditorExePathIndex < 1 ||
+                this.SelectedEditorExePathIndex >= this.EditorExePaths.Count) return false;
+            if (this.IsBusy ) return false;
+            return true;
+        }
+        
+        public void CmdEditorExeMoveSelectedDown(object? parameter = null) {
+            if (this.SelectedEditorExePathIndex < 0 ||
+                this.SelectedEditorExePathIndex >= this.EditorExePaths.Count - 1) return;
+            if (this.IsBusy ) return;
+            
+            int newIndex = this.SelectedEditorExePathIndex + 1;
+            this.EditorExePaths.Move(this.SelectedEditorExePathIndex, newIndex);
+            this.SelectedEditorExePathIndex = newIndex;
+        }
+        
+        [DependsOn(nameof(IsBusy))]
+        [DependsOn(nameof(SelectedEditorExePathIndex))]
+        [DependsOn(nameof(EditorExePaths))]
+        public bool CanCmdEditorExeMoveSelectedDown(object? parameter = null) {
+            if (this.SelectedEditorExePathIndex < 0 ||
+                this.SelectedEditorExePathIndex >= this.EditorExePaths.Count - 1) return false;
             if (this.IsBusy ) return false;
             return true;
         }

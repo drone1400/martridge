@@ -6,27 +6,27 @@
              xmlns:vm="using:Martridge.ViewModels.Configuration"
 
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             
+
              x:Class="Martridge.Views.Configuration.SettingsGeneralAddGameExeUserControl"
-             
+
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch">
-    
+
     <Design.DataContext>
         <vm:SettingsGeneralViewModel />
     </Design.DataContext>
     <UserControl.Styles>
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </UserControl.Styles>
-    
+
     <Border BorderThickness="1"
             BorderBrush="{DynamicResource ThemeBorderHighBrush}"
             Margin="6,3">
         <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,*">
-            <TextBox Grid.Row="0" Grid.Column="0" 
+            <TextBox Grid.Row="0" Grid.Column="0"
                      UseFloatingWatermark="True"
                      Watermark="{dloc:Localize SettingsGeneral/GameExePaths}"
-                     Text="{Binding GameExeAddNewManualValue}"/>
+                     Text="{Binding GameExeAddNewManualValue}" />
             <Button Grid.Row="0" Grid.Column="1"
                     Content="{dloc:Localize SettingsGeneral/GameExePaths_AddManual}"
                     Classes="Primary"
@@ -35,29 +35,48 @@
                     Content="{dloc:Localize SettingsGeneral/GameExePaths_AddBrowse}"
                     Classes="Primary"
                     Command="{Binding CmdGameExeAddNew}" />
-
-            <ListBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
-                     ItemsSource="{Binding GameExePaths}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid ColumnDefinitions="Auto,Auto,*,Auto">
-                            <Button Grid.Column="0"
-                                    Command="{Binding $parent[UserControl].DataContext.CmdExeExtensionEdit}"
-                                    CommandParameter="{Binding }" 
-                                    Classes="ListBoxButton">
-                                <Path Classes="ListBoxIconGear" />
-                            </Button>
-                            <TextBlock Grid.Column="2" Text="{Binding}"></TextBlock>
-                            <Button Grid.Column="1"
-                                    Command="{Binding $parent[UserControl].DataContext.CmdGameExeRemove}"
-                                    CommandParameter="{Binding }" 
-                                    Classes="ListBoxButton">
-                                <Path Classes="ListBoxIconTrashCan" />
-                            </Button>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ColumnDefinitions="Auto,*">
+                <Grid Grid.Column="0" RowDefinitions="*,Auto,Auto,Auto,*">
+                    <Button Grid.Row="1"
+                            Command="{Binding CmdGameExeMoveSelectedUp}"
+                            Classes="ListBoxButtonLeftBlue"
+                            Background="{DynamicResource ThemeAccentBrush}">
+                        <Path Classes="ListBoxIconArrow" />
+                    </Button>
+                    <Button Grid.Row="2"
+                            Command="{Binding CmdGameExeRemoveSelected}"
+                            Classes="ListBoxButtonLeft">
+                        <Path Classes="ListBoxIconTrashCan" />
+                    </Button>
+                    <Button Grid.Row="3"
+                            Command="{Binding CmdGameExeMoveSelectedDown}"
+                            Classes="ListBoxButtonLeftBlue">
+                        <Path Classes="ListBoxIconArrow">
+                            <Path.RenderTransform>
+                                <RotateTransform Angle="180" />
+                            </Path.RenderTransform>
+                        </Path>
+                    </Button>
+                </Grid>
+                <ListBox Grid.Column="1"
+                         ItemsSource="{Binding GameExePaths}"
+                         SelectedIndex="{Binding SelectedGameExePathIndex}"
+                         VerticalAlignment="Center">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Button Grid.Column="0"
+                                        Command="{Binding $parent[UserControl].DataContext.CmdExeExtensionEdit}"
+                                        CommandParameter="{Binding }"
+                                        Classes="ListBoxButton">
+                                    <Path Classes="ListBoxIconGear" />
+                                </Button>
+                                <TextBlock Grid.Column="1" Text="{Binding}"></TextBlock>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
         </Grid>
     </Border>
 </UserControl>

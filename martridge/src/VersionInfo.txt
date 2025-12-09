@@ -19,13 +19,12 @@
 - fixed issue with temporary files/directories not being deleted properly
 - fixed ALT+F4 not working (was the case for a while, oups!)
 - added 2.5 seconds delay after launching DMOD to prevent launching DMOD twice by accident
+- can now rearrange DMOD/Game/Editor path order in settings
 
 stuff left to do:
 - option to auto detect DinkHD/Freedink/etc in settings, do it automatically on first ever launch too
 - fix issue with certain image alignment in the UI when no Dink installation is detected?...
-- more adjustments to the new buttons in the Settings page UI
 - add confirmation when removing Game/Editor in Settings?...
-- make it so you can reorder Game/Editor paths in Settings
 - add alternative Online DMOD Browser that uses https://dinknetwork.com/api instead of parsing HTML
 - add alternative Online DMOD Browser that shows both DMODs and other files too, maybe useful for DMOD developers??
 - rework launch parameters so that you can customize them on a per engine basis?... hmm 

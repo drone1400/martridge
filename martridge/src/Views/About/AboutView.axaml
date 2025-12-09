@@ -17,80 +17,99 @@
     <ScrollViewer>
         <StackPanel Orientation="Vertical">
             <Border Classes="MartridgeCard">
-                    <Grid ColumnDefinitions="*,Auto,*">
-                        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-                            <Label Grid.Row="0"
-                                   Classes="HeadingTitle"
-                                   Content="{dloc:Localize AboutWindow/AppName}"
-                                   HorizontalAlignment="Center" />
+                <Grid ColumnDefinitions="*">
+                    <Grid Grid.Column="0" 
+                          ColumnDefinitions="Auto,*,Auto">
+                        <Image Grid.Row="0" Grid.Column="0"
+                               Source="{Binding AnimatedMartridge.Frame}"
+                               Width="{Binding AnimatedMartridge.Frame.Size.Width}"
+                               Height="{Binding AnimatedMartridge.Frame.Size.Height}"
+                               RenderOptions.BitmapInterpolationMode="None"
+                               VerticalAlignment="Center">
+                            <Image.RenderTransform>
+                                <ScaleTransform ScaleX="2.0" ScaleY="2.0" />
+                            </Image.RenderTransform>
+                        </Image>
+                        <Image Grid.Row="0" Grid.Column="2"
+                               Source="{Binding AnimatedMartridge.Frame}"
+                               Width="{Binding AnimatedMartridge.Frame.Size.Width}"
+                               Height="{Binding AnimatedMartridge.Frame.Size.Height}"
+                               RenderOptions.BitmapInterpolationMode="None"
+                               VerticalAlignment="Center">
+                            <Image.RenderTransform>
+                                <ScaleTransform ScaleX="-2.0" ScaleY="2.0" />
+                            </Image.RenderTransform>
+                        </Image>
+                    </Grid>
+                    
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" 
+                          HorizontalAlignment="Center"
+                          Margin="80,0">
+                        <Label Grid.Row="0"
+                               Classes="HeadingTitle"
+                               Content="{dloc:Localize AboutWindow/AppName}"
+                               HorizontalAlignment="Center" />
 
-                            <Label Grid.Row="1"
-                                   Classes="Heading2"
-                                   Content="{dloc:Localize AboutWindow/Version2}"
-                                   HorizontalAlignment="Center" />
+                        <Label Grid.Row="1"
+                               Classes="Heading2Wrapping"
+                               Content="{dloc:Localize AboutWindow/Version2}"
+                               HorizontalAlignment="Center" />
 
-                            <StackPanel
-                                Grid.Row="2"
-                                Margin="10,5"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Center">
-
-                                <Label
-                                    Content="{dloc:Localize AboutWindow/Version}"
-                                    HorizontalAlignment="Center" />
-                                <Label
-                                    Content=" - "
-                                    HorizontalAlignment="Center" />
-                                <Label
-                                    Content="{Binding Version}"
-                                    HorizontalAlignment="Center" />
-                            </StackPanel>
+                        <StackPanel
+                            Grid.Row="2"
+                            Margin="10,5"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center">
 
                             <Label
-                                Grid.Row="3"
-                                Margin="20,10"
-                                Content="{dloc:Localize AboutWindow/Description}"
-                                TextBlock.TextWrapping="Wrap" />
-                            
-                            <Button Grid.Row="4"
-                                    Classes="Invisibutton"
-                                    HorizontalAlignment="Center"
-                                    Command="{Binding #TheAboutView.DataContext.CmdOpenHyperlink}"
-                                    CommandParameter="https://github.com/drone1400/martridge">
-                                <TextBlock Margin="10,0"
-                                           Classes="HyperlinkWrapping"
-                                           Text="https://github.com/drone1400/martridge" />
-                            </Button>
-                            
-                        </Grid>
+                                Content="{dloc:Localize AboutWindow/Version}"
+                                HorizontalAlignment="Center" />
+                            <Label
+                                Content=" - "
+                                HorizontalAlignment="Center" />
+                            <Label
+                                Content="{Binding Version}"
+                                HorizontalAlignment="Center" />
+                        </StackPanel>
 
-                        <Image Grid.Row="0" Grid.Column="2"
-                               Source="{Binding AnimatedMartridgeLeft.Frame}"
-                               Height="80" />
-                        <Image Grid.Row="0" Grid.Column="0"
-                               Source="{Binding AnimatedMartridgeRight.Frame}"
-                               Height="80" />
+                        <Label
+                            Grid.Row="3"
+                            Classes="Heading3IWrapping"
+                            Margin="10"
+                            Content="{dloc:Localize AboutWindow/Description}" />
+
+                        <Button Grid.Row="4"
+                                Classes="Invisibutton"
+                                HorizontalAlignment="Center"
+                                Command="{Binding #TheAboutView.DataContext.CmdOpenHyperlink}"
+                                CommandParameter="https://github.com/drone1400/martridge">
+                            <TextBlock Margin="10,0"
+                                       Classes="HyperlinkWrapping"
+                                       Text="https://github.com/drone1400/martridge" />
+                        </Button>
+
                     </Grid>
+                </Grid>
             </Border>
-            
+
             <Border Classes="MartridgeCard">
                 <StackPanel Orientation="Vertical">
-                    <Label 
+                    <Label
                         Classes="Heading2B"
-                        Content="{dloc:Localize AboutWindow/Hotkeys/Title}"/>
-                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF1}"/>
-                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF2}"/>
-                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF3}"/>
-                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF4}"/>
-                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF5}"/>
-                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF6}"/>
-                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF7}"/>
-                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyEsc}"/>
-                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyPlayDmod}"/>
-                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyEditDmod}"/>
+                        Content="{dloc:Localize AboutWindow/Hotkeys/Title}" />
+                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF1}" />
+                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF2}" />
+                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF3}" />
+                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF4}" />
+                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF5}" />
+                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF6}" />
+                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyF7}" />
+                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyEsc}" />
+                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyPlayDmod}" />
+                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyEditDmod}" />
                 </StackPanel>
             </Border>
-            
+
             <Border Classes="MartridgeCard">
                 <StackPanel Orientation="Vertical">
                     <Label
@@ -143,8 +162,8 @@
                                                             Command="{Binding #TheAboutView.DataContext.CmdOpenHyperlink}"
                                                             CommandParameter="{Binding Link}">
                                                         <TextBlock Margin="10,0"
-                                                               Classes="HyperlinkWrapping"
-                                                               Text="{Binding Link}" />
+                                                                   Classes="HyperlinkWrapping"
+                                                                   Text="{Binding Link}" />
                                                     </Button>
                                                 </Grid>
                                             </DataTemplate>

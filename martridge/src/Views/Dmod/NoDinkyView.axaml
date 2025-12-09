@@ -21,13 +21,25 @@
     <Grid ColumnDefinitions="*,Auto,*">
         <Image Grid.Column="0" 
                Source="{Binding AnimatedDuckWizardRight.Frame}"
-               Width="99"
-               VerticalAlignment="Center"/>
+               Width="{Binding AnimatedDuckWizardRight.Frame.Size.Width}"
+               Height="{Binding AnimatedDuckWizardRight.Frame.Size.Height}"
+               RenderOptions.BitmapInterpolationMode="None"
+               VerticalAlignment="Center">
+            <Image.RenderTransform>
+                <ScaleTransform ScaleX="3.0" ScaleY="3.0"/>
+            </Image.RenderTransform>
+        </Image>
       
         <Image Grid.Column="2" 
-               Source="{Binding AnimatedDuckWizardLeft.Frame}"
-               Width="99"
-               VerticalAlignment="Center" />
+               Source="{Binding AnimatedDuckWizardRight.Frame}"
+               Width="{Binding AnimatedDuckWizardRight.Frame.Size.Width}"
+               Height="{Binding AnimatedDuckWizardRight.Frame.Size.Height}"
+               RenderOptions.BitmapInterpolationMode="None"
+               VerticalAlignment="Center">
+            <Image.RenderTransform>
+                <ScaleTransform ScaleX="-3.0" ScaleY="3.0"/>
+            </Image.RenderTransform>
+        </Image>
       
         <Grid Grid.Column="1"  
               VerticalAlignment="Center"

@@ -50,7 +50,14 @@
                     <Image Grid.Row="1" Grid.Column="0"
                            Margin="2,2,16,2"
                            Source="{Binding AnimatedImage.Frame}" 
-                           Stretch="Uniform"/>
+                           Width="{Binding AnimatedImage.Frame.Size.Width}"
+                           Height="{Binding AnimatedImage.Frame.Size.Height}"
+                           RenderOptions.BitmapInterpolationMode="None"
+                           VerticalAlignment="Center">
+                        <Image.RenderTransform>
+                            <ScaleTransform ScaleX="2.0" ScaleY="2.0"/>
+                        </Image.RenderTransform>
+                    </Image>
 
                     <Label Grid.Row="1" Grid.Column="1"
                            Content="{Binding Message}"

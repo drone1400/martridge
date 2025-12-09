@@ -28,7 +28,15 @@
           Margin="10">
     
         <Image Grid.Row="0" Grid.Column="0"
-               Source="{Binding AnimatedImage.Frame}"/>
+               Source="{Binding AnimatedImage.Frame}"
+               Width="{Binding AnimatedImage.Frame.Size.Width}"
+               Height="{Binding AnimatedImage.Frame.Size.Height}"
+               RenderOptions.BitmapInterpolationMode="None"
+               VerticalAlignment="Center">
+            <Image.RenderTransform>
+                <ScaleTransform ScaleX="2.0" ScaleY="2.0"/>
+            </Image.RenderTransform>
+        </Image>
     
         <Label Grid.Row="0" Grid.Column="1" 
                Content="{Binding Message}"

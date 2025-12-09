@@ -18,6 +18,7 @@
 - DMODs in non-standard format (like .rar, .7z, .zip) can now be installed
 - fixed issue with temporary files/directories not being deleted properly
 - fixed ALT+F4 not working (was the case for a while, oups!)
+- added 2.5 seconds delay after launching DMOD to prevent launching DMOD twice by accident
 
 stuff left to do:
 - option to auto detect DinkHD/Freedink/etc in settings, do it automatically on first ever launch too

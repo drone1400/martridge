@@ -50,8 +50,8 @@ namespace Martridge.ViewModels.Dmod {
         public DmodBrowserViewModel() {
             // Launcher Delay Timer
             this._dmodLauncherDelay = new Timer() {
-                Interval = 5000,
-                AutoReset = true,
+                Interval = 2500,
+                AutoReset = false,
             };
             this._dmodLauncherDelay.Elapsed += ( _, _) => {
                 this._dmodLauncherDelay.Stop();
@@ -61,7 +61,7 @@ namespace Martridge.ViewModels.Dmod {
             // Dmod Search Timer
             this._dmodSearchTimer = new Timer() {
                 Interval = 200,
-                AutoReset = true,
+                AutoReset = false,
             };
             this._dmodSearchTimer.Elapsed += ( _, _) => {
                 this._dmodSearchTimer.Stop();
@@ -733,6 +733,9 @@ namespace Martridge.ViewModels.Dmod {
         
         public async void CmdLaunchDmod(object? parameter = null) {
             try {
+                if (this.DmodLauncherWaitingForDelay)
+                    return;
+                
                 bool launchEditor = false;
                 if (parameter is string str && str == this.LaunchEditorParameter) launchEditor = true;
                 
@@ -749,6 +752,8 @@ namespace Martridge.ViewModels.Dmod {
                 string dmodPath = this.SelectedDmodDefinition.DmodDirectory;
                 
                 this.DmodLauncherWaitingForDelay = true;
+                this._dmodLauncherDelay.Stop();
+                this._dmodLauncherDelay.Start();
                 
                 this.SaveToConfigLauncher();
                 this.SaveActiveIndexToConfigGeneral();
@@ -771,8 +776,12 @@ namespace Martridge.ViewModels.Dmod {
         [DependsOn(nameof(ActiveGameExePath))]
         [DependsOn(nameof(ActiveEditorExePath))]
         [DependsOn(nameof(SelectedDmodDefinition))]
+        [DependsOn(nameof(DmodLauncherWaitingForDelay))]
         public bool CanCmdLaunchDmod(object? parameter = null) {
             try {
+                if (this.DmodLauncherWaitingForDelay)
+                    return false;
+                
                 bool launchEditor = parameter is string str && str == this.LaunchEditorParameter;
                 
                 if (this.DmodManager == null) return false;

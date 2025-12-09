@@ -872,8 +872,19 @@ namespace Martridge.ViewModels.Configuration {
         public override bool ProcessKeyDown(Key key, KeyModifiers modifiers) {
             switch (key) {
                 case Key.Escape:
+                    if (this.ExeExtensionViewModel != null) {
+                        this.CmdExeExtensionCancel();
+                        return true;
+                    }
                     this.CmdSettingsCancel();
                     return true;
+                case Key.Enter: {
+                    if (this.ExeExtensionViewModel != null) {
+                        this.CmdExeExtensionOk();
+                        return true;
+                    }
+                    break;
+                }
             }
             return false;
         }

@@ -20,15 +20,15 @@
 - fixed ALT+F4 not working (was the case for a while, oups!)
 - added 2.5 seconds delay after launching DMOD to prevent launching DMOD twice by accident
 - can now rearrange DMOD/Game/Editor path order in settings
+- fixed some image scaling issues
 
 stuff left to do:
-- option to auto detect DinkHD/Freedink/etc in settings, do it automatically on first ever launch too
-- fix issue with certain image alignment in the UI when no Dink installation is detected?...
 - add confirmation when removing Game/Editor in Settings?...
 - add alternative Online DMOD Browser that uses https://dinknetwork.com/api instead of parsing HTML
 - add alternative Online DMOD Browser that shows both DMODs and other files too, maybe useful for DMOD developers??
-- rework launch parameters so that you can customize them on a per engine basis?... hmm 
-- investigate why ducks stop animating when click and hold over title bar on windows???? (wtf)
+- rework launch parameters so that you can customize them on a per engine basis?... hmm
+- add global launch / wine settings that the user can edit 
+// - investigate why ducks stop animating when click and hold over title bar on windows???? (wtf)
 
 --- V0.9.0.0 ---
 - big UI changes

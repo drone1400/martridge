@@ -42,7 +42,6 @@
                     <DataTemplate>
                         <Grid ColumnDefinitions="Auto,Auto,*,Auto">
                             <Button Grid.Column="0"
-                                    IsVisible="{Binding $parent[ListBoxItem].IsSelected}"
                                     Command="{Binding $parent[UserControl].DataContext.CmdExeExtensionEdit}"
                                     CommandParameter="{Binding }" 
                                     Classes="ListBoxButton">
@@ -50,7 +49,6 @@
                             </Button>
                             <TextBlock Grid.Column="2" Text="{Binding}"></TextBlock>
                             <Button Grid.Column="1"
-                                    IsVisible="{Binding $parent[ListBoxItem].IsSelected}"
                                     Command="{Binding $parent[UserControl].DataContext.CmdGameExeRemove}"
                                     CommandParameter="{Binding }" 
                                     Classes="ListBoxButton">

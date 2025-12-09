@@ -102,10 +102,10 @@
   "DinkInstallerView/MessageBox_CleanInstallConfirm_DeleteDoubleConfirm_Title": "Installation issue!...",
   "DinkInstallerView/MessageBox_CleanInstallConfirm_DeleteDoubleConfirm_Body": "You have chosen to DELETE ALL FILES in the Installation path! Are you REALLY sure this is what you want?! Clicking YES here will delete all files in the destination path!",
   
-  "DinkTempFileHelper/Log/DeletingTemporaryFile": "Deleting temporary file: ",
-  "DinkTempFileHelper/Log/DeletingTemporaryDirectory": "Deleting temporary directory: ",
-  "DinkTempFileHelper/Log/CreatingTemporaryFile": "Creating temporary file: ",
-  "DinkTempFileHelper/Log/CreatingTemporaryDirectory": "Creating temporary directory: ",
+  "DinkTempFileHelper/Log/DeletingTemporaryFile": "Deleting temporary file:",
+  "DinkTempFileHelper/Log/DeletingTemporaryDirectory": "Deleting temporary directory:",
+  "DinkTempFileHelper/Log/CreatingTemporaryFile": "Creating temporary file:",
+  "DinkTempFileHelper/Log/CreatingTemporaryDirectory": "Creating temporary directory:",
 
   "DmodInstaller/Log/DmodFileNotFound": "DMOD file can not be accessed!",
   "DmodInstaller/Log/Decompressing/StartInitializing": "Initializing DMOD file...",

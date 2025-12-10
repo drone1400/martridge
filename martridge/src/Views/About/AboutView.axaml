@@ -107,6 +107,8 @@
                     <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyEsc}" />
                     <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyPlayDmod}" />
                     <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyEditDmod}" />
+                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyOpenLogWindow}" />
+                    <Label Content="{dloc:Localize AboutWindow/Hotkeys/KeyExit}" />
                 </StackPanel>
             </Border>
 

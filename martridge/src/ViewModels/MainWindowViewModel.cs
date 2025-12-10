@@ -884,8 +884,14 @@ namespace Martridge.ViewModels {
                 }
             } else {
                 switch (key) {
+                    case Key.F4:
+                        if (modifiers == KeyModifiers.Alt) {
+                            App.Instance?.CloseApp();
+                            return true;
+                        }
+                        return false;
                     case Key.L:
-                        if ((modifiers & KeyModifiers.Control) != 0) {
+                        if (modifiers == KeyModifiers.Control) {
                             App.Instance?.ShowLogWindow();
                             return true;
                         }

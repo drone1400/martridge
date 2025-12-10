@@ -308,6 +308,10 @@ namespace Martridge {
         private MainWindowViewModel? _mainWindowViewModel;
         private LogWindow? _logWindow;
 
+        public void CloseApp() {
+            this._mainWindow?.Close();
+        }
+
         private void RestoreWindowState(Window window, WindowState state, double width, double height, int positionX, int positionY) {
             switch (state) {
                 case WindowState.Maximized:

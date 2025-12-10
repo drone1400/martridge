@@ -480,6 +480,8 @@
   "AboutWindow/Hotkeys/KeyEsc": "ESC - cancels some operations / returns to DMOD Browser on some pages",
   "AboutWindow/Hotkeys/KeyPlayDmod": "CTRL+D - in the DMOD browser, launches selected DMOD using currently selected game engine",
   "AboutWindow/Hotkeys/KeyEditDmod": "CTRL+E - in the DMOD browser, launches the currently selected editor for the currently selected DMOD",
+  "AboutWindow/Hotkeys/KeyOpenLogWindow": "CTRL+L - opens log window",
+  "AboutWindow/Hotkeys/KeyExit": "ALT+F4 - closes Martridge",
   
   
   

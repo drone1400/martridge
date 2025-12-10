@@ -127,24 +127,6 @@
         <Setter Property="TextBlock.TextWrapping" Value="Wrap" />
     </Style>
     
-    
-    <Style Selector="TextBlock.Heading2IWrapping">
-        <Setter Property="Foreground" Value="{Binding ThemeForegroundBrush}" />
-        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}" />
-        <Setter Property="FontStyle" Value="Italic" />
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH2}" />
-        <Setter Property="TextWrapping" Value="Wrap" />
-    </Style>
-    <Style Selector="TextBlock.Heading3IWrapping">
-        <Setter Property="Foreground" Value="{Binding ThemeForegroundBrush}" />
-        <Setter Property="Padding" Value="{DynamicResource MartridgeLabelPadding}" />
-        <Setter Property="FontStyle" Value="Italic" />
-        <Setter Property="FontSize" Value="12" />
-        <Setter Property="Margin" Value="{DynamicResource MartridgeLabelMarginH3}" />
-        <Setter Property="TextWrapping" Value="Wrap" />
-    </Style>
-    
     <Style Selector="Label.TreeViewItemNormal">
     </Style>
     <Style Selector="Label.TreeViewItemIgnored">

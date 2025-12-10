@@ -233,8 +233,8 @@ namespace Martridge.ViewModels.DinkInstaller
             get => this._dinkInstallerConfigFileSource;
             set {
                 this.RaiseAndSetIfChanged(ref this._dinkInstallerConfigFileSource, value);
-                this._dinkInstallerConfigFileSourceUpdateTimer.Stop();
-                this._dinkInstallerConfigFileSourceUpdateTimer.Start();
+                this._dinkInstallerConfigFileSourceUpdateTimer?.Stop();
+                this._dinkInstallerConfigFileSourceUpdateTimer?.Start();
             }
         }
         private string _dinkInstallerConfigFileSource = string.Empty;

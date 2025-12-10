@@ -97,6 +97,7 @@ namespace Martridge.ViewModels.Dmod {
         
         private void InitializeFromConfig() {
             this.LoadFromConfigGeneral();
+            this.LoadFromConfigLauncher();
 
             // restore selected dmod...
             this.SelectDmodByPath(this.CfgAppState.DmodBrowserSelectedDmodPath);

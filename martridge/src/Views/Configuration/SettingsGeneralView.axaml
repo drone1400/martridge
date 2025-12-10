@@ -148,63 +148,24 @@
 
 
                 <Grid Grid.Row="1" x:Name="gridPathSettings">
-                    <ContentPresenter
-                        Content="{Binding Bounds.Height, ElementName=gridPathSettings, 
-                            Converter={StaticResource DoubleCompareBoolConverter},
-                            ConverterParameter={StaticResource MinimumPathUiHeightThreshold}}">
-                        <ContentPresenter.ContentTemplate>
-                            <martridge:GenericTemplateSelector>
-                                <DataTemplate x:Key="true">
-                                    <Grid
-                                        x:Name="gridPathSettingsMain"
-                                        DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=configuration:SettingsGeneralView}}">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"/>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="*"/>
-                                            <RowDefinition Height="{Binding ShowDmodDevFeatures,
-                                                    Converter={StaticResource BoolToGridSizeZeroStarConverter}}"/>
-                                        </Grid.RowDefinitions>
-                                        
-                                        <configuration:SettingsGeneralDefaultDmodLocationsUserControl 
-                                            Grid.Row="0"/>
-                                        <configuration:SettingsGeneralAdditionalDmodLocationsUserControl 
-                                            Grid.Row="1"/>
-
-                                        <configuration:SettingsGeneralAddGameExeUserControl 
-                                            Grid.Row="2"/>
-                                        
-                                        <configuration:SettingsGeneralAddEditorExeUserControl 
-                                            Grid.Row="3" 
-                                            IsVisible="{Binding ShowDmodDevFeatures}"/>
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate x:Key="false">
-                                    <Grid x:Name="gridPathSettingsAlternative"
-                                          DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=configuration:SettingsGeneralView}}">
-                                        <TabControl>
-                                            <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathDmod}"
-                                                     Classes="SmallTab">
-                                                <Grid RowDefinitions="Auto,*">
-                                                    <configuration:SettingsGeneralDefaultDmodLocationsUserControl Grid.Row="0"/>
-                                                    <configuration:SettingsGeneralAdditionalDmodLocationsUserControl Grid.Row="1"/>
-                                                </Grid>
-                                            </TabItem>
-                                            <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathGame}"
-                                                     Classes="SmallTab">
-                                                <configuration:SettingsGeneralAddGameExeUserControl />
-                                            </TabItem>
-                                            <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathEditor}"
-                                                     Classes="SmallTab"
-                                                     IsVisible="{Binding ShowDmodDevFeatures}">
-                                                <configuration:SettingsGeneralAddEditorExeUserControl />
-                                            </TabItem>
-                                        </TabControl>
-                                    </Grid>
-                                </DataTemplate>
-                            </martridge:GenericTemplateSelector>
-                        </ContentPresenter.ContentTemplate>
-                    </ContentPresenter>
+                    <TabControl>
+                        <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathDmod}"
+                                 Classes="SmallTab">
+                            <Grid RowDefinitions="Auto,*">
+                                <configuration:SettingsGeneralDefaultDmodLocationsUserControl Grid.Row="0"/>
+                                <configuration:SettingsGeneralAdditionalDmodLocationsUserControl Grid.Row="1"/>
+                            </Grid>
+                        </TabItem>
+                        <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathGame}"
+                                 Classes="SmallTab">
+                            <configuration:SettingsGeneralAddGameExeUserControl />
+                        </TabItem>
+                        <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathEditor}"
+                                 Classes="SmallTab"
+                                 IsVisible="{Binding ShowDmodDevFeatures}">
+                            <configuration:SettingsGeneralAddEditorExeUserControl />
+                        </TabItem>
+                    </TabControl>
                 </Grid>
             </Grid>
         </Grid>

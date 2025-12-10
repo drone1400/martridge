@@ -58,8 +58,8 @@
                                Content="{Binding SelectedDmodDefinition.Name, 
                             FallbackValue={StaticResource DataNotAvailable},
                             TargetNullValue={StaticResource DataNotAvailable} }" />
-                        <TextBlock Classes="Heading3IWrapping"
-                               Text="{Binding SelectedDmodDefinition.DmodDirectory, 
+                        <Label Classes="Heading3IWrapping"
+                               Content="{Binding SelectedDmodDefinition.DmodDirectory, 
                                     FallbackValue={StaticResource DataNotAvailable},
                                     TargetNullValue={StaticResource DataNotAvailable} }"
                                ToolTip.Tip="{Binding SelectedDmodDefinition.DmodDirectory, 
@@ -92,8 +92,8 @@
                         </Grid>
 
                         <Grid RowDefinitions="Auto,Auto">
-                            <TextBlock Grid.Row="1" Classes="Heading3IWrapping"
-                                   Text="{Binding ActiveGameExePath.Path, 
+                            <Label Grid.Row="1" Classes="Heading3IWrapping"
+                                   Content="{Binding ActiveGameExePath.Path, 
                                         FallbackValue={StaticResource DataNotAvailable},
                                         TargetNullValue={StaticResource DataNotAvailable} }"
                                    ToolTip.Tip="{Binding ActiveGameExePath.Path, 
@@ -129,8 +129,8 @@
 
                         <Grid RowDefinitions="Auto,Auto"
                               IsVisible="{Binding ShowDmodDevFeatures}">
-                            <TextBlock Grid.Row="1" Classes="Heading3IWrapping"
-                                   Text="{Binding ActiveEditorExePath.Path, 
+                            <Label Grid.Row="1" Classes="Heading3IWrapping"
+                                   Content="{Binding ActiveEditorExePath.Path, 
                                       FallbackValue={StaticResource DataNotAvailable},
                                       TargetNullValue={StaticResource DataNotAvailable} }"
                                    ToolTip.Tip="{Binding ActiveEditorExePath.Path, 

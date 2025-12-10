@@ -2,18 +2,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:dloc="using:Martridge.ViewModels.Localization"
         xmlns:vm="using:Martridge.ViewModels"
         xmlns:martridge="clr-namespace:Martridge"
-        xmlns:controls="clr-namespace:Martridge.Controls"
         xmlns:valueConverters="clr-namespace:Martridge.ViewModels.ValueConverters"
         xmlns:dinkyAlerts="clr-namespace:Martridge.Views.DinkyAlerts"
         xmlns:views="clr-namespace:Martridge.Views"
+        xmlns:system="clr-namespace:System;assembly=System.Runtime"
 
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
 
-        MinWidth="780"
-        MinHeight="580"
+        MinWidth="600"
+        MinHeight="480"
 
         x:Class="Martridge.Views.MainWindow"
 
@@ -32,9 +31,10 @@
         <StyleInclude Source="avares://martridge/AppStyles.axaml" />
     </Window.Styles>
     <Window.Resources>
-        <valueConverters:TypeCompareToBoolConverter x:Key="TypeCompareToBoolConverter" />
+        <valueConverters:DoubleCompareBoolConverter x:Key="DoubleCompareBoolConverter" />
         <valueConverters:IsNullCheckBoolConverter x:Key="IsNullCheckBoolConverter" />
         <valueConverters:IsNotNullCheckBoolConverter x:Key="IsNotNullCheckBoolConverter" />
+        <system:Double x:Key="MinimumWindowWidthThreshold">750</system:Double>
     </Window.Resources>
 
     <Border
@@ -51,9 +51,28 @@
             <Grid ColumnDefinitions="Auto,*"
                   IsEnabled="{Binding AlertViewModel,
                         Converter={StaticResource IsNullCheckBoolConverter}}"
-                  DragDrop.AllowDrop="True">
+                  DragDrop.AllowDrop="True"
+                  x:Name="gridMainContent">
                 
-                <views:SideBarWide Grid.Column="0" />
+                <ContentPresenter Grid.Column="0"
+                    Content="{Binding Bounds.Width, ElementName=gridMainContent, 
+                            Converter={StaticResource DoubleCompareBoolConverter},
+                            ConverterParameter={StaticResource MinimumWindowWidthThreshold}}">
+                    <ContentPresenter.ContentTemplate>
+                        <martridge:GenericTemplateSelector>
+                            <DataTemplate x:Key="true">
+                                <Grid DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=views:MainWindow}}">
+                                    <views:SideBarWide />
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate x:Key="false">
+                                <Grid DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=views:MainWindow}}">
+                                    <views:SideBarNarrow />
+                                </Grid>
+                            </DataTemplate>
+                        </martridge:GenericTemplateSelector>
+                    </ContentPresenter.ContentTemplate>
+                </ContentPresenter>
 
                 <Grid Grid.Column="1">
                     <ContentControl Content="{Binding CurrentViewModel}">

@@ -1,0 +1,58 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dloc="using:Martridge.ViewModels.Localization"
+             xmlns:vm="using:Martridge.ViewModels.Configuration"
+
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+
+             x:Class="Martridge.Views.Configuration.SettingsLaunchUserControl"
+
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch">
+
+    <Design.DataContext>
+        <vm:SettingsGeneralViewModel />
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml" />
+    </UserControl.Styles>
+
+    <!-- RefDir -->
+    <Border BorderThickness="1"
+            BorderBrush="{DynamicResource ThemeBorderHighBrush}"
+            Margin="6">
+        <StackPanel Orientation="Vertical">
+            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                <Label Grid.Row="0" Grid.Column="0" Classes="Heading2B"
+                       Content="{dloc:Localize SettingsGeneral/LaunchRefDirLocation}" />
+                <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding ShowLaunchRefDirPathInMainWindow}"
+                          Content="{dloc:Localize SettingsGeneral/ShowLaunchRefDirPathInMainWindow}" />
+                <Button Grid.Row="0" Grid.Column="2"
+                        Content="{dloc:Localize SettingsGeneral/LaunchRefDirLocation/Browse}"
+                        Classes="Primary"
+                        Command="{Binding CmdLaunchRefDirBrowse}" />
+
+                <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                         Text="{Binding LaunchRefDirPath}" />
+            </Grid>
+            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                <Label Grid.Row="0" Grid.Column="0" Classes="Heading2B"
+                       Content="{dloc:Localize SettingsGeneral/LaunchCustomUserArguments}" />
+                <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding ShowLaunchCustomArgsInMainWindow}"
+                          Content="{dloc:Localize SettingsGeneral/ShowLaunchCustomArgsInMainWindow}" />
+                <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                         Text="{Binding LaunchCustomUserArguments}" />
+            </Grid>
+            
+            <CheckBox 
+                IsChecked="{Binding QuitMartridgeOnGameLaunch}"
+                Content="{dloc:Localize SettingsGeneral/QuitMartridgeOnGameLaunch}" />
+            <CheckBox 
+                IsChecked="{Binding QuitMartridgeOnEditorLaunch}"
+                IsVisible="{Binding ShowDmodDevFeatures}"
+                Content="{dloc:Localize SettingsGeneral/QuitMartridgeOnEditorLaunch}" />
+        </StackPanel>
+    </Border>
+</UserControl>

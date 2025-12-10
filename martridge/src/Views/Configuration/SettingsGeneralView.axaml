@@ -68,7 +68,7 @@
                             ItemsSource="{Binding Localizations}"
                             HorizontalAlignment="Left"
                             SelectedItem="{Binding SelectedLocalization}"
-                            Width="360"
+                            Width="240"
                             Height="40"
                             Padding="0">
                             <ComboBox.DataTemplates>
@@ -79,7 +79,7 @@
                             </ComboBox.DataTemplates>
                         </ComboBox>
                         
-                                        
+                        
                         <Button 
                             Grid.Row="0" Grid.Column="1"
                             HorizontalAlignment="Right"
@@ -87,6 +87,13 @@
                             Content="{dloc:Localize SettingsGeneral/ShowLogWindow}"
                             Classes="Primary"
                             Command="{Binding CmdShowLogWindow}" />
+                        <Button 
+                            Grid.Row="1" Grid.Column="1"
+                            HorizontalAlignment="Right"
+                            Width="240"
+                            Content="{dloc:Localize SettingsGeneral/CreateDesktopShortcut}"
+                            Classes="Primary"
+                            Command="{Binding CmdCreateDesktopShortcut}" />
                     </Grid>
 
 

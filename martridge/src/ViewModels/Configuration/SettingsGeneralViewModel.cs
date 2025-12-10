@@ -1021,6 +1021,10 @@ namespace Martridge.ViewModels.Configuration {
             App.Instance?.ShowLogWindow();
         }
         
+        public void CmdCreateDesktopShortcut(object? parameter = null) {
+            DesktopShortcutHelper.CreateDesktopShortcut();
+        }
+        
         #endregion
         
         public override bool ProcessKeyDown(Key key, KeyModifiers modifiers) {

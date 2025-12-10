@@ -286,6 +286,7 @@
   "SettingsGeneral/TabItemPathGame": "Game paths",
   "SettingsGeneral/TabItemPathEditor": "Editor paths",
   "SettingsGeneral/ShowLogWindow": "Show Log Window",
+  "SettingsGeneral/CreateDesktopShortcut": "Create Desktop Shortcut",
   "SettingsGeneral/ExeExtension/ButtonOk": "Ok",
   "SettingsGeneral/ExeExtension/ButtonCancel": "Cancel",
   
@@ -464,6 +465,8 @@
   "AboutWindow/Package/Ignore/Description": "C# implementation of a .gitignore parser. Used to parse .dmodignore files.",
   "AboutWindow/Package/UtfUnknown/Name": "UTF Unknown",
   "AboutWindow/Package/UtfUnknown/Description": "C# implementation of Mozilla Universal Charset Detector and uchardet.",
+  "AboutWindow/Package/WindowsShortcutFactory/Name": "Windows Shortcut Factory",
+  "AboutWindow/Package/WindowsShortcutFactory/Description": "Simple library for creating and modifying Windows shortcuts from .NET.",
   "AboutWindow/Package/LinkType/Website": "Website",
   "AboutWindow/Package/LinkType/Source": "Source Code",
   "AboutWindow/Package/LinkType/OriginalSource": "Original Source Code",

@@ -103,6 +103,8 @@
         <PackageReference Condition="'$(IsWindows)'=='true' And '$(IsDinkInstallerEnabled)'=='true' And '$(IsOnlineFeaturesEnabled)'=='true'" 
                           Include="SevenZipExtractor" Version="1.0.17"/>
         <PackageReference Include="UTF.Unknown" Version="2.6.0" />
+        <PackageReference Condition="'$(IsWindows)'=='true'"
+                          Include="WindowsShortcutFactory" Version="1.2.0" />
     </ItemGroup>
 
     <ItemGroup>

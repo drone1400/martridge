@@ -165,6 +165,15 @@ namespace Martridge.ViewModels.About {
                         new UsedPackageLinkViewModel(linkSource, "https://github.com/zzzprojects/html-agility-pack"),
                     }),
 #endif
+#if PLATF_WINDOWS
+                new AboutUsedPackageViewModel(
+                    Localizer.Instance["AboutWindow/Package/WindowsShortcutFactory/Name"],
+                    Localizer.Instance["AboutWindow/Package/WindowsShortcutFactory/Description"],
+                    new List<UsedPackageLinkViewModel>() {
+                        new UsedPackageLinkViewModel(linkSource, "https://github.com/gdivis/WindowsShortcutFactory"),
+                    }),
+#endif
+                
             };
         }
     }

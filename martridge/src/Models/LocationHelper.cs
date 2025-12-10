@@ -25,6 +25,8 @@ namespace Martridge.Models {
         /// </summary>
         /// <returns>Path string</returns>
         public static string GetPathMartridge() => AppBaseDirectory;
+        
+        public static string GetPathMartridgeExecutable() => Path.Combine(AppBaseDirectory, AppExecutableName);
 
         /// <summary>
         /// Get the path where Martridge should point opened File Browser windows to by default
@@ -97,6 +99,7 @@ namespace Martridge.Models {
 
 
         private static string AppBaseDirectory { get; }
+        private static string AppExecutableName { get; }
 
         private static string PathMartridgeState { get; } = string.Empty;
         private static string PathMartridgeConfig { get; } = string.Empty;
@@ -108,6 +111,7 @@ namespace Martridge.Models {
         private static string PathMartridgeDefaultFileBrowser { get; } = string.Empty;
         
         
+        private const string ENV_VAR_APPDATA = "%APPDATA%";
         private const string ENV_VAR_HOME = "%HOME%";
         private const string ENV_VAR_XDG_CONFIG_HOME = "%XDG_CONFIG_HOME%";
         private const string ENV_VAR_XDG_DATA_HOME = "%XDG_DATA_HOME%";
@@ -187,12 +191,20 @@ namespace Martridge.Models {
                     }
                     else {
                         AppBaseDirectory = finfo.DirectoryName;
+                        AppExecutableName = finfo.Name;
                     }
                 }
 
                 if (string.IsNullOrWhiteSpace(AppBaseDirectory)) {
                     AppBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
                     //AppBaseDirectory = AppContext.BaseDirectory;
+                }
+                if (string.IsNullOrWhiteSpace(AppExecutableName)) {
+#if PLATF_WINDOWS
+                    AppExecutableName = "martridge.exe"; // fallback value...
+#else
+                    AppExecutableName = "martridge"; // fallback value...
+#endif
                 }
             }
 
@@ -218,6 +230,47 @@ namespace Martridge.Models {
                 MyTrace.Global.WriteException(ex);
                 throw ex;
             }
+        }
+
+        public static string TryGetWindowsAppDataRoaming() {
+            string dir;
+            try {
+                dir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            } catch (Exception) {
+                dir = string.Empty;
+            }
+
+            if (string.IsNullOrWhiteSpace(dir)) {
+                dir = Environment.ExpandEnvironmentVariables(ENV_VAR_APPDATA);
+                if (dir == ENV_VAR_APPDATA) {
+                    dir = Path.Combine(TryGetHomeDirectory(), "AppData","Roaming");
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(dir) == false &&
+                Directory.Exists(dir))
+                return dir;
+            
+            return string.Empty;
+        }
+
+        public static string TryGetWindowsDesktop() {
+            string dir;
+            try {
+                dir = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            } catch (Exception) {
+                dir = string.Empty;
+            }
+
+            if (string.IsNullOrWhiteSpace(dir)) {
+                dir = Path.Combine(TryGetHomeDirectory(), "Desktop");
+            }
+
+            if (string.IsNullOrWhiteSpace(dir) == false &&
+                Directory.Exists(dir))
+                return dir;
+            
+            return string.Empty;
         }
 
         public static string TryGetHomeDirectory() {

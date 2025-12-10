@@ -22,6 +22,7 @@ using Martridge.Models.Configuration;
 using Martridge.Models.Configuration.General;
 using Martridge.Models.DmodInstaller;
 using Martridge.Models.DmodPacker;
+using Martridge.Models.Localization;
 using Martridge.ViewModels.DinkyAlerts;
 
 #if ENABLE_FEATURE_ONLINE
@@ -36,6 +37,13 @@ using Martridge.ViewModels.DinkInstaller;
 namespace Martridge.ViewModels {
     public class MainWindowViewModel : ViewModelBase
     {
+#if DEBUG
+        public string Title => "Martridge (Debug Build) - " + Localizer.Instance["MainWindow/Title"];
+#else
+        public string Title => "Martridge - " + Localizer.Instance["MainWindow/Title"];
+#endif
+        
+        
         public MainWindowViewModel() {
             if (Application.Current is App app) {
                 app.OnThemePaletteChange += this.AppOnThemePaletteChanged;

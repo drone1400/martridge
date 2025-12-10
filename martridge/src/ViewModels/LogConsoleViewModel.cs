@@ -1,9 +1,17 @@
 ﻿using Martridge.Trace;
 using ReactiveUI;
 using System.ComponentModel;
+using Martridge.Models.Localization;
 
 namespace Martridge.ViewModels {
     public class LogConsoleViewModel : ViewModelBase {
+
+#if DEBUG
+        public string Title => "Martridge (Debug Build) - " + Localizer.Instance["LogWindow/Title"];
+#else
+        public string Title => "Martridge - " + Localizer.Instance["LogWindow/Title"];
+#endif
+        
         public string Text { get => this._traceListener.Text; }
         private MyTraceListenerGui _traceListener = new MyTraceListenerGui("LogConsoleViewTraceListener");
 

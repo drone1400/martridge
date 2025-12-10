@@ -11,7 +11,7 @@
         
         
         Icon="/Assets/martridge_new.ico"
-        Title="{dloc:Localize LogWindow/Title}"
+        Title="{Binding Title}"
         
         Closed="OnWindowClosed">
     <Design.DataContext>

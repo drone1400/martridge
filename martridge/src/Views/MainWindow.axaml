@@ -17,7 +17,7 @@
         x:Class="Martridge.Views.MainWindow"
 
         Icon="/Assets/martridge_new.ico"
-        Title="{dloc:Localize MainWindow/Title}"
+        Title="{Binding Title}"
         Background="{DynamicResource ThemeBackgroundBrush}"
         Name="TheMainWindow"
 

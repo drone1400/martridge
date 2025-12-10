@@ -47,7 +47,7 @@
                           Margin="80,0">
                         <Label Grid.Row="0"
                                Classes="HeadingTitle"
-                               Content="{dloc:Localize AboutWindow/AppName}"
+                               Content="{Binding AppName}"
                                HorizontalAlignment="Center" />
 
                         <Label Grid.Row="1"

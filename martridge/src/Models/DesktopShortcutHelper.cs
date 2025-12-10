@@ -43,6 +43,11 @@ namespace Martridge.Models {
                     Path = martridgeExe,
                     Description = Localizer.Instance["AboutWindow/Description"],
                 };
+                
+                string shortcutName = "Martridge.lnk";
+#if DEBUG
+                shortcutName = "Martridge (Debug).lnk";
+#endif
 
                 // save to start menu
                 string appDataRoaming = LocationHelper.TryGetWindowsAppDataRoaming();
@@ -50,14 +55,14 @@ namespace Martridge.Models {
                     string startMenuShortcutDir = Path.Combine(appDataRoaming, "Microsoft", "Windows", "Start Menu", "Programs", "custom");
                     
                     if (Directory.Exists(startMenuShortcutDir)) {
-                        shortcut.Save(Path.Combine(startMenuShortcutDir, "Martridge.lnk"));
+                        shortcut.Save(Path.Combine(startMenuShortcutDir, shortcutName));
                     }
                 }
 
                 // save to desktop
                 string desktopShortcutDir = LocationHelper.TryGetWindowsDesktop();
                 if (Directory.Exists(desktopShortcutDir)) {
-                    shortcut.Save(Path.Combine(desktopShortcutDir, "Martridge.lnk"));
+                    shortcut.Save(Path.Combine(desktopShortcutDir, shortcutName));
                 }
 #endif
             } catch (Exception ex) {
@@ -132,7 +137,13 @@ namespace Martridge.Models {
                 if (string.IsNullOrWhiteSpace(homeDir))
                     return;
 
-                string fileName = Path.Combine(homeDir, ".local", "share", "applications", "martridge_app.desktop");
+                string fileDesktop = "martridge_app.desktop";
+                
+#if DEBUG
+                fileDesktop = "martridge_app_debug.desktop";
+#endif
+                
+                string fileName = Path.Combine(homeDir, ".local", "share", "applications", fileDesktop);
 
                 string iconName = EnsureLinuxIconBitmapExists();
 
@@ -146,7 +157,11 @@ namespace Martridge.Models {
 
 
                 sw.WriteLine("[Desktop Entry]");
+#if DEBUG
+                sw.WriteLine("Name=Martridge (Debug)");
+#else
                 sw.WriteLine("Name=Martridge");
+#endif
                 sw.WriteLine($"Comment={Localizer.Instance["AboutWindow/Description"]}");
                 sw.WriteLine($"Exec={myName}");
                 if (string.IsNullOrWhiteSpace(iconName) == false) {

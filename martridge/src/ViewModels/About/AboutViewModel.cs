@@ -29,6 +29,12 @@ namespace Martridge.ViewModels.About {
             }
         }
         
+#if DEBUG        
+        public string AppName => "Martridge (Debug Build)";
+#else
+        public string AppName => "Martridge";
+#endif
+        
         public string Version { get; }
         
         public void CmdOpenHyperlink(object? parameter = null) {

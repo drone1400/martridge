@@ -20,6 +20,14 @@ namespace Martridge.Models.Dmod
             try {
                 exePath = exePath.Trim();
                 dmodPath = dmodPath.Trim();
+
+                if (Directory.Exists(dmodPath) == false)
+                    return;
+                
+                DmodFileDefinition dfd = new DmodFileDefinition(dmodPath);
+                // certain engines like DinkHD will fail to launch a DMOD that does not have the dmod.diz file
+                // make sure the file exists by generating a placeholder one if there's nothing there
+                dfd.EnsureExistsDmodDiz();
                 
                 bool isProbablyFreeDink = false;
                 bool isProbablyYeOldeDink = false;

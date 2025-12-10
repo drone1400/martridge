@@ -269,6 +269,17 @@ namespace Martridge.Models.Dmod {
             }
         }
 
-        
+        public void EnsureExistsDmodDiz() {
+            if (this.IsCorrectlyDefined == false ||
+                this.DmodDiz?.Exists == true)
+                return;
+
+            this.DmodDiz = new FileInfo(Path.Combine(this.DmodRoot.FullName, "dmod.diz"));
+            
+            using FileStream fileStream = new FileStream(this.DmodDiz.FullName, FileMode.Create, FileAccess.Write);
+            using StreamWriter writer = new StreamWriter(fileStream);
+            writer.WriteLine(this.DmodRoot.Name);
+            writer.Flush();
+        }
     }
 }

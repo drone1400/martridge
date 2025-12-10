@@ -54,8 +54,8 @@
                                 Converter={StaticResource GenericNotEqualsBoolConverter}, 
                                 ConverterParameter={x:Static dmodInstaller:DmodInstallPhase.Inactive} }">
 
-                    <TextBlock Classes="Heading2IWrapping"
-                           Text="{Binding FinalDmodDestination}" />
+                    <Label Classes="Heading2IWrapping"
+                           Content="{Binding FinalDmodDestination}" />
                     <ProgressBar Minimum="0" Maximum="1"
                                  IsVisible="{Binding !DmodInstallerInProgress}"
                                  Value="{Binding DmodInstallerPhaseProgressPercent}" />

@@ -73,10 +73,13 @@ namespace Martridge.Models.Dmod
                     pinfo.Environment.Add("LC_ALL", localization);
                     pinfo.Environment.Add("LANGUAGE", localization);
                 }
-                
-                // use the DMOD directory as the working directory when launching 
-                pinfo.WorkingDirectory = dmodPath;
-                
+
+                if (string.IsNullOrWhiteSpace(pinfo.WorkingDirectory)) {
+                    // if the process working directory has not been set previously,
+                    // use the DMOD directory as the working directory when launching
+                    pinfo.WorkingDirectory = dmodPath;
+                }
+
                 Process? proc = Process.Start(pinfo);
 
                 // check if need to quit martridge after launching

@@ -10,14 +10,27 @@
         <Version>0.10.0.0</Version>
         <RootNamespace>Martridge</RootNamespace>
         <Configurations>Debug;Release</Configurations>
-        <Platforms>AnyCPU;win-x64</Platforms>
+        <Platforms>win-x64;win-x86;linux-x64;linux-arm64;osx-arm64;osx-x64</Platforms>
         <AvaloniaVersion>11.3.8</AvaloniaVersion>
     </PropertyGroup>
 
     <PropertyGroup>
-        <IsLinux Condition="'$(RuntimeIdentifier)' == 'linux-x64'">true</IsLinux>
-        <IsMacOs Condition="'$(RuntimeIdentifier)' == 'osx-x64' or '$(RuntimeIdentifier)' == 'osx-arm64' ">true</IsMacOs>
-        <IsWindows Condition="'$(IsLinux)' != 'true' and '$(IsMacOs)' != 'true'">true</IsWindows>
+        <!-- identify based on runtime id.. -->
+<!--        <IsLinux Condition="'$(RuntimeIdentifier)' == 'linux-arm64'">true</IsLinux>-->
+<!--        <IsLinux Condition="'$(RuntimeIdentifier)' == 'linux-x64'">true</IsLinux>-->
+<!--        <IsMacOs Condition="'$(RuntimeIdentifier)' == 'osx-arm64'">true</IsMacOs>-->
+<!--        <IsMacOs Condition="'$(RuntimeIdentifier)' == 'osx-x64'">true</IsMacOs>-->
+<!--        <IsWindows Condition="'$(RuntimeIdentifier)' == 'win-x64'">true</IsWindows>-->
+<!--        <IsWindows Condition="'$(RuntimeIdentifier)' == 'win-x86'">true</IsWindows>-->
+        
+        <!-- identify based on platform... -->
+        <IsLinux Condition="'$(Platform)' == 'linux-arm64'">true</IsLinux>
+        <IsLinux Condition="'$(Platform)' == 'linux-x64'">true</IsLinux>
+        <IsMacOs Condition="'$(Platform)' == 'osx-arm64'">true</IsMacOs>
+        <IsMacOs Condition="'$(Platform)' == 'osx-x64'">true</IsMacOs>
+        <IsWindows Condition="'$(Platform)' == 'win-x86'">true</IsWindows>
+        <IsWindows Condition="'$(Platform)' == 'win-x64'">true</IsWindows>
+        
         <IsDinkInstallerEnabled Condition="'$(DisableFeatureDinkInstaller)'!='true'">true</IsDinkInstallerEnabled>
         <IsOnlineFeaturesEnabled Condition="'$(DisableFeatureOnline)'!='true'">true</IsOnlineFeaturesEnabled>
     </PropertyGroup>
@@ -119,11 +132,11 @@
         <!-- before, i used to not copy the x64 version because i assumed it was automagically included, but that was not the case, the 7zip wrapper was just defaulting
             to my 7zip install in program files! not good since users might not have 7zip installed at all! -->
 
-        <Copy Condition="'$(Platform)' == 'x86'"
+        <Copy Condition="'$(Platform)' == 'win-x86'"
               SourceFiles="$(ProjectDir)\lib\7zip\x86\7z.dll"
               DestinationFiles="$(PublishDir)\x86\7z.dll"/>
 
-        <Copy Condition="'$(Platform)' == 'x64'"
+        <Copy Condition="'$(Platform)' == 'win-x64'"
               SourceFiles="$(ProjectDir)\lib\7zip\x64\7z.dll"
               DestinationFiles="$(PublishDir)\x64\7z.dll"/>
 

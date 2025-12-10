@@ -47,9 +47,9 @@ jobs:
       - name: Clean SharpCompress
         run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Clean martridge
-        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
+        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="win-x86" --framework net10.0
       - name: Publish net10.0 win-x86
-        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net10.0_win-x86/martridge/ --configuration Release -p:Platform="x86" --framework net10.0 --runtime win-x86 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net10.0_win-x86/martridge/ --configuration Release -p:Platform="win-x86" --framework net10.0 --runtime win-x86 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
       - name: Archive published net10.0 win-x86
         uses: ihiroky/archive-action@v1
         with:
@@ -66,9 +66,9 @@ jobs:
       - name: Clean SharpCompress
         run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Clean martridge
-        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
+        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="win-x64" --framework net10.0
       - name: Publish net10.0 win-x64
-        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net10.0_win-x64/martridge/ --configuration Release -p:Platform="x64" --framework net10.0 --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net10.0_win-x64/martridge/ --configuration Release -p:Platform="win-x64" --framework net10.0 --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
       - name: Archive published net10.0 win-x64
         uses: ihiroky/archive-action@v1
         with:
@@ -84,9 +84,9 @@ jobs:
       - name: Clean SharpCompress
         run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Clean martridge
-        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
+        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="linux-x64" --framework net10.0
       - name: Publish net10.0 linux-x64
-        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net10.0_linux-x64/martridge/ --configuration Release -p:Platform="Any CPU" --framework net10.0 --runtime linux-x64 --self-contained true -p:PublishSingleFile=true
+        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net10.0_linux-x64/martridge/ --configuration Release -p:Platform="linux-x64" --framework net10.0 --runtime linux-x64 --self-contained true -p:PublishSingleFile=true
       - name: Archive published net10.0 linux-x64
         uses: ihiroky/archive-action@v1
         with:
@@ -101,9 +101,9 @@ jobs:
       - name: Clean SharpCompress
         run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Clean martridge
-        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
+        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="osx-x64" --framework net10.0
       - name: Publish net10.0 linux-x64
-        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net10.0_osx-x64/martridge/ --configuration Release -p:Platform="Any CPU" --framework net10.0 --runtime osx-x64 --self-contained true -p:PublishSingleFile=true
+        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net10.0_osx-x64/martridge/ --configuration Release -p:Platform="osx-x64" --framework net10.0 --runtime osx-x64 --self-contained true -p:PublishSingleFile=true
       - name: Archive published net10.0 osx-x64
         uses: ihiroky/archive-action@v1
         with:
@@ -119,9 +119,9 @@ jobs:
       - name: Clean SharpCompress
         run: dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
       - name: Clean martridge
-        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
+        run: dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="osx-arm64" --framework net10.0
       - name: Publish net10.0 linux-x64
-        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net10.0_osx-arm64/martridge/ --configuration Release -p:Platform="Any CPU" --framework net10.0 --runtime osx-arm64 --self-contained true -p:PublishSingleFile=true
+        run: dotnet publish ./martridge/src/martridge.csproj --output ./publish/net10.0_osx-arm64/martridge/ --configuration Release -p:Platform="osx-arm64" --framework net10.0 --runtime osx-arm64 --self-contained true -p:PublishSingleFile=true
       - name: Archive published net10.0 osx-arm64
         uses: ihiroky/archive-action@v1
         with:

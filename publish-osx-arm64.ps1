@@ -5,5 +5,5 @@
 dotnet clean ./citrus/src/Citrus.Avalonia/Citrus.Avalonia.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
 dotnet clean ./citrus/src/Citrus.Avalonia.DataGrid/Citrus.Avalonia.DataGrid.csproj --configuration Release -p:Platform="Any CPU" --framework netstandard2.0
 dotnet clean ./sharpcompress/src/SharpCompress/SharpCompress.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
-dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="Any CPU" --framework net10.0
-dotnet publish ./martridge/src/martridge.csproj --output ./publish/net10.0_osx-arm64/martridge/ --configuration Release -p:Platform="Any CPU" --framework net10.0 --runtime osx-arm64 --self-contained true -p:PublishSingleFile=true
+dotnet clean ./martridge/src/martridge.csproj --configuration Release -p:Platform="osx-arm64" --framework net10.0
+dotnet publish ./martridge/src/martridge.csproj --output ./publish/net10.0_osx-arm64/martridge/ --configuration Release -p:Platform="osx-arm64" --framework net10.0 --runtime osx-arm64 --self-contained true -p:PublishSingleFile=true

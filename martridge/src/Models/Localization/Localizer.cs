@@ -132,6 +132,17 @@ namespace Martridge.Models.Localization {
             }
         }
 
+        public bool TryGetValue(string key, out string value) {
+            string? res;
+            if (this._mStrings != null && this._mStrings.TryGetValue(key, out res)) {
+                value = res.Replace("\\n", "\n");
+                return true;
+            }
+
+            value = $"{this.Language}:{key}";
+            return false;
+        }
+
         public static Localizer Instance { get; set; } = new Localizer();
         public event PropertyChangedEventHandler? PropertyChanged;
 

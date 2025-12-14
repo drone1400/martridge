@@ -17,7 +17,7 @@
         
     </UserControl.Resources>
     
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,*,Auto">
         <ListBox Grid.Row="1"
                  ItemsSource="{Binding EnvironmentVariables}"
                  SelectedIndex="{Binding SelectedEnvrionmentVariableIndex}"
@@ -71,5 +71,22 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        <Grid Grid.Row="2">
+            <Grid Grid.Row="0" ColumnDefinitions="64,160,*">
+                <Button 
+                    Grid.Column="0" 
+                    Content="ADD"
+                    HorizontalAlignment="Stretch"
+                    Width="NaN"
+                    MinWidth="20"
+                    Command="{Binding AddNewEnvironmentVariable}" />
+                <TextBox
+                    Grid.Column="1"
+                    Text="{Binding NewEnvVarName}" />
+                <TextBox
+                    Grid.Column="2"
+                    Text="{Binding NewEnvVarValue}" />
+            </Grid>
+        </Grid>
     </Grid>
 </UserControl>

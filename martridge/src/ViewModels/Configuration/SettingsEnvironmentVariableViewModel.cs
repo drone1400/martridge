@@ -72,7 +72,9 @@ namespace Martridge.ViewModels.Configuration {
             this._key = name;
             this._value = value;
 
-            this._description = Localizer.Instance["EnvVar/Description/" + this._key];
+            this._description = Localizer.Instance.TryGetValue("EnvVar/Description/" + this._key, out string description)
+                ? description
+                : string.Empty;
         }
 
         public SettingsEnvironmentVariableViewModel(ConfigEnvironmentVariable data) {
@@ -83,7 +85,9 @@ namespace Martridge.ViewModels.Configuration {
             this._isAppendAtEnd = data.IsAppendAtEnd;
             this._appendSeparator = data.AppendSeparator;
             
-            this._description = Localizer.Instance["EnvVar/Description/" + this._key];
+            this._description = Localizer.Instance.TryGetValue("EnvVar/Description/" + this._key, out string description)
+                ? description
+                : string.Empty;
         }
         
         public SettingsEnvironmentVariableViewModel(ConfigDataEnvironmentVariable data) {
@@ -94,8 +98,9 @@ namespace Martridge.ViewModels.Configuration {
             this._isAppendAtEnd = data.IsAppendAtEnd ?? false;
             this._appendSeparator = data.AppendSeparator ?? ":";
             
-            this._description = Localizer.Instance["EnvVar/Description/" + this._key];
-            
+            this._description = Localizer.Instance.TryGetValue("EnvVar/Description/" + this._key, out string description)
+                ? description
+                : string.Empty;
         }
 
         public ConfigDataEnvironmentVariable GetConfigData() {

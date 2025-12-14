@@ -989,7 +989,7 @@ namespace Martridge.ViewModels.Configuration {
                     ConfigExtensionComponent? component = this.CfgExtension.TryAddOrGetExtension(exeCurrent);
                     if (component == null) return;
                     component.SteamData = cfgSteam;
-                    component.WineData = cfgWine;
+                    component.WineData = new ConfigWine(cfgWine);
                 }
                 finally {
                     Config.Instance.SaveConfigExtension();

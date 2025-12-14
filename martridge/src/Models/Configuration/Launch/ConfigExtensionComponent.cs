@@ -8,11 +8,11 @@ namespace Martridge.Models.Configuration.LaunchExtension {
         public string TargetExePath => this._targetExePath;
         private string _targetExePath = string.Empty;
 
-        public ConfigExtensionLinuxWine? WineData {
+        public ConfigWine? WineData {
             get => this._wineData;
             set => this._wineData = value;
         }
-        private ConfigExtensionLinuxWine? _wineData = null;
+        private ConfigWine? _wineData = null;
 
         public ConfigExtensionSteamInfo? SteamData {
             get => this._steamData;
@@ -26,13 +26,13 @@ namespace Martridge.Models.Configuration.LaunchExtension {
         }
         public ConfigExtensionComponent(ConfigDataExtensionComponent data) {
             this._targetExePath =  data.TargetExePath ?? string.Empty;
-            this._wineData = data.WineData != null ? new ConfigExtensionLinuxWine(data.WineData) : null;
+            this._wineData = data.WineData != null ? new ConfigWine(data.WineData) : null;
             this._steamData = data.SteamData != null ? new ConfigExtensionSteamInfo(data.SteamData) : null;
         }
 
         public void SetFromData(ConfigDataExtensionComponent data) {
             this._targetExePath =  data.TargetExePath ?? string.Empty;
-            this._wineData = data.WineData != null ? new ConfigExtensionLinuxWine(data.WineData) : null;
+            this._wineData = data.WineData != null ? new ConfigWine(data.WineData) : null;
             this._steamData = data.SteamData != null ? new ConfigExtensionSteamInfo(data.SteamData) : null;
         }
 

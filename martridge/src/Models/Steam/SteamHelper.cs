@@ -108,7 +108,7 @@ namespace Martridge.Models.Steam {
             }
         }
 
-        public static void AutoDetectWinePaths(string wineVerPath, out string wineBinPath, out string wineLibPath, out string wineDllPath, out string wineServer, out string wineLoader) {
+        public static void AutoDetectWinePathsFromWineVerPath(string wineVerPath, out string wineBinPath, out string wineLibPath, out string wineDllPath, out string wineServer, out string wineLoader) {
             wineBinPath = string.Empty;
             wineLibPath = string.Empty;
             wineServer = string.Empty;

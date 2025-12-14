@@ -226,22 +226,18 @@ namespace Martridge.Models.Dmod
                     pinfo.Environment.Add("SDL_AUDIODRIVER", "winmm");
                 }
 
-                bool useWine =
-                    extensionCfg?.WineData != null &&
-                    string.IsNullOrWhiteSpace(extensionCfg.WineData.WINEVERPATH) == false &&
-                    string.IsNullOrWhiteSpace(extensionCfg.WineData.WINEBINPATH) == false &&
-                    string.IsNullOrWhiteSpace(extensionCfg.WineData.WINELIBPATH) == false &&
-                    string.IsNullOrWhiteSpace(extensionCfg.WineData.WINESERVER) == false &&
-                    string.IsNullOrWhiteSpace(extensionCfg.WineData.WINELOADER) == false &&
-                    string.IsNullOrWhiteSpace(extensionCfg.WineData.WINEDLLPATH) == false &&
-                    string.IsNullOrWhiteSpace(extensionCfg.WineData.WINEPREFIX) == false;
+                
                 
 #if PLATF_WINDOWS
-                // hardcode this to false on Windows
-                useWine = false;
+                ConfigWine? wineCfg = null;
+#else
+                ConfigWine? wineCfg = null;
+                if (Config.Instance.GlobalWine.UseWine) wineCfg = Config.Instance.GlobalWine;
+                // game specific wine configs override the global ones
+                if (extensionCfg?.WineData.UseWine == true) wineCfg = extensionCfg.WineData;
 #endif
 
-                if (useWine) {
+                if (wineCfg != null) {
                     // actually check that this is a windows exe file..
                     using FileStream fs = new FileStream(exePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                     using BinaryReader br = new BinaryReader(fs);
@@ -250,34 +246,46 @@ namespace Martridge.Models.Dmod
 
                     if (magic1 != 0x4D && magic2 != 0x5A) {
                         // this does not appear to be a windows executable...
-                        useWine = false;
+                        wineCfg = null;
                     }
                 }
 
-                if (useWine) {
-                    pinfo.Environment["WINEVERPATH"] = extensionCfg!.WineData!.WINEVERPATH;
-                    pinfo.Environment["WINESERVER"] = extensionCfg!.WineData!.WINESERVER;
-                    pinfo.Environment["WINELOADER"] = extensionCfg!.WineData!.WINELOADER;
-                    pinfo.Environment["WINEDLLPATH"] = extensionCfg!.WineData!.WINEDLLPATH;
-                    pinfo.Environment["WINEPREFIX"] = extensionCfg!.WineData!.WINEPREFIX;
+                if (wineCfg != null) {
+                    string? wineBinary = null;
                     
-                    if (!pinfo.Environment.TryGetValue("LD_LIBRARY_PATH", out string? ldLibraryPath)) {
-                        pinfo.Environment["LD_LIBRARY_PATH"] = extensionCfg!.WineData!.WINELIBPATH;
-                    } else
-                    {
-                        pinfo.Environment["LD_LIBRARY_PATH"] = $"{extensionCfg!.WineData!.WINELIBPATH}:{ldLibraryPath}";
+                    foreach (var x in wineCfg.EnvironmentVariables) {
+                        try {
+                            if (x.Key == "WINELOADER") {
+                                wineBinary = x.Value.Value;
+                            }
+                            
+                            string? crtVal = Environment.GetEnvironmentVariable(x.Value.Key);
+                            
+                            if (x.Value.IsAppendMode && string.IsNullOrEmpty(crtVal) == false) {
+                                // append to existing env var value
+                                if (x.Value.IsAppendAtEnd) {
+                                    crtVal = crtVal + x.Value.AppendSeparator + x.Value.Value;
+                                }
+                                else {
+                                    crtVal = x.Value.Value + x.Value.AppendSeparator + crtVal;
+                                }
+                                pinfo.Environment[x.Value.Key] = crtVal;
+                            }
+                            else {
+                                pinfo.Environment[x.Value.Key] = x.Value.Value;
+                            }
+                        } catch (Exception ex) {
+                            MyTrace.Global.WriteException(ex);
+                        }
                     }
-                    
-                    if (!pinfo.Environment.TryGetValue("PATH", out string? path)) {
-                        pinfo.Environment["PATH"] = extensionCfg!.WineData!.WINEBINPATH;
-                    } else
-                    {
-                        pinfo.Environment["PATH"] = $"{extensionCfg!.WineData!.WINEBINPATH}:{path}";
+
+                    if (string.IsNullOrWhiteSpace(wineBinary)) {
+                        wineBinary = "wine"; // fallback to generic wine name
                     }
                     
                     // override some settings...
                     string wineArgs = "\"" + exePath + "\""  + " " + arguments;
-                    pinfo.FileName = extensionCfg!.WineData!.WINELOADER;
+                    pinfo.FileName = wineBinary;
                     pinfo.Arguments = wineArgs;
                 }
                 

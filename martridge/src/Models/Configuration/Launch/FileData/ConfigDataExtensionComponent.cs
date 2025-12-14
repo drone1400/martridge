@@ -5,7 +5,7 @@
         /// </summary>
         public string? TargetExePath { get; set; }
 
-        public ConfigDataExtensionLinuxWine? WineData { get; set; }
+        public ConfigDataWine? WineData { get; set; }
 
         public ConfigDataExtensionSteamInfo? SteamData { get; set; }
     }

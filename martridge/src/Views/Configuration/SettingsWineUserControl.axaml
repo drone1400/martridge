@@ -1,0 +1,75 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:configuration="clr-namespace:Martridge.ViewModels.Configuration"
+             xmlns:dloc="using:Martridge.ViewModels.Localization"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Martridge.Views.Configuration.SettingsWineUserControl">
+    
+    <Design.DataContext>
+        <configuration:SettingsWineViewModel />
+    </Design.DataContext>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://martridge/AppStyles.axaml" />
+    </UserControl.Styles>
+    <UserControl.Resources>
+        
+    </UserControl.Resources>
+    
+    <Grid RowDefinitions="Auto,*">
+        <ListBox Grid.Row="1"
+                 ItemsSource="{Binding EnvironmentVariables}"
+                 SelectedIndex="{Binding SelectedEnvrionmentVariableIndex}"
+                 VerticalAlignment="Top"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 KeyboardNavigation.TabNavigation="Continue">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid RowDefinitions="Auto,Auto,Auto">
+                        <Grid Grid.Row="0" ColumnDefinitions="32,160,*">
+                            <CheckBox 
+                                Grid.Column="0" 
+                                Content=""
+                                IsChecked="{Binding IsEnabled}"/>
+                            <TextBox
+                                Grid.Column="1"
+                                Text="{Binding Key}"
+                                IsReadOnly="True"/>
+                            <TextBox
+                                Grid.Column="2"
+                                Text="{Binding Value}"/>
+                        </Grid>
+                        <Grid Grid.Row="1" RowDefinitions="Auto,Auto"
+                              IsVisible="{Binding $parent[ListBoxItem].IsKeyboardFocusWithin}">
+                            <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,Auto,*">
+                                <CheckBox 
+                                    Grid.Column="0"
+                                    IsChecked="{Binding IsAppendMode}"
+                                    Content="{dloc:Localize SettingsWineView/IsAppendMode}"/>
+                                <CheckBox 
+                                    Grid.Column="1"
+                                    IsChecked="{Binding IsAppendAtEnd}"
+                                    IsVisible="{Binding IsAppendMode}"
+                                    Content="{dloc:Localize SettingsWineView/IsAppendAtEnd}"/>
+                                <Label 
+                                    Grid.Column="2"
+                                    IsVisible="{Binding IsAppendMode}"
+                                    Content="{dloc:Localize SettingsWineView/Separator}"/>
+                                <TextBox 
+                                    Grid.Column="3"
+                                    IsVisible="{Binding IsAppendMode}"
+                                    Text="{Binding AppendSeparator}" />
+                            </Grid>
+                            <Label
+                                Grid.Row="1" 
+                                Classes="Heading2IWrapping"
+                                Content="{Binding Description}"
+                                IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

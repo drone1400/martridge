@@ -286,6 +286,7 @@
   "SettingsGeneral/TabItemPathDmod": "DMOD paths",
   "SettingsGeneral/TabItemPathGame": "Game paths",
   "SettingsGeneral/TabItemPathEditor": "Editor paths",
+  "SettingsGeneral/TabItemWine": "WINE (Global)",
   "SettingsGeneral/ShowLogWindow": "Show Log Window",
   "SettingsGeneral/CreateDesktopShortcut": "Create Desktop Shortcut",
   "SettingsGeneral/ExeExtension/ButtonOk": "Ok",
@@ -308,6 +309,12 @@
   "SettingsExtensionConfigView/SteamAutoIdError/Title": "Could not auto-detect Steam App ID",
   "SettingsExtensionConfigView/SteamAutoIdError/BodyPart1": "Could not auto-detect any Steam App ID with the given path:",
   "SettingsExtensionConfigView/SteamAutoIdError/BodyPart2": "Make sure you add the game in Steam as a Non-Steam Game first!",
+  
+  "SettingsWineView/IsAppendMode": "Append mode",
+  "SettingsWineView/IsAppendAtEnd": "Append at end",
+  "SettingsWineView/Separator": "Separator",
+  
+  
   
   
   "SettingsThemeView/PreviewTheme": "Preview Theme: ",

@@ -32,20 +32,14 @@ namespace Martridge.Models.Configuration.Generic {
         /// </summary>
         public string AppendSeparator { get; } = ":";
         
-        /// <summary>
-        /// User description for environment variable
-        /// </summary>
-        public string Description { get; } = string.Empty;
-        
         public ConfigEnvironmentVariable() { }
-        public ConfigEnvironmentVariable(string key, string value, bool isEnabled, bool isAppendMode = false, bool isAppendAtEnd = false, string appendSeparator = ":", string description = "") {
+        public ConfigEnvironmentVariable(string key, string value, bool isEnabled, bool isAppendMode = false, bool isAppendAtEnd = false, string appendSeparator = ":") {
             this.Key = key;
             this.Value = value;
             this.IsEnabled = isEnabled;
             this.IsAppendMode = isAppendMode;
             this.IsAppendAtEnd = isAppendAtEnd;
             this.AppendSeparator = appendSeparator;
-            this.Description = description;
         }
         public ConfigEnvironmentVariable(ConfigDataEnvironmentVariable data) {
             this.Key = data.Key ?? string.Empty;
@@ -54,7 +48,6 @@ namespace Martridge.Models.Configuration.Generic {
             this.IsAppendMode = data.IsAppendMode ?? false;
             this.IsAppendAtEnd = data.IsAppendAtEnd ?? false;
             this.AppendSeparator = data.AppendSeparator ?? string.Empty;
-            this.Description = data.Description ?? string.Empty;
         }
 
         public ConfigDataEnvironmentVariable GetData() {
@@ -65,7 +58,6 @@ namespace Martridge.Models.Configuration.Generic {
                 IsAppendMode = this.IsAppendMode,
                 IsAppendAtEnd = this.IsAppendAtEnd,
                 AppendSeparator = this.AppendSeparator,
-                Description = this.Description,
             };
         }
     }

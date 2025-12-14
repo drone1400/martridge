@@ -164,7 +164,7 @@ namespace Martridge.Models.Configuration {
         public ConfigGeneral General { get; } = new ConfigGeneral();
         public ConfigAppState AppState { get; } = new ConfigAppState();
         public ConfigLaunch Launch { get; } = new ConfigLaunch();
-        public ConfigWine GlobalWine { get; } = new ConfigWine();
+        public ConfigWine? WineGlobal { get; } = new ConfigWine();
         public ConfigExtension LaunchExtension { get; } = new ConfigExtension();
                 
         public string FileNameGeneralConfig { get; private set; } = string.Empty;

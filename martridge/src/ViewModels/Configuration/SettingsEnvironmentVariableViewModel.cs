@@ -1,5 +1,6 @@
 ﻿using Martridge.Models.Configuration.Generic;
 using Martridge.Models.Configuration.Generic.FileData;
+using Martridge.Models.Localization;
 using ReactiveUI;
 namespace Martridge.ViewModels.Configuration {
     public class SettingsEnvironmentVariableViewModel : ViewModelBase {
@@ -70,6 +71,8 @@ namespace Martridge.ViewModels.Configuration {
         public SettingsEnvironmentVariableViewModel(string name, string value) {
             this._key = name;
             this._value = value;
+
+            this._description = Localizer.Instance["EnvVar/Description/" + this._key];
         }
 
         public SettingsEnvironmentVariableViewModel(ConfigEnvironmentVariable data) {
@@ -79,7 +82,8 @@ namespace Martridge.ViewModels.Configuration {
             this._isAppendMode = data.IsAppendMode;
             this._isAppendAtEnd = data.IsAppendAtEnd;
             this._appendSeparator = data.AppendSeparator;
-            this._description = data.Description;
+            
+            this._description = Localizer.Instance["EnvVar/Description/" + this._key];
         }
         
         public SettingsEnvironmentVariableViewModel(ConfigDataEnvironmentVariable data) {
@@ -89,7 +93,9 @@ namespace Martridge.ViewModels.Configuration {
             this._isAppendMode = data.IsAppendMode ?? false;
             this._isAppendAtEnd = data.IsAppendAtEnd ?? false;
             this._appendSeparator = data.AppendSeparator ?? ":";
-            this._description = data.Description ?? string.Empty;
+            
+            this._description = Localizer.Instance["EnvVar/Description/" + this._key];
+            
         }
 
         public ConfigDataEnvironmentVariable GetConfigData() {
@@ -100,7 +106,6 @@ namespace Martridge.ViewModels.Configuration {
                 IsAppendMode = this.IsAppendMode,
                 IsAppendAtEnd = this.IsAppendAtEnd,
                 AppendSeparator = this.AppendSeparator,
-                Description = this.Description,
             };
         }
 
@@ -111,8 +116,7 @@ namespace Martridge.ViewModels.Configuration {
                 isEnabled: this.IsEnabled,
                 isAppendMode: this.IsAppendMode,
                 isAppendAtEnd: this.IsAppendAtEnd,
-                appendSeparator: this.AppendSeparator,
-                description: this.Description);
+                appendSeparator: this.AppendSeparator);
         }
     }
 }

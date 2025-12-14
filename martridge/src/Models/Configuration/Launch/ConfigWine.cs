@@ -75,8 +75,7 @@ namespace Martridge.Models.Configuration.LaunchExtension {
                             isEnabled: x.IsEnabled ?? false,
                             isAppendMode: x.IsAppendMode ?? false,
                             isAppendAtEnd: x.IsAppendAtEnd ?? false,
-                            appendSeparator: x.AppendSeparator ?? ":",
-                            description: x.Description ?? string.Empty);
+                            appendSeparator: x.AppendSeparator ?? ":");
                     }
                 }
             } else {
@@ -99,8 +98,7 @@ namespace Martridge.Models.Configuration.LaunchExtension {
                                 isEnabled: old.IsEnabled,
                                 isAppendMode: old.IsAppendMode,
                                 isAppendAtEnd: old.IsAppendAtEnd,
-                                appendSeparator: old.AppendSeparator,
-                                description: old.Description);
+                                appendSeparator: old.AppendSeparator);
                         } else {
                             // add new environment variable
                             this._environmentVariables[x.Key ?? string.Empty] = new ConfigEnvironmentVariable(
@@ -109,8 +107,7 @@ namespace Martridge.Models.Configuration.LaunchExtension {
                                 isEnabled: x.IsEnabled ?? false,
                                 isAppendMode: x.IsAppendMode ?? false,
                                 isAppendAtEnd: x.IsAppendAtEnd ?? false,
-                                appendSeparator: x.AppendSeparator ?? ":",
-                                description: x.Description ?? string.Empty);
+                                appendSeparator: x.AppendSeparator ?? ":");
                         }
                     }
                 }
@@ -129,7 +126,6 @@ namespace Martridge.Models.Configuration.LaunchExtension {
                     IsAppendMode = kvp.Value.IsAppendMode,
                     IsAppendAtEnd = kvp.Value.IsAppendAtEnd,
                     AppendSeparator = kvp.Value.AppendSeparator,
-                    Description =  kvp.Value.Description,
                 });
             }
             

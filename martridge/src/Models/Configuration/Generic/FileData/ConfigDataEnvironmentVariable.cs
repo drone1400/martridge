@@ -6,17 +6,15 @@
         public bool? IsAppendMode { get; set; }
         public bool? IsAppendAtEnd { get; set; }
         public string? AppendSeparator { get; set; }
-        public string? Description { get; set; }
         
         public ConfigDataEnvironmentVariable() { }
-        public ConfigDataEnvironmentVariable(string key, string value, bool isEnabled, bool isAppendMode = false, bool isAppendAtEnd = false, string appendSeparator = ":", string description = "") {
+        public ConfigDataEnvironmentVariable(string key, string value, bool isEnabled, bool isAppendMode = false, bool isAppendAtEnd = false, string appendSeparator = ":") {
             this.Key = key;
             this.Value = value;
             this.IsEnabled = isEnabled;
             this.IsAppendMode = isAppendMode;
             this.IsAppendAtEnd = isAppendAtEnd;
             this.AppendSeparator = appendSeparator;
-            this.Description = description;
         }
     }
 }

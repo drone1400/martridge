@@ -138,6 +138,13 @@
                                  IsVisible="{Binding ShowDmodDevFeatures}">
                             <configuration:SettingsGeneralAddEditorExeUserControl />
                         </TabItem>
+                        <TabItem Header="{dloc:Localize SettingsGeneral/TabItemWine}"
+                                 Classes="SmallTab">
+                            <Grid>
+                                <configuration:SettingsWineUserControl
+                                    DataContext="{Binding WineViewModel}"/>
+                            </Grid>
+                        </TabItem>
                     </TabControl>
                 </Grid>
             </Grid>

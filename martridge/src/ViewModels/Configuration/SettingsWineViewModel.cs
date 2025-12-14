@@ -205,7 +205,6 @@ namespace Martridge.ViewModels.Configuration {
                     IsAppendMode = x.IsAppendMode,
                     IsAppendAtEnd = x.IsAppendAtEnd,
                     AppendSeparator = x.AppendSeparator,
-                    Description = x.Description,
                 });
             }
 

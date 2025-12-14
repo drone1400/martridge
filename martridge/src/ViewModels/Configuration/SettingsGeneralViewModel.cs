@@ -14,6 +14,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Martridge.Models.Configuration.General;
+using Martridge.Models.Configuration.Generic.FileData;
 using Martridge.Models.Configuration.LaunchExtension;
 using Martridge.Models.Configuration.LaunchExtension.FileData;
 using Martridge.Models.Steam;
@@ -162,6 +163,16 @@ namespace Martridge.ViewModels.Configuration {
             set => this.RaiseAndSetIfChanged(ref this._quitMartridgeOnEditorLaunch, value);
         }
         private bool _quitMartridgeOnEditorLaunch = false;
+        
+        //
+        // Global WINE settings
+        //
+
+        public SettingsWineViewModel? WineViewModel {
+            get => this._wineViewModel;
+            private set => this.RaiseAndSetIfChanged(ref this._wineViewModel, value);
+        }
+        private SettingsWineViewModel? _wineViewModel = null;
 
         //
         // Internal logic
@@ -204,6 +215,7 @@ namespace Martridge.ViewModels.Configuration {
         private void InitializeFromConfig() {
             this.LoadFromConfig();
             this.LoadFromConfigLaunch();
+            this.LoadFromConfigWine();
         }
 
         private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
@@ -243,6 +255,23 @@ namespace Martridge.ViewModels.Configuration {
                 [nameof(ConfigLaunch.QuitMartridgeOnGameLaunch)] = this.QuitMartridgeOnGameLaunch,
                 [nameof(ConfigLaunch.QuitMartridgeOnEditorLaunch)] = this.QuitMartridgeOnEditorLaunch,
             });
+        }
+
+        private void LoadFromConfigWine() {
+            if (this.CfgWineGlobal == null) {
+                this.WineViewModel = null;
+                return;
+            }
+
+            this.WineViewModel = new SettingsWineViewModel();
+            this.WineViewModel.InitializeFromConfig(this.CfgWineGlobal);
+        }
+
+        private void SaveToConfigWine() {
+            if (this.CfgWineGlobal == null) return;
+            if (this.WineViewModel == null) return;
+            
+            this.CfgWineGlobal.SetFromData(this.WineViewModel.GetConfigData());
         }
 
         private void LoadFromConfig() {
@@ -343,6 +372,7 @@ namespace Martridge.ViewModels.Configuration {
         public void CmdSettingsOk(object? parameter = null) {
             this.SaveToConfig();
             this.SaveToConfigLaunch();
+            this.SaveToConfigWine();
             // signal that settings are done...
             this.SettingsDone?.Invoke(this, EventArgs.Empty);
         }
@@ -918,14 +948,22 @@ namespace Martridge.ViewModels.Configuration {
                 Config.Instance.SaveConfigExtension();
             }
 #else
-            uint idResult = ConfigExtensionLinuxWine.AutoDetectConfigDataWine(path, 0, out ConfigDataExtensionLinuxWine? data);
-            if (idResult != 0 && data != null) {
+            uint idResult = ConfigWine.AutoDetectConfigDataWineFromSteam(path, 0, out List<ConfigDataEnvironmentVariable>? envVars);
+            if (idResult != 0 && envVars != null) {
                 ConfigExtensionComponent? component = this.CfgExtension.TryAddOrGetExtension(path);
                 if (component != null) {
                     if (component.SteamData == null) component.SteamData = new ConfigExtensionSteamInfo(idResult, false);
                     else component.SteamData = new ConfigExtensionSteamInfo(idResult, component.SteamData.PreferLaunchingAsSteamApp);
 
-                    component.WineData = new ConfigExtensionLinuxWine(data);
+                    ConfigDataWine data = new ConfigDataWine() {
+                        EnableWine = true,
+                        EnvironmentVariables = new List<ConfigDataEnvironmentVariable>(),
+                    };
+                    foreach (var x in envVars) {
+                        data.EnvironmentVariables.Add(x);
+                    }
+                    
+                    component.WineData = new ConfigWine(data);
                     
                     Config.Instance.SaveConfigExtension();
                 }
@@ -989,7 +1027,7 @@ namespace Martridge.ViewModels.Configuration {
                     ConfigExtensionComponent? component = this.CfgExtension.TryAddOrGetExtension(exeCurrent);
                     if (component == null) return;
                     component.SteamData = cfgSteam;
-                    component.WineData = cfgWine;
+                    component.WineData = new ConfigWine(cfgWine);
                 }
                 finally {
                     Config.Instance.SaveConfigExtension();

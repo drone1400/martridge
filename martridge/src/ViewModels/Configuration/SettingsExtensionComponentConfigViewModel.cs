@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Timers;
 using Avalonia.Metadata;
+using Martridge.Models.Configuration.Generic.FileData;
 using Martridge.Models.Configuration.LaunchExtension;
 using Martridge.Models.Configuration.LaunchExtension.FileData;
 using Martridge.Models.Localization;
@@ -37,95 +36,23 @@ namespace Martridge.ViewModels.Configuration {
         }
         private bool _preferLaunchingAsSteamApp = false;
 
-#if PLATF_WINDOWS
-        public bool ShowWineUi => false;
-#else
-        public bool ShowWineUi => true;
-#endif
-        
-        public string WineVerPath {
-            get => this._wineVerPath;
-            set => this.RaiseAndSetIfChanged(ref this._wineVerPath, value);
-        }
-        private string _wineVerPath = string.Empty;
-        
-        public string WineBinPath {
-            get => this._wineBinPath;
-            set => this.RaiseAndSetIfChanged(ref this._wineBinPath, value);
-        }
-        private string _wineBinPath = string.Empty;
-        
-        public string WineLibPath {
-            get => this._wineLibPath;
-            set => this.RaiseAndSetIfChanged(ref this._wineLibPath, value);
-        }
-        private string _wineLibPath = string.Empty;
-
-        public string WineServer {
-            get => this._wineServer;
-            set => this.RaiseAndSetIfChanged(ref this._wineServer, value);
-        }
-        private string _wineServer = string.Empty;
-
-        public string WineLoader {
-            get => this._wineLoader;
-            set => this.RaiseAndSetIfChanged(ref this._wineLoader, value);
-        }
-        private string _wineLoader =  string.Empty;
-        
-        public string WineDllPath {
-            get => this._wineDllPath;
-            set => this.RaiseAndSetIfChanged(ref this._wineDllPath, value);
-        }
-        private string _wineDllPath = string.Empty;
-        
-        public string WinePrefix {
-            get => this._winePrefix;
-            set => this.RaiseAndSetIfChanged(ref this._winePrefix, value);
-        }
-        private string _winePrefix = string.Empty;
-
-
-        private Timer _wineVerChangedTimer = new Timer() {
-            Interval = 330,
-            AutoReset = false,
-        };
+        public SettingsWineViewModel WineViewModel { get; } = new SettingsWineViewModel();
 
         public SettingsExtensionComponentConfigViewModel() {
-            this.PropertyChanged += this.OnPropertyChanged;
-            this._wineVerChangedTimer.Elapsed += this.WineVerChangedTimerOnElapsed;
-        }
-        private void WineVerChangedTimerOnElapsed(object? sender, ElapsedEventArgs e) {
-            this._wineVerChangedTimer.Stop();
-            this.TryAutoResolveSomeWinePaths();
-        }
-        private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName == nameof(this.WineVerPath)) {
-                this._wineVerChangedTimer.Stop();
-                this._wineVerChangedTimer.Start();
-            }
+            this.WineViewModel.AutoDetectWineCommand = ReactiveCommand.Create(this.CmdAutoDetectWineInternal);
         }
 
-        public void Initialize(string targetPath, ConfigExtensionLinuxWine? configWine, ConfigExtensionSteamInfo? configSteam) {
+
+        public void Initialize(string targetPath, ConfigWine? configWine, ConfigExtensionSteamInfo? configSteam) {
             this.ExePathOriginal = targetPath;
             this.ExePath = targetPath;
             
-            this.SetFromWineData(configWine);
             this.SetFromSteamData(configSteam);
-            this.TryAutoResolveSomeWinePaths();
+            this.SetFromWineData(configWine);
         }
 
-        public ConfigExtensionLinuxWine? GetWineData() {
-            if (string.IsNullOrWhiteSpace(this._wineVerPath) &&
-                string.IsNullOrWhiteSpace(this._wineBinPath) &&
-                string.IsNullOrWhiteSpace(this._wineLibPath) &&
-                string.IsNullOrWhiteSpace(this._wineServer) &&
-                string.IsNullOrWhiteSpace(this._wineLoader) &&
-                string.IsNullOrWhiteSpace(this._wineDllPath) &&
-                string.IsNullOrWhiteSpace(this._winePrefix))
-                return null;
-            
-            return new ConfigExtensionLinuxWine(this._wineVerPath, this._wineBinPath, this._wineLibPath, this._wineServer, this._wineLoader, this._wineDllPath, this._winePrefix);
+        public ConfigDataWine GetWineData() {
+            return this.WineViewModel.GetConfigData();
         }
 
         public ConfigExtensionSteamInfo? GetSteamData() {
@@ -135,46 +62,19 @@ namespace Martridge.ViewModels.Configuration {
             return new ConfigExtensionSteamInfo(this._steamId32, this._preferLaunchingAsSteamApp);
         }
 
-        private void SetFromWineData(ConfigExtensionLinuxWine? config) {
-            this.WineVerPath = config?.WINEVERPATH ?? string.Empty;
-            this.WineBinPath = config?.WINEBINPATH ?? string.Empty;
-            this.WineLibPath = config?.WINELIBPATH ?? string.Empty;
-            this.WineServer = config?.WINESERVER ?? string.Empty;
-            this.WineLoader = config?.WINELOADER ?? string.Empty;
-            this.WineDllPath = config?.WINEDLLPATH ?? string.Empty;
-            this.WinePrefix = config?.WINEPREFIX ?? string.Empty;
+        private void SetFromWineData(ConfigWine? config) {
+            if (config == null) return;
+            this.WineViewModel.InitializeFromConfig(config);
         }
         
-        private void SetFromWineData(ConfigDataExtensionLinuxWine? config) {
-            this.WineVerPath = config?.WINEVERPATH ?? string.Empty;
-            this.WineBinPath = config?.WINEBINPATH ?? string.Empty;
-            this.WineLibPath = config?.WINELIBPATH ?? string.Empty;
-            this.WineServer = config?.WINESERVER ?? string.Empty;
-            this.WineLoader = config?.WINELOADER ?? string.Empty;
-            this.WineDllPath = config?.WINEDLLPATH ?? string.Empty;
-            this.WinePrefix = config?.WINEPREFIX ?? string.Empty;
+        private void SetFromWineData(ConfigDataWine? config) {
+            if (config == null) return;
+            this.WineViewModel.InitializeFromConfig(config);
         }
 
         private void SetFromSteamData(ConfigExtensionSteamInfo? config) {
             this.SteamId32 = config?.SteamId32 ?? 0;
             this.PreferLaunchingAsSteamApp = config?.PreferLaunchingAsSteamApp ?? false;
-        }
-
-        private void TryAutoResolveSomeWinePaths() {
-            
-            SteamHelper.AutoDetectWinePaths(this._wineVerPath, out string wineBinPath, out string wineLibPath, out string wineDllPath, out string wineServer, out string wineLoader);
-
-            if (string.IsNullOrWhiteSpace(wineBinPath) == false &&
-                string.IsNullOrWhiteSpace(wineLibPath) == false &&
-                string.IsNullOrWhiteSpace(wineDllPath) == false &&
-                string.IsNullOrWhiteSpace(wineServer) == false &&
-                string.IsNullOrWhiteSpace(wineLoader) == false) {
-                this.WineBinPath = wineBinPath;
-                this.WineLibPath = wineLibPath;
-                this.WineDllPath = wineDllPath;
-                this.WineLoader = wineLoader;
-                this.WineServer = wineServer;
-            }
         }
 
         public async void CmdAutoDetectSteamId(object? parameter = null) {
@@ -198,20 +98,20 @@ namespace Martridge.ViewModels.Configuration {
             return true;
         }
 
-        public async void CmdAutoDetectWine(object? parameter = null) {
-            
-            uint idResult = ConfigExtensionLinuxWine.AutoDetectConfigDataWine(this.ExePath, this.SteamId32, out ConfigDataExtensionLinuxWine? data);
+        private void CmdAutoDetectWineInternal() {
+            uint idResult = ConfigWine.AutoDetectConfigDataWineFromSteam(this.ExePath, this.SteamId32, out List<ConfigDataEnvironmentVariable>? envVars);
 
-            if (data != null) {
+            if (idResult != 0 && envVars != null) {
                 this.SteamId32 = idResult;
-                this.SetFromWineData(data);
+                this.WineViewModel.CopyValuesFrom(envVars);
+                this.WineViewModel.EnableWine = true;
+            } else {
+                ConfigWine.AutoDetectDefaultWine(out List<ConfigDataEnvironmentVariable>? envVars2);
+                if (envVars2 != null) {
+                    this.WineViewModel.CopyValuesFrom(envVars2);
+                    this.WineViewModel.EnableWine = true;
+                }
             }
         }
-
-        [DependsOn(nameof(SteamId32))]
-        public bool CanCmdAutoDetectWine() {
-            return this.SteamId32 != 0;
-        }
-
     }
 }

@@ -12,7 +12,13 @@ using Martridge.Trace;
 
 namespace Martridge.Models.Configuration {
     public class Config {
-        #region globals 
+        #region globals
+
+#if PLATF_WINDOWS
+        public static bool PlatformSupportsWine => false;
+#else
+        public static bool PlatformSupportsWine => true;
+#endif
         public static Config Instance { get; } = new Config();
         public static void InitializeConfiguration()
         {
@@ -164,6 +170,7 @@ namespace Martridge.Models.Configuration {
         public ConfigGeneral General { get; } = new ConfigGeneral();
         public ConfigAppState AppState { get; } = new ConfigAppState();
         public ConfigLaunch Launch { get; } = new ConfigLaunch();
+        public ConfigWine? WineGlobal { get; private set; } = new ConfigWine();
         public ConfigExtension LaunchExtension { get; } = new ConfigExtension();
                 
         public string FileNameGeneralConfig { get; private set; } = string.Empty;
@@ -177,11 +184,14 @@ namespace Martridge.Models.Configuration {
         public void SaveGeneralConfig() {
             if (string.IsNullOrWhiteSpace(this.FileNameGeneralConfig))
                 return;
+
+            ConfigFileDataGeneral data = new ConfigFileDataGeneral() {
+                General = this.General.GetData(),
+                Launch = this.Launch.GetData(),
+                WineGlobal = this.WineGlobal?.GetData(),
+            };
             
-            ConfigJsonSerializer.SaveToFile(new ConfigFileDataGeneral(
-                    this.General.GetData(),
-                    this.Launch.GetData()),
-                this.FileNameGeneralConfig);
+            ConfigJsonSerializer.SaveToFile(data, this.FileNameGeneralConfig);
         }
 
         public void LoadGeneralConfig() {
@@ -196,6 +206,11 @@ namespace Martridge.Models.Configuration {
 
             if (data?.Launch != null) {
                 this.Launch.UpdateProperties(data.Launch.GetValues());
+            }
+
+            if (data?.WineGlobal != null) {
+                this.WineGlobal = new ConfigWine();
+                this.WineGlobal.SetFromData(data.WineGlobal);
             }
         }
         

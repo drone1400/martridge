@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:dloc="using:Martridge.ViewModels.Localization"
              xmlns:configuration="clr-namespace:Martridge.ViewModels.Configuration"
+             xmlns:configuration1="clr-namespace:Martridge.Views.Configuration"
+             xmlns:configuration2="clr-namespace:Martridge.Models.Configuration"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Martridge.Views.Configuration.SettingsExtensionComponentUserControl">
     
@@ -45,7 +47,7 @@
         </StackPanel>
         
         <Grid Grid.Row="3" ColumnDefinitions="100,Auto,*"
-              IsVisible="{Binding ShowWineUi}">
+              IsVisible="{x:Static configuration2:Config.PlatformSupportsWine}">
             <Separator Grid.Column="0" />
             <Label Grid.Column="1" Classes="Heading2B"
                    Content="{dloc:Localize SettingsExtensionConfigView/WineHeader}" />
@@ -54,35 +56,17 @@
             
         
         <StackPanel Grid.Row="4" Orientation="Vertical"
-                    IsVisible="{Binding ShowWineUi}">
+                    IsVisible="{x:Static configuration2:Config.PlatformSupportsWine}">
             
-            <Grid ColumnDefinitions="Auto,*,Auto">
-                <Button Grid.Column="2" 
-                        Content="{dloc:Localize SettingsExtensionConfigView/AutoDetectWine}"
-                        Command="{Binding CmdAutoDetectWine}" />
+            <Grid RowDefinitions="Auto,*">
+                <Label 
+                    Grid.Row="0" 
+                    Classes="Heading2IWrapping"
+                    Content="{dloc:Localize SettingsWineView/DescriptionSpecific}"/>
+                <configuration1:SettingsWineUserControl
+                    Grid.Row="1"
+                    DataContext="{Binding WineViewModel}"/>
             </Grid>
-            
-            <Label Classes="Heading2B"
-                   Content="{dloc:Localize SettingsExtensionConfigView/WineVerPath}" />
-            <TextBox Text="{Binding WineVerPath}" />
-            <Label Classes="Heading2B"
-                   Content="{dloc:Localize SettingsExtensionConfigView/WinePrefix}" />
-            <TextBox Text="{Binding WinePrefix}" />
-            <Label Classes="Heading2B"
-                   Content="{dloc:Localize SettingsExtensionConfigView/WineBinPath}" />
-            <TextBox Text="{Binding WineBinPath}" />
-            <Label Classes="Heading2B"
-                   Content="{dloc:Localize SettingsExtensionConfigView/WineLibPath}" />
-            <TextBox Text="{Binding WineLibPath}" />
-            <Label Classes="Heading2B"
-                   Content="{dloc:Localize SettingsExtensionConfigView/WineServer}" />
-            <TextBox Text="{Binding WineServer}" />
-            <Label Classes="Heading2B"
-                   Content="{dloc:Localize SettingsExtensionConfigView/WineLoader}" />
-            <TextBox Text="{Binding WineLoader}" />
-            <Label Classes="Heading2B"
-                   Content="{dloc:Localize SettingsExtensionConfigView/WineDllPath}" />
-            <TextBox Text="{Binding WineDllPath}" />
         </StackPanel>
     </Grid>
 </UserControl>

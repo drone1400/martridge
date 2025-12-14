@@ -11,6 +11,8 @@ namespace Martridge.ViewModels {
 
         public ConfigLaunch CfgLaunch => Config.Instance.Launch;
         protected virtual void OnCfgLaunchUpdated(object? sender, ConfigUpdateEventArgs e) {}
+
+        public ConfigWine? CfgWineGlobal => Config.Instance.WineGlobal;
         
         public ConfigAppState CfgAppState => Config.Instance.AppState;
         protected virtual void OnCfgAppStateUpdated(object? sender, ConfigUpdateEventArgs e) {}

@@ -9,6 +9,7 @@
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:martridge="clr-namespace:Martridge"
              xmlns:configuration="clr-namespace:Martridge.Views.Configuration"
+             xmlns:configuration2="clr-namespace:Martridge.Models.Configuration"
 
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Martridge.Views.Configuration.SettingsGeneralView"
@@ -137,6 +138,23 @@
                                  Classes="SmallTab"
                                  IsVisible="{Binding ShowDmodDevFeatures}">
                             <configuration:SettingsGeneralAddEditorExeUserControl />
+                        </TabItem>
+                        <TabItem Header="{dloc:Localize SettingsGeneral/TabItemWine}"
+                                 Classes="SmallTab"
+                                 IsVisible="{x:Static configuration2:Config.PlatformSupportsWine}">
+                            <ScrollViewer
+                                HorizontalScrollBarVisibility="Disabled"
+                                VerticalScrollBarVisibility="Auto">
+                                <Grid RowDefinitions="Auto,*">
+                                    <Label 
+                                        Grid.Row="0" 
+                                        Classes="Heading2IWrapping"
+                                        Content="{dloc:Localize SettingsWineView/DescriptionGlobal}"/>
+                                    <configuration:SettingsWineUserControl
+                                        Grid.Row="1"
+                                        DataContext="{Binding WineViewModel}"/>
+                                </Grid>
+                            </ScrollViewer>
                         </TabItem>
                     </TabControl>
                 </Grid>

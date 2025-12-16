@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:configuration="clr-namespace:Martridge.ViewModels.Configuration"
              xmlns:dloc="using:Martridge.ViewModels.Localization"
+             xmlns:configuration1="clr-namespace:Martridge.Views.Configuration"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Martridge.Views.Configuration.SettingsWineUserControl">
     
@@ -18,68 +19,94 @@
     </UserControl.Resources>
     
     <Grid RowDefinitions="Auto,*,Auto">
-        <ListBox Grid.Row="1"
-                 ItemsSource="{Binding EnvironmentVariables}"
-                 SelectedIndex="{Binding SelectedEnvrionmentVariableIndex}"
-                 VerticalAlignment="Top"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 KeyboardNavigation.TabNavigation="Continue">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Grid RowDefinitions="Auto,Auto,Auto">
-                        <Grid Grid.Row="0" ColumnDefinitions="32,160,*">
-                            <CheckBox 
-                                Grid.Column="0" 
-                                Content=""
-                                IsChecked="{Binding IsEnabled}"/>
-                            <TextBox
-                                Grid.Column="1"
-                                Text="{Binding Key}"
-                                IsReadOnly="True"/>
-                            <TextBox
-                                Grid.Column="2"
-                                Text="{Binding Value}"/>
-                        </Grid>
-                        <Grid Grid.Row="1" RowDefinitions="Auto,Auto"
-                              IsVisible="{Binding $parent[ListBoxItem].IsKeyboardFocusWithin}">
-                            <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,Auto,*">
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+            <Grid Grid.Column="0" RowDefinitions="*,Auto,Auto,Auto,*">
+                <Button Grid.Row="1"
+                        Command="{Binding CmdEnvVarSelectedMoveUp}"
+                        Classes="ListBoxButtonLeftBlue"
+                        Background="{DynamicResource ThemeAccentBrush}">
+                    <Path Classes="ListBoxIconArrow" />
+                </Button>
+                <Button Grid.Row="2"
+                        Command="{Binding CmdEnvVarRemoveSelected}"
+                        Classes="ListBoxButtonLeft">
+                    <Path Classes="ListBoxIconTrashCan" />
+                </Button>
+                <Button Grid.Row="3"
+                        Command="{Binding CmdEnvVarSelectedMoveDown}"
+                        Classes="ListBoxButtonLeftBlue">
+                    <Path Classes="ListBoxIconArrow">
+                        <Path.RenderTransform>
+                            <RotateTransform Angle="180" />
+                        </Path.RenderTransform>
+                    </Path>
+                </Button>
+            </Grid>
+            
+            <ListBox Grid.Column="1"
+                     ItemsSource="{Binding EnvironmentVariables}"
+                     SelectedIndex="{Binding SelectedEnvrionmentVariableIndex}"
+                     VerticalAlignment="Top"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     KeyboardNavigation.TabNavigation="Continue">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid RowDefinitions="Auto,Auto,Auto">
+                            <Grid Grid.Row="0" ColumnDefinitions="32,160,*,Auto">
                                 <CheckBox 
-                                    Grid.Column="0"
-                                    IsChecked="{Binding IsAppendMode}"
-                                    Content="{dloc:Localize SettingsWineView/IsAppendMode}"/>
-                                <CheckBox 
+                                    Grid.Column="0" 
+                                    Content=""
+                                    IsChecked="{Binding IsEnabled}"/>
+                                <TextBox
                                     Grid.Column="1"
-                                    IsChecked="{Binding IsAppendAtEnd}"
-                                    IsVisible="{Binding IsAppendMode}"
-                                    Content="{dloc:Localize SettingsWineView/IsAppendAtEnd}"/>
-                                <Label 
+                                    Text="{Binding Key}"
+                                    IsReadOnly="True"/>
+                                <TextBox
                                     Grid.Column="2"
-                                    IsVisible="{Binding IsAppendMode}"
-                                    Content="{dloc:Localize SettingsWineView/Separator}"/>
-                                <TextBox 
-                                    Grid.Column="3"
-                                    IsVisible="{Binding IsAppendMode}"
-                                    Text="{Binding AppendSeparator}" />
+                                    Text="{Binding Value}"/>
                             </Grid>
-                            <Label
-                                Grid.Row="1" 
-                                Classes="Heading2IWrapping"
-                                Content="{Binding Description}"
-                                IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                            <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto"
+                                  IsVisible="{Binding $parent[ListBoxItem].IsKeyboardFocusWithin}">
+                                <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,Auto,*">
+                                    <CheckBox 
+                                        Grid.Column="0"
+                                        IsChecked="{Binding IsAppendMode}"
+                                        Content="{dloc:Localize SettingsWineView/IsAppendMode}"/>
+                                    <CheckBox 
+                                        Grid.Column="1"
+                                        IsChecked="{Binding IsAppendAtEnd}"
+                                        IsVisible="{Binding IsAppendMode}"
+                                        Content="{dloc:Localize SettingsWineView/IsAppendAtEnd}"/>
+                                    <Label 
+                                        Grid.Column="2"
+                                        IsVisible="{Binding IsAppendMode}"
+                                        Content="{dloc:Localize SettingsWineView/Separator}"/>
+                                    <TextBox 
+                                        Grid.Column="3"
+                                        IsVisible="{Binding IsAppendMode}"
+                                        Text="{Binding AppendSeparator}" />
+                                </Grid>
+                                <Label
+                                    Grid.Row="1" 
+                                    Classes="Heading2IWrapping"
+                                    Content="{Binding Description}"
+                                    IsVisible="{Binding Description, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+            
         <Grid Grid.Row="2">
             <Grid Grid.Row="0" ColumnDefinitions="64,160,*">
                 <Button 
                     Grid.Column="0" 
-                    Content="ADD"
+                    Content="+"
                     HorizontalAlignment="Stretch"
                     Width="NaN"
                     MinWidth="20"
-                    Command="{Binding AddNewEnvironmentVariable}" />
+                    Command="{Binding CmdAddNewEnvironmentVariable}" />
                 <TextBox
                     Grid.Column="1"
                     Text="{Binding NewEnvVarName}" />

@@ -66,6 +66,12 @@ namespace Martridge.ViewModels.Configuration {
             set => this.RaiseAndSetIfChanged(ref this._description, value);
         }
         private string _description = string.Empty;
+
+        public bool CanFullyEdit {
+            get => this._canFullyEdit;
+            set => this.RaiseAndSetIfChanged(ref this._canFullyEdit, value);
+        }
+        private bool _canFullyEdit = false;
         
         public SettingsEnvironmentVariableViewModel() {}
         public SettingsEnvironmentVariableViewModel(string name, string value) {

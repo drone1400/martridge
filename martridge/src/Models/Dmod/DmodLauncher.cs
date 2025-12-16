@@ -8,6 +8,7 @@ using Martridge.Trace;
 using System.Linq;
 using Avalonia;
 using Martridge.Models.Configuration.General;
+using Martridge.Models.Configuration.Generic;
 using Martridge.Models.Configuration.LaunchExtension;
 using Martridge.Models.Steam;
 
@@ -253,26 +254,26 @@ namespace Martridge.Models.Dmod
                 if (wineCfg != null) {
                     string? wineBinary = null;
                     
-                    foreach (var x in wineCfg.EnvironmentVariables) {
+                    foreach (var x in wineCfg.EnvVars) {
                         try {
-                            if (x.Key == "WINELOADER") {
-                                wineBinary = x.Value.Value;
+                            if (x.Key == EnvironmentVariableHelper.WINELOADER) {
+                                wineBinary = x.Value;
                             }
                             
-                            string? crtVal = Environment.GetEnvironmentVariable(x.Value.Key);
+                            string? crtVal = Environment.GetEnvironmentVariable(x.Key);
                             
-                            if (x.Value.IsAppendMode && string.IsNullOrEmpty(crtVal) == false) {
+                            if (x.IsAppendMode && string.IsNullOrEmpty(crtVal) == false) {
                                 // append to existing env var value
-                                if (x.Value.IsAppendAtEnd) {
-                                    crtVal = crtVal + x.Value.AppendSeparator + x.Value.Value;
+                                if (x.IsAppendAtEnd) {
+                                    crtVal = crtVal + x.AppendSeparator + x.Value;
                                 }
                                 else {
-                                    crtVal = x.Value.Value + x.Value.AppendSeparator + crtVal;
+                                    crtVal = x.Value + x.AppendSeparator + crtVal;
                                 }
-                                pinfo.Environment[x.Value.Key] = crtVal;
+                                pinfo.Environment[x.Key] = crtVal;
                             }
                             else {
-                                pinfo.Environment[x.Value.Key] = x.Value.Value;
+                                pinfo.Environment[x.Key] = x.Value;
                             }
                         } catch (Exception ex) {
                             MyTrace.Global.WriteException(ex);

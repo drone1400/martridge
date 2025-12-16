@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Timers;
 using Avalonia.Metadata;
 using Martridge.Models.Configuration.Generic.FileData;
 using Martridge.Models.Configuration.LaunchExtension;
@@ -105,15 +103,15 @@ namespace Martridge.ViewModels.Configuration {
         }
 
         public void CmdAutoDetectWine(object? parameter = null) {
-            uint idResult = ConfigWine.AutoDetectConfigDataWineFromSteam(this.ExePath, this.SteamId32, out Dictionary<string, ConfigDataEnvironmentVariable>? envVars);
+            uint idResult = ConfigWine.AutoDetectConfigDataWineFromSteam(this.ExePath, this.SteamId32, out List<ConfigDataEnvironmentVariable>? envVars);
 
             if (envVars != null) {
                 this.SteamId32 = idResult;
-                this.WineViewModel.InitializeFromEnvVars(envVars);
+                this.WineViewModel.CopyValuesFrom(envVars);
             } else {
-                ConfigWine.AutoDetectDefaultWine(out Dictionary<string, ConfigDataEnvironmentVariable>? envVars2);
+                ConfigWine.AutoDetectDefaultWine(out List<ConfigDataEnvironmentVariable>? envVars2);
                 if (envVars2 != null) {
-                    this.WineViewModel.InitializeFromEnvVars(envVars2);
+                    this.WineViewModel.CopyValuesFrom(envVars2);
                 }
             }
         }

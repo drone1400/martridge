@@ -22,13 +22,21 @@ namespace Martridge.ViewModels.Configuration {
 
         public bool OverrideDefaultWineEnvVarDefinitions {
             get => this._overrideDefaultWineEnvVarDefinitions;
-            set => this.RaiseAndSetIfChanged(ref this._overrideDefaultWineEnvVarDefinitions, value);
+            set {
+                if (this.RaiseAndSetIfChanged(ref this._overrideDefaultWineEnvVarDefinitions, value)) {
+                    this.RefreshCanFullyEditProperties();
+                }
+            }
         }
         private bool _overrideDefaultWineEnvVarDefinitions = false;
 
         public ObservableCollection<SettingsEnvironmentVariableViewModel> EnvironmentVariables {
             get => this._environmentVariables;
-            private set => this.RaiseAndSetIfChanged(ref this._environmentVariables, value);
+            private set {
+                this.ClearEvents();
+                this.RaiseAndSetIfChanged(ref this._environmentVariables, value);
+                this.InitEvents();
+            }
         }
         private ObservableCollection<SettingsEnvironmentVariableViewModel> _environmentVariables = new ObservableCollection<SettingsEnvironmentVariableViewModel>();
 
@@ -59,63 +67,90 @@ namespace Martridge.ViewModels.Configuration {
         
         public SettingsWineViewModel() {
 
-            Dictionary<string, ConfigDataEnvironmentVariable> dictionary = ConfigWine.GetDefaultWineEnvVarsDictionary();
-            foreach (KeyValuePair<string, ConfigDataEnvironmentVariable> kvp in  dictionary) {
-                this._isDefaultEnvVar[kvp.Key] = true;
+            List<ConfigDataEnvironmentVariable> dictionary = ConfigWine.GetDefaultWineEnvVars();
+            foreach (ConfigDataEnvironmentVariable envVar in dictionary) {
+                this._isDefaultEnvVar[envVar.Key ?? string.Empty] = true;
             }
             
             this._wineVerChangedTimer.Elapsed += this.WineVerChangedTimerOnElapsed;
         }
 
         public void InitializeFromConfig(ConfigWine data) {
+            this.EnvironmentVariables.Clear();
             this.UseWine = data.UseWine;
             this.OverrideDefaultWineEnvVarDefinitions = data.OverrideDefaultWineEnvVarDefinitions;
             
             ObservableCollection<SettingsEnvironmentVariableViewModel> envVars = new ObservableCollection<SettingsEnvironmentVariableViewModel>();
             
-            foreach (KeyValuePair<string, ConfigEnvironmentVariable> envVar in data.EnvironmentVariables) {
-                envVars.Add(new SettingsEnvironmentVariableViewModel(envVar.Value));
+            foreach (var envVar in data.EnvVars) {
+                var newVm = new SettingsEnvironmentVariableViewModel(envVar);
+                envVars.Add(newVm);
+                newVm.CanFullyEdit = 
+                    this._isDefaultEnvVar.TryGetValue(newVm.Key, out bool isDefault) == false 
+                    || isDefault == false
+                    || this._overrideDefaultWineEnvVarDefinitions;
             }
             
             this.EnvironmentVariables = envVars;
         }
-
-        public void InitializeFromEnvVars(Dictionary<string, ConfigDataEnvironmentVariable> envVars) {
-            Dictionary<string, SettingsEnvironmentVariableViewModel> temp = new Dictionary<string, SettingsEnvironmentVariableViewModel>();
-            foreach (var x in this.EnvironmentVariables) {
-                temp[x.Key] = x;
-            }
-            foreach (KeyValuePair<string, ConfigDataEnvironmentVariable> kvp in envVars) {
-                if (temp.TryGetValue(kvp.Value.Key ?? string.Empty, out SettingsEnvironmentVariableViewModel? vm)) {
-                    // modifying existing env var value only
-                    vm.Value = kvp.Value.Value ?? string.Empty;
-                } else {
-                    // add new env var
-                    this.EnvironmentVariables.Add(new SettingsEnvironmentVariableViewModel(kvp.Value));
-                }
-            }
-        }
         
         public void InitializeFromConfig(ConfigDataWine data) {
+            this.EnvironmentVariables.Clear();
             this.UseWine = data.UseWine ?? true;
             this.OverrideDefaultWineEnvVarDefinitions = data.OverrideDefaultWineEnvVarDefinitions ?? false;
             
             ObservableCollection<SettingsEnvironmentVariableViewModel> envVars = new ObservableCollection<SettingsEnvironmentVariableViewModel>();
 
             if (data.EnvironmentVariables != null) {
-                foreach (ConfigDataEnvironmentVariable envVar in data.EnvironmentVariables) {
-                    envVars.Add(new SettingsEnvironmentVariableViewModel(envVar));
+                foreach (var envVar in data.EnvironmentVariables) {
+                    var newVm = new SettingsEnvironmentVariableViewModel(envVar);
+                    envVars.Add(newVm);
+                    newVm.CanFullyEdit =
+                        this._isDefaultEnvVar.TryGetValue(newVm.Key, out bool isDefault) == false
+                        || isDefault == false
+                        || this._overrideDefaultWineEnvVarDefinitions;
                 }
             }
-            this.ClearEvents();
+
             this.EnvironmentVariables = envVars;
-            this.InitEvents();
         }
+
+        private void RefreshCanFullyEditProperties() {
+            foreach (var vm in this.EnvironmentVariables) {
+                vm.CanFullyEdit = 
+                    this._isDefaultEnvVar.TryGetValue(vm.Key, out bool isDefault) == false 
+                    || isDefault == false
+                    || this._overrideDefaultWineEnvVarDefinitions;
+            }
+        }
+
+        public void CopyValuesFrom(List<ConfigDataEnvironmentVariable> envVars) {
+            Dictionary<string, SettingsEnvironmentVariableViewModel> temp = new Dictionary<string, SettingsEnvironmentVariableViewModel>();
+            foreach (SettingsEnvironmentVariableViewModel x in this.EnvironmentVariables) {
+                temp[x.Key] = x;
+            }
+            foreach (var x in envVars) {
+                if (temp.TryGetValue(x.Key ?? string.Empty, out SettingsEnvironmentVariableViewModel? vm)) {
+                    // modifying existing env var value only
+                    vm.Value = x.Value ?? string.Empty;
+                } else {
+                    // add new env var
+                    var newVm = new SettingsEnvironmentVariableViewModel(x);
+                    temp[newVm.Key] = newVm;
+                    this.EnvironmentVariables.Add(newVm);
+                    
+                }
+            }
+
+            this.RefreshCanFullyEditProperties();
+        }
+        
+
 
         private void ClearEvents() {
             foreach (var x in this.EnvironmentVariables) {
                 if (x.Key ==  EnvironmentVariableHelper.WINEVERPATH) {
-                    x.PropertyChanged -= this.WineverpathOnPropertyChanged;
+                    x.PropertyChanged -= this.WineVerPathOnPropertyChanged;
                 }
             }
             this.EnvironmentVariables.CollectionChanged -= this.EnvironmentVariablesOnCollectionChanged;
@@ -123,7 +158,7 @@ namespace Martridge.ViewModels.Configuration {
         private void InitEvents() {
             foreach (var x in this.EnvironmentVariables) {
                 if (x.Key ==  EnvironmentVariableHelper.WINEVERPATH) {
-                    x.PropertyChanged += this.WineverpathOnPropertyChanged;
+                    x.PropertyChanged += this.WineVerPathOnPropertyChanged;
                 }
             }
             this.EnvironmentVariables.CollectionChanged += this.EnvironmentVariablesOnCollectionChanged;
@@ -135,14 +170,40 @@ namespace Martridge.ViewModels.Configuration {
         }
         
         private void EnvironmentVariablesOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
-            foreach (var x in e.NewItems) {
-                if (x is SettingsEnvironmentVariableViewModel vm && vm.Key ==  EnvironmentVariableHelper.WINEVERPATH) {
-                    vm.PropertyChanged += this.WineverpathOnPropertyChanged;
+            if (e.OldItems != null) {
+                foreach (var x in e.OldItems) {
+                    if (x is not SettingsEnvironmentVariableViewModel vm)
+                        continue;
+                    
+                    // remove event for old items
+                    if (vm.Key ==  EnvironmentVariableHelper.WINEVERPATH) {
+                        vm.PropertyChanged -= this.WineVerPathOnPropertyChanged;
+                    } 
+                }
+            }
+            if (e.NewItems != null) {
+                foreach (var x in e.NewItems) {
+                    if (x is not SettingsEnvironmentVariableViewModel vm)
+                        continue;
+                    
+                    // make sure the property is set properly :P
+                    vm.CanFullyEdit = 
+                        this._isDefaultEnvVar.TryGetValue(vm.Key, out bool isDefault) == false 
+                        || isDefault == false
+                        || this._overrideDefaultWineEnvVarDefinitions;
+                    
+                    if (vm.Key ==  EnvironmentVariableHelper.WINEVERPATH) {
+                        // add event for new items
+                        vm.PropertyChanged += this.WineVerPathOnPropertyChanged;
+                        // trigger an auto-detect based on WINEVERPATH
+                        this._wineVerChangedTimer.Stop();
+                        this._wineVerChangedTimer.Start();
+                    } 
                 }
             }
         }
 
-        private void WineverpathOnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
+        private void WineVerPathOnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
             this._wineVerChangedTimer.Stop();
             this._wineVerChangedTimer.Start();
         }
@@ -154,6 +215,7 @@ namespace Martridge.ViewModels.Configuration {
             SettingsEnvironmentVariableViewModel? vmWineLoader = null;
             SettingsEnvironmentVariableViewModel? vmLdLibraryPath = null;
 
+            // detect view models
             foreach (var x in this.EnvironmentVariables) {
                 if (x.Key == EnvironmentVariableHelper.WINEVERPATH) {
                     vmWineVerPath = x;
@@ -171,21 +233,19 @@ namespace Martridge.ViewModels.Configuration {
             if (vmWineVerPath == null)
                 return;
             
-            
+            // detect paths
             SteamHelper.AutoDetectWinePathsFromWineVerPath(vmWineVerPath.Value, out string wineBinPath, out string wineLibPath, out string wineDllPath, out string wineServer, out string wineLoader);
 
+            // copy path data where possible
             if (vmWineServer != null && string.IsNullOrWhiteSpace(wineServer) == false) {
                 vmWineServer.Value = wineServer;
             }
-            
             if (vmWineLoader != null && string.IsNullOrWhiteSpace(wineLoader) == false) {
                 vmWineLoader.Value = wineLoader;
             }
-            
             if (vmWineDllPath != null && string.IsNullOrWhiteSpace(wineDllPath) == false) {
                 vmWineDllPath.Value = wineDllPath;
             }
-            
             if (vmLdLibraryPath != null && string.IsNullOrWhiteSpace(wineLibPath) == false &&
                 string.IsNullOrWhiteSpace(vmLdLibraryPath.Value)) {
                 vmLdLibraryPath.Value = wineLibPath;
@@ -210,50 +270,46 @@ namespace Martridge.ViewModels.Configuration {
 
             return data;
         }
-
-        public void AddNewEnvironmentVariable(object? parameter) {
-            if (string.IsNullOrWhiteSpace(this.NewEnvVarName)) return;
-
-            foreach (SettingsEnvironmentVariableViewModel x in this.EnvironmentVariables) {
-                if (x.Key == this.NewEnvVarName) return;
-            }
+        
+        //
+        // CmdAddNewEnvironmentVariable
+        //
+        public void CmdAddNewEnvironmentVariable(object? parameter) {
+            if (this.CanCmdAddNewEnvironmentVariable_Internal(parameter, out string key) == false)
+                return;
             
-            this.EnvironmentVariables.Add(new SettingsEnvironmentVariableViewModel(this.NewEnvVarName, this.NewEnvVarValue));
+            this.EnvironmentVariables.Add(new SettingsEnvironmentVariableViewModel(key, this.NewEnvVarValue));
             
             this.NewEnvVarName = string.Empty;
             this.NewEnvVarValue = string.Empty;
         }
-        
-        [DependsOn(nameof(this.NewEnvVarName))]
-        [DependsOn(nameof(this.NewEnvVarValue))]
-        public bool CanAddNewEnvironmentVariable(object? parameter) {
-            if (string.IsNullOrWhiteSpace(this.NewEnvVarName)) return false;
+        private bool CanCmdAddNewEnvironmentVariable_Internal(object? parameter, out string key) {
+            // make sure we have a valid name
+            key = this.NewEnvVarName.Trim();
+            if (string.IsNullOrWhiteSpace(key)) return false;
 
+            // make sure there are no duplicates
             foreach (SettingsEnvironmentVariableViewModel x in this.EnvironmentVariables) {
                 if (x.Key == this.NewEnvVarName) return false;
             }
 
             return true;
         }
-
-        public void RemoveEnvironmentVariable(object? parameter) {
-            if (this.SelectedEnvrionmentVariableIndex < 0 ||
-                this.SelectedEnvrionmentVariableIndex >= this.EnvironmentVariables.Count) {
+        [DependsOn(nameof(this.NewEnvVarName))]
+        [DependsOn(nameof(this.NewEnvVarValue))]
+        public bool CanCmdAddNewEnvironmentVariable(object? parameter) 
+            => this.CanCmdAddNewEnvironmentVariable_Internal(parameter, out string _);
+        
+        //
+        // CmdEnvVarRemoveSelected
+        //
+        public void CmdEnvVarRemoveSelected(object? parameter) {
+            if (this.CanCmdEnvVarRemoveSelected_Internal(parameter) == false)
                 return;
-            }
-            string key = this.EnvironmentVariables[this.SelectedEnvrionmentVariableIndex].Key;
-            if (this.OverrideDefaultWineEnvVarDefinitions == false &&
-                this._isDefaultEnvVar.TryGetValue(key, out bool result) && result) {
-                return;
-            }
-            
             
             this.EnvironmentVariables.RemoveAt(this.SelectedEnvrionmentVariableIndex);
         }
-
-        [DependsOn(nameof(this.OverrideDefaultWineEnvVarDefinitions))]
-        [DependsOn(nameof(this.SelectedEnvrionmentVariableIndex))]
-        public bool CanRemoveEnvironmentVariable(object? parameter) {
+        private bool CanCmdEnvVarRemoveSelected_Internal(object? parameter) {
             if (this.SelectedEnvrionmentVariableIndex < 0 ||
                 this.SelectedEnvrionmentVariableIndex >= this.EnvironmentVariables.Count) {
                 return false;
@@ -265,5 +321,57 @@ namespace Martridge.ViewModels.Configuration {
             }
             return true;
         }
+        [DependsOn(nameof(this.OverrideDefaultWineEnvVarDefinitions))]
+        [DependsOn(nameof(this.SelectedEnvrionmentVariableIndex))]
+        public bool CanCmdEnvVarRemoveSelected(object? parameter)
+            => this.CanCmdEnvVarRemoveSelected_Internal(parameter);
+        
+        //
+        // CmdEnvVarSelectedMoveUp
+        //
+        public void CmdEnvVarSelectedMoveUp(object? parameter) {
+            if (this.CanCmdEnvVarSelectedMoveUp_Internal(parameter) == false)
+                return;
+            
+            int oldIndex = this.SelectedEnvrionmentVariableIndex;
+            this.EnvironmentVariables.Move(oldIndex, this.SelectedEnvrionmentVariableIndex - 1);
+            this.SelectedEnvrionmentVariableIndex = oldIndex - 1;
+        }
+        private bool CanCmdEnvVarSelectedMoveUp_Internal(object? parameter) {
+            if (this.SelectedEnvrionmentVariableIndex < 1 ||
+                this.SelectedEnvrionmentVariableIndex >= this.EnvironmentVariables.Count) {
+                return false;
+            }
+            return true;
+        }
+        [DependsOn(nameof(this.OverrideDefaultWineEnvVarDefinitions))]
+        [DependsOn(nameof(this.SelectedEnvrionmentVariableIndex))]
+        public bool CanCmdEnvVarSelectedMoveUp(object? parameter)
+            => this.CanCmdEnvVarSelectedMoveUp_Internal(parameter);
+        
+        //
+        // CmdEnvVarSelectedMoveDown
+        //
+        public void CmdEnvVarSelectedMoveDown(object? parameter) {
+            if (this.CanCmdEnvVarSelectedMoveDown_Internal(parameter) == false)
+                return;
+            
+            int oldIndex = this.SelectedEnvrionmentVariableIndex;
+            this.EnvironmentVariables.Move(oldIndex, this.SelectedEnvrionmentVariableIndex + 1);
+            this.SelectedEnvrionmentVariableIndex = oldIndex + 1;
+        }
+        private bool CanCmdEnvVarSelectedMoveDown_Internal(object? parameter) {
+            if (this.SelectedEnvrionmentVariableIndex < 0 ||
+                this.SelectedEnvrionmentVariableIndex >= this.EnvironmentVariables.Count - 1) {
+                return false;
+            }
+            return true;
+        }
+        [DependsOn(nameof(this.OverrideDefaultWineEnvVarDefinitions))]
+        [DependsOn(nameof(this.SelectedEnvrionmentVariableIndex))]
+        public bool CanCmdEnvVarSelectedMoveDown(object? parameter)
+            => this.CanCmdEnvVarSelectedMoveDown_Internal(parameter);
+        
+        
     }
 }

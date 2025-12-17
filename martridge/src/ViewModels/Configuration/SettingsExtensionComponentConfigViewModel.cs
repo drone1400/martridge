@@ -110,10 +110,12 @@ namespace Martridge.ViewModels.Configuration {
             if (idResult != 0 && envVars != null) {
                 this.SteamId32 = idResult;
                 this.WineViewModel.CopyValuesFrom(envVars);
+                this.WineViewModel.EnableWine = true;
             } else {
                 ConfigWine.AutoDetectDefaultWine(out List<ConfigDataEnvironmentVariable>? envVars2);
                 if (envVars2 != null) {
                     this.WineViewModel.CopyValuesFrom(envVars2);
+                    this.WineViewModel.EnableWine = true;
                 }
             }
         }

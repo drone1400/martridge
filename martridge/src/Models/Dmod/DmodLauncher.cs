@@ -233,9 +233,9 @@ namespace Martridge.Models.Dmod
                 ConfigWine? wineCfg = null;
 #else
                 ConfigWine? wineCfg = null;
-                if (Config.Instance.GlobalWine.UseWine) wineCfg = Config.Instance.GlobalWine;
+                if (Config.Instance.WineGlobal?.EnableWine == true) wineCfg = Config.Instance.WineGlobal;
                 // game specific wine configs override the global ones
-                if (extensionCfg?.WineData.UseWine == true) wineCfg = extensionCfg.WineData;
+                if (extensionCfg?.WineData?.EnableWine == true) wineCfg = extensionCfg.WineData;
 #endif
 
                 if (wineCfg != null) {
@@ -261,6 +261,10 @@ namespace Martridge.Models.Dmod
                             }
                             
                             string? crtVal = Environment.GetEnvironmentVariable(x.Key);
+
+                            // skip env var if it is empty...
+                            if (string.IsNullOrWhiteSpace(x.Value))
+                                continue;
                             
                             switch (x.Mode) {
                                 case ConfigEnvVarMode.Normal:

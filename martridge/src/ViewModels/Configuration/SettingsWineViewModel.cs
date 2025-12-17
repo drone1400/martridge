@@ -340,6 +340,7 @@ namespace Martridge.ViewModels.Configuration {
                 return;
             
             this.CopyValuesFrom(envVars);
+            this.EnableWine = true;
         }
         
         //

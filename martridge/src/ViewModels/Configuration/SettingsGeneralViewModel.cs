@@ -948,7 +948,7 @@ namespace Martridge.ViewModels.Configuration {
                 Config.Instance.SaveConfigExtension();
             }
 #else
-            uint idResult = ConfigWine.AutoDetectConfigDataWineFromSteam(path, 0, out Dictionary<string, ConfigDataEnvironmentVariable>? envVars);
+            uint idResult = ConfigWine.AutoDetectConfigDataWineFromSteam(path, 0, out List<ConfigDataEnvironmentVariable>? envVars);
             if (idResult != 0 && envVars != null) {
                 ConfigExtensionComponent? component = this.CfgExtension.TryAddOrGetExtension(path);
                 if (component != null) {
@@ -956,12 +956,11 @@ namespace Martridge.ViewModels.Configuration {
                     else component.SteamData = new ConfigExtensionSteamInfo(idResult, component.SteamData.PreferLaunchingAsSteamApp);
 
                     ConfigDataWine data = new ConfigDataWine() {
-                        UseWine = true,
-                        OverrideDefaultWineEnvVarDefinitions = false,
+                        EnableWine = true,
                         EnvironmentVariables = new List<ConfigDataEnvironmentVariable>(),
                     };
                     foreach (var x in envVars) {
-                        data.EnvironmentVariables.Add(x.Value);
+                        data.EnvironmentVariables.Add(x);
                     }
                     
                     component.WineData = new ConfigWine(data);

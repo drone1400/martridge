@@ -17,10 +17,10 @@ namespace Martridge.Models.Configuration.LaunchExtension {
         private bool _enableWine = true;
 
         public IReadOnlyList<ConfigEnvironmentVariable> EnvVars => this._envVars; 
-        private List<ConfigEnvironmentVariable> _envVars; 
+        private List<ConfigEnvironmentVariable> _envVars = new List<ConfigEnvironmentVariable>(); 
         
         public IReadOnlyDictionary<string,ConfigEnvironmentVariable> EnvVarDictionary => this._envVarDictionary;
-        private Dictionary<string, ConfigEnvironmentVariable> _envVarDictionary;
+        private Dictionary<string, ConfigEnvironmentVariable> _envVarDictionary = new Dictionary<string, ConfigEnvironmentVariable>();
         
 
         public static List<ConfigDataEnvironmentVariable> GetDefaultWineEnvVars() => new List<ConfigDataEnvironmentVariable>() {
@@ -34,9 +34,6 @@ namespace Martridge.Models.Configuration.LaunchExtension {
         
         public ConfigWine() {
             this._enableWine = true;
-            
-            this._envVars = new List<ConfigEnvironmentVariable>();
-            this._envVarDictionary = new Dictionary<string, ConfigEnvironmentVariable>();
             
             // initialize default env vars
             var defaults = GetDefaultWineEnvVars();

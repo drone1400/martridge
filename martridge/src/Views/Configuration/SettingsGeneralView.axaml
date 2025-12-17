@@ -140,26 +140,9 @@
                         </TabItem>
                         <TabItem Header="{dloc:Localize SettingsGeneral/TabItemWine}"
                                  Classes="SmallTab">
-                            <Grid RowDefinitions="Auto,*">
-                                <Grid Grid.Row="0" RowDefinitions="Auto,Auto"
-                                      ColumnDefinitions="Auto,*,Auto">
-                                    <CheckBox
-                                        Grid.Row="0"
-                                        Content="{dloc:Localize SettingsWineView/EnableWine}"
-                                        IsChecked="{Binding WineViewModel.EnableWine}"/>
-                                    <Button 
-                                        Grid.Row="0"
-                                        Grid.Column="2"
-                                        Classes="Primary"
-                                        Content="{dloc:Localize SettingsWineView/AutoDetect}"
-                                        HorizontalAlignment="Right"
-                                        Width="160"
-                                        Command="{Binding WineViewModel.CmdAutoDetect}" />
-                                </Grid>
-                                <configuration:SettingsWineUserControl
-                                    Grid.Row="1"
-                                    DataContext="{Binding WineViewModel}"/>
-                            </Grid>
+                            <configuration:SettingsWineUserControl
+                                Grid.Row="1"
+                                DataContext="{Binding WineViewModel}"/>
                         </TabItem>
                     </TabControl>
                 </Grid>

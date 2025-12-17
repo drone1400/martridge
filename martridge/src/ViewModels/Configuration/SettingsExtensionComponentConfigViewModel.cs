@@ -44,7 +44,9 @@ namespace Martridge.ViewModels.Configuration {
 
         public SettingsWineViewModel WineViewModel { get; } = new SettingsWineViewModel();
 
-        public SettingsExtensionComponentConfigViewModel() { }
+        public SettingsExtensionComponentConfigViewModel() {
+            this.WineViewModel.AutoDetectWineCommand = ReactiveCommand.Create(this.CmdAutoDetectWineInternal);
+        }
 
 
         public void Initialize(string targetPath, ConfigWine? configWine, ConfigExtensionSteamInfo? configSteam) {
@@ -102,10 +104,10 @@ namespace Martridge.ViewModels.Configuration {
             return true;
         }
 
-        public void CmdAutoDetectWine(object? parameter = null) {
+        private void CmdAutoDetectWineInternal() {
             uint idResult = ConfigWine.AutoDetectConfigDataWineFromSteam(this.ExePath, this.SteamId32, out List<ConfigDataEnvironmentVariable>? envVars);
 
-            if (envVars != null) {
+            if (idResult != 0 && envVars != null) {
                 this.SteamId32 = idResult;
                 this.WineViewModel.CopyValuesFrom(envVars);
             } else {
@@ -115,11 +117,5 @@ namespace Martridge.ViewModels.Configuration {
                 }
             }
         }
-
-        [DependsOn(nameof(SteamId32))]
-        public bool CanCmdAutoDetectWine() {
-            return this.SteamId32 != 0;
-        }
-
     }
 }

@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Timers;
+using System.Windows.Input;
 using Avalonia.Metadata;
 using Martridge.Models.Configuration.Generic;
 using Martridge.Models.Configuration.Generic.FileData;
@@ -66,6 +68,12 @@ namespace Martridge.ViewModels.Configuration {
             set => this.RaiseAndSetIfChanged(ref this._newEnvVarSeparator, value);
         }
         private string _newEnvVarSeparator = ":";
+
+        public ICommand AutoDetectWineCommand {
+            get => this._autoDetectWineCommand;
+            set => this.RaiseAndSetIfChanged(ref this._autoDetectWineCommand, value);
+        }
+        private ICommand _autoDetectWineCommand;
         
         private Timer _wineVerChangedTimer = new Timer() {
             Interval = 330,
@@ -74,6 +82,8 @@ namespace Martridge.ViewModels.Configuration {
         
         public SettingsWineViewModel() {
             this._wineVerChangedTimer.Elapsed += this.WineVerChangedTimerOnElapsed;
+
+            this._autoDetectWineCommand = ReactiveCommand.Create(this.CmdAutoDetectInternal);
         }
 
         public void InitializeFromConfig(ConfigWine data) {
@@ -324,7 +334,7 @@ namespace Martridge.ViewModels.Configuration {
         //
         // CmdAutoDetect
         //
-        public void CmdAutoDetect(object? parameter) {
+        private void CmdAutoDetectInternal() {
             ConfigWine.AutoDetectDefaultWine(out List<ConfigDataEnvironmentVariable>? envVars);
             if (envVars is null)
                 return;

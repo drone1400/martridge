@@ -21,13 +21,21 @@
     </UserControl.Resources>
     
     <Grid RowDefinitions="Auto,*,Auto">
-        <!-- NOTE: Because I want to reuse this user control in other palces, this is set elsewhere... -->
-        <!-- <Grid Grid.Row="0" RowDefinitions="Auto,Auto"> -->
-        <!--     <CheckBox  -->
-        <!--         Grid.Row="0"  -->
-        <!--         Content="{dloc:Localize SettingsWineView/EnableWine}" -->
-        <!--         IsChecked="{Binding EnableWine}"/> -->
-        <!-- </Grid> -->
+        <Grid Grid.Row="0" RowDefinitions="Auto,Auto"
+              ColumnDefinitions="Auto,*,Auto">
+            <CheckBox
+                Grid.Row="0"
+                Content="{dloc:Localize SettingsWineView/EnableWine}"
+                IsChecked="{Binding EnableWine}"/>
+            <Button 
+                Grid.Row="0"
+                Grid.Column="2"
+                Classes="Primary"
+                Content="{dloc:Localize SettingsWineView/AutoDetect}"
+                HorizontalAlignment="Right"
+                Width="160"
+                Command="{Binding AutoDetectWineCommand}" />
+        </Grid>
         
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
             <Grid Grid.Column="0" RowDefinitions="Auto,Auto,Auto,*">

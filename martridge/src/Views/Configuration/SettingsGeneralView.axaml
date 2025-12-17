@@ -9,6 +9,7 @@
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:martridge="clr-namespace:Martridge"
              xmlns:configuration="clr-namespace:Martridge.Views.Configuration"
+             xmlns:configuration2="clr-namespace:Martridge.Models.Configuration"
 
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Martridge.Views.Configuration.SettingsGeneralView"
@@ -139,7 +140,8 @@
                             <configuration:SettingsGeneralAddEditorExeUserControl />
                         </TabItem>
                         <TabItem Header="{dloc:Localize SettingsGeneral/TabItemWine}"
-                                 Classes="SmallTab">
+                                 Classes="SmallTab"
+                                 IsVisible="{x:Static configuration2:Config.PlatformSupportsWine}">
                             <ScrollViewer
                                 HorizontalScrollBarVisibility="Disabled"
                                 VerticalScrollBarVisibility="Auto">

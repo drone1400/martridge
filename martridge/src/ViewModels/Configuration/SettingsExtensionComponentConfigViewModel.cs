@@ -36,12 +36,6 @@ namespace Martridge.ViewModels.Configuration {
         }
         private bool _preferLaunchingAsSteamApp = false;
 
-#if PLATF_WINDOWS
-        public bool ShowWineUi => true;
-#else
-        public bool ShowWineUi => true;
-#endif
-
         public SettingsWineViewModel WineViewModel { get; } = new SettingsWineViewModel();
 
         public SettingsExtensionComponentConfigViewModel() {

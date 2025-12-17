@@ -12,7 +12,13 @@ using Martridge.Trace;
 
 namespace Martridge.Models.Configuration {
     public class Config {
-        #region globals 
+        #region globals
+
+#if PLATF_WINDOWS
+        public static bool PlatformSupportsWine => false;
+#else
+        public static bool PlatformSupportsWine => true;
+#endif
         public static Config Instance { get; } = new Config();
         public static void InitializeConfiguration()
         {

@@ -351,6 +351,7 @@
   "SettingsThemeView/DmodPreview": "DMOD list preview",
 
   "DmodLauncher/LaunchFile": "<Attempting to launch DMOD using executable>",
+  "DmodLauncher/LaunchAddingEnvVar": "<Setting Process Environment Variables>",
   "DmodLauncher/LaunchGeneric": "<Attempting to launch DMOD...>",
   "DmodLauncher/LaunchUsingSteam": "<Attempting to launch DMOD through STEAM>",
   "DmodLauncher/LaunchEnd": "<DMOD process ended>",

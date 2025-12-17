@@ -5,6 +5,7 @@
              xmlns:dloc="using:Martridge.ViewModels.Localization"
              xmlns:configuration="clr-namespace:Martridge.ViewModels.Configuration"
              xmlns:configuration1="clr-namespace:Martridge.Views.Configuration"
+             xmlns:configuration2="clr-namespace:Martridge.Models.Configuration"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Martridge.Views.Configuration.SettingsExtensionComponentUserControl">
     
@@ -46,7 +47,7 @@
         </StackPanel>
         
         <Grid Grid.Row="3" ColumnDefinitions="100,Auto,*"
-              IsVisible="{Binding ShowWineUi}">
+              IsVisible="{x:Static configuration2:Config.PlatformSupportsWine}">
             <Separator Grid.Column="0" />
             <Label Grid.Column="1" Classes="Heading2B"
                    Content="{dloc:Localize SettingsExtensionConfigView/WineHeader}" />
@@ -55,7 +56,7 @@
             
         
         <StackPanel Grid.Row="4" Orientation="Vertical"
-                    IsVisible="{Binding ShowWineUi}">
+                    IsVisible="{x:Static configuration2:Config.PlatformSupportsWine}">
             
             <Grid RowDefinitions="Auto,*">
                 <Label 

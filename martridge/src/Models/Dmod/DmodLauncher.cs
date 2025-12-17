@@ -6,6 +6,7 @@ using DynamicData.Kernel;
 using Martridge.Models.Configuration;
 using Martridge.Trace;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Avalonia;
 using Martridge.Models.Configuration.General;
 using Martridge.Models.Configuration.Generic;
@@ -185,6 +186,78 @@ namespace Martridge.Models.Dmod
             return arguments;
         }
 
+        private static void PrepareWine(ProcessStartInfo pinfo, string exePath, string arguments, ConfigExtensionComponent? extensionCfg = null) {
+            if (Config.PlatformSupportsWine == false)
+                return;
+            
+            ConfigWine? wineCfg = null;
+                    
+            if (Config.Instance.WineGlobal?.EnableWine == true) wineCfg = Config.Instance.WineGlobal;
+            // game specific wine configs override the global ones
+            if (extensionCfg?.WineData?.EnableWine == true) wineCfg = extensionCfg.WineData;
+
+            if (wineCfg == null)
+                return;
+            
+            // actually check that this is a windows exe file..
+            using FileStream fs = new FileStream(exePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using BinaryReader br = new BinaryReader(fs);
+            byte magic1 = br.ReadByte();
+            byte magic2 = br.ReadByte();
+
+            if (magic1 != 0x4D && magic2 != 0x5A) {
+                // this does not appear to be a windows executable...
+                return;
+            }
+
+            string? wineBinary = null;
+            
+            MyTrace.Global.WriteMessage(new List<string>() {
+                Localization.Localizer.Instance["DmodLauncher/LaunchAddingEnvVar"],
+            });
+
+            foreach (var x in wineCfg.EnvVars) {
+                try {
+                    if (x.Key == EnvironmentVariableHelper.WINELOADER) {
+                        wineBinary = x.Value;
+                    }
+                            
+                    string? crtVal = Environment.GetEnvironmentVariable(x.Key);
+
+                    // skip env var if it is empty...
+                    if (string.IsNullOrWhiteSpace(x.Value))
+                        continue;
+                    string envVarValue = string.Empty;
+                    switch (x.Mode) {
+                        case ConfigEnvVarMode.Normal:
+                            envVarValue = x.Value; 
+                            break;
+                        case ConfigEnvVarMode.AppendEnd:
+                            envVarValue = crtVal + x.AppendSeparator + x.Value;
+                            break;
+                        case ConfigEnvVarMode.AppendStart:
+                            envVarValue = x.Value + x.AppendSeparator + crtVal;
+                            break;
+                    }
+                    
+                    pinfo.Environment[x.Key] = envVarValue;
+                    
+                    MyTrace.Global.WriteMessage($"    {x.Key} = \"{envVarValue}\"");
+                } catch (Exception ex) {
+                    MyTrace.Global.WriteException(ex);
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(wineBinary)) {
+                wineBinary = "wine"; // fallback to generic wine name
+            }
+                    
+            // override some settings...
+            string wineArgs = "\"" + exePath + "\""  + " " + arguments;
+            pinfo.FileName = wineBinary;
+            pinfo.Arguments = wineArgs;
+        }
+
         private static ProcessStartInfo? PrepareProcessFromFile(string exePath, string arguments, bool isProbablyFreeDink, ConfigExtensionComponent? extensionCfg = null) {
             FileInfo finfo = new FileInfo(exePath);
             if (finfo.Exists == false)
@@ -228,68 +301,8 @@ namespace Martridge.Models.Dmod
                 }
 
                 
-                
-#if PLATF_WINDOWS
-                ConfigWine? wineCfg = null;
-#else
-                ConfigWine? wineCfg = null;
-                if (Config.Instance.WineGlobal?.EnableWine == true) wineCfg = Config.Instance.WineGlobal;
-                // game specific wine configs override the global ones
-                if (extensionCfg?.WineData?.EnableWine == true) wineCfg = extensionCfg.WineData;
-#endif
-
-                if (wineCfg != null) {
-                    // actually check that this is a windows exe file..
-                    using FileStream fs = new FileStream(exePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    using BinaryReader br = new BinaryReader(fs);
-                    byte magic1 = br.ReadByte();
-                    byte magic2 = br.ReadByte();
-
-                    if (magic1 != 0x4D && magic2 != 0x5A) {
-                        // this does not appear to be a windows executable...
-                        wineCfg = null;
-                    }
-                }
-
-                if (wineCfg != null) {
-                    string? wineBinary = null;
-                    
-                    foreach (var x in wineCfg.EnvVars) {
-                        try {
-                            if (x.Key == EnvironmentVariableHelper.WINELOADER) {
-                                wineBinary = x.Value;
-                            }
-                            
-                            string? crtVal = Environment.GetEnvironmentVariable(x.Key);
-
-                            // skip env var if it is empty...
-                            if (string.IsNullOrWhiteSpace(x.Value))
-                                continue;
-                            
-                            switch (x.Mode) {
-                                case ConfigEnvVarMode.Normal:
-                                    pinfo.Environment[x.Key] = x.Value; 
-                                    break;
-                                case ConfigEnvVarMode.AppendEnd:
-                                    pinfo.Environment[x.Key] = crtVal + x.AppendSeparator + x.Value;
-                                    break;
-                                case ConfigEnvVarMode.AppendStart:
-                                    pinfo.Environment[x.Key] = x.Value + x.AppendSeparator + crtVal;
-                                    break;
-                            }
-                        } catch (Exception ex) {
-                            MyTrace.Global.WriteException(ex);
-                        }
-                    }
-
-                    if (string.IsNullOrWhiteSpace(wineBinary)) {
-                        wineBinary = "wine"; // fallback to generic wine name
-                    }
-                    
-                    // override some settings...
-                    string wineArgs = "\"" + exePath + "\""  + " " + arguments;
-                    pinfo.FileName = wineBinary;
-                    pinfo.Arguments = wineArgs;
+                if (Config.PlatformSupportsWine) {
+                    PrepareWine(pinfo, exePath, arguments, extensionCfg);
                 }
                 
                 MyTrace.Global.WriteMessage(new List<string>() {

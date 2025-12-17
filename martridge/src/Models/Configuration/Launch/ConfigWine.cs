@@ -13,14 +13,8 @@ namespace Martridge.Models.Configuration.LaunchExtension {
         /// <summary>
         /// If this is not set to true, will not use wine for the current game. Settings will be saved but not active.
         /// </summary>
-        public bool UseWine => this._useWine;
-        private bool _useWine = true;
-
-        /// <summary>
-        /// If true, will allow users to completely override the default standard WINE environment variables, otherwise some properties for them will not be available in the UI
-        /// </summary>
-        public bool OverrideDefaultWineEnvVarDefinitions => this._overrideDefaultWineEnvVarDefinitions;
-        private bool _overrideDefaultWineEnvVarDefinitions = false;
+        public bool EnableWine => this._enableWine;
+        private bool _enableWine = true;
 
         public IReadOnlyList<ConfigEnvironmentVariable> EnvVars => this._envVars; 
         private List<ConfigEnvironmentVariable> _envVars; 
@@ -35,12 +29,11 @@ namespace Martridge.Models.Configuration.LaunchExtension {
             new ConfigDataEnvironmentVariable(EnvironmentVariableHelper.WINESERVER, "wineserver", true),
             new ConfigDataEnvironmentVariable(EnvironmentVariableHelper.WINEDLLPATH, "", true),
             new ConfigDataEnvironmentVariable(EnvironmentVariableHelper.WINEPREFIX, "", true),
-            new ConfigDataEnvironmentVariable(EnvironmentVariableHelper.LD_LIBRARY_PATH, "", true, true, false, ":"),
+            new ConfigDataEnvironmentVariable(EnvironmentVariableHelper.LD_LIBRARY_PATH, "", true, nameof(ConfigEnvVarMode.AppendStart), ":"),
         };
         
         public ConfigWine() {
-            this._useWine = true;
-            this._overrideDefaultWineEnvVarDefinitions = false;
+            this._enableWine = true;
             
             this._envVars = new List<ConfigEnvironmentVariable>();
             this._envVarDictionary = new Dictionary<string, ConfigEnvironmentVariable>();
@@ -59,83 +52,37 @@ namespace Martridge.Models.Configuration.LaunchExtension {
         }
         
         public void SetFromData(ConfigDataWine data) {
-            this._useWine = data.UseWine ??  true;
-            this._overrideDefaultWineEnvVarDefinitions = data.OverrideDefaultWineEnvVarDefinitions ?? false;
+            this._enableWine = data.EnableWine ??  true;
 
             this._envVars = new List<ConfigEnvironmentVariable>();
             this._envVarDictionary = new Dictionary<string, ConfigEnvironmentVariable>();
             
-            if (this._overrideDefaultWineEnvVarDefinitions) {
-                // set properties exactly as they are in the config file
+            // check if we have any environment variable definitions
+            if (data.EnvironmentVariables == null)
+                return;
                 
-                // check if we have any environment variable definitions
-                if (data.EnvironmentVariables == null)
-                    return;
+            List<ConfigDataEnvironmentVariable> values = new List<ConfigDataEnvironmentVariable>();
+            Dictionary<string, ConfigDataEnvironmentVariable> valuesDictionary = new Dictionary<string, ConfigDataEnvironmentVariable>();
                 
-                List<ConfigDataEnvironmentVariable> values = new List<ConfigDataEnvironmentVariable>();
-                Dictionary<string, ConfigDataEnvironmentVariable> valuesDictionary = new Dictionary<string, ConfigDataEnvironmentVariable>();
-                
-                foreach (ConfigDataEnvironmentVariable x in data.EnvironmentVariables) {
-                    if (valuesDictionary.TryGetValue(x.Key ?? string.Empty, out ConfigDataEnvironmentVariable? envVar)) {
-                        // modify/override existing entry in case of duplicates...
-                        envVar.Value = x.Value;
-                        envVar.IsEnabled = envVar.IsEnabled;
-                        envVar.IsAppendMode = envVar.IsAppendMode;
-                        envVar.IsAppendAtEnd = envVar.IsAppendAtEnd;
-                        envVar.AppendSeparator = envVar.AppendSeparator;
-                    } else {
-                        // add new entry
-                        values.Add(x);
-                        valuesDictionary.Add(x.Key ?? string.Empty, x);
-                    }
-                }
-
-                foreach (var x in values) {
-                    // add to list and dictionary
-                    ConfigEnvironmentVariable envVar = new ConfigEnvironmentVariable(x);
-                    this._envVars.Add(envVar);
-                    this._envVarDictionary[envVar.Key] = envVar;
-                }
-            } else {
-                // initialize default env vars
-                List<ConfigDataEnvironmentVariable> defaults = GetDefaultWineEnvVars();
-                Dictionary<string, bool> isDefault = new Dictionary<string, bool>();
-                
-                List<ConfigDataEnvironmentVariable> values = new List<ConfigDataEnvironmentVariable>();
-                Dictionary<string, ConfigDataEnvironmentVariable> valuesDictionary = new Dictionary<string, ConfigDataEnvironmentVariable>();
-                
-                foreach (var x in defaults) {
-                    isDefault.Add(x.Key ?? string.Empty, true);
+            foreach (ConfigDataEnvironmentVariable x in data.EnvironmentVariables) {
+                if (valuesDictionary.TryGetValue(x.Key ?? string.Empty, out ConfigDataEnvironmentVariable? envVar)) {
+                    // modify/override existing entry in case of duplicates...
+                    envVar.Value = x.Value;
+                    envVar.IsEnabled = x.IsEnabled;
+                    envVar.Mode = x.Mode;
+                    envVar.AppendSeparator = x.AppendSeparator;
+                } else {
+                    // add new entry
                     values.Add(x);
                     valuesDictionary.Add(x.Key ?? string.Empty, x);
                 }
+            }
 
-                if (data.EnvironmentVariables != null) {
-                    foreach (ConfigDataEnvironmentVariable x in data.EnvironmentVariables) {
-                        if (valuesDictionary.TryGetValue(x.Key ?? string.Empty, out ConfigDataEnvironmentVariable? envVar)) {
-                            // modify/override existing entry in case of duplicates...
-                            envVar.Value = x.Value;
-                            envVar.IsEnabled = envVar.IsEnabled;
-                            if (isDefault.TryGetValue(x.Key ?? string.Empty, out bool isDefaultEnvVar) == false || isDefaultEnvVar == false) {
-                                // override other values for non defaults too
-                                envVar.IsAppendMode = envVar.IsAppendMode;
-                                envVar.IsAppendAtEnd = envVar.IsAppendAtEnd;
-                                envVar.AppendSeparator = envVar.AppendSeparator;
-                            }
-                        } else {
-                            // add new entry
-                            values.Add(x);
-                            valuesDictionary.Add(x.Key ?? string.Empty, x);
-                        }
-                    }
-                }
-                
-                foreach (var x in values) {
-                    // add to list and dictionary
-                    ConfigEnvironmentVariable envVar = new ConfigEnvironmentVariable(x);
-                    this._envVars.Add(envVar);
-                    this._envVarDictionary[envVar.Key] = envVar;
-                }
+            foreach (var x in values) {
+                // add to list and dictionary
+                ConfigEnvironmentVariable envVar = new ConfigEnvironmentVariable(x);
+                this._envVars.Add(envVar);
+                this._envVarDictionary[envVar.Key] = envVar;
             }
         }
 
@@ -144,19 +91,11 @@ namespace Martridge.Models.Configuration.LaunchExtension {
             List<ConfigDataEnvironmentVariable> list = new List<ConfigDataEnvironmentVariable>();
 
             foreach (var x in this._envVars) {
-                list.Add(new ConfigDataEnvironmentVariable() {
-                    Key = x.Key,
-                    Value = x.Value,
-                    IsEnabled = x.IsEnabled,
-                    IsAppendMode = x.IsAppendMode,
-                    IsAppendAtEnd = x.IsAppendAtEnd,
-                    AppendSeparator = x.AppendSeparator,
-                });
+                list.Add(x.GetData());
             }
             
             return new ConfigDataWine() {
-                UseWine = this._useWine,
-                OverrideDefaultWineEnvVarDefinitions = this._overrideDefaultWineEnvVarDefinitions,
+                EnableWine = this._enableWine,
                 EnvironmentVariables = list,
             };
         }

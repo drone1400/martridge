@@ -262,18 +262,16 @@ namespace Martridge.Models.Dmod
                             
                             string? crtVal = Environment.GetEnvironmentVariable(x.Key);
                             
-                            if (x.IsAppendMode && string.IsNullOrEmpty(crtVal) == false) {
-                                // append to existing env var value
-                                if (x.IsAppendAtEnd) {
-                                    crtVal = crtVal + x.AppendSeparator + x.Value;
-                                }
-                                else {
-                                    crtVal = x.Value + x.AppendSeparator + crtVal;
-                                }
-                                pinfo.Environment[x.Key] = crtVal;
-                            }
-                            else {
-                                pinfo.Environment[x.Key] = x.Value;
+                            switch (x.Mode) {
+                                case ConfigEnvVarMode.Normal:
+                                    pinfo.Environment[x.Key] = x.Value; 
+                                    break;
+                                case ConfigEnvVarMode.AppendEnd:
+                                    pinfo.Environment[x.Key] = crtVal + x.AppendSeparator + x.Value;
+                                    break;
+                                case ConfigEnvVarMode.AppendStart:
+                                    pinfo.Environment[x.Key] = x.Value + x.AppendSeparator + crtVal;
+                                    break;
                             }
                         } catch (Exception ex) {
                             MyTrace.Global.WriteException(ex);

@@ -1,4 +1,5 @@
-﻿using Martridge.Models.Configuration.Generic.FileData;
+﻿using System;
+using Martridge.Models.Configuration.Generic.FileData;
 
 namespace Martridge.Models.Configuration.Generic {
     public class ConfigEnvironmentVariable {
@@ -17,15 +18,7 @@ namespace Martridge.Models.Configuration.Generic {
         /// </summary>
         public bool IsEnabled { get; } = true;
 
-        /// <summary>
-        /// If true, will append value to existing environment variable value when modifying
-        /// </summary>
-        public bool IsAppendMode { get; } = false;
-
-        /// <summary>
-        /// If true, will append value at end of existing value, otherwise at start
-        /// </summary>
-        public bool IsAppendAtEnd { get; } = false;
+        public ConfigEnvVarMode Mode { get; } = ConfigEnvVarMode.Normal;
         
         /// <summary>
         /// Will use this string to separate current value and appended value when appending
@@ -33,32 +26,48 @@ namespace Martridge.Models.Configuration.Generic {
         public string AppendSeparator { get; } = ":";
         
         public ConfigEnvironmentVariable() { }
-        public ConfigEnvironmentVariable(string key, string value, bool isEnabled, bool isAppendMode = false, bool isAppendAtEnd = false, string appendSeparator = ":") {
+        public ConfigEnvironmentVariable(string key, string value, bool isEnabled) {
             this.Key = key;
             this.Value = value;
             this.IsEnabled = isEnabled;
-            this.IsAppendMode = isAppendMode;
-            this.IsAppendAtEnd = isAppendAtEnd;
+        }
+        public ConfigEnvironmentVariable(string key, string value, bool isEnabled, ConfigEnvVarMode mode = ConfigEnvVarMode.Normal, string appendSeparator = ":") {
+            this.Key = key;
+            this.Value = value;
+            this.IsEnabled = isEnabled;
+            this.Mode = mode;
             this.AppendSeparator = appendSeparator;
         }
         public ConfigEnvironmentVariable(ConfigDataEnvironmentVariable data) {
             this.Key = data.Key ?? string.Empty;
             this.Value = data.Value ?? string.Empty;
             this.IsEnabled = data.IsEnabled ?? true;
-            this.IsAppendMode = data.IsAppendMode ?? false;
-            this.IsAppendAtEnd = data.IsAppendAtEnd ?? false;
-            this.AppendSeparator = data.AppendSeparator ?? string.Empty;
+            this.Mode = data.Mode != null && Enum.TryParse(data.Mode, true, out ConfigEnvVarMode mode)
+                ? mode
+                : ConfigEnvVarMode.Normal;
+            this.AppendSeparator = data.AppendSeparator ?? ":";
         }
 
         public ConfigDataEnvironmentVariable GetData() {
-            return new ConfigDataEnvironmentVariable() {
-                Key = this.Key,
-                Value = this.Value,
-                IsEnabled = this.IsEnabled,
-                IsAppendMode = this.IsAppendMode,
-                IsAppendAtEnd = this.IsAppendAtEnd,
-                AppendSeparator = this.AppendSeparator,
-            };
+            switch (this.Mode) {
+                default:
+                case ConfigEnvVarMode.Normal:
+                    return new ConfigDataEnvironmentVariable() {
+                        Key = this.Key,
+                        Value = this.Value,
+                        IsEnabled = this.IsEnabled,
+                        Mode = this.Mode.ToString(),
+                    };
+                case ConfigEnvVarMode.AppendStart:
+                case ConfigEnvVarMode.AppendEnd:
+                    return new ConfigDataEnvironmentVariable() {
+                        Key = this.Key,
+                        Value = this.Value,
+                        IsEnabled = this.IsEnabled,
+                        Mode = this.Mode.ToString(),
+                        AppendSeparator = this.AppendSeparator,
+                    };
+            }
         }
     }
 }

@@ -310,13 +310,35 @@
   "SettingsExtensionConfigView/SteamAutoIdError/BodyPart1": "Could not auto-detect any Steam App ID with the given path:",
   "SettingsExtensionConfigView/SteamAutoIdError/BodyPart2": "Make sure you add the game in Steam as a Non-Steam Game first!",
   
-  "SettingsWineView/IsAppendMode": "Append mode",
-  "SettingsWineView/IsAppendAtEnd": "Append at end",
-  "SettingsWineView/Separator": "Separator",
-  
-  
-  
-  
+  "SettingsWineView/": "Separator",
+  "SettingsWineView/AppendAtStart": "Mode: Append at Start",
+  "SettingsWineView/AppendAtEnd": "Mode: Append at End",
+  "SettingsWineView/EnableWine": "Enable wine settings",
+  "SettingsWineView/NewEnvVar/Key": "Key",
+  "SettingsWineView/NewEnvVar/Value": "Value",
+  "SettingsWineView/NewEnvVar/Mode": "Mode",
+  "SettingsWineView/NewEnvVar/Separator": "Separator",
+  "SettingsWineView/NewEnvVar/AddNew": "Add New EnvVar",
+  "SettingsWineView/AutoDetect": "Auto Detect",
+  "SettingsWineView/ResetToDefault": "Reset To Default",
+  "SettingsWineView/ResetToDefault/ConfirmTitle": "Reset To Default - Confirmation",
+  "SettingsWineView/ResetToDefault/ConfirmBody": "Are you sure you want to reset ALL the WINE environment variables?",
+  "SettingsWineView/ConfigEnvVarMode/Normal": "Normal",
+  "SettingsWineView/ConfigEnvVarMode/AppendStart": "Append at Start",
+  "SettingsWineView/ConfigEnvVarMode/AppendEnd": "Append at End",
+
+  "SettingsWineView/EnvVar/Description/WINEVERPATH": "Specifies the path to the WINE installation directory. NOTE: This is not a standard wine environment variable, Martridge uses this to autodetect other wine paths when set.",
+  "SettingsWineView/EnvVar/Description/WINELOADER": "Specifies the path and name of the wine binary to use to launch new Windows processes. If not set, Wine will look for a file named 'wine' in the path and in a few other likely locations. This variable allows users to define a custom Wine loader, which can be useful when managing multiple Wine installations or versions.",
+  "SettingsWineView/EnvVar/Description/WINESERVER": "Specifies the path and name of the wineserver binary that Wine uses to manage its processes. If WINESERVER is not set, Wine will attempt to locate the wineserver binary in standard locations such as /usr/lib/wine/wineserver or within the system's PATH. This variable is crucial for ensuring that Wine can properly communicate with its server component, especially in environments where multiple Wine installations or custom paths are used.",
+  "SettingsWineView/EnvVar/Description/WINEDLLPATH": "Specifies the path(s) in which to search for builtin DLLs and Winelib applications within Wine. This variable accepts a list of directories separated by colons (:). In addition to any directories specified in WINEDLLPATH, Wine will also look in standard system directories such as /usr/lib/x86_64-linux-gnu/wine. This variable is particularly useful when managing custom or alternative DLLs for compatibility or debugging purposes.",
+  "SettingsWineView/EnvVar/Description/WINEPREFIX": "Defines the directory where Wine stores its configuration files, registry data, and virtual drive (typically emulating a C: drive). By default, this is set to $HOME/.wine, which is the hidden directory in the user's home folder. This variable allows users to create multiple independent Wine environments, each with its own settings, installed software, and registry, preventing conflicts between different applications.",
+  "SettingsWineView/EnvVar/Description/LD_LIBRARY_PATH": "Used to specify additional directories where the dynamic linker should search for shared libraries when running programs, including Wine. In the context of Wine, it is commonly set to include the lib directory of a specific Wine installation, ensuring that the correct versions of Wine's shared libraries are loaded rather than system-wide libraries.",
+
+
+
+
+
+
   "SettingsThemeView/PreviewTheme": "Preview Theme: ",
   "SettingsThemeView/CurrentTheme": "Currently selected theme: ",
   "SettingsThemeView/CmdUseDefaultLightTheme": "Load Light theme",
@@ -491,15 +513,6 @@
   "AboutWindow/Hotkeys/KeyEditDmod": "CTRL+E - in the DMOD browser, launches the currently selected editor for the currently selected DMOD",
   "AboutWindow/Hotkeys/KeyOpenLogWindow": "CTRL+L - opens log window",
   "AboutWindow/Hotkeys/KeyExit": "ALT+F4 - closes Martridge",
-  
-  "EnvVar/Description/WINEVERPATH": "Specifies the path to the WINE installation directory. NOTE: This is not a standard wine environment variable, Martridge uses this to autodetect other wine paths when set.",
-  "EnvVar/Description/WINELOADER": "Specifies the path and name of the wine binary to use to launch new Windows processes. If not set, Wine will look for a file named 'wine' in the path and in a few other likely locations. This variable allows users to define a custom Wine loader, which can be useful when managing multiple Wine installations or versions.",
-  "EnvVar/Description/WINESERVER": "Specifies the path and name of the wineserver binary that Wine uses to manage its processes. If WINESERVER is not set, Wine will attempt to locate the wineserver binary in standard locations such as /usr/lib/wine/wineserver or within the system's PATH. This variable is crucial for ensuring that Wine can properly communicate with its server component, especially in environments where multiple Wine installations or custom paths are used.",
-  "EnvVar/Description/WINEDLLPATH": "Specifies the path(s) in which to search for builtin DLLs and Winelib applications within Wine. This variable accepts a list of directories separated by colons (:). In addition to any directories specified in WINEDLLPATH, Wine will also look in standard system directories such as /usr/lib/x86_64-linux-gnu/wine. This variable is particularly useful when managing custom or alternative DLLs for compatibility or debugging purposes.",
-  "EnvVar/Description/WINEPREFIX": "Defines the directory where Wine stores its configuration files, registry data, and virtual drive (typically emulating a C: drive). By default, this is set to $HOME/.wine, which is the hidden directory in the user's home folder. This variable allows users to create multiple independent Wine environments, each with its own settings, installed software, and registry, preventing conflicts between different applications.",
-  "EnvVar/Description/LD_LIBRARY_PATH": "Used to specify additional directories where the dynamic linker should search for shared libraries when running programs, including Wine. In the context of Wine, it is commonly set to include the lib directory of a specific Wine installation, ensuring that the correct versions of Wine's shared libraries are loaded rather than system-wide libraries.",
-  
-  
 
   "HelloWorld": "Hello World!"
 }

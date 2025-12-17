@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Martridge.Models.Configuration.AppState;
@@ -30,6 +31,8 @@ namespace Martridge.Models.Configuration {
             Instance.LoadConfigExtension();
             Instance.LoadAppState();
 
+            TryAddDefaultDmodPaths();
+
             // if we have no known dinks, try scanning all known paths!
             if (Instance.General.GameExePaths.Count == 0) {
                 TryAddDefaultKnownDinks();
@@ -37,6 +40,28 @@ namespace Martridge.Models.Configuration {
             
             Instance.General.Updated += GeneralOnUpdated;
             Instance.Launch.Updated += LaunchOnUpdated;
+        }
+
+        private static void TryAddDefaultDmodPaths() {
+            try {
+                if (Instance.General.DmodPaths.Count > 0)
+                    return;
+                
+                string myPath = LocationHelper.GetPathMartridge();
+                if (Directory.Exists(myPath) == false)
+                    return;
+            
+                string defaultDmods = Path.Combine(myPath, "dmods");
+                Directory.CreateDirectory(defaultDmods);
+
+                Instance.General.UpdateProperties(new Dictionary<string, object?>() {
+                    [nameof(ConfigDataGeneralV2.DmodPaths)] = new List<string>() {
+                        defaultDmods,
+                    }
+                });
+            } catch (Exception ex) {
+                MyTrace.Global.WriteException(ex);
+            }
         }
         
         private static void LaunchOnUpdated(object? sender, EventArgs e) {

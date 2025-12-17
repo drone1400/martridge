@@ -1,15 +1,15 @@
 using Martridge.Models.Configuration.LaunchExtension.FileData;
 namespace Martridge.Models.Configuration.General.FileData {
-    public class ConfigFileDataGeneral {
+    public class ConfigFileDataGeneralV1 {
         public string ConfigDataVersion {
-            get => "V25.0";
+            get => "V1";
         }
         
-        public ConfigDataGeneral? General { get; set; }
+        public ConfigDataGeneralV1? General { get; set; }
         public ConfigDataLaunch? Launch { get; set; }
         public ConfigDataWine? WineGlobal { get; set; }
 
-        public ConfigFileDataGeneral() {
+        public ConfigFileDataGeneralV1() {
             
         }
     }

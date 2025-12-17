@@ -224,8 +224,7 @@ namespace Martridge.ViewModels {
             if (sender is not ConfigGeneral general) return;
             
             foreach (string name in e.UpdatedProperties) {
-                if (name == nameof(ConfigGeneral.AdditionalDmodLocations) ||
-                    name == nameof(ConfigGeneral.DefaultDmodLocation) ||
+                if (name == nameof(ConfigGeneral.DmodPaths) ||
                     name == nameof(ConfigGeneral.GameExePaths)) {
                     this._dmodManager?.Initialize();
                 } else if (name == nameof(ConfigGeneral.ShowDmodDevFeatures)) {

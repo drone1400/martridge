@@ -1,7 +1,7 @@
 ﻿namespace Martridge.Models.Configuration.AppState.FileData {
     public class ConfigFileDataAppState{
         public string ConfigDataVersion {
-            get => "V25.0";
+            get => "V1";
         }
         
         public ConfigDataAppState? AppState { get; set; }

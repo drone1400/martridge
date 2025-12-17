@@ -45,7 +45,7 @@ namespace Martridge.Models.Configuration.LaunchExtension {
             return newComponent;
         }
 
-        public void SetFromData(ConfigFileDataExtension? data) {
+        public void SetFromData(ConfigFileDataExtensionV1? data) {
             this._extensionsBase.Clear();
             if (data?.ExtensionDefinitions == null)
                 return;
@@ -59,8 +59,8 @@ namespace Martridge.Models.Configuration.LaunchExtension {
             }
         }
 
-        public ConfigFileDataExtension GetData() {
-            ConfigFileDataExtension fileData = new ConfigFileDataExtension() {
+        public ConfigFileDataExtensionV1 GetData() {
+            ConfigFileDataExtensionV1 fileData = new ConfigFileDataExtensionV1() {
                 ExtensionDefinitions = new List<ConfigDataExtensionComponent>()
             };
             foreach (var pair in this._extensionsBase) {

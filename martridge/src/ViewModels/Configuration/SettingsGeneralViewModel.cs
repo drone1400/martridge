@@ -81,12 +81,6 @@ namespace Martridge.ViewModels.Configuration {
         }
         private bool _useRelativePathForSubfolders = false;
 
-        public string DefaultDmodLocation {
-            get => this._defaultDmodLocation;
-            set => this.RaiseAndSetIfChanged(ref this._defaultDmodLocation, value);
-        }
-        private string _defaultDmodLocation = "DMODS";
-
         public ObservableCollection<string> GameExePaths {
             get => this._gameExePaths;
             set => this.RaiseAndSetIfChanged(ref this._gameExePaths, value);
@@ -124,17 +118,17 @@ namespace Martridge.ViewModels.Configuration {
         private CultureInfo? _selectedLocalization = null;
         private string? _savedLocalization = null;
         
-        public ObservableCollection<string> AdditionalDmods {
-            get => this._additionalDmods;
-            set => this.RaiseAndSetIfChanged(ref this._additionalDmods, value);
+        public ObservableCollection<string> DmodPaths {
+            get => this._dmodPaths;
+            set => this.RaiseAndSetIfChanged(ref this._dmodPaths, value);
         }
-        private ObservableCollection<string> _additionalDmods = new ObservableCollection<string>();
+        private ObservableCollection<string> _dmodPaths = new ObservableCollection<string>();
 
-        public int SelectedAdditionalDmodIndex {
-            get => this._selectedAdditionalDmodIndex;
-            set => this.RaiseAndSetIfChanged(ref this._selectedAdditionalDmodIndex, value);
+        public int SelectedDmodPathIndex {
+            get => this._selectedDmodPathIndex;
+            set => this.RaiseAndSetIfChanged(ref this._selectedDmodPathIndex, value);
         }
-        private int _selectedAdditionalDmodIndex = -1;
+        private int _selectedDmodPathIndex = -1;
         
         //
         // Launch settings
@@ -289,7 +283,7 @@ namespace Martridge.ViewModels.Configuration {
             }
 
             ObservableCollection<string> listDmod = new ObservableCollection<string>();
-            foreach (string str in this.CfgGeneral.AdditionalDmodLocations) {
+            foreach (string str in this.CfgGeneral.DmodPaths) {
                 listDmod.Add(str);
             }
             
@@ -299,8 +293,7 @@ namespace Martridge.ViewModels.Configuration {
             this.ShowLaunchRefDirPathInMainWindow = this.CfgGeneral.ShowLaunchRefDirPathInMainWindow;
             this.ShowLaunchCustomArgsInMainWindow = this.CfgGeneral.ShowLaunchCustomArgsInMainWindow;
             this.UseRelativePathForSubfolders = this.CfgGeneral.UseRelativePathForSubfolders;
-            this.AdditionalDmods = listDmod;
-            this.DefaultDmodLocation = this.CfgGeneral.DefaultDmodLocation;
+            this.DmodPaths = listDmod;
             this.GameExePaths = listGameExe;
             this.EditorExePaths = listEditorExe;
             
@@ -328,7 +321,7 @@ namespace Martridge.ViewModels.Configuration {
             }
 
             List<string> listDmod = new List<string>();
-            foreach (string str in this.AdditionalDmods) {
+            foreach (string str in this.DmodPaths) {
                 listDmod.Add(str);
             }
 
@@ -358,8 +351,7 @@ namespace Martridge.ViewModels.Configuration {
                 [nameof(ConfigGeneral.UseRelativePathForSubfolders)] = this.UseRelativePathForSubfolders,
                 [nameof(ConfigGeneral.GameExePaths)] = listGameExe,
                 [nameof(ConfigGeneral.EditorExePaths)] = listEditorExe,
-                [nameof(ConfigGeneral.DefaultDmodLocation)] = this.DefaultDmodLocation,
-                [nameof(ConfigGeneral.AdditionalDmodLocations)] = listDmod,
+                [nameof(ConfigGeneral.DmodPaths)] = listDmod,
                 [nameof(ConfigGeneral.ActiveGameExeIndex)] = activeGameExeIndex,
                 [nameof(ConfigGeneral.ActiveEditorExeIndex)] = activeEditorExeIndex,
             });
@@ -448,129 +440,87 @@ namespace Martridge.ViewModels.Configuration {
         #region COMMANDS - DMODs
 
         //
-        // Default dmods
-        //
-        
-        public async void CmdDefaultDmodsBrowse(object? parameter = null) {
-            if (this.IsBusy ) return;
-            
-            this.IsBusy = true;
-
-            await Task.Run(() => {
-                try
-                {
-                    IStorageFolder? storageFolder = LocationHelper.BrowseFolderPicker(
-                        Localizer.Instance["SettingsGeneral/BrowseDefaultDmodDirectory"],
-                        string.IsNullOrWhiteSpace(this.DefaultDmodLocation) 
-                            ? LocationHelper.GetPathDefaultFileBrowser()
-                            : this.DefaultDmodLocation );
-                    
-                    if (storageFolder != null)
-                    {
-                        this.DefaultDmodLocation = storageFolder.Path.LocalPath;
-                    }
-                } catch (Exception ex)
-                {
-                    MyTrace.Global.WriteException(ex);
-                }
-                finally
-                {
-                    this.IsBusy = false;
-                }
-            });
-        }
-        
-        [DependsOn(nameof(IsBusy))]
-        public bool CanCmdDefaultDmodsBrowse(object? parameter = null) {
-            // general conditions
-            if (this.IsBusy ) return false;
-            // specific conditions
-            return true;
-        }
-
-
-        //
         // Additional dmods
         //
 
-        public void CmdAdditionalDmodsRemoveSelected(object? parameter = null) {
-            if (this.SelectedAdditionalDmodIndex < 0 ||
-                this.SelectedAdditionalDmodIndex >= this.AdditionalDmods.Count) return;
+        public void CmdDmodPathsRemoveSelected(object? parameter = null) {
+            if (this.SelectedDmodPathIndex < 0 ||
+                this.SelectedDmodPathIndex >= this.DmodPaths.Count) return;
             if (this.IsBusy ) return;
             
-            this.AdditionalDmods.RemoveAt(this.SelectedAdditionalDmodIndex);
+            this.DmodPaths.RemoveAt(this.SelectedDmodPathIndex);
         }
         
         [DependsOn(nameof(IsBusy))]
-        [DependsOn(nameof(SelectedAdditionalDmodIndex))]
-        [DependsOn(nameof(AdditionalDmods))]
-        public bool CanCmdAdditionalDmodsRemoveSelected(object? parameter = null) {
-            if (this.SelectedAdditionalDmodIndex < 0 ||
-                this.SelectedAdditionalDmodIndex >= this.AdditionalDmods.Count) return false;
+        [DependsOn(nameof(SelectedDmodPathIndex))]
+        [DependsOn(nameof(DmodPaths))]
+        public bool CanCmdDmodPathsRemoveSelected(object? parameter = null) {
+            if (this.SelectedDmodPathIndex < 0 ||
+                this.SelectedDmodPathIndex >= this.DmodPaths.Count) return false;
             if (this.IsBusy ) return false;
             return true;
         }
         
-        public void CmdAdditionalDmodsMoveSelectedUp(object? parameter = null) {
-            if (this.SelectedAdditionalDmodIndex < 1 ||
-                this.SelectedAdditionalDmodIndex >= this.AdditionalDmods.Count) return;
+        public void CmdDmodPathsMoveSelectedUp(object? parameter = null) {
+            if (this.SelectedDmodPathIndex < 1 ||
+                this.SelectedDmodPathIndex >= this.DmodPaths.Count) return;
             if (this.IsBusy ) return;
 
-            int newIndex = this.SelectedAdditionalDmodIndex - 1;
-            this.AdditionalDmods.Move(this.SelectedAdditionalDmodIndex, newIndex);
-            this.SelectedAdditionalDmodIndex = newIndex;
+            int newIndex = this.SelectedDmodPathIndex - 1;
+            this.DmodPaths.Move(this.SelectedDmodPathIndex, newIndex);
+            this.SelectedDmodPathIndex = newIndex;
             
         }
         
         [DependsOn(nameof(IsBusy))]
-        [DependsOn(nameof(SelectedAdditionalDmodIndex))]
-        [DependsOn(nameof(AdditionalDmods))]
-        public bool CanCmdAdditionalDmodsMoveSelectedUp(object? parameter = null) {
-            if (this.SelectedAdditionalDmodIndex < 1 ||
-                this.SelectedAdditionalDmodIndex >= this.AdditionalDmods.Count) return false;
+        [DependsOn(nameof(SelectedDmodPathIndex))]
+        [DependsOn(nameof(DmodPaths))]
+        public bool CanCmdDmodPathsMoveSelectedUp(object? parameter = null) {
+            if (this.SelectedDmodPathIndex < 1 ||
+                this.SelectedDmodPathIndex >= this.DmodPaths.Count) return false;
             if (this.IsBusy ) return false;
             return true;
         }
         
-        public void CmdAdditionalDmodsMoveSelectedDown(object? parameter = null) {
-            if (this.SelectedAdditionalDmodIndex < 0 ||
-                this.SelectedAdditionalDmodIndex >= this.AdditionalDmods.Count - 1) return;
+        public void CmdDmodPathsMoveSelectedDown(object? parameter = null) {
+            if (this.SelectedDmodPathIndex < 0 ||
+                this.SelectedDmodPathIndex >= this.DmodPaths.Count - 1) return;
             if (this.IsBusy ) return;
             
-            int newIndex = this.SelectedAdditionalDmodIndex + 1;
-            this.AdditionalDmods.Move(this.SelectedAdditionalDmodIndex, newIndex);
-            this.SelectedAdditionalDmodIndex = newIndex;
+            int newIndex = this.SelectedDmodPathIndex + 1;
+            this.DmodPaths.Move(this.SelectedDmodPathIndex, newIndex);
+            this.SelectedDmodPathIndex = newIndex;
         }
         
         [DependsOn(nameof(IsBusy))]
-        [DependsOn(nameof(SelectedAdditionalDmodIndex))]
-        [DependsOn(nameof(AdditionalDmods))]
-        public bool CanCmdAdditionalDmodsMoveSelectedDown(object? parameter = null) {
-            if (this.SelectedAdditionalDmodIndex < 0 ||
-                this.SelectedAdditionalDmodIndex >= this.AdditionalDmods.Count - 1) return false;
+        [DependsOn(nameof(SelectedDmodPathIndex))]
+        [DependsOn(nameof(DmodPaths))]
+        public bool CanCmdDmodPathsMoveSelectedDown(object? parameter = null) {
+            if (this.SelectedDmodPathIndex < 0 ||
+                this.SelectedDmodPathIndex >= this.DmodPaths.Count - 1) return false;
             if (this.IsBusy ) return false;
             return true;
         }
 
         
-        public string AdditionalDmodLocationsAddNewManualValue {
-            get => this._additionalDmodLocationsAddNewManualValue;
-            set => this.RaiseAndSetIfChanged(ref  this._additionalDmodLocationsAddNewManualValue, value);
+        public string DmodPathsAddNewManualValue {
+            get => this._dmodPathsAddNewManualValue;
+            set => this.RaiseAndSetIfChanged(ref  this._dmodPathsAddNewManualValue, value);
         }
-        private string _additionalDmodLocationsAddNewManualValue = string.Empty;
+        private string _dmodPathsAddNewManualValue = string.Empty;
         
         
-        public void CmdAdditionalDmodLocationsAddNewManual(object? parameter = null) {
+        public void CmdDmodPathsAddNewManual(object? parameter = null) {
             if (this.IsBusy) return;
-            if (string.IsNullOrWhiteSpace(this.AdditionalDmodLocationsAddNewManualValue)) return;
+            if (string.IsNullOrWhiteSpace(this.DmodPathsAddNewManualValue)) return;
             
             try
             {
                 this.IsBusy = true;
                 
-                if (LocationHelper.PathIsDuplicate(this.AdditionalDmods, this.AdditionalDmodLocationsAddNewManualValue) == false)
+                if (LocationHelper.PathIsDuplicate(this.DmodPaths, this.DmodPathsAddNewManualValue) == false)
                 {
-                    this.AdditionalDmods.Add(this.AdditionalDmodLocationsAddNewManualValue);
+                    this.DmodPaths.Add(this.DmodPathsAddNewManualValue);
                 }
             } catch (Exception ex)
             {
@@ -583,10 +533,10 @@ namespace Martridge.ViewModels.Configuration {
         }
         
         [DependsOn(nameof(IsBusy))]
-        [DependsOn(nameof(AdditionalDmodLocationsAddNewManualValue))]
-        public bool CanCmdAdditionalDmodLocationsAddNewManual(object? parameter = null) {
+        [DependsOn(nameof(DmodPathsAddNewManualValue))]
+        public bool CanCmdDmodPathsAddNewManual(object? parameter = null) {
             if (this.IsBusy) return false;
-            if (string.IsNullOrWhiteSpace(this.AdditionalDmodLocationsAddNewManualValue)) return false;
+            if (string.IsNullOrWhiteSpace(this.DmodPathsAddNewManualValue)) return false;
             return true;
         }
         
@@ -596,17 +546,23 @@ namespace Martridge.ViewModels.Configuration {
             this.IsBusy = true;
             
             await Task.Run(() => {
-                try
-                {
+                try {
+                    string suggestedPath = string.Empty;
+                    if (this.SelectedDmodPathIndex >= 0 &&  this.SelectedDmodPathIndex < this.DmodPaths.Count) {
+                        suggestedPath = this.DmodPaths[this.SelectedDmodPathIndex];
+                    } else if (this.DmodPaths.Count >= 1) {
+                        suggestedPath = this.DmodPaths[0];
+                    }
+                    
                     IStorageFolder? storageFolder = LocationHelper.BrowseFolderPicker(
                         Localizer.Instance["SettingsGeneral/BrowseAddDmodDirectory"],
-                        string.IsNullOrWhiteSpace(this.DefaultDmodLocation) 
+                        string.IsNullOrWhiteSpace(suggestedPath) 
                             ? LocationHelper.GetPathDefaultFileBrowser()
-                            : this.DefaultDmodLocation );
+                            : suggestedPath );
 
-                    if (storageFolder != null && LocationHelper.PathIsDuplicate(this.AdditionalDmods, storageFolder.Path.LocalPath) == false)
+                    if (storageFolder != null && LocationHelper.PathIsDuplicate(this.DmodPaths, storageFolder.Path.LocalPath) == false)
                     {
-                        this.AdditionalDmods.Add(storageFolder.Path.LocalPath);
+                        this.DmodPaths.Add(storageFolder.Path.LocalPath);
                     }
                 } catch (Exception ex)
                 {

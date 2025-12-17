@@ -27,11 +27,11 @@
             <TextBox Grid.Row="0" Grid.Column="0"
                      UseFloatingWatermark="True"
                      Watermark="{dloc:Localize SettingsGeneral/AdditionalDmodLocations}"
-                     Text="{Binding AdditionalDmodLocationsAddNewManualValue}" />
+                     Text="{Binding DmodPathsAddNewManualValue}" />
             <Button Grid.Row="0" Grid.Column="1"
                     Content="{dloc:Localize SettingsGeneral/AdditionalDmodLocations_AddManual}"
                     Classes="Primary"
-                    Command="{Binding CmdAdditionalDmodLocationsAddNewManual}" />
+                    Command="{Binding CmdDmodPathsAddNewManual}" />
             <Button Grid.Row="0" Grid.Column="2"
                     Content="{dloc:Localize SettingsGeneral/AdditionalDmodLocations_AddBrowse}"
                     Classes="Primary"
@@ -39,18 +39,18 @@
             <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ColumnDefinitions="Auto,*">
                 <Grid Grid.Column="0" RowDefinitions="*,Auto,Auto,Auto,*">
                     <Button Grid.Row="1"
-                            Command="{Binding CmdAdditionalDmodsMoveSelectedUp}"
+                            Command="{Binding CmdDmodPathsMoveSelectedUp}"
                             Classes="ListBoxButtonLeftBlue"
                             Background="{DynamicResource ThemeAccentBrush}">
                         <Path Classes="ListBoxIconArrow" />
                     </Button>
                     <Button Grid.Row="2"
-                            Command="{Binding CmdAdditionalDmodsRemoveSelected}"
+                            Command="{Binding CmdDmodPathsRemoveSelected}"
                             Classes="ListBoxButtonLeft">
                         <Path Classes="ListBoxIconTrashCan" />
                     </Button>
                     <Button Grid.Row="3"
-                            Command="{Binding CmdAdditionalDmodsMoveSelectedDown}"
+                            Command="{Binding CmdDmodPathsMoveSelectedDown}"
                             Classes="ListBoxButtonLeftBlue">
                         <Path Classes="ListBoxIconArrow">
                             <Path.RenderTransform>
@@ -60,8 +60,8 @@
                     </Button>
                 </Grid>
                 <ListBox Grid.Column="1"
-                         ItemsSource="{Binding AdditionalDmods}"
-                         SelectedIndex="{Binding SelectedAdditionalDmodIndex}"
+                         ItemsSource="{Binding DmodPaths}"
+                         SelectedIndex="{Binding SelectedDmodPathIndex}"
                          VerticalAlignment="Center">
                     <ListBox.ItemTemplate>
                         <DataTemplate>

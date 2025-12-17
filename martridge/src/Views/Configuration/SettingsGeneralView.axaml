@@ -126,7 +126,6 @@
                         <TabItem Header="{dloc:Localize SettingsGeneral/TabItemPathDmod}"
                                  Classes="SmallTab">
                             <Grid RowDefinitions="Auto,*">
-                                <configuration:SettingsGeneralDefaultDmodLocationsUserControl Grid.Row="0"/>
                                 <configuration:SettingsGeneralAdditionalDmodLocationsUserControl Grid.Row="1"/>
                             </Grid>
                         </TabItem>

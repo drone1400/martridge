@@ -5,6 +5,7 @@ using Martridge.Models.Configuration.AppState;
 using Martridge.Models.Configuration.AppState.FileData;
 using Martridge.Models.Configuration.General;
 using Martridge.Models.Configuration.General.FileData;
+using Martridge.Models.Configuration.Generic.FileData;
 using Martridge.Models.Configuration.LaunchExtension;
 using Martridge.Models.Configuration.LaunchExtension.FileData;
 using Martridge.Models.Localization;
@@ -185,7 +186,7 @@ namespace Martridge.Models.Configuration {
             if (string.IsNullOrWhiteSpace(this.FileNameGeneralConfig))
                 return;
 
-            ConfigFileDataGeneral data = new ConfigFileDataGeneral() {
+            ConfigFileDataGeneralV2 data = new ConfigFileDataGeneralV2() {
                 General = this.General.GetData(),
                 Launch = this.Launch.GetData(),
                 WineGlobal = this.WineGlobal?.GetData(),
@@ -198,19 +199,42 @@ namespace Martridge.Models.Configuration {
             if (string.IsNullOrWhiteSpace(this.FileNameGeneralConfig))
                 return;
             
-            ConfigFileDataGeneral? data = ConfigJsonSerializer.LoadFromFile<ConfigFileDataGeneral>(this.FileNameGeneralConfig);
-            
-            if (data?.General != null) {
-                this.General.UpdateProperties(data.General.GetValues());
-            }
+            ConfigFileGenericVersion? version = ConfigJsonSerializer.LoadFromFile<ConfigFileGenericVersion>(this.FileNameGeneralConfig);
 
-            if (data?.Launch != null) {
-                this.Launch.UpdateProperties(data.Launch.GetValues());
-            }
+            if (version?.ConfigDataVersion == null ||
+                string.CompareOrdinal(version.ConfigDataVersion, "V2") < 0) {
+                // load from old version
+                ConfigFileDataGeneralV1? data = ConfigJsonSerializer.LoadFromFile<ConfigFileDataGeneralV1>(this.FileNameGeneralConfig);
+                
+                if (data?.General != null) {
+                    this.General.UpdateProperties(data.General.GetValues());
+                }
 
-            if (data?.WineGlobal != null) {
-                this.WineGlobal = new ConfigWine();
-                this.WineGlobal.SetFromData(data.WineGlobal);
+                if (data?.Launch != null) {
+                    this.Launch.UpdateProperties(data.Launch.GetValues());
+                }
+
+                if (data?.WineGlobal != null) {
+                    this.WineGlobal = new ConfigWine();
+                    this.WineGlobal.SetFromData(data.WineGlobal);
+                }
+            }
+            else {
+                // load from current version
+                ConfigFileDataGeneralV2? data = ConfigJsonSerializer.LoadFromFile<ConfigFileDataGeneralV2>(this.FileNameGeneralConfig);
+                
+                if (data?.General != null) {
+                    this.General.UpdateProperties(data.General.GetValues());
+                }
+
+                if (data?.Launch != null) {
+                    this.Launch.UpdateProperties(data.Launch.GetValues());
+                }
+
+                if (data?.WineGlobal != null) {
+                    this.WineGlobal = new ConfigWine();
+                    this.WineGlobal.SetFromData(data.WineGlobal);
+                }
             }
         }
         
@@ -238,9 +262,9 @@ namespace Martridge.Models.Configuration {
             if (string.IsNullOrWhiteSpace(this.FileNameExtensionConfig))
                 return;
             
-            ConfigFileDataExtension extension = this.LaunchExtension.GetData();
-            if (extension.ExtensionDefinitions?.Count > 0) {
-                ConfigJsonSerializer.SaveToFile(extension, this.FileNameExtensionConfig);
+            ConfigFileDataExtensionV1 extensionV1 = this.LaunchExtension.GetData();
+            if (extensionV1.ExtensionDefinitions?.Count > 0) {
+                ConfigJsonSerializer.SaveToFile(extensionV1, this.FileNameExtensionConfig);
             }
         }
 
@@ -248,7 +272,7 @@ namespace Martridge.Models.Configuration {
             if (string.IsNullOrWhiteSpace(this.FileNameExtensionConfig))
                 return;
             
-            ConfigFileDataExtension? data  = ConfigJsonSerializer.LoadFromFile<ConfigFileDataExtension>(this.FileNameExtensionConfig);
+            ConfigFileDataExtensionV1? data  = ConfigJsonSerializer.LoadFromFile<ConfigFileDataExtensionV1>(this.FileNameExtensionConfig);
             this.LaunchExtension.SetFromData(data);
         }
         

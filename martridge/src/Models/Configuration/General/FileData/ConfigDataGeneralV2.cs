@@ -4,7 +4,7 @@ namespace Martridge.Models.Configuration.General.FileData {
     /// <summary>
     /// Class used for JSON serialization
     /// </summary>
-    public class ConfigDataGeneral {
+    public class ConfigDataGeneralV2 {
         /// <summary>
         /// The name of the localization table to use int he application.
         /// </summary>
@@ -91,7 +91,7 @@ namespace Martridge.Models.Configuration.General.FileData {
         public int? ActiveEditorExeIndex { get; set; }
 
         /// <summary>
-        /// List of paths to Dink executable files
+        /// List of paths to Dink executable files, Martridge will also scan the `DMOD`/`DMODS` subfolders at these locations 
         /// </summary>
         public List<string>? GameExePaths { get; set; }
         
@@ -101,14 +101,9 @@ namespace Martridge.Models.Configuration.General.FileData {
         public List<string>? EditorExePaths { get; set; }
         
         /// <summary>
-        /// The default location where DMODS should get installed by the application
+        /// List of additional directories to scan for DMODS or install DMODS in (formerly known as AdditionalDmodLocations)
         /// </summary>
-        public string? DefaultDmodLocation { get; set; }
-        
-        /// <summary>
-        /// List of additional directories to scan for DMODS
-        /// </summary>
-        public List<string>? AdditionalDmodLocations { get; set; }
+        public List<string>? DmodPaths { get; set; }
         
         /// <summary>
         /// If ture, will decompress DMOD tar archives from bzip2 to a memory stream instead of a temporary file
@@ -133,8 +128,7 @@ namespace Martridge.Models.Configuration.General.FileData {
                 [nameof(ConfigGeneral.ActiveEditorExeIndex)] = this.ActiveEditorExeIndex,
                 [nameof(ConfigGeneral.GameExePaths)] = this.GameExePaths,
                 [nameof(ConfigGeneral.EditorExePaths)] = this.EditorExePaths,
-                [nameof(ConfigGeneral.DefaultDmodLocation)] = this.DefaultDmodLocation,
-                [nameof(ConfigGeneral.AdditionalDmodLocations)] = this.AdditionalDmodLocations,
+                [nameof(ConfigGeneral.DmodPaths)] = this.DmodPaths,
                 [nameof(ConfigGeneral.DinkInstallerConfigFileSource)] = this.DinkInstallerConfigFileSource,
                 [nameof(ConfigGeneral.MaxLogsToKeep)] = this.MaxLogsToKeep,
                 [nameof(ConfigGeneral.DecompressDmodsToMemoryStreamInsteadOfTemporaryFile)] = this.DecompressDmodsToMemoryStreamInsteadOfTemporaryFile,

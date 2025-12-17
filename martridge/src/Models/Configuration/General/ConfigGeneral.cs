@@ -122,16 +122,10 @@ namespace Martridge.Models.Configuration.General {
         private readonly List<string> _editorExePaths = new List<string>();
 
         /// <summary>
-        /// The default location where DMODS should get installed by the application
-        /// </summary>
-        public string DefaultDmodLocation { get => this._defaultDmodLocation; }
-        private string _defaultDmodLocation = "./DMODS";
-
-        /// <summary>
         /// List of additional directories to scan for DMODS
         /// </summary>
-        public ReadOnlyCollection<string> AdditionalDmodLocations { get; }
-        private readonly List<string> _additionalDmodLocations = new List<string>();
+        public ReadOnlyCollection<string> DmodPaths { get; }
+        private readonly List<string> _dmodPaths = new List<string>();
 
         /// <summary>
         /// The source URL or file for the DinkInstaller config json file
@@ -154,7 +148,7 @@ namespace Martridge.Models.Configuration.General {
         public ConfigGeneral() {
             this.GameExePaths = new ReadOnlyCollection<string>(this._gameExePaths);
             this.EditorExePaths = new ReadOnlyCollection<string>(this._editorExePaths);
-            this.AdditionalDmodLocations = new ReadOnlyCollection<string>(this._additionalDmodLocations);
+            this.DmodPaths = new ReadOnlyCollection<string>(this._dmodPaths);
         }
 
         private void FireUpdatedEvent(List<string> updatedProperties) {
@@ -211,13 +205,13 @@ namespace Martridge.Models.Configuration.General {
 
         public void TryAddAdditionalDmodPath(string? path) {
             if (string.IsNullOrWhiteSpace(path)) return;
-            if (LocationHelper.PathIsDuplicate(this._additionalDmodLocations, path)) return;
+            if (LocationHelper.PathIsDuplicate(this._dmodPaths, path)) return;
             if (this.UseRelativePathForSubfolders) {
                 path = LocationHelper.TryMakePathRelativeToMartridge(path);
             }
             // add new path at first position
-            this._additionalDmodLocations.Insert(0,path);
-            this.FireUpdatedEvent(nameof(this.AdditionalDmodLocations));
+            this._dmodPaths.Insert(0,path);
+            this.FireUpdatedEvent(nameof(this.DmodPaths));
         }
 
         public void UpdateProperties(Dictionary<string, object?> newValues) {
@@ -280,21 +274,9 @@ namespace Martridge.Models.Configuration.General {
                     case nameof(this.DinkInstallerConfigFileSource): TryUpdateGeneric(kvp, ref this._dinkInstallerConfigFileSource); break;
                     case nameof(this.MaxLogsToKeep): TryUpdateGeneric(kvp, ref this._maxLogsToKeep); break;
                     case nameof(this.DecompressDmodsToMemoryStreamInsteadOfTemporaryFile): TryUpdateGeneric(kvp, ref this._decompressDmodsToMemoryStreamInsteadOfTemporaryFile); break;
-                    
-                    case nameof(this.DefaultDmodLocation): {
-                        if (kvp.Value is string path) {
-                            if (this._useRelativePathForSubfolders) {
-                                path = LocationHelper.TryMakePathRelativeToMartridge(path);
-                            }
-                            this._defaultDmodLocation = path;
-                            updatedProperties.Add(kvp.Key);
-                        }
-                        break;
-                    }
-                    
                     case nameof(this.GameExePaths): TryUpdatePathList(kvp, this._gameExePaths, this._useRelativePathForSubfolders); break;
                     case nameof(this.EditorExePaths): TryUpdatePathList(kvp, this._editorExePaths, this._useRelativePathForSubfolders); break;
-                    case nameof(this.AdditionalDmodLocations): TryUpdatePathList(kvp, this._additionalDmodLocations, this._useRelativePathForSubfolders); break;
+                    case nameof(this.DmodPaths): TryUpdatePathList(kvp, this._dmodPaths, this._useRelativePathForSubfolders); break;
                 }
             }
             
@@ -303,13 +285,10 @@ namespace Martridge.Models.Configuration.General {
             }
         }
 
-        public ConfigDataGeneral GetData() {
-                string defaultDmodLocation;
+        public ConfigDataGeneralV2 GetData() {
                 List<string> gameExePaths = new List<string>();
                 List<string> editorExePaths = new List<string>();
-                List<string> additionalDmodLocations = new List<string>();
-                
-                defaultDmodLocation = this._defaultDmodLocation;
+                List<string> dmodPaths = new List<string>();
                     
                 foreach (string s in this._gameExePaths) {
                     gameExePaths.Add(s);
@@ -317,11 +296,11 @@ namespace Martridge.Models.Configuration.General {
                 foreach (string s in this._editorExePaths) {
                     editorExePaths.Add(s);
                 }
-                foreach (string s in this._additionalDmodLocations) {
-                    additionalDmodLocations.Add(s);
+                foreach (string s in this._dmodPaths) {
+                    dmodPaths.Add(s);
                 }
 
-                ConfigDataGeneral data = new ConfigDataGeneral()  {
+                ConfigDataGeneralV2 data = new ConfigDataGeneralV2()  {
                     ThemeName = this.ThemeName,
                     DarkThemeOverride = this.DarkThemeOverride,
                     LightThemeOverride = this.LightThemeOverride,
@@ -337,8 +316,7 @@ namespace Martridge.Models.Configuration.General {
                     ActiveEditorExeIndex = this.ActiveEditorExeIndex,
                     GameExePaths = gameExePaths,
                     EditorExePaths = editorExePaths,
-                    DefaultDmodLocation = defaultDmodLocation,
-                    AdditionalDmodLocations = additionalDmodLocations,
+                    DmodPaths = dmodPaths,
                     DinkInstallerConfigFileSource = this.DinkInstallerConfigFileSource,
                     MaxLogsToKeep = this.MaxLogsToKeep,
                     DecompressDmodsToMemoryStreamInsteadOfTemporaryFile = this.DecompressDmodsToMemoryStreamInsteadOfTemporaryFile,
@@ -354,29 +332,7 @@ namespace Martridge.Models.Configuration.General {
             public List<DirectoryInfo> GetRealDmodDirectories() {
                 Dictionary<string, DirectoryInfo> dict = new Dictionary<string, DirectoryInfo>();
 
-                string defaultDmodLocation = LocationHelper.TryMakePathAbsoluteBasedOnMartridge(this.DefaultDmodLocation);
-
-                try {
-                    DirectoryInfo defaultDmods = new DirectoryInfo(defaultDmodLocation);
-                    if (defaultDmods.Exists) {
-                        dict.Add(defaultDmods.FullName, defaultDmods);
-                    }
-                    else {
-                        try {
-                            defaultDmods.Create();
-                            defaultDmods.Refresh();
-                            if (defaultDmods.Exists) {
-                                dict.Add(defaultDmods.FullName, defaultDmods);
-                            }
-                        } catch (Exception ex) {
-                            MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
-                        }
-                    }
-                } catch (Exception ex) {
-                    MyTrace.Global.WriteException(ex, MyTraceLevel.Warning);
-                }
-
-                foreach (string locationRaw in this.AdditionalDmodLocations) {
+                foreach (string locationRaw in this.DmodPaths) {
                     try {
                         string location = LocationHelper.TryMakePathAbsoluteBasedOnMartridge(locationRaw);
                         DirectoryInfo dirInfo = new DirectoryInfo(location);

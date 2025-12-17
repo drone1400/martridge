@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 namespace Martridge.Models.Configuration.LaunchExtension.FileData {
-    public class ConfigFileDataExtension {
+    public class ConfigFileDataExtensionV1 {
         public string ConfigDataVersion {
-            get => "V25.0";
+            get => "V1";
         }
         public List<ConfigDataExtensionComponent>? ExtensionDefinitions { get; set; }
     }

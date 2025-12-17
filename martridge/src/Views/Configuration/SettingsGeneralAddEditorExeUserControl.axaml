@@ -37,19 +37,19 @@
                     Classes="Primary"
                     Command="{Binding CmdEditorExeAddNew}" />
             <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ColumnDefinitions="Auto,*">
-                <Grid Grid.Column="0" RowDefinitions="*,Auto,Auto,Auto,*">
-                    <Button Grid.Row="1"
+                <Grid Grid.Column="0" RowDefinitions="Auto,Auto,Auto,*">
+                    <Button Grid.Row="0"
                             Command="{Binding CmdEditorExeMoveSelectedUp}"
                             Classes="ListBoxButtonLeftBlue"
                             Background="{DynamicResource ThemeAccentBrush}">
                         <Path Classes="ListBoxIconArrow" />
                     </Button>
-                    <Button Grid.Row="2"
+                    <Button Grid.Row="1"
                             Command="{Binding CmdEditorExeRemoveSelected}"
                             Classes="ListBoxButtonLeft">
                         <Path Classes="ListBoxIconTrashCan" />
                     </Button>
-                    <Button Grid.Row="3"
+                    <Button Grid.Row="2"
                             Command="{Binding CmdEditorExeMoveSelectedDown}"
                             Classes="ListBoxButtonLeftBlue">
                         <Path Classes="ListBoxIconArrow">
@@ -62,7 +62,7 @@
                 <ListBox Grid.Column="1"
                          ItemsSource="{Binding EditorExePaths}"
                          SelectedIndex="{Binding SelectedEditorExePathIndex}"
-                         VerticalAlignment="Center">
+                         VerticalAlignment="Top">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid ColumnDefinitions="Auto,*">

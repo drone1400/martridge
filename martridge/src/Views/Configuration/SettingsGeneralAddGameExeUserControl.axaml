@@ -36,19 +36,19 @@
                     Classes="Primary"
                     Command="{Binding CmdGameExeAddNew}" />
             <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" ColumnDefinitions="Auto,*">
-                <Grid Grid.Column="0" RowDefinitions="*,Auto,Auto,Auto,*">
-                    <Button Grid.Row="1"
+                <Grid Grid.Column="0" RowDefinitions="Auto,Auto,Auto,*">
+                    <Button Grid.Row="0"
                             Command="{Binding CmdGameExeMoveSelectedUp}"
                             Classes="ListBoxButtonLeftBlue"
                             Background="{DynamicResource ThemeAccentBrush}">
                         <Path Classes="ListBoxIconArrow" />
                     </Button>
-                    <Button Grid.Row="2"
+                    <Button Grid.Row="1"
                             Command="{Binding CmdGameExeRemoveSelected}"
                             Classes="ListBoxButtonLeft">
                         <Path Classes="ListBoxIconTrashCan" />
                     </Button>
-                    <Button Grid.Row="3"
+                    <Button Grid.Row="2"
                             Command="{Binding CmdGameExeMoveSelectedDown}"
                             Classes="ListBoxButtonLeftBlue">
                         <Path Classes="ListBoxIconArrow">
@@ -61,7 +61,7 @@
                 <ListBox Grid.Column="1"
                          ItemsSource="{Binding GameExePaths}"
                          SelectedIndex="{Binding SelectedGameExePathIndex}"
-                         VerticalAlignment="Center">
+                         VerticalAlignment="Top">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Grid ColumnDefinitions="Auto,*">

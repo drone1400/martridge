@@ -310,7 +310,8 @@
   "SettingsExtensionConfigView/SteamAutoIdError/BodyPart1": "Could not auto-detect any Steam App ID with the given path:",
   "SettingsExtensionConfigView/SteamAutoIdError/BodyPart2": "Make sure you add the game in Steam as a Non-Steam Game first!",
   
-  "SettingsWineView/": "Separator",
+  "SettingsWineView/DescriptionGlobal": "Here you can set the WINE environment variables for launching any game exe through Martridge. Note that if you have a standard wine installation, you can likely leave all of these empty and just have the Enable wine checkbox ticked. If you want to use a specific wine installation, fill out environment variables accordingly.",
+  "SettingsWineView/DescriptionSpecific": "Here you can set the WINE environment variables for launching this specific game exe through Martridge (Warning: if this is not a windows executable game, these settings will be ignored). Note that if you have a standard wine installation, you can likely leave all of these empty and just have the Enable wine checkbox ticked. If you want to use a specific wine installation, fill out environment variables accordingly.",
   "SettingsWineView/AppendAtStart": "Mode: Append at Start",
   "SettingsWineView/AppendAtEnd": "Mode: Append at End",
   "SettingsWineView/EnableWine": "Enable wine settings",

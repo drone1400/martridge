@@ -25,8 +25,8 @@ namespace Martridge.Models.Configuration.LaunchExtension {
 
         public static List<ConfigDataEnvironmentVariable> GetDefaultWineEnvVars() => new List<ConfigDataEnvironmentVariable>() {
             new ConfigDataEnvironmentVariable(EnvironmentVariableHelper.WINEVERPATH, "", true),
-            new ConfigDataEnvironmentVariable(EnvironmentVariableHelper.WINELOADER, "wine", true),
-            new ConfigDataEnvironmentVariable(EnvironmentVariableHelper.WINESERVER, "wineserver", true),
+            new ConfigDataEnvironmentVariable(EnvironmentVariableHelper.WINELOADER, "", true),
+            new ConfigDataEnvironmentVariable(EnvironmentVariableHelper.WINESERVER, "", true),
             new ConfigDataEnvironmentVariable(EnvironmentVariableHelper.WINEDLLPATH, "", true),
             new ConfigDataEnvironmentVariable(EnvironmentVariableHelper.WINEPREFIX, "", true),
             new ConfigDataEnvironmentVariable(EnvironmentVariableHelper.LD_LIBRARY_PATH, "", true, nameof(ConfigEnvVarMode.AppendStart), ":"),

@@ -140,9 +140,19 @@
                         </TabItem>
                         <TabItem Header="{dloc:Localize SettingsGeneral/TabItemWine}"
                                  Classes="SmallTab">
-                            <configuration:SettingsWineUserControl
-                                Grid.Row="1"
-                                DataContext="{Binding WineViewModel}"/>
+                            <ScrollViewer
+                                HorizontalScrollBarVisibility="Disabled"
+                                VerticalScrollBarVisibility="Auto">
+                                <Grid RowDefinitions="Auto,*">
+                                    <Label 
+                                        Grid.Row="0" 
+                                        Classes="Heading2IWrapping"
+                                        Content="{dloc:Localize SettingsWineView/DescriptionGlobal}"/>
+                                    <configuration:SettingsWineUserControl
+                                        Grid.Row="1"
+                                        DataContext="{Binding WineViewModel}"/>
+                                </Grid>
+                            </ScrollViewer>
                         </TabItem>
                     </TabControl>
                 </Grid>

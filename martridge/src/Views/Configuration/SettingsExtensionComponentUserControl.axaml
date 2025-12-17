@@ -58,6 +58,10 @@
                     IsVisible="{Binding ShowWineUi}">
             
             <Grid RowDefinitions="Auto,*">
+                <Label 
+                    Grid.Row="0" 
+                    Classes="Heading2IWrapping"
+                    Content="{dloc:Localize SettingsWineView/DescriptionSpecific}"/>
                 <configuration1:SettingsWineUserControl
                     Grid.Row="1"
                     DataContext="{Binding WineViewModel}"/>
